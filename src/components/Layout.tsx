@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { LogOut, Menu, X, User as UserIcon, LayoutDashboard, ListChecks, Users } from 'lucide-react'
+import { LogOut, Menu, X, LayoutDashboard, ListChecks, Users, Shield } from 'lucide-react'
 
 export default function Layout() {
   const { user, logout } = useAuth()
@@ -38,10 +38,14 @@ export default function Layout() {
     return 'GL'
   }
 
+  const perfil = user?.perfil || (user?.email === 'dfarias53@gmail.com' ? 'admin' : 'lider')
+  const isAdmin = perfil === 'admin'
+
   const navLinks = [
     { to: '/', label: 'Início', icon: LayoutDashboard },
     { to: '/rotinas', label: 'Rotinas', icon: ListChecks },
     { to: '/equipe', label: 'Minha Equipe', icon: Users },
+    ...(isAdmin ? [{ to: '/admin', label: 'Admin', icon: Shield }] : []),
   ]
 
   return (
@@ -116,12 +120,29 @@ export default function Layout() {
                   >
                     <DropdownMenuLabel className="font-normal p-3">
                       <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-semibold text-[#1F2937] leading-none">
-                          {user.name || 'Líder'}
-                        </p>
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm font-semibold text-[#1F2937] leading-none">
+                            {user.name || 'Líder'}
+                          </p>
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider bg-[#0F766E]/10 text-[#0F766E]">
+                            {perfil}
+                          </span>
+                        </div>
                         <p className="text-xs text-[#6B7280] truncate leading-none">{user.email}</p>
                       </div>
                     </DropdownMenuLabel>
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuItem
+                          onClick={() => navigate('/admin')}
+                          className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2 text-[#0F766E]"
+                        >
+                          <Shield className="w-4 h-4" />
+                          <span>Painel Administrativo</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-[#E5E7EB]" />
+                      </>
+                    )}
                     <DropdownMenuSeparator className="bg-[#E5E7EB]" />
                     <DropdownMenuItem
                       onClick={handleLogout}
@@ -182,8 +203,13 @@ export default function Layout() {
                 {getInitials(user.name, user.email)}
               </div>
               <div className="overflow-hidden">
-                <div className="text-xs font-semibold text-[#1F2937] truncate">
-                  {user.name || 'Líder'}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-[#1F2937] truncate">
+                    {user.name || 'Líder'}
+                  </span>
+                  <span className="text-[9px] font-bold px-1 py-0.2 rounded uppercase bg-[#0F766E]/15 text-[#0F766E]">
+                    {perfil}
+                  </span>
                 </div>
                 <div className="text-[11px] text-[#6B7280] truncate">{user.email}</div>
               </div>

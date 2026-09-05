@@ -14,25 +14,56 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(
-    pb.authStore.isValid && pb.authStore.record ? (pb.authStore.record as unknown as User) : null,
-  )
+  const [user, setUser] = useState<User | null>(() => {
+    if (pb.authStore.isValid && pb.authStore.record) {
+      const rec = pb.authStore.record as unknown as User
+      return {
+        ...rec,
+        perfil: rec.perfil || (rec.email === 'dfarias53@gmail.com' ? 'admin' : 'lider'),
+      }
+    }
+    return null
+  })
   const [token, setToken] = useState<string | null>(pb.authStore.token || null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     // Initial verification
-    const currentUser =
-      pb.authStore.isValid && pb.authStore.record ? (pb.authStore.record as unknown as User) : null
+    if (pb.authStore.isValid && pb.authStore.record) {
+      const rec = pb.authStore.record as unknown as User
+      const updatedUser = {
+        ...rec,
+        perfil: rec.perfil || (rec.email === 'dfarias53@gmail.com' ? 'admin' : 'lider'),
+      }
+      setUser(updatedUser)
+      // If perfil isn't set yet on model, refresh auth store
+      if (!rec.perfil) {
+        pb.collection('users')
+          .getOne<User>(rec.id)
+          .then((fresh) => {
+            setUser(fresh)
+          })
+          .catch(() => {})
+      }
+    } else {
+      setUser(null)
+    }
 
-    setUser(currentUser)
     setToken(pb.authStore.token || null)
     setLoading(false)
 
     // Listen to changes in authStore
     const unsubscribe = pb.authStore.onChange((newToken, model) => {
       setToken(newToken || null)
-      setUser(model ? (model as unknown as User) : null)
+      if (model) {
+        const rec = model as unknown as User
+        setUser({
+          ...rec,
+          perfil: rec.perfil || (rec.email === 'dfarias53@gmail.com' ? 'admin' : 'lider'),
+        })
+      } else {
+        setUser(null)
+      }
     })
 
     return () => {

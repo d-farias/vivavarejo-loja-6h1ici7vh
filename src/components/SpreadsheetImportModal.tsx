@@ -1,32 +1,32 @@
 import React, { useState, useRef } from 'react'
-import type { Rotina } from '@/types'
+import type { Rotina, Loja } from '@/types'
 import { parseUploadedSpreadsheet, ParsedSheetRoutine } from '@/lib/spreadsheet-parser'
 import { rotinasService } from '@/services/rotinas'
+import { useStore } from '@/context/StoreContext'
 import {
   UploadCloud,
   FileSpreadsheet,
   AlertTriangle,
   CheckCircle2,
   X,
-  Clock,
-  ShieldCheck,
   RefreshCw,
-  Plus,
-  Replace,
-  ArrowRight,
+  Store,
 } from 'lucide-react'
 
 interface SpreadsheetImportModalProps {
   isOpen: boolean
   onClose: () => void
   onSuccess: () => Promise<void>
+  initialLojaId?: string
 }
 
 export function SpreadsheetImportModal({
   isOpen,
   onClose,
   onSuccess,
+  initialLojaId,
 }: SpreadsheetImportModalProps) {
+  const { lojas, lojaSelecionadaId } = useStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
   const [parsing, setParsing] = useState(false)
@@ -36,6 +36,13 @@ export function SpreadsheetImportModal({
   const [detectedHeaders, setDetectedHeaders] = useState<string[]>([])
   const [importMode, setImportMode] = useState<'append' | 'replace'>('append')
   const [progressMsg, setProgressMsg] = useState('')
+
+  // Loja de destino da importação
+  const [targetLojaId, setTargetLojaId] = useState<string>(() => {
+    if (initialLojaId && initialLojaId !== 'todas') return initialLojaId
+    if (lojaSelecionadaId && lojaSelecionadaId !== 'todas') return lojaSelecionadaId
+    return lojas[0]?.id || ''
+  })
 
   if (!isOpen) return null
 
@@ -74,10 +81,10 @@ export function SpreadsheetImportModal({
     setProgressMsg('Iniciando importação...')
 
     try {
-      // Se modo for substituir, apaga todas as rotinas antes de inserir as novas
+      // Se modo for substituir, apaga as rotinas anteriores desta loja (ou todas se nenhuma loja vinculada)
       if (importMode === 'replace') {
         setProgressMsg('Substituindo: removendo rotinas anteriores...')
-        await rotinasService.deleteAll()
+        await rotinasService.deleteAll(targetLojaId || null)
       }
 
       let insertedCount = 0
@@ -94,6 +101,7 @@ export function SpreadsheetImportModal({
           area: item.area,
           observacoes: item.observacoes,
           status: 'Ativa',
+          loja: targetLojaId || undefined,
         })
       }
 
@@ -217,6 +225,31 @@ export function SpreadsheetImportModal({
                 <div className="p-3.5 rounded-lg bg-red-50 border border-red-200 text-[#B91C1C] text-xs flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                   <span>{parseError}</span>
+                </div>
+              )}
+
+              {/* Loja de Destino da Importação */}
+              {lojas.length > 0 && (
+                <div className="p-3.5 rounded-lg bg-[#F7F7F5] border border-[#E5E7EB] space-y-1.5">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] flex items-center gap-1.5">
+                    <Store className="w-3.5 h-3.5 text-[#0F766E]" />
+                    <span>Loja de Destino das Rotinas</span>
+                  </label>
+                  <select
+                    value={targetLojaId}
+                    onChange={(e) => setTargetLojaId(e.target.value)}
+                    className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
+                  >
+                    <option value="">Nenhuma loja específica (Visível em todas)</option>
+                    {lojas.map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.nome} {l.expand?.cliente ? `• ${l.expand.cliente.nome}` : ''}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-[11px] text-[#6B7280]">
+                    As rotinas importadas serão associadas a esta loja e filtradas nos painéis.
+                  </p>
                 </div>
               )}
 

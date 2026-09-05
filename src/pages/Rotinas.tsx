@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
+import { useStore } from '@/context/StoreContext'
 import { rotinasService, execucoesService, getTodayDateString } from '@/services/rotinas'
 import type { Rotina, ExecucaoRotina } from '@/types'
 import { getHorarioStatus } from '@/lib/time-utils'
@@ -7,6 +8,7 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RoutineFormModal } from '@/components/RoutineFormModal'
 import { SpreadsheetImportModal } from '@/components/SpreadsheetImportModal'
+import { StoreSelector } from '@/components/StoreSelector'
 import {
   Search,
   Filter,
@@ -25,10 +27,15 @@ import {
   Edit2,
   Trash2,
   AlertTriangle,
+  Store,
 } from 'lucide-react'
 
 export default function Rotinas() {
   const { user } = useAuth()
+  const { lojaSelecionadaId, lojaSelecionada } = useStore()
+  const perfil = user?.perfil || (user?.email === 'dfarias53@gmail.com' ? 'admin' : 'lider')
+  const podeGerenciar = perfil === 'admin' || perfil === 'lider'
+
   const [rotinas, setRotinas] = useState<Rotina[]>([])
   const [execucoes, setExecucoes] = useState<ExecucaoRotina[]>([])
   const [loading, setLoading] = useState(true)
@@ -50,7 +57,7 @@ export default function Rotinas() {
     setError(false)
     try {
       const [allRoutines, todayExecs] = await Promise.all([
-        rotinasService.getAll(),
+        rotinasService.getAll(lojaSelecionadaId),
         execucoesService.getTodayExecutions(user.id),
       ])
       setRotinas(allRoutines)
@@ -60,7 +67,7 @@ export default function Rotinas() {
     } finally {
       setLoading(false)
     }
-  }, [user])
+  }, [user, lojaSelecionadaId])
 
   useEffect(() => {
     loadData()
@@ -328,38 +335,45 @@ export default function Rotinas() {
 
   return (
     <div className="space-y-6">
-      {/* Header Row: Título + Ações de Gestão (Nova Rotina e Importar Planilha) */}
+      {/* Header Row: Título + Seletor de Loja + Ações de Gestão */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#1F2937] tracking-tight">
             Biblioteca de Rotinas
           </h1>
           <p className="text-sm text-[#6B7280] mt-1">
-            Gestão operacional de rotinas da loja. Cadastre, edite, exclua ou importe planilhas
-            operacionais.
+            {lojaSelecionada
+              ? `Rotinas operacionais configuradas para ${lojaSelecionada.nome}.`
+              : 'Gestão operacional de rotinas da loja. Cadastre, edite, exclua ou importe planilhas.'}
           </p>
         </div>
 
-        {/* Action Buttons: Importar Planilha + Nova Rotina */}
+        {/* Action Buttons: Seletor de Loja + Importar Planilha + Nova Rotina */}
         <div className="flex items-center gap-2.5 flex-wrap">
-          <button
-            onClick={() => setIsImportModalOpen(true)}
-            className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-md shadow-xs transition-colors"
-          >
-            <FileSpreadsheet className="w-4 h-4 text-[#0F766E]" />
-            <span>Importar Planilha</span>
-          </button>
+          <StoreSelector />
 
-          <button
-            onClick={() => {
-              setEditingRotina(null)
-              setIsFormModalOpen(true)
-            }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Nova Rotina</span>
-          </button>
+          {podeGerenciar && (
+            <>
+              <button
+                onClick={() => setIsImportModalOpen(true)}
+                className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-md shadow-xs transition-colors"
+              >
+                <FileSpreadsheet className="w-4 h-4 text-[#0F766E]" />
+                <span>Importar Planilha</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setEditingRotina(null)
+                  setIsFormModalOpen(true)
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Nova Rotina</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -496,25 +510,27 @@ export default function Rotinas() {
                       {rotina.nome}
                     </h3>
 
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        onClick={() => handleOpenEdit(rotina)}
-                        className="p-1 text-[#9CA3AF] hover:text-[#0F766E] rounded transition-colors"
-                        title="Editar rotina"
-                        aria-label={`Editar ${rotina.nome}`}
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
+                    {podeGerenciar && (
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => handleOpenEdit(rotina)}
+                          className="p-1 text-[#9CA3AF] hover:text-[#0F766E] rounded transition-colors"
+                          title="Editar rotina"
+                          aria-label={`Editar ${rotina.nome}`}
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
 
-                      <button
-                        onClick={() => setDeleteConfirmId(rotina.id)}
-                        className="p-1 text-[#9CA3AF] hover:text-[#B91C1C] rounded transition-colors"
-                        title="Excluir rotina"
-                        aria-label={`Excluir ${rotina.nome}`}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                        <button
+                          onClick={() => setDeleteConfirmId(rotina.id)}
+                          className="p-1 text-[#9CA3AF] hover:text-[#B91C1C] rounded transition-colors"
+                          title="Excluir rotina"
+                          aria-label={`Excluir ${rotina.nome}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {/* Status do Horário Limite */}
@@ -706,22 +722,26 @@ export default function Rotinas() {
             {/* Modal Actions */}
             <div className="pt-3 border-t border-[#E5E7EB] flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    handleOpenEdit(selectedRotina)
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#0F766E] hover:bg-[#0F766E]/10 rounded-md transition-colors"
-                >
-                  <Edit2 className="w-3.5 h-3.5" />
-                  <span>Editar</span>
-                </button>
-                <button
-                  onClick={() => setDeleteConfirmId(selectedRotina.id)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#B91C1C] hover:bg-red-50 rounded-md transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Excluir</span>
-                </button>
+                {podeGerenciar && (
+                  <>
+                    <button
+                      onClick={() => {
+                        handleOpenEdit(selectedRotina)
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#0F766E] hover:bg-[#0F766E]/10 rounded-md transition-colors"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      <span>Editar</span>
+                    </button>
+                    <button
+                      onClick={() => setDeleteConfirmId(selectedRotina.id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#B91C1C] hover:bg-red-50 rounded-md transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Excluir</span>
+                    </button>
+                  </>
+                )}
               </div>
 
               <div className="flex items-center gap-2">

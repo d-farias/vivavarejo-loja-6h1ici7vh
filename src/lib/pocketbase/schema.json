@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-09-05T13:13:55.715Z",
+  "generatedAt": "2026-09-05T13:27:01.480Z",
   "collections": [
     {
       "name": "users",
       "type": "auth",
       "apiRules": {
-        "list": "id = @request.auth.id",
-        "view": "id = @request.auth.id",
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
         "create": "",
-        "update": "id = @request.auth.id",
+        "update": "@request.auth.id != '' && (id = @request.auth.id || @request.auth.perfil = 'admin')",
         "delete": "id = @request.auth.id"
       },
       "fields": [
@@ -37,6 +37,13 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "perfil",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["admin", "lider", "funcionario"]
         }
       ],
       "indexes": [
@@ -50,9 +57,9 @@
       "apiRules": {
         "list": "@request.auth.id != ''",
         "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'lider' || @request.auth.perfil = '')",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'lider' || @request.auth.perfil = '')",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'lider' || @request.auth.perfil = '')"
       },
       "fields": [
         {
@@ -124,12 +131,28 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "funcao",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "funcoes"
         }
       ],
       "indexes": [
         "CREATE INDEX idx_rotinas_frequencia ON rotinas (frequencia)",
         "CREATE INDEX idx_rotinas_area ON rotinas (area)",
-        "CREATE INDEX idx_rotinas_created ON rotinas (created)"
+        "CREATE INDEX idx_rotinas_created ON rotinas (created)",
+        "CREATE INDEX `idx_rotinas_loja` ON `rotinas` (loja)",
+        "CREATE INDEX `idx_rotinas_funcao` ON `rotinas` (funcao)"
       ]
     },
     {
@@ -188,6 +211,218 @@
         "CREATE INDEX idx_execucoes_rotina ON execucoes_rotinas (rotina)",
         "CREATE INDEX idx_execucoes_usuario ON execucoes_rotinas (usuario)",
         "CREATE INDEX idx_execucoes_data ON execucoes_rotinas (data_execucao)"
+      ]
+    },
+    {
+      "name": "clientes",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "update": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "delete": "@request.auth.id != '' && @request.auth.perfil = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "nome",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "contato",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observacoes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_clientes_nome ON clientes (nome)"]
+    },
+    {
+      "name": "lojas",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "update": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "delete": "@request.auth.id != '' && @request.auth.perfil = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "nome",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "cliente",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "clientes"
+        },
+        {
+          "name": "codigo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observacoes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_lojas_cliente ON lojas (cliente)",
+        "CREATE INDEX idx_lojas_nome ON lojas (nome)"
+      ]
+    },
+    {
+      "name": "funcoes",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "update": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "delete": "@request.auth.id != '' && @request.auth.perfil = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "nome",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_funcoes_loja ON funcoes (loja)",
+        "CREATE INDEX idx_funcoes_nome ON funcoes (nome)"
+      ]
+    },
+    {
+      "name": "funcionarios",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "update": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "delete": "@request.auth.id != '' && @request.auth.perfil = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "nome",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "funcao",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "funcoes"
+        },
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "usuario",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "ativo",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_funcionarios_loja ON funcionarios (loja)",
+        "CREATE INDEX idx_funcionarios_funcao ON funcionarios (funcao)",
+        "CREATE INDEX idx_funcionarios_usuario ON funcionarios (usuario)",
+        "CREATE INDEX idx_funcionarios_ativo ON funcionarios (ativo)"
       ]
     }
   ]

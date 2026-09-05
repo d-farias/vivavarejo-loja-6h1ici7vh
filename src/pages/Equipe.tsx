@@ -1,14 +1,28 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
+import { useStore } from '@/context/StoreContext'
 import { rotinasService } from '@/services/rotinas'
-import type { Rotina } from '@/types'
+import { funcionariosService } from '@/services/funcionarios'
+import type { Rotina, Funcionario } from '@/types'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Users, Clock, ShieldCheck, RefreshCw, Briefcase, ChevronRight } from 'lucide-react'
+import { StoreSelector } from '@/components/StoreSelector'
+import {
+  Users,
+  Clock,
+  ShieldCheck,
+  RefreshCw,
+  Briefcase,
+  ChevronRight,
+  UserCheck,
+  Store,
+} from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function Equipe() {
   const { user } = useAuth()
+  const { lojaSelecionadaId, lojaSelecionada } = useStore()
   const [rotinas, setRotinas] = useState<Rotina[]>([])
+  const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
@@ -16,14 +30,20 @@ export default function Equipe() {
     if (!user) return
     setError(false)
     try {
-      const allRoutines = await rotinasService.getAll()
+      const [allRoutines, allFuncs] = await Promise.all([
+        rotinasService.getAll(lojaSelecionadaId),
+        lojaSelecionadaId && lojaSelecionadaId !== 'todas'
+          ? funcionariosService.getByLoja(lojaSelecionadaId)
+          : funcionariosService.getAll(),
+      ])
       setRotinas(allRoutines)
+      setFuncionarios(allFuncs)
     } catch {
       setError(true)
     } finally {
       setLoading(false)
     }
-  }, [user])
+  }, [user, lojaSelecionadaId])
 
   useEffect(() => {
     loadData()
@@ -84,13 +104,65 @@ export default function Equipe() {
 
   return (
     <div className="space-y-6 md:space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#1F2937] tracking-tight">
-          Minha equipe
-        </h1>
-        <p className="text-sm text-[#6B7280] mt-1">Áreas e responsáveis pelas rotinas da loja.</p>
+      {/* Header & Seletor de Loja */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#1F2937] tracking-tight">
+            Minha equipe
+          </h1>
+          <p className="text-sm text-[#6B7280] mt-1">
+            {lojaSelecionada
+              ? `Estrutura de equipe e rotinas para ${lojaSelecionada.nome}.`
+              : 'Áreas, funções e responsáveis pelas rotinas operacionais.'}
+          </p>
+        </div>
+
+        <StoreSelector />
       </div>
+
+      {/* Membros da Equipe Cadastrados (se houver para a loja selecionada) */}
+      {funcionarios.length > 0 && (
+        <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 sm:p-5 shadow-xs space-y-3">
+          <div className="flex items-center gap-2">
+            <UserCheck className="w-4 h-4 text-[#0F766E]" />
+            <h2 className="text-sm font-bold text-[#1F2937] uppercase tracking-wider">
+              Membros da Equipe ({funcionarios.length})
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {funcionarios.map((fc) => (
+              <div
+                key={fc.id}
+                className="p-3 rounded-md border border-[#E5E7EB] bg-[#F7F7F5]/40 flex items-start justify-between gap-2"
+              >
+                <div>
+                  <div className="font-semibold text-xs text-[#1F2937]">{fc.nome}</div>
+                  <div className="text-[11px] text-[#0F766E] font-medium mt-0.5">
+                    {fc.expand?.funcao?.nome || 'Função operacional'}
+                  </div>
+                  {fc.expand?.loja && (
+                    <div className="text-[10px] text-[#6B7280] flex items-center gap-1 mt-1">
+                      <Store className="w-3 h-3 text-[#9CA3AF]" />
+                      <span>{fc.expand.loja.nome}</span>
+                    </div>
+                  )}
+                </div>
+
+                {fc.ativo !== false ? (
+                  <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-50 text-[#047857]">
+                    Ativo
+                  </span>
+                ) : (
+                  <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-gray-100 text-[#6B7280]">
+                    Inativo
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Summary Banner */}
       <div className="p-4 rounded-lg bg-white border border-[#E5E7EB] shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">

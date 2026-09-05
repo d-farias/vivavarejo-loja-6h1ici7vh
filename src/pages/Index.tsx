@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import { useAuth } from '@/context/AuthContext'
+import { useStore } from '@/context/StoreContext'
 import { rotinasService, execucoesService, getTodayDateString } from '@/services/rotinas'
 import type { Rotina, ExecucaoRotina } from '@/types'
 import { parseHorarioLimiteToMinutes, getHorarioStatus } from '@/lib/time-utils'
 import { useRealtime } from '@/hooks/use-realtime'
 import { Skeleton } from '@/components/ui/skeleton'
+import { StoreSelector } from '@/components/StoreSelector'
 import {
   CheckCircle2,
   Clock,
@@ -18,11 +20,13 @@ import {
   TrendingUp,
   Layers,
   Sparkles,
+  Store,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function Index() {
   const { user } = useAuth()
+  const { lojaSelecionadaId, lojaSelecionada } = useStore()
   const [rotinas, setRotinas] = useState<Rotina[]>([])
   const [execucoes, setExecucoes] = useState<ExecucaoRotina[]>([])
   const [loading, setLoading] = useState(true)
@@ -36,7 +40,7 @@ export default function Index() {
     setError(false)
     try {
       const [allRoutines, todayExecs] = await Promise.all([
-        rotinasService.getAll(),
+        rotinasService.getAll(lojaSelecionadaId),
         execucoesService.getTodayExecutions(user.id),
       ])
       setRotinas(allRoutines)
@@ -46,7 +50,7 @@ export default function Index() {
     } finally {
       setLoading(false)
     }
-  }, [user])
+  }, [user, lojaSelecionadaId])
 
   useEffect(() => {
     loadData()
@@ -343,23 +347,29 @@ export default function Index() {
 
   return (
     <div className="space-y-6 md:space-y-8">
-      {/* Welcome Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* Welcome Header & Store Selector */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#1F2937] tracking-tight">
             Olá, {firstName}
           </h1>
           <p className="text-sm text-[#6B7280] mt-1">
-            Painel diário de acompanhamento e controle operacional da loja.
+            {lojaSelecionada
+              ? `Acompanhamento diário das rotinas da loja ${lojaSelecionada.nome}.`
+              : 'Painel diário de acompanhamento e controle operacional.'}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+
+        {/* Seletor de Loja persistido no localStorage + Acesso à biblioteca */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <StoreSelector />
+
           <Link
             to="/rotinas"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-xs font-semibold text-[#1F2937] rounded-md shadow-xs transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-xs font-semibold text-[#1F2937] rounded-md shadow-xs transition-colors"
           >
             <Layers className="w-3.5 h-3.5 text-[#0F766E]" />
-            <span>Gerenciar / Importar Rotinas</span>
+            <span>Biblioteca de Rotinas</span>
           </Link>
         </div>
       </div>

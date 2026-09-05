@@ -1,7 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import type { Rotina, FrequenciaRotina, StatusRotina } from '@/types'
 import { formatHorarioLimite } from '@/lib/time-utils'
-import { X, Clock, Wrench, ShieldCheck, Tag, Info, UserCheck } from 'lucide-react'
+import { useStore } from '@/context/StoreContext'
+import { funcoesService } from '@/services/funcoes'
+import type { Funcao } from '@/types'
+import { X, Clock, Wrench, ShieldCheck, Info, Store, Briefcase } from 'lucide-react'
 
 interface RoutineFormModalProps {
   isOpen: boolean
@@ -21,6 +24,7 @@ const FREQUENCIAS: FrequenciaRotina[] = [
 const STATUS_OPTIONS: StatusRotina[] = ['Ativa', 'Pendente', 'Concluída']
 
 export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: RoutineFormModalProps) {
+  const { lojas, lojaSelecionadaId } = useStore()
   const isEditing = Boolean(initialData?.id)
 
   const [nome, setNome] = useState(initialData?.nome || '')
@@ -34,6 +38,26 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
   const [status, setStatus] = useState<StatusRotina>(initialData?.status || 'Ativa')
   const [area, setArea] = useState(initialData?.area || '')
   const [observacoes, setObservacoes] = useState(initialData?.observacoes || '')
+
+  // Loja e Função vinculada à rotina
+  const [lojaId, setLojaId] = useState<string>(() => {
+    if (initialData?.loja) return initialData.loja
+    if (lojaSelecionadaId && lojaSelecionadaId !== 'todas') return lojaSelecionadaId
+    return lojas[0]?.id || ''
+  })
+  const [funcaoId, setFuncaoId] = useState<string>(initialData?.funcao || '')
+  const [funcoesLoja, setFuncoesLoja] = useState<Funcao[]>([])
+
+  useEffect(() => {
+    if (lojaId) {
+      funcoesService
+        .getByLoja(lojaId)
+        .then(setFuncoesLoja)
+        .catch(() => setFuncoesLoja([]))
+    } else {
+      setFuncoesLoja([])
+    }
+  }, [lojaId])
 
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<{ nome?: string; responsavel?: string }>({})
@@ -72,6 +96,8 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
         status,
         area: area.trim() || responsavel.trim(),
         observacoes: observacoes.trim(),
+        loja: lojaId || undefined,
+        funcao: funcaoId || undefined,
       })
       onClose()
     } finally {
@@ -112,6 +138,59 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="overflow-y-auto p-6 space-y-4">
+          {/* Vínculo de Loja e Função */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-md bg-[#F7F7F5] border border-[#E5E7EB]">
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
+                <Store className="w-3.5 h-3.5 text-[#0F766E]" />
+                <span>Loja de Aplicação</span>
+              </label>
+              <select
+                value={lojaId}
+                onChange={(e) => {
+                  setLojaId(e.target.value)
+                  setFuncaoId('')
+                }}
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
+              >
+                <option value="">Todas as lojas (Sem vínculo exclusivo)</option>
+                {lojas.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.nome} {l.expand?.cliente ? `• ${l.expand.cliente.nome}` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
+                <Briefcase className="w-3.5 h-3.5 text-[#0F766E]" />
+                <span>Função de Loja (opcional)</span>
+              </label>
+              <select
+                value={funcaoId}
+                onChange={(e) => {
+                  const val = e.target.value
+                  setFuncaoId(val)
+                  // Se escolheu função, atualiza o responsável automaticamente se estiver em branco
+                  const fObj = funcoesLoja.find((f) => f.id === val)
+                  if (fObj && !responsavel) {
+                    setResponsavel(fObj.nome)
+                  }
+                }}
+                disabled={!lojaId || funcoesLoja.length === 0}
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] disabled:opacity-50"
+              >
+                <option value="">Selecione ou deixe geral...</option>
+                {funcoesLoja.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           {/* Nome da Rotina */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1">

@@ -10,30 +10,51 @@ export function getTodayDateString(): string {
 }
 
 export const rotinasService = {
-  async getAll(): Promise<Rotina[]> {
+  async getAll(lojaId?: string | null): Promise<Rotina[]> {
+    let filter = ''
+    if (lojaId && lojaId !== 'todas') {
+      // Rotinas da loja específica OU rotinas sem loja (compatibilidade legada)
+      filter = `loja = "${lojaId}" || loja = ""`
+    }
+
     return await pb.collection('rotinas').getFullList<Rotina>({
+      filter: filter || undefined,
       sort: 'horario_limite,nome',
+      expand: 'loja,funcao',
     })
   },
 
   async getById(id: string): Promise<Rotina> {
-    return await pb.collection('rotinas').getOne<Rotina>(id)
+    return await pb.collection('rotinas').getOne<Rotina>(id, {
+      expand: 'loja,funcao',
+    })
   },
 
   async create(data: Partial<Rotina>): Promise<Rotina> {
-    return await pb.collection('rotinas').create<Rotina>(data)
+    return await pb.collection('rotinas').create<Rotina>(data, {
+      expand: 'loja,funcao',
+    })
   },
 
   async update(id: string, data: Partial<Rotina>): Promise<Rotina> {
-    return await pb.collection('rotinas').update<Rotina>(id, data)
+    return await pb.collection('rotinas').update<Rotina>(id, data, {
+      expand: 'loja,funcao',
+    })
   },
 
   async delete(id: string): Promise<boolean> {
     return await pb.collection('rotinas').delete(id)
   },
 
-  async deleteAll(): Promise<void> {
-    const all = await pb.collection('rotinas').getFullList<{ id: string }>({ fields: 'id' })
+  async deleteAll(lojaId?: string | null): Promise<void> {
+    let filter = ''
+    if (lojaId && lojaId !== 'todas') {
+      filter = `loja = "${lojaId}"`
+    }
+    const all = await pb.collection('rotinas').getFullList<{ id: string }>({
+      filter: filter || undefined,
+      fields: 'id',
+    })
     for (const item of all) {
       try {
         await pb.collection('rotinas').delete(item.id)
