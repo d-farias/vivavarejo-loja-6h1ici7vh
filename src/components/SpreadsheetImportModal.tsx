@@ -145,7 +145,7 @@ export function SpreadsheetImportModal({
             <div>
               <h2 className="text-lg font-bold text-[#1F2937]">Importar Planilha de Rotinas</h2>
               <p className="text-xs text-[#6B7280]">
-                Faça upload de arquivo Excel (.xlsx) ou CSV para alimentar o Painel da Loja
+                Faça upload de arquivo Excel (.xlsx) ou CSV para alimentar o VivaVarejo
               </p>
             </div>
           </div>

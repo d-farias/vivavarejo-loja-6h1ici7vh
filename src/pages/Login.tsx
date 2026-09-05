@@ -76,7 +76,7 @@ export default function Login() {
           <div className="w-10 h-10 rounded bg-[#0F766E] flex items-center justify-center text-white mb-3 shadow-xs">
             <div className="w-4 h-4 border-2 border-white rotate-45 transform" />
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937]">Painel da Loja</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937]">VivaVarejo</h1>
           <p className="text-xs sm:text-sm text-[#6B7280] mt-1">
             Acompanhamento operacional e gestão de rotinas
           </p>

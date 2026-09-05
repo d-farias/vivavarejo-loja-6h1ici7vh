@@ -124,7 +124,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
             <p className="text-xs text-[#6B7280]">
               {isEditing
                 ? 'Atualize as orientações, horários e responsáveis da rotina'
-                : 'Cadastre uma nova rotina para acompanhamento no Painel da Loja'}
+                : 'Cadastre uma nova rotina para acompanhamento no VivaVarejo'}
             </p>
           </div>
           <button
