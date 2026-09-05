@@ -132,7 +132,7 @@ export default function Signup() {
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-              E-mail corporativo
+              E-mail
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -140,7 +140,7 @@ export default function Signup() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu.email@varejo.com.br"
+                placeholder="seu@email.com"
                 className={`w-full pl-9 pr-3 py-2 text-sm bg-white border ${
                   fieldErrors.email
                     ? 'border-[#B91C1C] focus:ring-red-200'

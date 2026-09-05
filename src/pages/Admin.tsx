@@ -2002,7 +2002,7 @@ export default function Admin() {
                   defaultValue={userModal.user?.email || ''}
                   required
                   disabled={userModal.mode === 'edit'}
-                  placeholder="usuario@varejo.com.br"
+                  placeholder="usuario@email.com"
                   className={`w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] ${
                     userModal.mode === 'edit' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                   }`}

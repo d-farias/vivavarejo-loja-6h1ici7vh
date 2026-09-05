@@ -105,7 +105,7 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-              E-mail corporativo
+              E-mail
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -113,7 +113,7 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu.email@varejo.com.br"
+                placeholder="seu@email.com"
                 className={`w-full pl-9 pr-3 py-2 text-sm bg-white border ${
                   fieldErrors.email
                     ? 'border-[#B91C1C] focus:ring-red-200'
@@ -308,7 +308,7 @@ export default function Login() {
                     onChange={(e) => setForgotEmail(e.target.value)}
                     required
                     disabled={forgotLoading}
-                    placeholder="seu.email@varejo.com.br"
+                    placeholder="seu@email.com"
                     className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/20 text-[#1F2937]"
                   />
                 </div>
