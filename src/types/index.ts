@@ -8,6 +8,7 @@ export interface User extends RecordModel {
   name?: string
   avatar?: string
   perfil?: PerfilUsuario
+  ativo?: boolean
   created: string
   updated: string
 }

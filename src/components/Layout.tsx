@@ -9,13 +9,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { LogOut, Menu, X, LayoutDashboard, ListChecks, Users, Shield } from 'lucide-react'
+import { LogOut, Menu, X, LayoutDashboard, ListChecks, Users, Shield, KeyRound } from 'lucide-react'
+import { ChangePasswordModal } from '@/components/ChangePasswordModal'
 
 export default function Layout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false)
 
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup'
 
@@ -143,6 +145,13 @@ export default function Layout() {
                         <DropdownMenuSeparator className="bg-[#E5E7EB]" />
                       </>
                     )}
+                    <DropdownMenuItem
+                      onClick={() => setChangePasswordOpen(true)}
+                      className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2 text-[#1F2937] hover:text-[#2563EB]"
+                    >
+                      <KeyRound className="w-4 h-4 text-[#6B7280]" />
+                      <span>Alterar senha</span>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-[#E5E7EB]" />
                     <DropdownMenuItem
                       onClick={handleLogout}
@@ -239,7 +248,17 @@ export default function Layout() {
               })}
             </nav>
 
-            <div className="p-3 border-t border-[#E5E7EB]">
+            <div className="p-3 border-t border-[#E5E7EB] space-y-1">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  setChangePasswordOpen(true)
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-[#1F2937] hover:bg-gray-100 transition-colors"
+              >
+                <KeyRound className="w-4 h-4 text-[#6B7280]" />
+                <span>Alterar senha</span>
+              </button>
               <button
                 onClick={() => {
                   setMobileMenuOpen(false)
@@ -259,6 +278,16 @@ export default function Layout() {
       <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-6 py-6 md:py-8">
         <Outlet />
       </main>
+
+      {/* Modal Alterar Senha */}
+      {user && (
+        <ChangePasswordModal
+          open={changePasswordOpen}
+          onOpenChange={setChangePasswordOpen}
+          userEmail={user.email}
+          userId={user.id}
+        />
+      )}
 
       {/* Footer */}
       <footer className="w-full border-t border-[#E5E7EB] bg-white py-4 mt-auto">

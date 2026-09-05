@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-05T15:00:18.077Z",
+  "generatedAt": "2026-09-05T15:40:19.928Z",
   "collections": [
     {
       "name": "users",
@@ -9,7 +9,7 @@
         "view": "@request.auth.id != ''",
         "create": "",
         "update": "@request.auth.id != '' && (id = @request.auth.id || @request.auth.perfil = 'admin')",
-        "delete": "id = @request.auth.id"
+        "delete": "@request.auth.id != '' && (id = @request.auth.id || @request.auth.perfil = 'admin')"
       },
       "fields": [
         {
@@ -44,6 +44,12 @@
           "required": false,
           "system": false,
           "selectValues": ["admin", "lider", "funcionario"]
+        },
+        {
+          "name": "ativo",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

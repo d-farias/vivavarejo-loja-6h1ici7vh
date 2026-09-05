@@ -63,4 +63,35 @@ export const usersService = {
   async updatePerfil(userId: string, perfil: PerfilUsuario): Promise<User> {
     return await pb.collection('users').update<User>(userId, { perfil })
   },
+
+  async update(userId: string, data: Partial<User>): Promise<User> {
+    return await pb.collection('users').update<User>(userId, data)
+  },
+
+  async create(data: {
+    email: string
+    password: string
+    passwordConfirm: string
+    name: string
+    perfil: PerfilUsuario
+    ativo?: boolean
+  }): Promise<User> {
+    return await pb.collection('users').create<User>(data)
+  },
+
+  async resetPassword(userId: string, novaSenha: string): Promise<User> {
+    return await pb.collection('users').update<User>(userId, {
+      password: novaSenha,
+      passwordConfirm: novaSenha,
+    })
+  },
+
+  async requestPasswordReset(email: string): Promise<boolean> {
+    return await pb.collection('users').requestPasswordReset(email.trim())
+  },
+
+  async toggleAtivo(userId: string, ativoAtual?: boolean): Promise<User> {
+    const novoStatus = ativoAtual === false ? true : false
+    return await pb.collection('users').update<User>(userId, { ativo: novoStatus })
+  },
 }

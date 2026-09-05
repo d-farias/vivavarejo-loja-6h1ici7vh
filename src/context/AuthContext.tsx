@@ -73,6 +73,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, pass: string) => {
     const authData = await pb.collection('users').authWithPassword<User>(email.trim(), pass)
+    if (authData.record.ativo === false) {
+      pb.authStore.clear()
+      setUser(null)
+      setToken(null)
+      throw new Error('Esta conta de usuário foi desativada pelo administrador.')
+    }
     setUser(authData.record)
     setToken(authData.token)
   }
