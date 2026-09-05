@@ -35,6 +35,8 @@ export interface Loja extends RecordModel {
   cliente: string
   codigo?: string
   observacoes?: string
+  email_regional?: string
+  alertas_ativos?: boolean
   created: string
   updated: string
   expand?: {
@@ -79,6 +81,7 @@ export interface Rotina extends RecordModel {
   area?: string
   loja?: string
   funcao?: string
+  alerta_enviado_em?: string
   expand?: {
     loja?: Loja
     funcao?: Funcao

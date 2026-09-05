@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-05T14:05:05.969Z",
+  "generatedAt": "2026-09-05T14:33:22.202Z",
   "collections": [
     {
       "name": "users",
@@ -145,6 +145,12 @@
           "required": false,
           "system": false,
           "collectionRef": "funcoes"
+        },
+        {
+          "name": "alerta_enviado_em",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -314,6 +320,18 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "email_regional",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "alertas_ativos",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

@@ -28,6 +28,8 @@ export const lojasService = {
     cliente: string
     codigo?: string
     observacoes?: string
+    email_regional?: string
+    alertas_ativos?: boolean
   }): Promise<Loja> {
     return await pb.collection('lojas').create<Loja>(data, {
       expand: 'cliente',
