@@ -142,7 +142,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-md bg-[#F7F7F5] border border-[#E5E7EB]">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
-                <Store className="w-3.5 h-3.5 text-[#0F766E]" />
+                <Store className="w-3.5 h-3.5 text-[#2563EB]" />
                 <span>Loja de Aplicação</span>
               </label>
               <select
@@ -151,7 +151,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
                   setLojaId(e.target.value)
                   setFuncaoId('')
                 }}
-                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
               >
                 <option value="">Todas as lojas (Sem vínculo exclusivo)</option>
                 {lojas.map((l) => (
@@ -164,7 +164,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
-                <Briefcase className="w-3.5 h-3.5 text-[#0F766E]" />
+                <Briefcase className="w-3.5 h-3.5 text-[#2563EB]" />
                 <span>Função de Loja (opcional)</span>
               </label>
               <select
@@ -179,7 +179,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
                   }
                 }}
                 disabled={!lojaId || funcoesLoja.length === 0}
-                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] disabled:opacity-50"
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] disabled:opacity-50"
               >
                 <option value="">Selecione ou deixe geral...</option>
                 {funcoesLoja.map((f) => (
@@ -202,8 +202,8 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
               onChange={(e) => setNome(e.target.value)}
               placeholder="Ex: Auditoria Matinal de Preços e Encartes"
               className={`w-full px-3 py-2 text-sm bg-white border ${
-                errors.nome ? 'border-red-400' : 'border-[#E5E7EB]'
-              } rounded-md outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937]`}
+                errors.nome ? 'border-[#B91C1C]' : 'border-[#E5E7EB]'
+              } rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]`}
             />
             {errors.nome && <p className="text-[11px] text-red-500 mt-1">{errors.nome}</p>}
           </div>
@@ -220,8 +220,8 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
                 onChange={(e) => setResponsavel(e.target.value)}
                 placeholder="Ex: Cartazista, Analista, Gerente"
                 className={`w-full px-3 py-2 text-sm bg-white border ${
-                  errors.responsavel ? 'border-red-400' : 'border-[#E5E7EB]'
-                } rounded-md outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937]`}
+                  errors.responsavel ? 'border-[#B91C1C]' : 'border-[#E5E7EB]'
+                } rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]`}
               />
               {errors.responsavel && (
                 <p className="text-[11px] text-red-500 mt-1">{errors.responsavel}</p>
@@ -237,7 +237,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
                 value={area}
                 onChange={(e) => setArea(e.target.value)}
                 placeholder="Ex: Prevenção, Mercearia, Frente de Caixa"
-                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937]"
+                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
               />
             </div>
           </div>
@@ -251,7 +251,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
               <select
                 value={frequencia}
                 onChange={(e) => setFrequencia(e.target.value as FrequenciaRotina)}
-                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937]"
+                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
               >
                 {FREQUENCIAS.map((f) => (
                   <option key={f} value={f}>
@@ -275,7 +275,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
                   value={horarioLimite}
                   onChange={(e) => setHorarioLimite(e.target.value)}
                   placeholder="Ex: 10:00, 11Hs, Integral"
-                  className="w-full pl-9 pr-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937]"
+                  className="w-full pl-9 pr-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
                 />
               </div>
             </div>
@@ -285,7 +285,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#0F766E]" />
+                <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
                 <span>Validação (quem valida)</span>
               </label>
               <input
@@ -293,13 +293,13 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
                 value={validacao}
                 onChange={(e) => setValidacao(e.target.value)}
                 placeholder="Ex: Gerente/GO, Prev/Gerente"
-                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937]"
+                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
               />
             </div>
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
-                <Wrench className="w-3.5 h-3.5 text-[#0F766E]" />
+                <Wrench className="w-3.5 h-3.5 text-[#2563EB]" />
                 <span>Ferramenta necessária</span>
               </label>
               <input
@@ -307,7 +307,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
                 value={ferramenta}
                 onChange={(e) => setFerramenta(e.target.value)}
                 placeholder="Ex: Coletor RF, Checklist, Manual"
-                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937]"
+                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
               />
             </div>
           </div>
@@ -325,7 +325,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
                   onClick={() => setStatus(st)}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
                     status === st
-                      ? 'bg-[#0F766E] text-white border-[#0F766E]'
+                      ? 'bg-[#2563EB] text-white border-[#2563EB]'
                       : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:bg-gray-50'
                   }`}
                 >
@@ -346,7 +346,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
               value={observacoes}
               onChange={(e) => setObservacoes(e.target.value)}
               placeholder="Instruções operacionais para quem executa ou valida..."
-              className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937]"
+              className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
             />
           </div>
 
@@ -363,7 +363,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md shadow-xs transition-colors disabled:opacity-60"
+              className="px-5 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors disabled:opacity-60"
             >
               {loading ? 'Salvando...' : isEditing ? 'Atualizar Rotina' : 'Cadastrar Rotina'}
             </button>

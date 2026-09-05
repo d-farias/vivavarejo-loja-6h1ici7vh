@@ -56,7 +56,7 @@ export default function Layout() {
           {/* Logo & Title */}
           <div className="flex items-center gap-3">
             <NavLink to="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded bg-[#0F766E] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
+              <div className="w-8 h-8 rounded bg-[#2563EB] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
                 {/* Compact square diamond logo */}
                 <div className="w-3.5 h-3.5 border-2 border-white rotate-45 transform" />
               </div>
@@ -82,7 +82,7 @@ export default function Layout() {
                   className={({ isActive }) =>
                     `relative px-3.5 py-2 text-sm font-medium transition-colors ${
                       isActive
-                        ? 'text-[#0F766E] font-semibold'
+                        ? 'text-[#2563EB] font-semibold'
                         : 'text-[#6B7280] hover:text-[#1F2937]'
                     }`
                   }
@@ -91,7 +91,7 @@ export default function Layout() {
                     <>
                       <span>{link.label}</span>
                       {isActive && (
-                        <span className="absolute bottom-[-10px] left-3 right-3 h-[2px] bg-[#0F766E] rounded-full transition-all duration-200" />
+                        <span className="absolute bottom-[-10px] left-3 right-3 h-[2px] bg-[#2563EB] rounded-full transition-all duration-200" />
                       )}
                     </>
                   )}
@@ -107,7 +107,7 @@ export default function Layout() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
-                      className="w-9 h-9 rounded-full bg-[#0F766E]/10 border border-[#0F766E]/20 text-[#0F766E] hover:bg-[#0F766E]/20 flex items-center justify-center font-semibold text-xs tracking-wider transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/30"
+                      className="w-9 h-9 rounded-full bg-[#3B82F6]/10 border border-[#3B82F6]/25 text-[#2563EB] hover:bg-[#3B82F6]/20 flex items-center justify-center font-semibold text-xs tracking-wider transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]/30"
                       title={user.name || user.email}
                       aria-label="Menu do usuário"
                     >
@@ -124,7 +124,7 @@ export default function Layout() {
                           <p className="text-sm font-semibold text-[#1F2937] leading-none">
                             {user.name || 'Líder'}
                           </p>
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider bg-[#0F766E]/10 text-[#0F766E]">
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider bg-[#3B82F6]/10 text-[#2563EB]">
                             {perfil}
                           </span>
                         </div>
@@ -135,7 +135,7 @@ export default function Layout() {
                       <>
                         <DropdownMenuItem
                           onClick={() => navigate('/admin')}
-                          className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2 text-[#0F766E]"
+                          className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2 text-[#2563EB]"
                         >
                           <Shield className="w-4 h-4" />
                           <span>Painel Administrativo</span>
@@ -182,7 +182,7 @@ export default function Layout() {
           <div className="relative w-4/5 max-w-xs bg-white h-full shadow-2xl flex flex-col z-10 border-r border-[#E5E7EB] transform transition-transform duration-200 ease-in-out">
             <div className="p-4 border-b border-[#E5E7EB] flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded bg-[#0F766E] flex items-center justify-center text-white">
+                <div className="w-7 h-7 rounded bg-[#2563EB] flex items-center justify-center text-white">
                   <div className="w-3 h-3 border-2 border-white rotate-45 transform" />
                 </div>
                 <span className="text-xs font-bold uppercase tracking-wider text-[#1F2937]">
@@ -199,7 +199,7 @@ export default function Layout() {
             </div>
 
             <div className="p-4 border-b border-[#E5E7EB] bg-[#F7F7F5]/50 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-[#0F766E]/15 text-[#0F766E] font-semibold text-xs flex items-center justify-center border border-[#0F766E]/20">
+              <div className="w-9 h-9 rounded-full bg-[#3B82F6]/15 text-[#2563EB] font-semibold text-xs flex items-center justify-center border border-[#3B82F6]/25">
                 {getInitials(user.name, user.email)}
               </div>
               <div className="overflow-hidden">
@@ -207,7 +207,7 @@ export default function Layout() {
                   <span className="text-xs font-semibold text-[#1F2937] truncate">
                     {user.name || 'Líder'}
                   </span>
-                  <span className="text-[9px] font-bold px-1 py-0.2 rounded uppercase bg-[#0F766E]/15 text-[#0F766E]">
+                  <span className="text-[9px] font-bold px-1 py-0.2 rounded uppercase bg-[#3B82F6]/15 text-[#2563EB]">
                     {perfil}
                   </span>
                 </div>
@@ -227,7 +227,7 @@ export default function Layout() {
                     className={({ isActive }) =>
                       `flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
                         isActive
-                          ? 'bg-[#0F766E]/10 text-[#0F766E] font-semibold'
+                          ? 'bg-[#3B82F6]/10 text-[#2563EB] font-semibold'
                           : 'text-[#4B5563] hover:bg-gray-100 hover:text-[#1F2937]'
                       }`
                     }

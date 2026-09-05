@@ -73,7 +73,7 @@ export default function Login() {
       <div className="w-full max-w-md bg-white border border-[#E5E7EB] rounded-lg p-6 sm:p-8 shadow-xs">
         {/* Header */}
         <div className="flex flex-col items-center text-center mb-6">
-          <div className="w-10 h-10 rounded bg-[#0F766E] flex items-center justify-center text-white mb-3 shadow-xs">
+          <div className="w-10 h-10 rounded bg-[#2563EB] flex items-center justify-center text-white mb-3 shadow-xs">
             <div className="w-4 h-4 border-2 border-white rotate-45 transform" />
           </div>
           <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937]">VivaVarejo</h1>
@@ -114,8 +114,8 @@ export default function Login() {
                 className={`w-full pl-9 pr-3 py-2 text-sm bg-white border ${
                   fieldErrors.email
                     ? 'border-[#B91C1C] focus:ring-red-200'
-                    : 'border-[#E5E7EB] focus:border-[#0F766E]'
-                } rounded-md outline-none focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937] placeholder:text-gray-400`}
+                    : 'border-[#E5E7EB] focus:border-[#2563EB]'
+                } rounded-md outline-none focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937] placeholder:text-gray-400`}
                 disabled={loading}
               />
             </div>
@@ -138,8 +138,8 @@ export default function Login() {
                 className={`w-full pl-9 pr-3 py-2 text-sm bg-white border ${
                   fieldErrors.password
                     ? 'border-[#B91C1C] focus:ring-red-200'
-                    : 'border-[#E5E7EB] focus:border-[#0F766E]'
-                } rounded-md outline-none focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937] placeholder:text-gray-400`}
+                    : 'border-[#E5E7EB] focus:border-[#2563EB]'
+                } rounded-md outline-none focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937] placeholder:text-gray-400`}
                 disabled={loading}
               />
             </div>
@@ -151,7 +151,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-2.5 px-4 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-sm rounded-md shadow-xs transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full mt-2 py-2.5 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm rounded-md shadow-xs transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
@@ -160,7 +160,7 @@ export default function Login() {
         {/* Signup Link */}
         <div className="mt-6 text-center text-xs text-[#6B7280]">
           Não tem conta?{' '}
-          <Link to="/signup" className="text-[#0F766E] font-semibold hover:underline">
+          <Link to="/signup" className="text-[#2563EB] font-semibold hover:underline">
             Cadastre-se
           </Link>
         </div>
