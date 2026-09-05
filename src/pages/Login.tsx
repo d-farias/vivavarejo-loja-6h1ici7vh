@@ -90,14 +90,6 @@ export default function Login() {
           </div>
         )}
 
-        {/* Demo credentials hint */}
-        <div className="mb-5 p-3 rounded bg-[#F7F7F5] border border-[#E5E7EB] text-xs text-[#4B5563]">
-          <span className="font-semibold block mb-0.5 text-[#1F2937]">Acesso inicial:</span>
-          <span>
-            E-mail: <code>dfarias53@gmail.com</code> | Senha: <code>Skip@Pass</code>
-          </span>
-        </div>
-
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
