@@ -12,7 +12,12 @@ export const clientesService = {
     return await pb.collection('clientes').getOne<Cliente>(id)
   },
 
-  async create(data: { nome: string; contato?: string; observacoes?: string }): Promise<Cliente> {
+  async create(data: {
+    nome: string
+    contato?: string
+    observacoes?: string
+    envio_semanal?: boolean
+  }): Promise<Cliente> {
     return await pb.collection('clientes').create<Cliente>(data)
   },
 

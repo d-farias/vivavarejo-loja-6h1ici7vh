@@ -588,7 +588,14 @@ export default function Admin() {
       ) : (
         <>
           {/* ======================= ABA PAINEL GERENCIAL ======================= */}
-          {activeTab === 'painel' && <PainelGerencial clientes={clientes} lojas={lojas} />}
+          {activeTab === 'painel' && (
+            <PainelGerencial
+              clientes={clientes}
+              lojas={lojas}
+              isAdmin={perfil === 'admin'}
+              onClienteUpdated={loadAll}
+            />
+          )}
 
           {/* ======================= ABA CLIENTES ======================= */}
           {activeTab === 'clientes' && (

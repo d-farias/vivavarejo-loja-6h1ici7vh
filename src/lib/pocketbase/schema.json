@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-05T13:52:04.911Z",
+  "generatedAt": "2026-09-05T14:05:05.969Z",
   "collections": [
     {
       "name": "users",
@@ -255,6 +255,12 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "envio_semanal",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_clientes_nome ON clientes (nome)"]

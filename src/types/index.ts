@@ -25,6 +25,7 @@ export interface Cliente extends RecordModel {
   nome: string
   contato?: string
   observacoes?: string
+  envio_semanal?: boolean
   created: string
   updated: string
 }
