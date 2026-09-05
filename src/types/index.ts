@@ -16,8 +16,9 @@ export type FrequenciaRotina =
 
 export type StatusRotina = 'Ativa' | 'Pendente' | 'Concluída'
 
-export interface Rotina {
-  id: string
+import type { RecordModel } from 'pocketbase'
+
+export interface Rotina extends RecordModel {
   nome: string
   responsavel: string
   frequencia: FrequenciaRotina
@@ -27,11 +28,7 @@ export interface Rotina {
   status?: StatusRotina
   observacoes?: string
   area?: string
-  created: string
-  updated: string
 }
-
-import type { RecordModel } from 'pocketbase'
 
 export interface ExecucaoRotina extends RecordModel {
   rotina: string

@@ -27,6 +27,21 @@ export const rotinasService = {
   async update(id: string, data: Partial<Rotina>): Promise<Rotina> {
     return await pb.collection('rotinas').update<Rotina>(id, data)
   },
+
+  async delete(id: string): Promise<boolean> {
+    return await pb.collection('rotinas').delete(id)
+  },
+
+  async deleteAll(): Promise<void> {
+    const all = await pb.collection('rotinas').getFullList<{ id: string }>({ fields: 'id' })
+    for (const item of all) {
+      try {
+        await pb.collection('rotinas').delete(item.id)
+      } catch (e) {
+        console.error('Erro ao deletar rotina:', item.id, e)
+      }
+    }
+  },
 }
 
 export const execucoesService = {

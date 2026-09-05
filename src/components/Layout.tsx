@@ -58,7 +58,7 @@ export default function Layout() {
               </div>
               <div className="flex flex-col">
                 <span className="text-sm font-bold tracking-wider uppercase text-[#1F2937] leading-tight">
-                  Guia para Líderes
+                  Painel da Loja
                 </span>
                 <span className="text-[10px] text-[#6B7280] leading-none tracking-normal">
                   Varejo Operacional
@@ -165,7 +165,7 @@ export default function Layout() {
                   <div className="w-3 h-3 border-2 border-white rotate-45 transform" />
                 </div>
                 <span className="text-xs font-bold uppercase tracking-wider text-[#1F2937]">
-                  Guia para Líderes
+                  Painel da Loja
                 </span>
               </div>
               <button
@@ -238,9 +238,9 @@ export default function Layout() {
       <footer className="w-full border-t border-[#E5E7EB] bg-white py-4 mt-auto">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#6B7280]">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-[#1F2937]">Guia para Líderes</span>
+            <span className="font-semibold text-[#1F2937]">Painel da Loja</span>
             <span className="hidden sm:inline">•</span>
-            <span className="text-[#6B7280]">Rotinas e liderança para o varejo</span>
+            <span className="text-[#6B7280]">Acompanhamento de rotinas e liderança de loja</span>
           </div>
           <div>
             <span>

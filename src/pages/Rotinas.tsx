@@ -2,9 +2,11 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { rotinasService, execucoesService, getTodayDateString } from '@/services/rotinas'
 import type { Rotina, ExecucaoRotina } from '@/types'
-import { isPastDue } from '@/lib/time-utils'
+import { getHorarioStatus } from '@/lib/time-utils'
 import { useRealtime } from '@/hooks/use-realtime'
 import { Skeleton } from '@/components/ui/skeleton'
+import { RoutineFormModal } from '@/components/RoutineFormModal'
+import { SpreadsheetImportModal } from '@/components/SpreadsheetImportModal'
 import {
   Search,
   Filter,
@@ -18,6 +20,11 @@ import {
   AlertCircle,
   RefreshCw,
   FileText,
+  Plus,
+  FileSpreadsheet,
+  Edit2,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react'
 
 export default function Rotinas() {
@@ -31,6 +38,12 @@ export default function Rotinas() {
   const [selectedArea, setSelectedArea] = useState<string>('Todas')
   const [selectedRotina, setSelectedRotina] = useState<Rotina | null>(null)
   const [submittingId, setSubmittingId] = useState<string | null>(null)
+
+  // Modais de CRUD e Importação
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false)
+  const [editingRotina, setEditingRotina] = useState<Rotina | null>(null)
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   const loadData = useCallback(async () => {
     if (!user) return
@@ -53,7 +66,29 @@ export default function Rotinas() {
     loadData()
   }, [loadData])
 
-  // Realtime updates
+  // Realtime updates em rotinas (reflete criações, updates, deletes e importações imediatamente)
+  useRealtime<Rotina>(
+    'rotinas',
+    useCallback((data) => {
+      const record = data.record
+      setRotinas((prev) => {
+        if (data.action === 'delete') {
+          return prev.filter((item) => item.id !== record.id)
+        }
+        if (data.action === 'create') {
+          const exists = prev.some((item) => item.id === record.id)
+          return exists ? prev : [record, ...prev]
+        }
+        if (data.action === 'update') {
+          return prev.map((item) => (item.id === record.id ? record : item))
+        }
+        return prev
+      })
+    }, []),
+    !!user,
+  )
+
+  // Realtime updates em execucoes
   useRealtime<ExecucaoRotina>(
     'execucoes_rotinas',
     useCallback((data) => {
@@ -93,8 +128,8 @@ export default function Rotinas() {
   const availableAreas = useMemo(() => {
     const areas = new Set<string>()
     rotinas.forEach((r) => {
-      if (r.area) areas.add(r.area)
-      else if (r.responsavel) areas.add(r.responsavel)
+      if (r.area && r.area.trim()) areas.add(r.area.trim())
+      else if (r.responsavel && r.responsavel.trim()) areas.add(r.responsavel.trim())
     })
     return Array.from(areas).sort()
   }, [rotinas])
@@ -156,6 +191,42 @@ export default function Rotinas() {
     }
   }
 
+  // Handle Save (Create or Update)
+  const handleSaveRoutine = async (data: Partial<Rotina>) => {
+    if (editingRotina) {
+      const updated = await rotinasService.update(editingRotina.id, data)
+      setRotinas((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))
+      if (selectedRotina?.id === updated.id) {
+        setSelectedRotina(updated)
+      }
+    } else {
+      const created = await rotinasService.create(data)
+      setRotinas((prev) => [created, ...prev])
+    }
+    setEditingRotina(null)
+  }
+
+  // Handle Delete
+  const handleDeleteRoutine = async (id: string) => {
+    try {
+      await rotinasService.delete(id)
+      setRotinas((prev) => prev.filter((r) => r.id !== id))
+      if (selectedRotina?.id === id) {
+        setSelectedRotina(null)
+      }
+    } catch (err) {
+      console.error('Erro ao excluir rotina:', err)
+    } finally {
+      setDeleteConfirmId(null)
+    }
+  }
+
+  // Open Edit modal from card or detail view
+  const handleOpenEdit = (rotina: Rotina) => {
+    setEditingRotina(rotina)
+    setIsFormModalOpen(true)
+  }
+
   // Filtered routines
   const filteredRotinas = useMemo(() => {
     return rotinas.filter((r) => {
@@ -166,7 +237,8 @@ export default function Rotinas() {
         const matchResp = r.responsavel.toLowerCase().includes(query)
         const matchFerramenta = r.ferramenta?.toLowerCase().includes(query) || false
         const matchValidacao = r.validacao?.toLowerCase().includes(query) || false
-        if (!matchName && !matchResp && !matchFerramenta && !matchValidacao) {
+        const matchArea = r.area?.toLowerCase().includes(query) || false
+        if (!matchName && !matchResp && !matchFerramenta && !matchValidacao && !matchArea) {
           return false
         }
       }
@@ -188,7 +260,7 @@ export default function Rotinas() {
 
       // Area filter
       if (selectedArea !== 'Todas') {
-        const routineArea = r.area || r.responsavel
+        const routineArea = (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim())
         if (routineArea !== selectedArea) {
           return false
         }
@@ -204,11 +276,12 @@ export default function Rotinas() {
     setSelectedArea('Todas')
   }
 
-  // Esc key closes modal
+  // Esc key closes modals
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setSelectedRotina(null)
+        setDeleteConfirmId(null)
       }
     }
     window.addEventListener('keydown', handleKeyDown)
@@ -255,96 +328,128 @@ export default function Rotinas() {
 
   return (
     <div className="space-y-6">
-      {/* Header Row */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      {/* Header Row: Título + Ações de Gestão (Nova Rotina e Importar Planilha) */}
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#1F2937] tracking-tight">
-            Rotinas operacionais
+            Biblioteca de Rotinas
           </h1>
           <p className="text-sm text-[#6B7280] mt-1">
-            Biblioteca de rotinas da loja. Filtre, veja detalhes e marque execuções.
+            Gestão operacional de rotinas da loja. Cadastre, edite, exclua ou importe planilhas
+            operacionais.
           </p>
         </div>
 
-        {/* Search Input */}
-        <div className="relative w-full md:w-72">
-          <Search className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Buscar rotina..."
-            className="w-full pl-9 pr-8 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937] placeholder:text-gray-400"
-          />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
+        {/* Action Buttons: Importar Planilha + Nova Rotina */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            onClick={() => setIsImportModalOpen(true)}
+            className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-md shadow-xs transition-colors"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-[#0F766E]" />
+            <span>Importar Planilha</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setEditingRotina(null)
+              setIsFormModalOpen(true)
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Nova Rotina</span>
+          </button>
         </div>
       </div>
 
-      {/* Filter Chips Bar */}
-      <div className="space-y-3">
-        {/* Frequency filters */}
-        <div className="flex items-center gap-2 flex-wrap text-xs">
-          <span className="font-semibold text-[#4B5563] flex items-center gap-1 mr-1">
-            <Filter className="w-3.5 h-3.5" />
-            Frequência:
-          </span>
-          {frequencyFilters.map((freq) => {
-            const active = selectedFreq === freq
-            return (
+      {/* Filter and Search Bar */}
+      <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 shadow-xs space-y-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          {/* Search Input */}
+          <div className="relative w-full sm:w-80">
+            <Search className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar por rotina, responsável, área..."
+              className="w-full pl-9 pr-8 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937] placeholder:text-gray-400"
+            />
+            {searchTerm && (
               <button
-                key={freq}
-                onClick={() => setSelectedFreq(freq)}
-                className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-all duration-200 ${
-                  active
-                    ? 'bg-[#0F766E] text-white border-[#0F766E] shadow-xs'
-                    : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:border-gray-400 hover:text-[#1F2937]'
-                }`}
+                onClick={() => setSearchTerm('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                {freq}
+                <X className="w-4 h-4" />
               </button>
-            )
-          })}
+            )}
+          </div>
+
+          <span className="text-xs text-[#6B7280]">
+            Exibindo <strong>{filteredRotinas.length}</strong> de {rotinas.length} rotinas
+          </span>
         </div>
 
-        {/* Area filters */}
-        {availableAreas.length > 0 && (
-          <div className="flex items-center gap-2 flex-wrap text-xs pt-1 border-t border-[#E5E7EB]">
-            <span className="font-semibold text-[#4B5563] mr-1">Área:</span>
-            <button
-              onClick={() => setSelectedArea('Todas')}
-              className={`px-3 py-1 rounded-full border text-[11px] font-medium transition-all duration-200 ${
-                selectedArea === 'Todas'
-                  ? 'bg-[#0F766E] text-white border-[#0F766E]'
-                  : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:border-gray-400 hover:text-[#1F2937]'
-              }`}
-            >
-              Todas as áreas
-            </button>
-            {availableAreas.map((area) => {
-              const active = selectedArea === area
+        {/* Filter Chips Bar */}
+        <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
+          {/* Frequency filters */}
+          <div className="flex items-center gap-2 flex-wrap text-xs">
+            <span className="font-semibold text-[#4B5563] flex items-center gap-1 mr-1">
+              <Filter className="w-3.5 h-3.5" />
+              Frequência:
+            </span>
+            {frequencyFilters.map((freq) => {
+              const active = selectedFreq === freq
               return (
                 <button
-                  key={area}
-                  onClick={() => setSelectedArea(area)}
-                  className={`px-3 py-1 rounded-full border text-[11px] font-medium transition-all duration-200 ${
+                  key={freq}
+                  onClick={() => setSelectedFreq(freq)}
+                  className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-all duration-200 ${
                     active
-                      ? 'bg-[#0F766E] text-white border-[#0F766E]'
+                      ? 'bg-[#0F766E] text-white border-[#0F766E] shadow-xs'
                       : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:border-gray-400 hover:text-[#1F2937]'
                   }`}
                 >
-                  {area}
+                  {freq}
                 </button>
               )
             })}
           </div>
-        )}
+
+          {/* Area filters */}
+          {availableAreas.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap text-xs pt-1">
+              <span className="font-semibold text-[#4B5563] mr-1">Área:</span>
+              <button
+                onClick={() => setSelectedArea('Todas')}
+                className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all duration-200 ${
+                  selectedArea === 'Todas'
+                    ? 'bg-[#0F766E] text-white border-[#0F766E]'
+                    : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:border-gray-400 hover:text-[#1F2937]'
+                }`}
+              >
+                Todas
+              </button>
+              {availableAreas.map((area) => {
+                const active = selectedArea === area
+                return (
+                  <button
+                    key={area}
+                    onClick={() => setSelectedArea(area)}
+                    className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all duration-200 ${
+                      active
+                        ? 'bg-[#0F766E] text-white border-[#0F766E]'
+                        : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:border-gray-400 hover:text-[#1F2937]'
+                    }`}
+                  >
+                    {area}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Routine Cards Grid */}
@@ -352,7 +457,7 @@ export default function Rotinas() {
         <div className="p-10 text-center bg-white border border-[#E5E7EB] rounded-lg space-y-3">
           <AlertCircle className="w-8 h-8 text-[#9CA3AF] mx-auto" />
           <p className="text-sm text-[#4B5563] font-medium">
-            Nenhuma rotina encontrada com esses filtros.
+            Nenhuma rotina encontrada com esses critérios.
           </p>
           <button
             onClick={clearFilters}
@@ -365,7 +470,8 @@ export default function Rotinas() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredRotinas.map((rotina) => {
             const isDone = completionMap.has(rotina.id)
-            const pastDue = !isDone && isPastDue(rotina.horario_limite)
+            const status = getHorarioStatus(rotina.horario_limite, isDone)
+            const pastDue = status.isAtrasada
 
             return (
               <div
@@ -374,24 +480,66 @@ export default function Rotinas() {
                   isDone
                     ? 'opacity-70 border-[#E5E7EB] bg-gray-50/50'
                     : pastDue
-                      ? 'border-red-200'
+                      ? 'border-red-300 bg-red-50/10'
                       : 'border-[#E5E7EB] hover:border-[#0F766E]/50'
                 }`}
               >
                 <div>
-                  {/* Routine Name */}
-                  <div className="flex items-start justify-between gap-2 mb-2.5">
+                  {/* Top Bar: Name + Badges + Edit/Delete quick buttons */}
+                  <div className="flex items-start justify-between gap-2 mb-2">
                     <h3
-                      className={`font-bold text-base leading-snug cursor-pointer hover:text-[#0F766E] transition-colors ${
+                      className={`font-bold text-base leading-snug cursor-pointer hover:text-[#0F766E] transition-colors flex-1 ${
                         isDone ? 'line-through text-[#6B7280]' : 'text-[#1F2937]'
                       }`}
                       onClick={() => setSelectedRotina(rotina)}
                     >
                       {rotina.nome}
                     </h3>
-                    {pastDue && (
-                      <span className="shrink-0 px-2 py-0.5 text-[10px] font-semibold bg-red-100 text-[#B91C1C] rounded">
-                        Atrasada
+
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => handleOpenEdit(rotina)}
+                        className="p-1 text-[#9CA3AF] hover:text-[#0F766E] rounded transition-colors"
+                        title="Editar rotina"
+                        aria-label={`Editar ${rotina.nome}`}
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+
+                      <button
+                        onClick={() => setDeleteConfirmId(rotina.id)}
+                        className="p-1 text-[#9CA3AF] hover:text-[#B91C1C] rounded transition-colors"
+                        title="Excluir rotina"
+                        aria-label={`Excluir ${rotina.nome}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Status do Horário Limite */}
+                  <div className="mb-2.5">
+                    {!isDone && pastDue && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold bg-red-100 text-[#B91C1C] rounded border border-red-200">
+                        <AlertTriangle className="w-3 h-3" />
+                        <span>ATRASADA ({status.normalizedHorario || rotina.horario_limite})</span>
+                      </span>
+                    )}
+                    {!isDone && !pastDue && status.hasHorario && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium bg-[#0F766E]/10 text-[#0F766E] rounded border border-[#0F766E]/20">
+                        <Clock className="w-3 h-3" />
+                        <span>{status.displayLabel}</span>
+                      </span>
+                    )}
+                    {!isDone && status.isIntegral && (
+                      <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-medium bg-gray-100 text-[#4B5563] rounded border border-gray-200">
+                        Integral (dia todo)
+                      </span>
+                    )}
+                    {isDone && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium bg-emerald-50 text-[#047857] rounded border border-emerald-200">
+                        <Check className="w-3 h-3" />
+                        <span>Concluída hoje</span>
                       </span>
                     )}
                   </div>
@@ -404,19 +552,12 @@ export default function Rotinas() {
                     </span>
 
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#F7F7F5] border border-[#E5E7EB] text-[#4B5563]">
-                      <Clock className="w-3 h-3 text-[#9CA3AF]" />
                       <span>{rotina.frequencia}</span>
                     </span>
 
-                    {rotina.horario_limite && (
-                      <span
-                        className={`font-mono text-[11px] px-2 py-0.5 rounded border ${
-                          pastDue
-                            ? 'border-red-200 bg-red-50 text-[#B91C1C] font-semibold'
-                            : 'border-[#E5E7EB] bg-[#F7F7F5] text-[#374151]'
-                        }`}
-                      >
-                        Até {rotina.horario_limite}
+                    {rotina.area && (
+                      <span className="inline-block px-2 py-0.5 rounded bg-gray-100 text-[#4B5563] text-[11px]">
+                        {rotina.area}
                       </span>
                     )}
                   </div>
@@ -461,8 +602,10 @@ export default function Rotinas() {
                     aria-label={`Marcar ${rotina.nome}`}
                     className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-150 transform active:scale-90 ${
                       isDone
-                        ? 'bg-[#0F766E] border-[#0F766E] text-white'
-                        : 'border-[#D1D5DB] hover:border-[#0F766E] text-transparent hover:text-gray-300 bg-white'
+                        ? 'bg-[#047857] border-[#047857] text-white'
+                        : pastDue
+                          ? 'border-red-400 hover:border-red-600 text-transparent hover:text-red-400 bg-white'
+                          : 'border-[#D1D5DB] hover:border-[#0F766E] text-transparent hover:text-gray-300 bg-white'
                     }`}
                   >
                     <Check className="w-4 h-4 stroke-[2.5]" />
@@ -474,17 +617,17 @@ export default function Rotinas() {
         </div>
       )}
 
-      {/* Routine Detail Modal / Bottom Sheet */}
+      {/* Routine Detail Modal */}
       {selectedRotina && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-4">
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-200"
             onClick={() => setSelectedRotina(null)}
           />
 
-          {/* Modal / Bottom Sheet Box */}
-          <div className="relative w-full sm:max-w-lg bg-white rounded-t-xl sm:rounded-lg shadow-xl p-5 sm:p-6 z-10 border border-[#E5E7EB] max-h-[85vh] overflow-y-auto animate-fade-in-up">
+          {/* Modal Box */}
+          <div className="relative w-full sm:max-w-xl bg-white rounded-t-xl sm:rounded-lg shadow-xl p-5 sm:p-6 z-10 border border-[#E5E7EB] max-h-[85vh] overflow-y-auto animate-fade-in-up">
             {/* Header */}
             <div className="flex items-start justify-between gap-3 pb-3 border-b border-[#E5E7EB]">
               <div>
@@ -561,36 +704,110 @@ export default function Rotinas() {
             </div>
 
             {/* Modal Actions */}
-            <div className="pt-3 border-t border-[#E5E7EB] flex items-center justify-end gap-2">
-              <button
-                onClick={() => setSelectedRotina(null)}
-                className="px-4 py-2 text-xs font-semibold text-[#4B5563] hover:text-[#1F2937] transition-colors"
-              >
-                Fechar
-              </button>
-              {(() => {
-                const isDone = completionMap.has(selectedRotina.id)
-                return (
-                  <button
-                    onClick={() => {
-                      handleToggle(selectedRotina.id)
-                    }}
-                    disabled={submittingId === selectedRotina.id}
-                    className={`px-4 py-2 text-xs font-semibold rounded-md flex items-center gap-2 transition-colors ${
-                      isDone
-                        ? 'bg-gray-100 text-[#4B5563] hover:bg-gray-200'
-                        : 'bg-[#0F766E] text-white hover:bg-[#115E59]'
-                    }`}
-                  >
-                    <Check className="w-4 h-4" />
-                    <span>{isDone ? 'Concluída hoje (desmarcar)' : 'Concluir rotina'}</span>
-                  </button>
-                )
-              })()}
+            <div className="pt-3 border-t border-[#E5E7EB] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    handleOpenEdit(selectedRotina)
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#0F766E] hover:bg-[#0F766E]/10 rounded-md transition-colors"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                  <span>Editar</span>
+                </button>
+                <button
+                  onClick={() => setDeleteConfirmId(selectedRotina.id)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#B91C1C] hover:bg-red-50 rounded-md transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Excluir</span>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setSelectedRotina(null)}
+                  className="px-3 py-1.5 text-xs font-semibold text-[#4B5563] hover:text-[#1F2937] transition-colors"
+                >
+                  Fechar
+                </button>
+                {(() => {
+                  const isDone = completionMap.has(selectedRotina.id)
+                  return (
+                    <button
+                      onClick={() => {
+                        handleToggle(selectedRotina.id)
+                      }}
+                      disabled={submittingId === selectedRotina.id}
+                      className={`px-4 py-2 text-xs font-semibold rounded-md flex items-center gap-2 transition-colors ${
+                        isDone
+                          ? 'bg-gray-100 text-[#4B5563] hover:bg-gray-200'
+                          : 'bg-[#047857] text-white hover:bg-[#065f46]'
+                      }`}
+                    >
+                      <Check className="w-4 h-4" />
+                      <span>{isDone ? 'Concluída hoje (desmarcar)' : 'Concluir rotina hoje'}</span>
+                    </button>
+                  )
+                })()}
+              </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs"
+            onClick={() => setDeleteConfirmId(null)}
+          />
+          <div className="relative w-full max-w-sm bg-white rounded-lg p-5 z-10 border border-[#E5E7EB] shadow-xl space-y-4">
+            <div className="flex items-center gap-2.5 text-[#B91C1C]">
+              <AlertTriangle className="w-5 h-5 shrink-0" />
+              <h3 className="font-bold text-base text-[#1F2937]">Excluir rotina?</h3>
+            </div>
+            <p className="text-xs text-[#6B7280]">
+              Esta ação removerá esta rotina operacional do sistema e do painel de acompanhamento.
+            </p>
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E5E7EB]">
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                className="px-3 py-1.5 text-xs font-medium text-[#4B5563] hover:bg-gray-100 rounded-md"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => handleDeleteRoutine(deleteConfirmId)}
+                className="px-3.5 py-1.5 text-xs font-semibold bg-[#B91C1C] hover:bg-red-700 text-white rounded-md transition-colors"
+              >
+                Confirmar exclusão
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Criação / Edição de Rotina */}
+      <RoutineFormModal
+        isOpen={isFormModalOpen}
+        onClose={() => {
+          setIsFormModalOpen(false)
+          setEditingRotina(null)
+        }}
+        onSave={handleSaveRoutine}
+        initialData={editingRotina}
+      />
+
+      {/* Modal de Importação de Planilha Excel/CSV em Runtime */}
+      <SpreadsheetImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onSuccess={async () => {
+          await loadData()
+        }}
+      />
     </div>
   )
 }
