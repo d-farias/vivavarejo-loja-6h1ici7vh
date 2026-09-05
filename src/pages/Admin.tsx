@@ -183,15 +183,31 @@ export default function Admin() {
     const cliente = formData.get('cliente') as string
     const codigo = (formData.get('codigo') as string)?.trim()
     const observacoes = (formData.get('observacoes') as string)?.trim()
+    const email_regional = (formData.get('email_regional') as string)?.trim() || ''
+    const alertas_ativos = formData.get('alertas_ativos') === 'true'
 
     if (!nome || !cliente) return
 
     try {
       if (lojaModal.data) {
-        await lojasService.update(lojaModal.data.id, { nome, cliente, codigo, observacoes })
+        await lojasService.update(lojaModal.data.id, {
+          nome,
+          cliente,
+          codigo,
+          observacoes,
+          email_regional,
+          alertas_ativos,
+        })
         showFeedback('Loja atualizada com sucesso!')
       } else {
-        await lojasService.create({ nome, cliente, codigo, observacoes })
+        await lojasService.create({
+          nome,
+          cliente,
+          codigo,
+          observacoes,
+          email_regional,
+          alertas_ativos,
+        })
         showFeedback('Loja cadastrada com sucesso!')
       }
       setLojaModal({ open: false, data: null })
@@ -594,6 +610,7 @@ export default function Admin() {
               lojas={lojas}
               isAdmin={perfil === 'admin'}
               onClienteUpdated={loadAll}
+              onLojaUpdated={loadAll}
             />
           )}
 
@@ -757,6 +774,8 @@ export default function Admin() {
                         <th className="p-3.5">Loja</th>
                         <th className="p-3.5">Cliente</th>
                         <th className="p-3.5">Código</th>
+                        <th className="p-3.5">E-mail Regional</th>
+                        <th className="p-3.5">Alertas</th>
                         <th className="p-3.5">Observações</th>
                         <th className="p-3.5 text-right">Ações</th>
                       </tr>
@@ -773,6 +792,29 @@ export default function Admin() {
                           </td>
                           <td className="p-3.5 font-mono text-xs text-[#2563EB]">
                             {loja.codigo || '-'}
+                          </td>
+                          <td className="p-3.5 text-xs text-[#4B5563]">
+                            {loja.email_regional ? (
+                              <span className="font-mono text-[11px] text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                                {loja.email_regional}
+                              </span>
+                            ) : (
+                              <span className="text-[#9CA3AF] italic text-[11px]">
+                                Não cadastrado
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-3.5">
+                            {loja.alertas_ativos !== false ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#3B82F6]/10 text-[#2563EB]">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+                                Ativos
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-[#6B7280]">
+                                Desligados
+                              </span>
+                            )}
                           </td>
                           <td className="p-3.5 text-[#6B7280] max-w-xs truncate">
                             {loja.observacoes || '-'}
@@ -1294,6 +1336,36 @@ export default function Admin() {
                   placeholder="Ex: LJ-01"
                   className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#374151] mb-1">
+                  E-mail do Regional da Loja
+                </label>
+                <input
+                  type="email"
+                  name="email_regional"
+                  defaultValue={lojaModal.data?.email_regional || ''}
+                  placeholder="Ex: regional@vivavarejo.com.br"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                />
+                <p className="text-[11px] text-[#6B7280] mt-0.5">
+                  Recebe alertas automáticos imediatos caso rotinas não sejam realizadas no horário.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#374151] mb-1">
+                  Alertas de Rotinas Atrasadas
+                </label>
+                <select
+                  name="alertas_ativos"
+                  defaultValue={lojaModal.data?.alertas_ativos !== false ? 'true' : 'false'}
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                >
+                  <option value="true">Ativos (envio automático a cada 5 min)</option>
+                  <option value="false">Desativados para esta loja</option>
+                </select>
               </div>
 
               <div>

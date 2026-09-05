@@ -157,7 +157,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
   const brasilTime = new Date(now.getTime() + brasilOffsetMs)
   const currentMinutes = brasilTime.getUTCHours() * 60 + brasilTime.getUTCMinutes()
   const currentHourFormatted = `${String(brasilTime.getUTCHours()).padStart(2, '0')}:${String(brasilTime.getUTCMinutes()).padStart(2, '0')}`
-  const todayStr = `${brasilTime.getUTCFullYear()}-${String(brasilTime.getUTCOffset ? brasilTime.getUTCMonth() + 1 : brasilTime.getUTCMonth() + 1).padStart(2, '0')}-${String(brasilTime.getUTCDate()).padStart(2, '0')}`
+  const todayStr = `${brasilTime.getUTCFullYear()}-${String(brasilTime.getUTCMonth() + 1).padStart(2, '0')}-${String(brasilTime.getUTCDate()).padStart(2, '0')}`
 
   // Buscar todas as lojas cadastradas
   let lojas = []
@@ -168,7 +168,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
     return
   }
 
-  // Buscar todos os clientes (para obter nome e contato de fallback se necessário)
+  // Buscar todos os clientes (para obter nome e contato)
   let clientesMap = {}
   try {
     const clientesList = $app.findRecordsByFilter('clientes', '', 'nome', 500, 0)
@@ -251,16 +251,11 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
       continue
     }
 
-    // Anti-duplicidade: verificar se já gerou alerta hoje
+    // Anti-duplicidade: verificar se já gerou alerta hoje (formato YYYY-MM-DD...)
     const alertaEnviadoEm = r.getString('alerta_enviado_em')
     if (alertaEnviadoEm && alertaEnviadoEm.startsWith(todayStr)) {
       continue
     }
-
-    // Verificar se a rotina deve ser executada hoje de acordo com a frequência
-    const freq = (r.getString('frequencia') || 'Diária').trim()
-    // 'Diária' roda todo dia; 'Rotinas' e 'Conforme vendas' também são monitoradas diariamente
-    // Se for Semanal e não for o dia, ou casos específicos, por padrão monitoramos Diária, Semanal, etc.
 
     // Parser do horário limite
     const horarioStr = r.getString('horario_limite')
@@ -319,8 +314,8 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
     const cliente = clienteId ? clientesMap[clienteId] : null
     const clienteNome = cliente ? cliente.getString('nome') : 'VivaVarejo'
 
-    // Verificar se os alertas estão ativos para esta loja
-    // Regra: se alertas_ativos for false, pular a loja com log
+    // Blindagem 1: Verificar se os alertas estão ativos para esta loja
+    // Regra: se alertas_ativos for explicitamente false, pular a loja com log
     if (lojaEfetiva && lojaEfetiva.getBool('alertas_ativos') === false) {
       console.log(
         `[AlertaRotinas] Loja "${lojaNome}" (${lojaEfetiva.id}) está com alertas_ativos = false. Pulando.`,
@@ -331,7 +326,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
     // Determinar destinatários:
     // 1. Regional da loja (email_regional no registro da loja)
     // 2. Gerente da loja (funcionário com cargo contendo 'gerente' ou usuário com perfil 'lider' vinculado a esta loja)
-    // 3. Fallback: contato do cliente (se tiver email) ou admin
+    // 3. Fallback: contato do cliente (se tiver email)
     const emailsDestinatarios = new Set()
     const destinatariosDetalhes = []
 
@@ -402,7 +397,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
       }
     }
 
-    // Se ainda assim não houver NENHUM destinatário válido, pular a loja com log claro
+    // Blindagem 2: Se não houver NENHUM destinatário válido, pular a loja com log claro
     if (destinatariosDetalhes.length === 0) {
       console.log(
         `[AlertaRotinas] Loja "${lojaNome}" possui ${atrasadas.length} rotina(s) atrasada(s), mas nenhum destinatário (gerente/regional/cliente) foi encontrado. Pulando com log.`,
@@ -411,13 +406,13 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
     }
 
     // Montar assunto e corpo do e-mail consolidado
-    // Assunto claro: "[VivaVarejo] Rotina não realizada — Loja X — 10:00" ou consolidado se houver várias
+    // Assunto no padrão solicitado: "[VivaVarejo] Rotinas não realizadas — Loja X"
     let subject = ''
     if (atrasadas.length === 1) {
       const rUnica = atrasadas[0]
       subject = `[VivaVarejo] Rotina não realizada — ${lojaNome} — ${rUnica.horarioLimite}`
     } else {
-      subject = `[VivaVarejo] ${atrasadas.length} rotinas não realizadas no horário — ${lojaNome} — ${currentHourFormatted}`
+      subject = `[VivaVarejo] Rotinas não realizadas — ${lojaNome}`
     }
 
     // Linhas da tabela de rotinas atrasadas
@@ -461,7 +456,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
     <div style="background: #FFFFFF; border-bottom: 2px solid #2563EB; padding: 24px 28px;">
       <div style="font-size: 20px; font-weight: 800; color: #2563EB; letter-spacing: -0.5px;">VIVAVAREJO</div>
       <div style="font-size: 16px; font-weight: 700; color: #1F2937; margin-top: 6px;">
-        Alerta Imediato: Rotina(s) não realizada(s) no horário
+        Alerta Operacional: Rotina(s) não realizada(s) no horário
       </div>
       <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">
         Unidade: <strong>${escapeHtml(lojaNome)}</strong> ${lojaCodigo ? `(${escapeHtml(lojaCodigo)})` : ''} • Rede: ${escapeHtml(clienteNome)} • Horário da verificação: ${currentHourFormatted} (horário de Brasília)
@@ -470,7 +465,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
 
     <div style="padding: 24px 28px;">
 
-      <!-- Banner de Alerta -->
+      <!-- Banner de Alerta Sóbrio -->
       <div style="background: #FEF2F2; border: 1px solid #FCA5A5; border-left: 4px solid #B91C1C; border-radius: 6px; padding: 14px 16px; margin-bottom: 22px;">
         <div style="font-size: 13px; font-weight: 700; color: #991B1B;">
           Atenção Gerência & Regional da Loja
@@ -508,9 +503,9 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
 
       <!-- Rodapé Institucional -->
       <div style="border-top: 1px solid #E5E7EB; padding-top: 16px; margin-top: 24px; font-size: 11px; color: #6B7280; text-align: center; line-height: 1.5;">
-        Este e-mail é um alerta automático gerado pelo sistema de auditoria <strong>VivaVarejo</strong>.<br>
-        Destinatários: ${destinatariosDetalhes.map((d) => escapeHtml(d.address)).join(', ')}.<br>
-        Para ajustar as notificações ou e-mails de destino, acesse o <em>Painel Administrativo &gt; Painel Gerencial &gt; Alertas de Rotinas Atrasadas</em>.
+        Este e-mail é um alerta automático gerado pelo sistema de gestão operacional <strong>VivaVarejo</strong>.<br>
+        Destinatários notificados: ${destinatariosDetalhes.map((d) => escapeHtml(d.address)).join(', ')}.<br>
+        Para ajustar as notificações ou e-mails de destino, acesse o <em>Painel Administrativo &gt; Painel Gerencial &gt; Alertas de rotinas atrasadas</em>.
       </div>
 
     </div>
@@ -519,7 +514,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
 </html>
     `
 
-    // Envio do e-mail via mailer PocketBase com proteção total
+    // Envio do e-mail via mailer PocketBase com proteção total contra falhas
     try {
       const senderAddress = $app.settings().meta.senderAddress || 'no-reply@vivavarejo.com.br'
       const senderName = $app.settings().meta.senderName || 'VivaVarejo Alertas'
@@ -541,7 +536,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
         `[AlertaRotinas] Alerta enviado com sucesso para ${destinatariosDetalhes.length} destinatário(s) da loja "${lojaNome}".`,
       )
 
-      // Marcar anti-duplicidade em cada rotina alertada
+      // Marcar anti-duplicidade em cada rotina alertada (após envio bem-sucedido)
       for (let rIdx = 0; rIdx < atrasadas.length; rIdx++) {
         try {
           const rec = atrasadas[rIdx].record

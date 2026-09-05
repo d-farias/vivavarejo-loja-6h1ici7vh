@@ -17,18 +17,23 @@ import {
   Calendar,
   Mail,
   Check,
+  Edit2,
+  Save,
+  X,
 } from 'lucide-react'
 import pb from '../lib/pocketbase/client'
 import { Cliente, Loja, Rotina, ExecucaoRotina } from '../types'
 import { isPastDue, getHorarioStatus } from '../lib/time-utils'
 import { getTodayDateString } from '../services/rotinas'
 import { clientesService } from '../services/clientes'
+import { lojasService } from '../services/lojas'
 
 interface PainelGerencialProps {
   clientes: Cliente[]
   lojas: Loja[]
   isAdmin?: boolean
   onClienteUpdated?: () => void
+  onLojaUpdated?: () => void
 }
 
 interface DiaExecucao {
@@ -94,6 +99,7 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
   lojas,
   isAdmin = true,
   onClienteUpdated,
+  onLojaUpdated,
 }) => {
   // Filtros internos da aba
   const [selectedClienteId, setSelectedClienteId] = useState<string>('todos')
@@ -110,10 +116,21 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
   const [emailFeedback, setEmailFeedback] = useState<string | null>(null)
   const [localClientes, setLocalClientes] = useState<Cliente[]>(clientes)
 
-  // Sincroniza localClientes quando a prop clientes for atualizada
+  // Estado local para lojas e configuração de alertas atrasados
+  const [localLojas, setLocalLojas] = useState<Loja[]>(lojas)
+  const [updatingLojaId, setUpdatingLojaId] = useState<string | null>(null)
+  const [alertasFeedback, setAlertasFeedback] = useState<string | null>(null)
+  const [editingRegionalLojaId, setEditingRegionalLojaId] = useState<string | null>(null)
+  const [tempEmailRegional, setTempEmailRegional] = useState<string>('')
+
+  // Sincroniza localClientes e localLojas quando as props forem atualizadas
   useEffect(() => {
     setLocalClientes(clientes)
   }, [clientes])
+
+  useEffect(() => {
+    setLocalLojas(lojas)
+  }, [lojas])
 
   const handleToggleEnvioSemanal = async (clienteId: string, currentVal: boolean) => {
     if (!isAdmin) return
@@ -135,6 +152,65 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
       setTimeout(() => setEmailFeedback(null), 4000)
     } finally {
       setUpdatingClienteId(null)
+    }
+  }
+
+  const handleToggleAlertasLoja = async (lojaId: string, currentVal: boolean) => {
+    if (!isAdmin) return
+    const newVal = !currentVal
+    setUpdatingLojaId(lojaId)
+    try {
+      await lojasService.update(lojaId, { alertas_ativos: newVal })
+      setLocalLojas((prev) =>
+        prev.map((l) => (l.id === lojaId ? { ...l, alertas_ativos: newVal } : l)),
+      )
+      setAlertasFeedback('Status do alerta de rotinas atualizado!')
+      setTimeout(() => setAlertasFeedback(null), 3500)
+      if (onLojaUpdated) {
+        onLojaUpdated()
+      }
+    } catch (err: any) {
+      console.error('Erro ao atualizar alertas_ativos da loja:', err)
+      setAlertasFeedback(err?.message || 'Erro ao atualizar alerta da loja.')
+      setTimeout(() => setAlertasFeedback(null), 4000)
+    } finally {
+      setUpdatingLojaId(null)
+    }
+  }
+
+  const handleStartEditRegional = (loja: Loja) => {
+    if (!isAdmin) return
+    setEditingRegionalLojaId(loja.id)
+    setTempEmailRegional(loja.email_regional || '')
+  }
+
+  const handleCancelEditRegional = () => {
+    setEditingRegionalLojaId(null)
+    setTempEmailRegional('')
+  }
+
+  const handleSaveEmailRegional = async (lojaId: string) => {
+    if (!isAdmin) return
+    setUpdatingLojaId(lojaId)
+    try {
+      const trimmed = tempEmailRegional.trim()
+      await lojasService.update(lojaId, { email_regional: trimmed })
+      setLocalLojas((prev) =>
+        prev.map((l) => (l.id === lojaId ? { ...l, email_regional: trimmed } : l)),
+      )
+      setEditingRegionalLojaId(null)
+      setTempEmailRegional('')
+      setAlertasFeedback('E-mail do regional atualizado com sucesso!')
+      setTimeout(() => setAlertasFeedback(null), 3500)
+      if (onLojaUpdated) {
+        onLojaUpdated()
+      }
+    } catch (err: any) {
+      console.error('Erro ao salvar email regional da loja:', err)
+      setAlertasFeedback(err?.message || 'Erro ao salvar e-mail do regional.')
+      setTimeout(() => setAlertasFeedback(null), 4000)
+    } finally {
+      setUpdatingLojaId(null)
     }
   }
 
@@ -1157,100 +1233,271 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
         </div>
       </div>
 
-      {/* Card de Configuração: Resumo Semanal por E-mail (Item #2 da Automação) */}
-      <div className="bg-white border border-[#E5E7EB] rounded-lg p-5 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-          <div>
-            <h3 className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
-              <Mail className="w-4 h-4 text-[#2563EB]" />
-              <span>Resumo semanal por e-mail</span>
-            </h3>
-            <p className="text-xs text-[#6B7280]">
-              Disparo automatizado via job no backend toda{' '}
-              <strong>segunda-feira às 06:30 (horário de Brasília)</strong> com KPIs e propostas de
-              melhoria
-            </p>
+      {/* Grid de Configurações de Automação: Resumo Semanal + Alertas de Rotinas Atrasadas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Card 1: Resumo Semanal por E-mail */}
+        <div className="bg-white border border-[#E5E7EB] rounded-lg p-5 shadow-xs flex flex-col">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h3 className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
+                <Mail className="w-4 h-4 text-[#2563EB]" />
+                <span>Resumo semanal por e-mail</span>
+              </h3>
+              <p className="text-xs text-[#6B7280]">
+                Disparo automatizado às <strong>segundas-feiras às 06:30</strong> com KPIs e
+                propostas
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded bg-[#3B82F6]/10 text-[#2563EB] self-start sm:self-auto shrink-0">
+              <Calendar className="w-3 h-3" />
+              <span>Segundas-feiras</span>
+            </span>
           </div>
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded bg-[#3B82F6]/10 text-[#2563EB] self-start sm:self-auto">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>Frequência fixa: Segundas-feiras</span>
-          </span>
+
+          {emailFeedback && (
+            <div className="mb-3 p-2.5 text-xs rounded bg-blue-50 text-[#1D4ED8] border border-blue-200 flex items-center gap-1.5">
+              <Check className="w-3.5 h-3.5 shrink-0" />
+              <span>{emailFeedback}</span>
+            </div>
+          )}
+
+          <div className="flex-1 overflow-auto max-h-96">
+            {clientesComContato.length === 0 ? (
+              <div className="p-4 bg-[#F7F7F5] border border-dashed border-[#E5E7EB] rounded-md text-xs text-[#6B7280] text-center">
+                Nenhum cliente cadastrado com e-mail/contato preenchido. Cadastre ou edite um
+                cliente na aba <strong>Clientes</strong> informando o e-mail de contato para ativar
+                o resumo semanal.
+              </div>
+            ) : (
+              <div className="border border-[#E5E7EB] rounded-md divide-y divide-[#E5E7EB] overflow-hidden">
+                {clientesComContato.map((c) => {
+                  const isEnabled = c.envio_semanal !== false // padrão ativo se não for false
+                  const isUpdating = updatingClienteId === c.id
+
+                  return (
+                    <div
+                      key={c.id}
+                      className="p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-white hover:bg-[#F7F7F5]/60 transition-colors"
+                    >
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-[#1F2937]">{c.nome}</span>
+                          <span
+                            className={`text-[10px] font-semibold px-1.5 py-0.2 rounded ${
+                              isEnabled
+                                ? 'bg-blue-50 text-[#2563EB] border border-blue-200'
+                                : 'bg-gray-100 text-[#6B7280]'
+                            }`}
+                          >
+                            {isEnabled ? 'Ativo' : 'Pausado'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-[#4B5563] flex items-center gap-1">
+                          <Mail className="w-3 h-3 text-[#9CA3AF]" />
+                          <span>{c.contato}</span>
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2.5 self-end sm:self-auto">
+                        <span className="text-[11px] text-[#6B7280] hidden sm:inline">
+                          {isEnabled ? 'Recebe semanal' : 'Desativado'}
+                        </span>
+                        <button
+                          type="button"
+                          disabled={!isAdmin || isUpdating}
+                          onClick={() => handleToggleEnvioSemanal(c.id, isEnabled)}
+                          className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
+                            isEnabled ? 'bg-[#2563EB]' : 'bg-gray-200'
+                          }`}
+                          title={
+                            !isAdmin
+                              ? 'Apenas administradores podem alterar configurações de envio'
+                              : isEnabled
+                                ? 'Clique para desativar envio semanal'
+                                : 'Clique para ativar envio semanal'
+                          }
+                        >
+                          <span
+                            className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out ${
+                              isEnabled ? 'translate-x-4' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
-        {emailFeedback && (
-          <div className="mb-3 p-2.5 text-xs rounded bg-blue-50 text-[#1D4ED8] border border-blue-200 flex items-center gap-1.5">
-            <Check className="w-3.5 h-3.5 shrink-0" />
-            <span>{emailFeedback}</span>
+        {/* Card 2: Alertas de Rotinas Atrasadas (Disparo a cada 5 min) */}
+        <div className="bg-white border border-[#E5E7EB] rounded-lg p-5 shadow-xs flex flex-col">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h3 className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
+                <Clock className="w-4 h-4 text-[#2563EB]" />
+                <span>Alertas de rotinas atrasadas</span>
+              </h3>
+              <p className="text-xs text-[#6B7280]">
+                Varredura a <strong>cada 5 minutos</strong>: avisa Gerente e Regional quando o
+                horário limite é ultrapassado
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 self-start sm:self-auto shrink-0">
+              <Clock className="w-3 h-3" />
+              <span>A cada 5 min</span>
+            </span>
           </div>
-        )}
 
-        {clientesComContato.length === 0 ? (
-          <div className="p-4 bg-[#F7F7F5] border border-dashed border-[#E5E7EB] rounded-md text-xs text-[#6B7280] text-center">
-            Nenhum cliente cadastrado com e-mail/contato preenchido. Cadastre ou edite um cliente na
-            aba <strong>Clientes</strong> informando o e-mail de contato para ativar o resumo
-            semanal.
-          </div>
-        ) : (
-          <div className="border border-[#E5E7EB] rounded-md divide-y divide-[#E5E7EB] overflow-hidden">
-            {clientesComContato.map((c) => {
-              const isEnabled = c.envio_semanal !== false // padrão ativo se não for false
-              const isUpdating = updatingClienteId === c.id
+          {alertasFeedback && (
+            <div className="mb-3 p-2.5 text-xs rounded bg-blue-50 text-[#1D4ED8] border border-blue-200 flex items-center gap-1.5">
+              <Check className="w-3.5 h-3.5 shrink-0" />
+              <span>{alertasFeedback}</span>
+            </div>
+          )}
 
-              return (
-                <div
-                  key={c.id}
-                  className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white hover:bg-[#F7F7F5]/60 transition-colors"
-                >
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-[#1F2937]">{c.nome}</span>
-                      <span
-                        className={`text-[10px] font-semibold px-1.5 py-0.2 rounded ${
-                          isEnabled
-                            ? 'bg-blue-50 text-[#2563EB] border border-blue-200'
-                            : 'bg-gray-100 text-[#6B7280]'
-                        }`}
-                      >
-                        {isEnabled ? 'Envio Ativo' : 'Pausado'}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-[#4B5563] flex items-center gap-1">
-                      <Mail className="w-3 h-3 text-[#9CA3AF]" />
-                      <span>{c.contato}</span>
-                    </p>
-                  </div>
+          <div className="flex-1 overflow-auto max-h-96">
+            {localLojas.length === 0 ? (
+              <div className="p-4 bg-[#F7F7F5] border border-dashed border-[#E5E7EB] rounded-md text-xs text-[#6B7280] text-center">
+                Nenhuma loja cadastrada. Adicione lojas na aba <strong>Lojas</strong> para
+                configurar alertas de rotinas em atraso.
+              </div>
+            ) : (
+              <div className="border border-[#E5E7EB] rounded-md divide-y divide-[#E5E7EB] overflow-hidden">
+                {localLojas.map((loja) => {
+                  const isEnabled = loja.alertas_ativos !== false // padrão ativo se não for false
+                  const isUpdating = updatingLojaId === loja.id
+                  const isEditingRegional = editingRegionalLojaId === loja.id
+                  const clienteObj = clientes.find((c) => c.id === loja.cliente)
 
-                  <div className="flex items-center gap-3">
-                    <span className="text-[11px] text-[#6B7280] hidden sm:inline">
-                      {isEnabled ? 'Recebe às segundas' : 'Não receberá'}
-                    </span>
-                    <button
-                      type="button"
-                      disabled={!isAdmin || isUpdating}
-                      onClick={() => handleToggleEnvioSemanal(c.id, isEnabled)}
-                      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
-                        isEnabled ? 'bg-[#2563EB]' : 'bg-gray-200'
-                      }`}
-                      title={
-                        !isAdmin
-                          ? 'Apenas administradores podem alterar configurações de envio'
-                          : isEnabled
-                            ? 'Clique para desativar envio semanal'
-                            : 'Clique para ativar envio semanal'
-                      }
+                  return (
+                    <div
+                      key={loja.id}
+                      className="p-3 flex flex-col gap-2.5 bg-white hover:bg-[#F7F7F5]/60 transition-colors"
                     >
-                      <span
-                        className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out ${
-                          isEnabled ? 'translate-x-4' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
-                  </div>
-                </div>
-              )
-            })}
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs font-bold text-[#1F2937]">
+                            {loja.nome} {loja.codigo ? `(${loja.codigo})` : ''}
+                          </span>
+                          <span className="text-[10px] text-[#6B7280] font-medium bg-gray-100 px-1.5 py-0.2 rounded">
+                            {clienteObj?.nome || 'Cliente não vinculado'}
+                          </span>
+                          <span
+                            className={`text-[10px] font-semibold px-1.5 py-0.2 rounded ${
+                              isEnabled
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                : 'bg-gray-100 text-[#6B7280]'
+                            }`}
+                          >
+                            {isEnabled ? 'Alertas Ativos' : 'Desativados'}
+                          </span>
+                        </div>
+
+                        {/* Toggle Alertas Ativos */}
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            disabled={!isAdmin || isUpdating}
+                            onClick={() => handleToggleAlertasLoja(loja.id, isEnabled)}
+                            className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
+                              isEnabled ? 'bg-[#2563EB]' : 'bg-gray-200'
+                            }`}
+                            title={
+                              !isAdmin
+                                ? 'Apenas administradores podem alterar alertas'
+                                : isEnabled
+                                  ? 'Clique para desativar alertas desta loja'
+                                  : 'Clique para ativar alertas desta loja'
+                            }
+                          >
+                            <span
+                              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out ${
+                                isEnabled ? 'translate-x-4' : 'translate-x-0'
+                              }`}
+                            />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* E-mail do Regional com edição inline */}
+                      <div className="text-[11px] text-[#4B5563] pt-1 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                          <span className="font-semibold text-[#6B7280] whitespace-nowrap">
+                            E-mail do Regional:
+                          </span>
+                          {isEditingRegional ? (
+                            <div className="flex items-center gap-1.5 flex-1 max-w-sm">
+                              <input
+                                type="email"
+                                value={tempEmailRegional}
+                                onChange={(e) => setTempEmailRegional(e.target.value)}
+                                placeholder="regional@cliente.com"
+                                className="w-full px-2 py-1 text-xs bg-white border border-[#2563EB] rounded outline-none text-[#1F2937]"
+                                autoFocus
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleSaveEmailRegional(loja.id)
+                                  if (e.key === 'Escape') handleCancelEditRegional()
+                                }}
+                              />
+                              <button
+                                type="button"
+                                disabled={isUpdating}
+                                onClick={() => handleSaveEmailRegional(loja.id)}
+                                className="p-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded"
+                                title="Salvar e-mail"
+                              >
+                                <Save className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleCancelEditRegional}
+                                className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
+                                title="Cancelar edição"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5 truncate">
+                              <span
+                                className={`truncate ${
+                                  loja.email_regional
+                                    ? 'text-[#1F2937] font-medium'
+                                    : 'text-[#9CA3AF] italic'
+                                }`}
+                              >
+                                {loja.email_regional || 'Nenhum e-mail regional cadastrado'}
+                              </span>
+                              {isAdmin && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleStartEditRegional(loja)}
+                                  className="p-1 text-[#6B7280] hover:text-[#2563EB] hover:bg-gray-100 rounded shrink-0 transition-colors"
+                                  title="Editar e-mail do regional"
+                                >
+                                  <Edit2 className="w-3 h-3" />
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {!isEditingRegional && (
+                          <span className="text-[10px] text-[#9CA3AF] shrink-0">
+                            Destinatários: Gerente da loja + Regional
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   )
