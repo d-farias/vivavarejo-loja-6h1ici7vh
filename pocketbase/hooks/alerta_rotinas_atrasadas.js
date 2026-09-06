@@ -1,11 +1,13 @@
-// Job agendado frequente: Verificação a cada 5 minutos de rotinas atrasadas e envio imediato de alerta por e-mail
+// Job agendado frequente: Verificação a cada 5 minutos de rotinas e visitas de promotores atrasadas e envio imediato de alerta por e-mail
 // Executa a cada 5 minutos: '*/5 * * * *'
 // NOTA IMPORTANTE JSVM: Em hooks do PocketBase, callbacks executam em VM isolada.
 // Toda a lógica e funções auxiliares DEVEM estar inline dentro do callback do cronAdd.
 // Utiliza $app para todas as operações de banco de dados.
 
 cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
-  console.log('[AlertaRotinas] Iniciando varredura a cada 5 minutos de rotinas em atraso...')
+  console.log(
+    '[AlertaRotinas] Iniciando varredura a cada 5 minutos de rotinas e visitas em atraso...',
+  )
 
   // 1. Extração segura de e-mail de strings livres
   const extractEmail = (str) => {
@@ -225,13 +227,38 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
     rotinas = $app.findRecordsByFilter('rotinas', 'status != "Concluída"', 'nome', 3000, 0)
   } catch (err) {
     console.error('[AlertaRotinas] Erro ao carregar rotinas:', err)
-    return
   }
 
-  if (!rotinas || rotinas.length === 0) {
-    console.log('[AlertaRotinas] Nenhuma rotina cadastrada. Encerrando.')
-    return
+  // Buscar todas as visitas de promotor (não canceladas e não realizadas)
+  let visitas = []
+  try {
+    visitas = $app.findRecordsByFilter(
+      'visitas_promotor',
+      'status != "cancelada" && status != "realizada"',
+      'data_visita,hora_prevista',
+      3000,
+      0,
+    )
+  } catch (err) {
+    console.error('[AlertaRotinas] Erro ao carregar visitas_promotor:', err)
   }
+
+  // Buscar promotores e fornecedores para montar o resumo da visita
+  let promotoresMap = {}
+  try {
+    const promList = $app.findRecordsByFilter('promotores', '', 'nome', 1000, 0)
+    for (let i = 0; i < promList.length; i++) {
+      promotoresMap[promList[i].id] = promList[i]
+    }
+  } catch (_) {}
+
+  let fornecedoresMap = {}
+  try {
+    const fornList = $app.findRecordsByFilter('fornecedores', '', 'nome', 1000, 0)
+    for (let i = 0; i < fornList.length; i++) {
+      fornecedoresMap[fornList[i].id] = fornList[i]
+    }
+  } catch (_) {}
 
   // Criar mapa de lojas por ID
   const lojasMap = {}
@@ -285,24 +312,99 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
     }
   }
 
-  const lojaIdsComAtraso = Object.keys(atrasadasPorLoja)
+  // Identificar visitas de promotores atrasadas que ainda NÃO tiveram alerta disparado hoje
+  const visitasAtrasadasPorLoja = {} // lojaId -> Array de visitas atrasadas
+
+  for (let i = 0; i < visitas.length; i++) {
+    const v = visitas[i]
+
+    // Anti-duplicidade: verificar se já gerou alerta hoje
+    const alertaVisitaEm = v.getString('alerta_enviado_em')
+    if (alertaVisitaEm && alertaVisitaEm.startsWith(todayStr)) {
+      continue
+    }
+
+    const dataVisitaRaw = v.getString('data_visita')
+    const dataVisitaStr = dataVisitaRaw ? dataVisitaRaw.substring(0, 10) : ''
+    if (!dataVisitaStr) continue
+
+    const horaPrevistaStr = (v.getString('hora_prevista') || '').trim()
+
+    let isAtrasada = false
+    let detalheHorario = ''
+
+    if (dataVisitaStr < todayStr) {
+      // Visita em dia anterior não realizada
+      isAtrasada = true
+      detalheHorario = `${dataVisitaStr.split('-').reverse().join('/')}${horaPrevistaStr ? ` às ${horaPrevistaStr}` : ''}`
+    } else if (dataVisitaStr === todayStr) {
+      // Visita para hoje: checar se hora_prevista expirou
+      if (horaPrevistaStr) {
+        const colonMatch = horaPrevistaStr.match(/^(\d{1,2}):(\d{2})/)
+        if (colonMatch) {
+          const h = parseInt(colonMatch[1], 10)
+          const m = parseInt(colonMatch[2], 10)
+          if (!isNaN(h) && !isNaN(m)) {
+            const scheduledMinutes = h * 60 + m
+            if (currentMinutes > scheduledMinutes) {
+              isAtrasada = true
+              detalheHorario = `Hoje às ${horaPrevistaStr}`
+            }
+          }
+        }
+      }
+    }
+
+    if (isAtrasada) {
+      const lojaId = v.getString('loja') || '_sem_loja_'
+      if (!visitasAtrasadasPorLoja[lojaId]) {
+        visitasAtrasadasPorLoja[lojaId] = []
+      }
+
+      const promId = v.getString('promotor')
+      const promObj = promId ? promotoresMap[promId] : null
+      const promNome = promObj ? promObj.getString('nome') : 'Promotor'
+      const fornId = promObj ? promObj.getString('fornecedor') : ''
+      const fornObj = fornId ? fornecedoresMap[fornId] : null
+      const fornNome = fornObj ? fornObj.getString('nome') : 'Fornecedor'
+
+      visitasAtrasadasPorLoja[lojaId].push({
+        record: v,
+        promotorNome: promNome,
+        fornecedorNome: fornNome,
+        detalheHorario: detalheHorario,
+        observacoes: v.getString('observacoes') || '—',
+      })
+    }
+  }
+
+  // Agrupar lojas que possuem ou rotinas atrasadas OU visitas de promotor atrasadas
+  const todasLojasComAtraso = new Set([
+    ...Object.keys(atrasadasPorLoja),
+    ...Object.keys(visitasAtrasadasPorLoja),
+  ])
+
+  const lojaIdsComAtraso = Array.from(todasLojasComAtraso)
   if (lojaIdsComAtraso.length === 0) {
-    console.log('[AlertaRotinas] Nenhuma rotina pendente em atraso nesta verificação.')
+    console.log(
+      '[AlertaRotinas] Nenhuma rotina ou visita de promotor pendente em atraso nesta verificação.',
+    )
     return
   }
 
   console.log(
-    `[AlertaRotinas] Encontradas rotinas atrasadas em ${lojaIdsComAtraso.length} grupo(s) de lojas.`,
+    `[AlertaRotinas] Encontradas pendências em atraso em ${lojaIdsComAtraso.length} grupo(s) de lojas.`,
   )
 
   let totalEmailsEnviados = 0
 
   for (let lIdx = 0; lIdx < lojaIdsComAtraso.length; lIdx++) {
     const lojaId = lojaIdsComAtraso[lIdx]
-    const atrasadas = atrasadasPorLoja[lojaId]
+    const atrasadas = atrasadasPorLoja[lojaId] || []
+    const visitasAtrasadas = visitasAtrasadasPorLoja[lojaId] || []
     const loja = lojasMap[lojaId]
 
-    // Se for rotina sem loja vinculada e houver apenas 1 loja, associa a ela
+    // Se for registro sem loja vinculada e houver apenas 1 loja, associa a ela
     let lojaEfetiva = loja
     if (!lojaEfetiva && lojaId === '_sem_loja_' && lojas.length === 1) {
       lojaEfetiva = lojas[0]
@@ -400,17 +502,20 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
     // Blindagem 2: Se não houver NENHUM destinatário válido, pular a loja com log claro
     if (destinatariosDetalhes.length === 0) {
       console.log(
-        `[AlertaRotinas] Loja "${lojaNome}" possui ${atrasadas.length} rotina(s) atrasada(s), mas nenhum destinatário (gerente/regional/cliente) foi encontrado. Pulando com log.`,
+        `[AlertaRotinas] Loja "${lojaNome}" possui pendências em atraso (${atrasadas.length} rotinas, ${visitasAtrasadas.length} visitas), mas nenhum destinatário (gerente/regional/cliente) foi encontrado. Pulando com log.`,
       )
       continue
     }
 
     // Montar assunto e corpo do e-mail consolidado
-    // Assunto no padrão solicitado: "[VivaVarejo] Rotinas não realizadas — Loja X"
     let subject = ''
-    if (atrasadas.length === 1) {
+    if (visitasAtrasadas.length > 0 && atrasadas.length === 0) {
+      subject = `[VivaVarejo] Visita de promotor atrasada — ${lojaNome}`
+    } else if (atrasadas.length === 1 && visitasAtrasadas.length === 0) {
       const rUnica = atrasadas[0]
       subject = `[VivaVarejo] Rotina não realizada — ${lojaNome} — ${rUnica.horarioLimite}`
+    } else if (visitasAtrasadas.length > 0 && atrasadas.length > 0) {
+      subject = `[VivaVarejo] Rotinas e Visitas não realizadas — ${lojaNome}`
     } else {
       subject = `[VivaVarejo] Rotinas não realizadas — ${lojaNome}`
     }
@@ -441,13 +546,40 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
       `
     }
 
+    // Linhas da tabela de visitas de promotores atrasadas
+    let visitasHtml = ''
+    for (let vIdx = 0; vIdx < visitasAtrasadas.length; vIdx++) {
+      const vItem = visitasAtrasadas[vIdx]
+      visitasHtml += `
+        <tr style="border-bottom: 1px solid #E5E7EB;">
+          <td style="padding: 12px 14px; font-weight: 700; color: #1F2937;">
+            ${escapeHtml(vItem.promotorNome)}
+          </td>
+          <td style="padding: 12px 14px; color: #2563EB; font-weight: 600;">
+            ${escapeHtml(vItem.fornecedorNome)}
+          </td>
+          <td style="padding: 12px 14px; text-align: center; font-weight: 700; color: #B91C1C;">
+            ${escapeHtml(vItem.detalheHorario)}
+          </td>
+          <td style="padding: 12px 14px; color: #6B7280; font-size: 11px;">
+            ${escapeHtml(vItem.observacoes)}
+          </td>
+          <td style="padding: 12px 14px; text-align: center;">
+            <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; background-color: #FEE2E2; color: #B91C1C;">
+              Não realizada
+            </span>
+          </td>
+        </tr>
+      `
+    }
+
     // Template HTML sóbrio na paleta institucional (fundo #F7F7F5, texto #1F2937, azul #2563EB, bordas #E5E7EB, sem gradientes)
     const htmlBody = `
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <title>Alerta Operacional - Rotina não realizada</title>
+  <title>Alerta Operacional - VivaVarejo</title>
 </head>
 <body style="margin: 0; padding: 20px; background-color: #F7F7F5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1F2937;">
   <div style="max-width: 680px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden;">
@@ -456,7 +588,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
     <div style="background: #FFFFFF; border-bottom: 2px solid #2563EB; padding: 24px 28px;">
       <div style="font-size: 20px; font-weight: 800; color: #2563EB; letter-spacing: -0.5px;">VIVAVAREJO</div>
       <div style="font-size: 16px; font-weight: 700; color: #1F2937; margin-top: 6px;">
-        Alerta Operacional: Rotina(s) não realizada(s) no horário
+        Alerta Operacional: Pendência(s) não realizada(s) no horário
       </div>
       <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">
         Unidade: <strong>${escapeHtml(lojaNome)}</strong> ${lojaCodigo ? `(${escapeHtml(lojaCodigo)})` : ''} • Rede: ${escapeHtml(clienteNome)} • Horário da verificação: ${currentHourFormatted} (horário de Brasília)
@@ -471,10 +603,13 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
           Atenção Gerência & Regional da Loja
         </div>
         <div style="font-size: 12px; color: #7F1D1D; line-height: 1.5; margin-top: 4px;">
-          O horário limite programado para a(s) tarefa(s) abaixo foi ultrapassado sem registro de conclusão no sistema. Por favor, alinhe com os responsáveis operacionais imediatamente.
+          O horário programado para o(s) item(ns) abaixo foi ultrapassado sem registro de realização no sistema. Por favor, alinhe com os responsáveis operacionais imediatamente.
         </div>
       </div>
 
+      ${
+        atrasadas.length > 0
+          ? `
       <!-- Tabela de Rotinas Atrasadas -->
       <div style="margin-bottom: 24px;">
         <div style="font-size: 13px; font-weight: 700; color: #1F2937; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
@@ -495,10 +630,40 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
           </tbody>
         </table>
       </div>
+      `
+          : ''
+      }
+
+      ${
+        visitasAtrasadas.length > 0
+          ? `
+      <!-- Tabela de Visitas de Promotores Atrasadas -->
+      <div style="margin-bottom: 24px;">
+        <div style="font-size: 13px; font-weight: 700; color: #1F2937; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+          Visita(s) de Promotores com Horário Expirado
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid #E5E7EB;">
+          <thead>
+            <tr style="background: #F7F7F5; border-bottom: 1px solid #E5E7EB; color: #4B5563;">
+              <th style="padding: 10px 14px; text-align: left; font-weight: 700;">Promotor</th>
+              <th style="padding: 10px 14px; text-align: left; font-weight: 700;">Fornecedor</th>
+              <th style="padding: 10px 14px; text-align: center; font-weight: 700;">Previsão</th>
+              <th style="padding: 10px 14px; text-align: left; font-weight: 700;">Observações</th>
+              <th style="padding: 10px 14px; text-align: center; font-weight: 700;">Situação</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${visitasHtml}
+          </tbody>
+        </table>
+      </div>
+      `
+          : ''
+      }
 
       <!-- Orientação Operacional -->
       <div style="background: #F7F7F5; border: 1px solid #E5E7EB; border-radius: 6px; padding: 12px 14px; font-size: 12px; color: #4B5563; line-height: 1.5; margin-bottom: 20px;">
-        <strong>Como regularizar:</strong> Assim que a equipe concluir a execução física da rotina, marque a tarefa como concluída no VivaVarejo. Este alerta não será repetido para esta rotina no dia de hoje.
+        <strong>Como regularizar:</strong> Assim que a equipe ou o promotor concluir a atividade física na loja, registre a conclusão no VivaVarejo. Este alerta não será repetido para o mesmo item no dia de hoje.
       </div>
 
       <!-- Rodapé Institucional -->
@@ -545,6 +710,20 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
         } catch (saveErr) {
           console.error(
             `[AlertaRotinas] Erro ao marcar alerta_enviado_em na rotina ${atrasadas[rIdx].record.id}:`,
+            saveErr,
+          )
+        }
+      }
+
+      // Marcar anti-duplicidade em cada visita de promotor alertada
+      for (let vIdx = 0; vIdx < visitasAtrasadas.length; vIdx++) {
+        try {
+          const rec = visitasAtrasadas[vIdx].record
+          rec.set('alerta_enviado_em', `${todayStr} ${currentHourFormatted}`)
+          $app.save(rec)
+        } catch (saveErr) {
+          console.error(
+            `[AlertaRotinas] Erro ao marcar alerta_enviado_em na visita ${visitasAtrasadas[vIdx].record.id}:`,
             saveErr,
           )
         }
