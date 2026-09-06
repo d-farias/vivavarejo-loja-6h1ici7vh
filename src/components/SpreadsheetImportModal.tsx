@@ -2,7 +2,9 @@ import React, { useState, useRef } from 'react'
 import type { Rotina, Loja } from '@/types'
 import { parseUploadedSpreadsheet, ParsedSheetRoutine } from '@/lib/spreadsheet-parser'
 import { rotinasService } from '@/services/rotinas'
+import { modelosRotinasService } from '@/services/modelosRotinas'
 import { useStore } from '@/context/StoreContext'
+import { useAuth } from '@/context/AuthContext'
 import {
   UploadCloud,
   FileSpreadsheet,
@@ -11,6 +13,7 @@ import {
   X,
   RefreshCw,
   Store,
+  Layers,
 } from 'lucide-react'
 
 interface SpreadsheetImportModalProps {
@@ -27,6 +30,7 @@ export function SpreadsheetImportModal({
   initialLojaId,
 }: SpreadsheetImportModalProps) {
   const { lojas, lojaSelecionadaId } = useStore()
+  const { user } = useAuth()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
   const [parsing, setParsing] = useState(false)
@@ -36,6 +40,10 @@ export function SpreadsheetImportModal({
   const [detectedHeaders, setDetectedHeaders] = useState<string[]>([])
   const [importMode, setImportMode] = useState<'append' | 'replace'>('append')
   const [progressMsg, setProgressMsg] = useState('')
+
+  // Opção de salvar importação como modelo reutilizável
+  const [saveAsModelo, setSaveAsModelo] = useState(false)
+  const [modeloNome, setModeloNome] = useState('')
 
   // Loja de destino da importação
   const [targetLojaId, setTargetLojaId] = useState<string>(() => {
@@ -64,6 +72,10 @@ export function SpreadsheetImportModal({
       } else {
         setParsedData(result.routines)
         setDetectedHeaders(result.headers)
+        if (!modeloNome) {
+          const baseName = selectedFile.name.replace(/\.[^/.]+$/, '')
+          setModeloNome(`Modelo - ${baseName}`)
+        }
       }
     } catch (err: any) {
       setParseError(
@@ -102,6 +114,31 @@ export function SpreadsheetImportModal({
           observacoes: item.observacoes,
           status: 'Ativa',
           loja: targetLojaId || undefined,
+        })
+      }
+
+      // Se marcou para salvar como modelo reutilizável
+      if (saveAsModelo && modeloNome.trim()) {
+        setProgressMsg('Salvando rotinas como novo modelo reutilizável...')
+        const lojaAlvo = lojas.find((l) => l.id === targetLojaId)
+        await modelosRotinasService.salvarImportacaoComoModelo({
+          nomeModelo: modeloNome.trim(),
+          descricao: `Criado a partir da importação de "${file?.name || 'planilha'}" para a loja ${
+            lojaAlvo?.nome || 'Geral'
+          }`,
+          clienteId: lojaAlvo?.cliente,
+          criadoPorId: user?.id,
+          itens: parsedData.map((it) => ({
+            nome: it.nome,
+            responsavel: it.responsavel,
+            funcao_nome: it.responsavel,
+            frequencia: it.frequencia,
+            horario_limite: it.horario_limite,
+            ferramenta: it.ferramenta,
+            validacao: it.validacao,
+            area: it.area,
+            observacoes: it.observacoes,
+          })),
         })
       }
 
@@ -304,6 +341,45 @@ export function SpreadsheetImportModal({
                       </div>
                     </label>
                   </div>
+                </div>
+              )}
+
+              {/* Opção: Salvar esta importação como modelo reutilizável */}
+              {parsedData.length > 0 && (
+                <div className="p-3.5 rounded-lg bg-[#F7F7F5] border border-[#E5E7EB] space-y-2.5">
+                  <label className="flex items-start gap-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={saveAsModelo}
+                      onChange={(e) => setSaveAsModelo(e.target.checked)}
+                      className="mt-0.5 rounded text-[#2563EB] focus:ring-[#2563EB]"
+                    />
+                    <div>
+                      <span className="text-xs font-semibold text-[#1F2937] flex items-center gap-1.5">
+                        <Layers className="w-3.5 h-3.5 text-[#2563EB]" />
+                        <span>Salvar esta importação como modelo reutilizável</span>
+                      </span>
+                      <p className="text-[11px] text-[#6B7280]">
+                        Permite aplicar este mesmo conjunto de rotinas em outras lojas da rede sem
+                        precisar importar novamente.
+                      </p>
+                    </div>
+                  </label>
+
+                  {saveAsModelo && (
+                    <div className="pt-1.5 pl-6">
+                      <label className="block text-[11px] font-semibold text-[#374151] mb-1">
+                        Nome do modelo
+                      </label>
+                      <input
+                        type="text"
+                        value={modeloNome}
+                        onChange={(e) => setModeloNome(e.target.value)}
+                        placeholder="Ex: Modelo Padrão - Hipermercados"
+                        className="w-full px-3 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 

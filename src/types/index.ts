@@ -99,3 +99,38 @@ export interface ExecucaoRotina extends RecordModel {
     usuario?: User
   }
 }
+
+export interface ModeloRotina extends RecordModel {
+  nome: string
+  cliente?: string
+  descricao?: string
+  criado_por?: string
+  created: string
+  updated: string
+  expand?: {
+    cliente?: Cliente
+    criado_por?: User
+  }
+}
+
+export interface ModeloRotinaItem extends RecordModel {
+  modelo: string
+  nome: string
+  responsavel?: string
+  funcao_nome?: string
+  frequencia: FrequenciaRotina
+  horario_limite?: string
+  ferramenta?: string
+  validacao?: string
+  area?: string
+  observacoes?: string
+  created: string
+  updated: string
+  expand?: {
+    modelo?: ModeloRotina
+  }
+}
+
+export interface ModeloComContagem extends ModeloRotina {
+  totalItens?: number
+}

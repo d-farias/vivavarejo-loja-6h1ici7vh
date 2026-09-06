@@ -5,7 +5,17 @@ import { clientesService } from '@/services/clientes'
 import { lojasService } from '@/services/lojas'
 import { funcoesService } from '@/services/funcoes'
 import { funcionariosService, usersService } from '@/services/funcionarios'
-import type { Cliente, Loja, Funcao, Funcionario, User, PerfilUsuario } from '@/types'
+import { modelosRotinasService } from '@/services/modelosRotinas'
+import type {
+  Cliente,
+  Loja,
+  Funcao,
+  Funcionario,
+  User,
+  PerfilUsuario,
+  ModeloComContagem,
+  ModeloRotina,
+} from '@/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Building2,
@@ -32,10 +42,17 @@ import {
   Power,
   Copy,
   Info,
+  Layers,
+  ArrowRight,
+  Eye,
 } from 'lucide-react'
 import { PainelGerencial } from '../components/PainelGerencial'
+import { ModeloFormModal } from '../components/ModeloFormModal'
+import { ModeloDetalhesModal } from '../components/ModeloDetalhesModal'
+import { AplicarModeloModal } from '../components/AplicarModeloModal'
+import { SalvarLojaComoModeloModal } from '../components/SalvarLojaComoModeloModal'
 
-type TabType = 'painel' | 'clientes' | 'lojas' | 'funcoes' | 'funcionarios' | 'usuarios'
+type TabType = 'painel' | 'modelos' | 'clientes' | 'lojas' | 'funcoes' | 'funcionarios' | 'usuarios'
 
 export default function Admin() {
   const { user } = useAuth()
@@ -49,6 +66,7 @@ export default function Admin() {
   const [funcoes, setFuncoes] = useState<Funcao[]>([])
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
   const [usuarios, setUsuarios] = useState<User[]>([])
+  const [modelos, setModelos] = useState<ModeloComContagem[]>([])
 
   const [loading, setLoading] = useState(true)
   const [feedbackMsg, setFeedbackMsg] = useState<{
@@ -125,22 +143,50 @@ export default function Admin() {
     isBlocked: false,
   })
 
+  // Modais de Modelos de Rotinas
+  const [modeloModal, setModeloModal] = useState<{ open: boolean; data: ModeloRotina | null }>({
+    open: false,
+    data: null,
+  })
+  const [modeloDetalhesModal, setModeloDetalhesModal] = useState<{
+    open: boolean
+    data: ModeloRotina | null
+  }>({
+    open: false,
+    data: null,
+  })
+  const [aplicarModeloModal, setAplicarModeloModal] = useState<{
+    open: boolean
+    initialModeloId?: string
+    initialLojaId?: string
+  }>({
+    open: false,
+  })
+  const [salvarLojaComoModeloModal, setSalvarLojaComoModeloModal] = useState<{
+    open: boolean
+    initialLojaId?: string
+  }>({
+    open: false,
+  })
+
   // Carregamento unificado
   const loadAll = useCallback(async () => {
     setLoading(true)
     try {
-      const [c, l, fn, fc, u] = await Promise.all([
+      const [c, l, fn, fc, u, mod] = await Promise.all([
         clientesService.getAll(),
         lojasService.getAll(),
         funcoesService.getAll(),
         funcionariosService.getAll(),
         usersService.getAll(),
+        modelosRotinasService.getAllComContagem(),
       ])
       setClientes(c)
       setLojas(l)
       setFuncoes(fn)
       setFuncionarios(fc)
       setUsuarios(u)
+      setModelos(mod)
     } catch (err) {
       console.error('Erro ao carregar dados do admin:', err)
       setFeedbackMsg({ type: 'error', text: 'Erro ao carregar dados do painel ADM.' })
@@ -381,6 +427,24 @@ export default function Admin() {
     })
   }
 
+  // Exclusão de modelo de rotina
+  const handleDeleteModelo = async (modelo: ModeloComContagem) => {
+    if (
+      !confirm(
+        `Confirma a exclusão do modelo "${modelo.nome}"? Todas as ${modelo.totalItens || 0} rotinas vinculadas a este modelo serão removidas (as rotinas já aplicadas em lojas serão mantidas intactas).`,
+      )
+    ) {
+      return
+    }
+    try {
+      await modelosRotinasService.delete(modelo.id)
+      showFeedback('Modelo excluído com sucesso!')
+      loadAll()
+    } catch (err: any) {
+      showFeedback(err?.message || 'Erro ao excluir modelo', 'error')
+    }
+  }
+
   // Confirmação de exclusão genérica
   const handleConfirmDelete = async () => {
     if (deleteDialog.isBlocked || !deleteDialog.id) return
@@ -559,6 +623,19 @@ export default function Admin() {
     })
   }, [clientes, searchTerm])
 
+  const filteredModelos = useMemo(() => {
+    return modelos.filter((m) => {
+      const matchSearch =
+        m.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (m.descricao && m.descricao.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (m.expand?.cliente?.nome &&
+          m.expand.cliente.nome.toLowerCase().includes(searchTerm.toLowerCase()))
+      const matchCliente =
+        selectedClienteFilter === 'todos' || !m.cliente || m.cliente === selectedClienteFilter
+      return matchSearch && matchCliente
+    })
+  }, [modelos, searchTerm, selectedClienteFilter])
+
   const filteredLojas = useMemo(() => {
     return lojas.filter((l) => {
       if (selectedClienteFilter !== 'todos' && l.cliente !== selectedClienteFilter) return false
@@ -705,6 +782,22 @@ export default function Admin() {
           <span>Painel Gerencial</span>
         </button>
 
+        {/* Nova aba: Modelos de Rotinas */}
+        <button
+          onClick={() => {
+            setActiveTab('modelos')
+            setSearchTerm('')
+          }}
+          className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+            activeTab === 'modelos'
+              ? 'border-[#2563EB] text-[#2563EB]'
+              : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
+          }`}
+        >
+          <Layers className="w-4 h-4" />
+          <span>Modelos ({modelos.length})</span>
+        </button>
+
         <button
           onClick={() => {
             setActiveTab('clientes')
@@ -803,7 +896,195 @@ export default function Admin() {
               isAdmin={perfil === 'admin'}
               onClienteUpdated={loadAll}
               onLojaUpdated={loadAll}
+              onOpenAplicarModelo={(lojaId) =>
+                setAplicarModeloModal({ open: true, initialLojaId: lojaId })
+              }
             />
+          )}
+
+          {/* ======================= ABA MODELOS DE ROTINAS ======================= */}
+          {activeTab === 'modelos' && (
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 flex-1">
+                  <div className="relative w-full sm:w-72">
+                    <Search className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Buscar modelos de rotinas..."
+                      className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                    />
+                  </div>
+
+                  {/* Filtro por Cliente */}
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <Filter className="w-3.5 h-3.5 text-[#6B7280]" />
+                    <select
+                      value={selectedClienteFilter}
+                      onChange={(e) => setSelectedClienteFilter(e.target.value)}
+                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
+                    >
+                      <option value="todos">Todos os Modelos (Gerais e Redes)</option>
+                      {clientes.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          Rede: {c.nome}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+                  {lojas.length > 0 && (
+                    <button
+                      onClick={() => setSalvarLojaComoModeloModal({ open: true })}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] text-xs font-semibold rounded-md shadow-xs transition-colors"
+                      title="Salvar todas as rotinas de uma loja como novo modelo reutilizável"
+                    >
+                      <Store className="w-3.5 h-3.5 text-[#2563EB]" />
+                      <span>Salvar Loja como Modelo</span>
+                    </button>
+                  )}
+
+                  {modelos.length > 0 && lojas.length > 0 && (
+                    <button
+                      onClick={() => setAplicarModeloModal({ open: true })}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
+                      title="Replicar modelo de rotinas em uma loja de destino"
+                    >
+                      <ArrowRight className="w-3.5 h-3.5" />
+                      <span>Aplicar Modelo em Loja</span>
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => setModeloModal({ open: true, data: null })}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#2563EB] text-[#2563EB] hover:bg-blue-50 text-xs font-semibold rounded-md shadow-xs transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Novo Modelo</span>
+                  </button>
+                </div>
+              </div>
+
+              {filteredModelos.length === 0 ? (
+                <div className="p-8 text-center bg-white border border-[#E5E7EB] rounded-lg">
+                  <Layers className="w-8 h-8 text-[#9CA3AF] mx-auto mb-2" />
+                  <p className="text-sm font-medium text-[#1F2937]">
+                    Nenhum modelo de rotinas cadastrado.
+                  </p>
+                  <p className="text-xs text-[#6B7280] mt-1 max-w-md mx-auto">
+                    Crie modelos reutilizáveis para padronizar as rotinas de consultoria entre as
+                    lojas da rede sem recadastrar tudo manualmente.
+                  </p>
+                  <div className="mt-4 flex justify-center gap-2">
+                    {lojas.length > 0 && (
+                      <button
+                        onClick={() => setSalvarLojaComoModeloModal({ open: true })}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] text-xs font-semibold rounded-md shadow-xs"
+                      >
+                        <Store className="w-3.5 h-3.5 text-[#2563EB]" />
+                        <span>Salvar Loja como Modelo</span>
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setModeloModal({ open: true, data: null })}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Criar Modelo Manual</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-white border border-[#E5E7EB] rounded-lg overflow-hidden shadow-xs">
+                  <table className="w-full text-left text-xs sm:text-sm">
+                    <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563] text-xs font-semibold uppercase tracking-wider">
+                      <tr>
+                        <th className="p-3.5">Modelo</th>
+                        <th className="p-3.5">Rede / Cliente</th>
+                        <th className="p-3.5 text-center">Rotinas Mapeadas</th>
+                        <th className="p-3.5">Descrição</th>
+                        <th className="p-3.5 text-right">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#E5E7EB]">
+                      {filteredModelos.map((m) => (
+                        <tr key={m.id} className="hover:bg-gray-50/80 transition-colors">
+                          <td className="p-3.5 font-semibold text-[#1F2937]">
+                            <div className="flex items-center gap-2">
+                              <Layers className="w-4 h-4 text-[#2563EB] shrink-0" />
+                              <span>{m.nome}</span>
+                            </div>
+                          </td>
+                          <td className="p-3.5 text-[#4B5563]">
+                            {m.expand?.cliente ? (
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-gray-100 text-[11px] font-medium text-[#374151]">
+                                <Building2 className="w-3 h-3 text-[#6B7280]" />
+                                <span>{m.expand.cliente.nome}</span>
+                              </span>
+                            ) : (
+                              <span className="text-[11px] font-medium text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                                Padrão Geral
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-3.5 text-center">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#3B82F6]/10 text-[#2563EB]">
+                              {m.totalItens || 0} rotinas
+                            </span>
+                          </td>
+                          <td className="p-3.5 text-[#6B7280] max-w-xs truncate">
+                            {m.descricao || '-'}
+                          </td>
+                          <td className="p-3.5 text-right">
+                            <div className="inline-flex items-center gap-1">
+                              <button
+                                onClick={() => setModeloDetalhesModal({ open: true, data: m })}
+                                className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                title="Ver rotinas deste modelo"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
+                              {lojas.length > 0 && (
+                                <button
+                                  onClick={() =>
+                                    setAplicarModeloModal({
+                                      open: true,
+                                      initialModeloId: m.id,
+                                    })
+                                  }
+                                  className="p-1.5 text-[#2563EB] hover:text-[#1D4ED8] rounded hover:bg-blue-50"
+                                  title="Aplicar este modelo em uma loja"
+                                >
+                                  <ArrowRight className="w-4 h-4" />
+                                </button>
+                              )}
+                              <button
+                                onClick={() => setModeloModal({ open: true, data: m })}
+                                className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                title="Editar dados do modelo"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteModelo(m)}
+                                className="p-1.5 text-[#4B5563] hover:text-[#B91C1C] rounded hover:bg-red-50"
+                                title="Excluir modelo"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           )}
 
           {/* ======================= ABA CLIENTES ======================= */}
@@ -1013,6 +1294,32 @@ export default function Admin() {
                           </td>
                           <td className="p-3.5 text-right">
                             <div className="inline-flex items-center gap-1">
+                              <button
+                                onClick={() =>
+                                  setSalvarLojaComoModeloModal({
+                                    open: true,
+                                    initialLojaId: loja.id,
+                                  })
+                                }
+                                className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                title="Salvar rotinas desta loja como Modelo"
+                              >
+                                <Layers className="w-4 h-4" />
+                              </button>
+                              {modelos.length > 0 && (
+                                <button
+                                  onClick={() =>
+                                    setAplicarModeloModal({
+                                      open: true,
+                                      initialLojaId: loja.id,
+                                    })
+                                  }
+                                  className="p-1.5 text-[#2563EB] hover:text-[#1D4ED8] rounded hover:bg-blue-50"
+                                  title="Aplicar um Modelo nesta loja"
+                                >
+                                  <ArrowRight className="w-4 h-4" />
+                                </button>
+                              )}
                               <button
                                 onClick={() => setLojaModal({ open: true, data: loja })}
                                 className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
@@ -2232,6 +2539,50 @@ export default function Admin() {
           </div>
         </div>
       )}
+
+      {/* ==================== MODAIS DE MODELOS DE ROTINAS ==================== */}
+      <ModeloFormModal
+        isOpen={modeloModal.open}
+        onClose={() => setModeloModal({ open: false, data: null })}
+        onSuccess={(msg) => {
+          showFeedback(msg)
+          loadAll()
+        }}
+        modelo={modeloModal.data}
+        clientes={clientes}
+      />
+
+      <ModeloDetalhesModal
+        isOpen={modeloDetalhesModal.open}
+        onClose={() => setModeloDetalhesModal({ open: false, data: null })}
+        modelo={modeloDetalhesModal.data}
+      />
+
+      <AplicarModeloModal
+        isOpen={aplicarModeloModal.open}
+        onClose={() => setAplicarModeloModal({ open: false })}
+        onSuccess={(msg) => {
+          showFeedback(msg)
+          loadAll()
+        }}
+        modelos={modelos}
+        clientes={clientes}
+        lojas={lojas}
+        initialModeloId={aplicarModeloModal.initialModeloId}
+        initialLojaId={aplicarModeloModal.initialLojaId}
+      />
+
+      <SalvarLojaComoModeloModal
+        isOpen={salvarLojaComoModeloModal.open}
+        onClose={() => setSalvarLojaComoModeloModal({ open: false })}
+        onSuccess={(msg) => {
+          showFeedback(msg)
+          loadAll()
+        }}
+        lojas={lojas}
+        clientes={clientes}
+        initialLojaId={salvarLojaComoModeloModal.initialLojaId}
+      />
 
       {/* ==================== DIÁLOGO DE EXCLUSÃO ==================== */}
       {deleteDialog.open && (

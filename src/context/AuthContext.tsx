@@ -7,7 +7,7 @@ interface AuthContextType {
   token: string | null
   loading: boolean
   login: (email: string, pass: string) => Promise<void>
-  signup: (email: string, pass: string, name: string) => Promise<void>
+  signup: (email: string, pass: string, name: string, empresa?: string) => Promise<void>
   logout: () => void
 }
 
@@ -83,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(authData.token)
   }
 
-  const signup = async (email: string, pass: string, name: string) => {
+  const signup = async (email: string, pass: string, name: string, empresa?: string) => {
     await pb.collection('users').create({
       email: email.trim(),
       password: pass,
@@ -94,6 +94,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     })
     // Auto login right after registration
     await login(email, pass)
+
+    // Se informou empresa / rede, cria o registro de Cliente automaticamente
+    const empresaTrimmed = empresa?.trim()
+    if (empresaTrimmed) {
+      try {
+        await pb.collection('clientes').create({
+          nome: empresaTrimmed,
+          contato: email.trim(),
+          observacoes: `Criado automaticamente no onboarding de ${name.trim()}`,
+        })
+      } catch (e) {
+        console.warn('Erro ao criar cliente automaticamente no onboarding:', e)
+      }
+    }
   }
 
   const logout = () => {

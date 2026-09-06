@@ -34,6 +34,7 @@ interface PainelGerencialProps {
   isAdmin?: boolean
   onClienteUpdated?: () => void
   onLojaUpdated?: () => void
+  onOpenAplicarModelo?: (lojaId?: string) => void
 }
 
 interface DiaExecucao {
@@ -100,6 +101,7 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
   isAdmin = true,
   onClienteUpdated,
   onLojaUpdated,
+  onOpenAplicarModelo,
 }) => {
   // Filtros internos da aba
   const [selectedClienteId, setSelectedClienteId] = useState<string>('todos')
@@ -771,7 +773,20 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap">
+          {isAdmin && onOpenAplicarModelo && (
+            <button
+              onClick={() =>
+                onOpenAplicarModelo(selectedLojaId !== 'todas' ? selectedLojaId : undefined)
+              }
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white border border-[#2563EB] text-[#2563EB] hover:bg-blue-50 rounded-md shadow-xs transition-colors"
+              title="Replicar modelo de rotinas em uma loja da rede"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Aplicar modelo em nova loja</span>
+            </button>
+          )}
+
           <button
             onClick={() => loadData()}
             disabled={loading}
@@ -793,6 +808,39 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
             <span>Exportar CSV</span>
           </button>
         </div>
+      </div>
+
+      {/* Card de Ação Rápida: Velocidade de Onboarding Multi-loja */}
+      <div className="p-4 bg-gradient-to-r from-blue-50/80 to-white border border-blue-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-md bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
+            <Layers className="w-5 h-5" />
+          </div>
+          <div>
+            <h4 className="text-xs sm:text-sm font-bold text-[#1F2937] flex items-center gap-2">
+              <span>Modelos de Rotinas & Replicabilidade Multi-Loja</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-[#2563EB]">
+                Consultoria
+              </span>
+            </h4>
+            <p className="text-xs text-[#6B7280] mt-0.5">
+              Padronize seus processos operacionais criando modelos de rotinas reutilizáveis.
+              Aplique instantaneamente um checklist padronizado em qualquer filial da rede.
+            </p>
+          </div>
+        </div>
+
+        {isAdmin && onOpenAplicarModelo && (
+          <button
+            onClick={() =>
+              onOpenAplicarModelo(selectedLojaId !== 'todas' ? selectedLojaId : undefined)
+            }
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors shrink-0 self-start sm:self-auto"
+          >
+            <span>Aplicar modelo em nova loja</span>
+            <Check className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
       {/* Indicadores de Topo (KPIs) */}

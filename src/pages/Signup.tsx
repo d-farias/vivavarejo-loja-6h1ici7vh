@@ -1,19 +1,21 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
-import { AlertCircle, Lock, Mail, User } from 'lucide-react'
+import { AlertCircle, Building2, Lock, Mail, User } from 'lucide-react'
 
 export default function Signup() {
   const { signup } = useAuth()
   const navigate = useNavigate()
 
   const [name, setName] = useState('')
+  const [empresa, setEmpresa] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<{
     name?: string
+    empresa?: string
     email?: string
     password?: string
     confirmPassword?: string
@@ -50,7 +52,7 @@ export default function Signup() {
     setFieldErrors({})
 
     try {
-      await signup(email, password, name)
+      await signup(email, password, name, empresa)
       navigate('/', { replace: true })
     } catch (err: unknown) {
       const errorObj = err as {
@@ -151,6 +153,27 @@ export default function Signup() {
             {fieldErrors.name && (
               <p className="text-[11px] text-[#B91C1C] mt-1 font-medium">{fieldErrors.name}</p>
             )}
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
+              Empresa / Rede{' '}
+              <span className="text-[#9CA3AF] font-normal lowercase">(opcional)</span>
+            </label>
+            <div className="relative">
+              <Building2 className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={empresa}
+                onChange={(e) => setEmpresa(e.target.value)}
+                placeholder="Ex: Supermercados Estrela ou Rede Alvorada"
+                className="w-full pl-9 pr-3 py-2 text-sm bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-md outline-none focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937] placeholder:text-gray-400"
+                disabled={loading}
+              />
+            </div>
+            <p className="text-[11px] text-[#6B7280] mt-1">
+              Cadastraremos sua rede para você gerenciar lojas e modelos de rotinas.
+            </p>
           </div>
 
           <div>
