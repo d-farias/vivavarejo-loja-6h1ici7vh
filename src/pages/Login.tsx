@@ -82,6 +82,17 @@ export default function Login() {
   return (
     <div className="min-h-[calc(100vh-140px)] flex items-center justify-center py-10 px-4">
       <div className="w-full max-w-md bg-white border border-[#E5E7EB] rounded-lg p-6 sm:p-8 shadow-xs">
+        {/* Link Voltar à Landing Page */}
+        <div className="mb-4">
+          <Link
+            to="/bem-vindo"
+            className="inline-flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#1F2937] transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Voltar à página inicial</span>
+          </Link>
+        </div>
+
         {/* Header */}
         <div className="flex flex-col items-center text-center mb-6">
           <div className="w-10 h-10 rounded bg-[#2563EB] flex items-center justify-center text-white mb-3 shadow-xs">

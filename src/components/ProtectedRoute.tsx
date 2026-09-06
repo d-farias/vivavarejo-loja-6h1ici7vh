@@ -31,7 +31,9 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
   }
 
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />
+    // Se o visitante tentar acessar a raiz '/' sem estar logado, cai na landing page externa /bem-vindo
+    const target = location.pathname === '/' ? '/bem-vindo' : '/login'
+    return <Navigate to={target} state={{ from: location }} replace />
   }
 
   return <>{children}</>

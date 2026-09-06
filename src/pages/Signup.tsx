@@ -1,16 +1,33 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
-import { AlertCircle, Building2, Lock, Mail, User } from 'lucide-react'
+import { AlertCircle, Building2, Lock, Mail, User, CheckCircle2, ArrowLeft } from 'lucide-react'
+import { VAREJO_SEGMENTOS } from '@/components/EnquadramentoClienteCard'
 
 export default function Signup() {
   const { signup } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const location = useLocation()
+
+  // State vindo da Landing Page (/bem-vindo) via query params ou history state
+  const stateData = (location.state as { tipoPessoa?: 'PF' | 'PJ'; segmento?: string }) || {}
+  const paramTipo = (searchParams.get('tipo') as 'PF' | 'PJ') || stateData.tipoPessoa
+  const paramSegmento = searchParams.get('segmento') || stateData.segmento
+
+  const initialTipoPessoa: 'PF' | 'PJ' = paramTipo === 'PF' ? 'PF' : 'PJ'
+  const initialSegmento = paramSegmento || 'Moda e Vestuário'
+  const hasPreselectedEnquadramento = Boolean(paramTipo || paramSegmento)
 
   const [name, setName] = useState('')
   const [empresa, setEmpresa] = useState('')
-  const [tipoPessoa, setTipoPessoa] = useState<'PF' | 'PJ'>('PJ')
-  const [segmento, setSegmento] = useState('Moda e Vestuário')
+  const [tipoPessoa, setTipoPessoa] = useState<'PF' | 'PJ'>(initialTipoPessoa)
+  const [segmento, setSegmento] = useState<string>(initialSegmento)
+  const [outroSegmento, setOutroSegmento] = useState<string>(
+    paramSegmento && !(VAREJO_SEGMENTOS as readonly string[]).includes(paramSegmento)
+      ? paramSegmento
+      : '',
+  )
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -53,8 +70,16 @@ export default function Signup() {
     setLoading(true)
     setFieldErrors({})
 
+    const finalSegmento = segmento === 'Outro' ? outroSegmento.trim() || 'Outro' : segmento
+
     try {
-      await signup(email, password, name, empresa, tipoPessoa, segmento)
+      // Se não preencheu explicitamente a empresa mas veio da landing com interesse definido,
+      // usa o nome pessoal ou uma denominação padrão para que o cliente seja criado com o enquadramento
+      const nomeEmpresaFinal =
+        empresa.trim() ||
+        (tipoPessoa === 'PF' ? `Operação ${name.trim()}` : `Rede / Loja de ${name.trim()}`)
+
+      await signup(email, password, name, nomeEmpresaFinal, tipoPessoa, finalSegmento)
       navigate('/', { replace: true })
     } catch (err: unknown) {
       const errorObj = err as {
@@ -112,7 +137,20 @@ export default function Signup() {
   return (
     <div className="min-h-[calc(100vh-140px)] flex items-center justify-center py-10 px-4">
       <div className="w-full max-w-md bg-white border border-[#E5E7EB] rounded-lg p-6 sm:p-8 shadow-xs">
-        {/* Header */}
+        {/* Header com link de voltar */}
+        <div className="flex items-center justify-between mb-4">
+          <Link
+            to="/bem-vindo"
+            className="inline-flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#1F2937] transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Voltar à página inicial</span>
+          </Link>
+          <Link to="/login" className="text-xs font-semibold text-[#2563EB] hover:underline">
+            Já tenho conta
+          </Link>
+        </div>
+
         <div className="flex flex-col items-center text-center mb-6">
           <div className="w-10 h-10 rounded bg-[#2563EB] flex items-center justify-center text-white mb-3 shadow-xs">
             <div className="w-4 h-4 border-2 border-white rotate-45 transform" />
@@ -122,6 +160,29 @@ export default function Signup() {
             Cadastre seu perfil de liderança para gerenciar as rotinas da sua loja
           </p>
         </div>
+
+        {/* Resumo do Enquadramento selecionado na Landing Page */}
+        {hasPreselectedEnquadramento && (
+          <div className="mb-5 p-3 rounded-lg bg-blue-50/70 border border-blue-200 text-xs">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-[#1D4ED8] flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-[#2563EB]" />
+                Enquadramento definido na apresentação:
+              </span>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-[#2563EB]">
+                {tipoPessoa}
+              </span>
+            </div>
+            <p className="text-[#374151] mt-1 text-[11px]">
+              Perfil:{' '}
+              <strong>
+                {tipoPessoa === 'PF' ? 'Pessoa Física (PF)' : 'Pessoa Jurídica (CNPJ)'}
+              </strong>{' '}
+              • Segmento:{' '}
+              <strong>{segmento === 'Outro' && outroSegmento ? outroSegmento : segmento}</strong>
+            </p>
+          </div>
+        )}
 
         {/* General Error Banner */}
         {fieldErrors.general && (
@@ -178,41 +239,65 @@ export default function Signup() {
             </p>
           </div>
 
-          {empresa.trim() && (
-            <div className="grid grid-cols-2 gap-3 p-3 bg-[#F7F7F5] rounded-md border border-[#E5E7EB]">
-              <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#374151] mb-1">
-                  Tipo
-                </label>
-                <select
-                  value={tipoPessoa}
-                  onChange={(e) => setTipoPessoa(e.target.value as 'PF' | 'PJ')}
-                  className="w-full px-2 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded outline-none text-[#1F2937]"
-                >
-                  <option value="PJ">Pessoa Jurídica (PJ)</option>
-                  <option value="PF">Pessoa Física (PF)</option>
-                </select>
+          {/* Se veio com enquadramento da landing, os campos de enquadramento já estão preenchidos.
+              Mostramos os seletores se o usuário quiser alterar ou se não veio da landing */}
+          {(empresa.trim().length > 0 || !hasPreselectedEnquadramento) && (
+            <div className="space-y-2 p-3 bg-[#F7F7F5] rounded-md border border-[#E5E7EB]">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#374151] mb-1">
+                    Tipo de Perfil
+                  </label>
+                  <select
+                    value={tipoPessoa}
+                    onChange={(e) => setTipoPessoa(e.target.value as 'PF' | 'PJ')}
+                    className="w-full px-2 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded outline-none text-[#1F2937]"
+                  >
+                    <option value="PJ">Pessoa Jurídica (PJ)</option>
+                    <option value="PF">Pessoa Física (PF)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#374151] mb-1">
+                    Segmento
+                  </label>
+                  <select
+                    value={
+                      (VAREJO_SEGMENTOS as readonly string[]).includes(segmento)
+                        ? segmento
+                        : 'Outro'
+                    }
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setSegmento(val)
+                      if (val !== 'Outro') setOutroSegmento('')
+                    }}
+                    className="w-full px-2 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded outline-none text-[#1F2937]"
+                  >
+                    {VAREJO_SEGMENTOS.map((seg) => (
+                      <option key={seg} value={seg}>
+                        {seg}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#374151] mb-1">
-                  Segmento
-                </label>
-                <select
-                  value={segmento}
-                  onChange={(e) => setSegmento(e.target.value)}
-                  className="w-full px-2 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded outline-none text-[#1F2937]"
-                >
-                  <option value="Moda e Vestuário">Moda e Vestuário</option>
-                  <option value="Supermercado/Food">Supermercado/Food</option>
-                  <option value="Farmácia">Farmácia</option>
-                  <option value="Eletrônicos">Eletrônicos</option>
-                  <option value="Construção/Casa">Construção/Casa</option>
-                  <option value="Cosméticos">Cosméticos</option>
-                  <option value="Pet">Pet</option>
-                  <option value="Outro">Outro</option>
-                </select>
-              </div>
+              {segmento === 'Outro' && (
+                <div className="pt-1">
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#374151] mb-1">
+                    Especifique o segmento
+                  </label>
+                  <input
+                    type="text"
+                    value={outroSegmento}
+                    onChange={(e) => setOutroSegmento(e.target.value)}
+                    placeholder="Ex: Ótica, Joalheria, etc."
+                    className="w-full px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded outline-none text-[#1F2937]"
+                  />
+                </div>
+              )}
             </div>
           )}
 

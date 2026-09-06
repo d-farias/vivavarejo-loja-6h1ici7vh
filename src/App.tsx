@@ -12,6 +12,7 @@ import Equipe from './pages/Equipe'
 import Admin from './pages/Admin'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import BemVindo from './pages/BemVindo'
 import NotFound from './pages/NotFound'
 
 const App = () => (
@@ -61,6 +62,9 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
             </Route>
+
+            {/* Public External Landing Page */}
+            <Route path="/bem-vindo" element={<BemVindo />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
