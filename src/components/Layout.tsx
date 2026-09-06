@@ -29,7 +29,10 @@ export default function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
 
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup'
+  const isAuthPage =
+    location.pathname === '/login' ||
+    location.pathname === '/signup' ||
+    location.pathname === '/cadastro'
 
   const handleLogout = () => {
     logout()

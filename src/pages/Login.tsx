@@ -85,7 +85,7 @@ export default function Login() {
         {/* Link Voltar à Landing Page */}
         <div className="mb-4">
           <Link
-            to="/bem-vindo"
+            to="/"
             className="inline-flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#1F2937] transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />

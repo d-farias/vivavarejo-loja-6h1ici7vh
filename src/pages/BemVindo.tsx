@@ -137,7 +137,7 @@ export default function BemVindo() {
       {/* Header sóbrio */}
       <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-sm border-b border-[#E5E7EB]">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link to="/bem-vindo" className="flex items-center gap-2.5 group">
+          <Link to="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded bg-[#2563EB] flex items-center justify-center text-white shadow-xs">
               <div className="w-3.5 h-3.5 border-2 border-white rotate-45 transform" />
             </div>
