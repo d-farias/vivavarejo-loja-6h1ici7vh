@@ -140,14 +140,9 @@ export default function BemVindo() {
             <div className="w-8 h-8 rounded bg-[#2563EB] flex items-center justify-center text-white shadow-xs">
               <div className="w-3.5 h-3.5 border-2 border-white rotate-45 transform" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-bold tracking-wider uppercase text-[#1F2937] leading-tight">
-                VivaVarejo
-              </span>
-              <span className="text-[10px] text-[#6B7280] leading-none">
-                Rotinas e liderança para o varejo
-              </span>
-            </div>
+            <span className="text-sm font-bold tracking-wider uppercase text-[#1F2937] leading-tight">
+              VivaVarejo
+            </span>
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-3">
@@ -612,12 +607,9 @@ export default function BemVindo() {
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 space-y-6">
           {/* Linha superior: Rotinas de Gestão | Links de acesso */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex flex-col">
+            <div>
               <span className="text-xs font-medium text-[#4B5563] tracking-wider uppercase leading-snug">
                 Rotinas de Gestão
-              </span>
-              <span className="text-[11px] text-[#6B7280] leading-none mt-0.5">
-                Rotinas e liderança para o varejo
               </span>
             </div>
 
