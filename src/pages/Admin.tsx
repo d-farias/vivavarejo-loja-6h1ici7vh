@@ -52,6 +52,7 @@ import { ModeloFormModal } from '../components/ModeloFormModal'
 import { ModeloDetalhesModal } from '../components/ModeloDetalhesModal'
 import { AplicarModeloModal } from '../components/AplicarModeloModal'
 import { SalvarLojaComoModeloModal } from '../components/SalvarLojaComoModeloModal'
+import { GerarModeloIaModal } from '../components/GerarModeloIaModal'
 import { PlanosAcaoCard } from '../components/PlanosAcaoCard'
 import { PlanoAcaoModal } from '../components/PlanoAcaoModal'
 import { planosAcaoService } from '../services/planosAcao'
@@ -194,6 +195,7 @@ export default function Admin() {
   }>({
     open: false,
   })
+  const [gerarModeloIaModal, setGerarModeloIaModal] = useState<boolean>(false)
 
   // Modal de Plano de Ação
   const [planoAcaoModal, setPlanoAcaoModal] = useState<{
@@ -1091,6 +1093,15 @@ export default function Admin() {
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+                  <button
+                    onClick={() => setGerarModeloIaModal(true)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
+                    title="Descreva a operação da loja e deixe a IA gerar o modelo com as rotinas"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Gerar modelo com IA</span>
+                  </button>
+
                   {lojas.length > 0 && (
                     <button
                       onClick={() => setSalvarLojaComoModeloModal({ open: true })}
@@ -1105,10 +1116,10 @@ export default function Admin() {
                   {modelos.length > 0 && lojas.length > 0 && (
                     <button
                       onClick={() => setAplicarModeloModal({ open: true })}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] text-xs font-semibold rounded-md shadow-xs transition-colors"
                       title="Replicar modelo de rotinas em uma loja de destino"
                     >
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <ArrowRight className="w-3.5 h-3.5 text-[#2563EB]" />
                       <span>Aplicar Modelo em Loja</span>
                     </button>
                   )}
@@ -1133,7 +1144,14 @@ export default function Admin() {
                     Crie modelos reutilizáveis para padronizar as rotinas de consultoria entre as
                     lojas da rede sem recadastrar tudo manualmente.
                   </p>
-                  <div className="mt-4 flex justify-center gap-2">
+                  <div className="mt-4 flex justify-center flex-wrap gap-2">
+                    <button
+                      onClick={() => setGerarModeloIaModal(true)}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Gerar modelo com IA</span>
+                    </button>
                     {lojas.length > 0 && (
                       <button
                         onClick={() => setSalvarLojaComoModeloModal({ open: true })}
@@ -1145,7 +1163,7 @@ export default function Admin() {
                     )}
                     <button
                       onClick={() => setModeloModal({ open: true, data: null })}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#2563EB] text-[#2563EB] hover:bg-blue-50 text-xs font-semibold rounded-md shadow-xs"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Criar Modelo Manual</span>
@@ -2943,6 +2961,16 @@ export default function Admin() {
         lojas={lojas}
         clientes={clientes}
         initialLojaId={salvarLojaComoModeloModal.initialLojaId}
+      />
+
+      <GerarModeloIaModal
+        isOpen={gerarModeloIaModal}
+        onClose={() => setGerarModeloIaModal(false)}
+        onSuccess={(msg) => {
+          showFeedback(msg)
+          loadAll()
+        }}
+        clientes={clientes}
       />
 
       {/* ==================== MODAL DE PLANO DE AÇÃO ==================== */}
