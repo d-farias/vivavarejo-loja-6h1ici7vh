@@ -137,11 +137,24 @@ export default function Index() {
     !!user,
   )
 
-  // Mapping of executions by routine ID
+  // Mapping of executions by routine ID:
+  // Atenção: para contagem como concluída válida nos KPIs, a execução não pode estar devolvida.
+  // Rotinas concluídas com status 'aguardando_validacao' ou 'aprovada' contam na visualização do dia.
   const completionMap = useMemo(() => {
     const map = new Map<string, ExecucaoRotina>()
     for (const exec of execucoes) {
-      if (exec.concluida) {
+      if (exec.concluida && exec.status_validacao !== 'devolvida') {
+        map.set(exec.rotina, exec)
+      }
+    }
+    return map
+  }, [execucoes])
+
+  // Execuções devolvidas do dia para exibição especial de aviso para o líder
+  const devolvidasMap = useMemo(() => {
+    const map = new Map<string, ExecucaoRotina>()
+    for (const exec of execucoes) {
+      if (exec.status_validacao === 'devolvida') {
         map.set(exec.rotina, exec)
       }
     }
@@ -707,6 +720,9 @@ export default function Index() {
           <div className="space-y-2.5">
             {sortedRoutines.map((rotina) => {
               const isDone = completionMap.has(rotina.id)
+              const execItem = completionMap.get(rotina.id)
+              const devolvidaItem = devolvidasMap.get(rotina.id)
+              const isDevolvida = !isDone && Boolean(devolvidaItem)
               const status = getHorarioStatus(rotina.horario_limite, isDone)
               const pastDue = status.isAtrasada
 
@@ -715,21 +731,35 @@ export default function Index() {
                   key={rotina.id}
                   className={`bg-white border rounded-lg p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-all duration-200 ${
                     isDone
-                      ? 'opacity-60 border-[#E5E7EB] bg-gray-50/60'
-                      : pastDue
-                        ? 'border-red-300 bg-red-50/20 shadow-xs'
-                        : 'border-[#E5E7EB] hover:border-[#2563EB]/40 hover:shadow-xs'
+                      ? execItem?.status_validacao === 'aguardando_validacao'
+                        ? 'border-blue-200 bg-blue-50/20 shadow-xs'
+                        : 'opacity-70 border-[#E5E7EB] bg-gray-50/60'
+                      : isDevolvida
+                        ? 'border-amber-300 bg-amber-50/40 shadow-xs'
+                        : pastDue
+                          ? 'border-red-300 bg-red-50/20 shadow-xs'
+                          : 'border-[#E5E7EB] hover:border-[#2563EB]/40 hover:shadow-xs'
                   }`}
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span
                         className={`text-sm sm:text-base font-semibold ${
-                          isDone ? 'line-through text-[#6B7280]' : 'text-[#1F2937]'
+                          isDone && execItem?.status_validacao === 'aprovada'
+                            ? 'line-through text-[#6B7280]'
+                            : 'text-[#1F2937]'
                         }`}
                       >
                         {rotina.nome}
                       </span>
+
+                      {/* Destaque de Devolvida pelo Regional */}
+                      {isDevolvida && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                          <AlertTriangle className="w-3 h-3 text-amber-700" />
+                          <span>DEVOLVIDA PELO REGIONAL</span>
+                        </span>
+                      )}
 
                       {/* Sinalizador vermelho de atraso ou neutro/teal */}
                       {!isDone && pastDue && (
@@ -754,13 +784,39 @@ export default function Index() {
                         </span>
                       )}
 
-                      {isDone && (
+                      {isDone && execItem?.status_validacao === 'aguardando_validacao' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                          <Clock className="w-3 h-3 text-amber-600" />
+                          <span>Aguardando validação do regional</span>
+                        </span>
+                      )}
+
+                      {isDone && execItem?.status_validacao === 'aprovada' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          <span>Validada e aprovada</span>
+                        </span>
+                      )}
+
+                      {isDone && !execItem?.status_validacao && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-[#3B82F6]/10 text-[#2563EB] border border-[#3B82F6]/25">
                           <CheckCircle2 className="w-3 h-3" />
                           <span>Concluída hoje</span>
                         </span>
                       )}
                     </div>
+
+                    {/* Comentário da devolução visível para o líder */}
+                    {isDevolvida && devolvidaItem?.comentario_validacao && (
+                      <div className="mt-2 p-2.5 rounded bg-amber-50/80 border border-amber-200 text-xs text-amber-900">
+                        <span className="font-semibold">Motivo da devolução pelo Regional:</span>{' '}
+                        <span>{devolvidaItem.comentario_validacao}</span>
+                        <div className="text-[11px] text-amber-700 mt-1">
+                          Ajuste a rotina na loja e clique novamente em concluir para reenviar à
+                          validação.
+                        </div>
+                      </div>
+                    )}
 
                     <div className="flex items-center gap-3 mt-1.5 text-xs text-[#6B7280] flex-wrap">
                       <span className="flex items-center gap-1">

@@ -94,6 +94,15 @@ export const ConcluirRotinaModal: React.FC<ConcluirRotinaModalProps> = ({
             </div>
           </div>
 
+          {/* Aviso sobre workflow de validação */}
+          <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-lg p-3 text-xs text-[#4B5563] space-y-1">
+            <div className="font-semibold text-[#1F2937]">Workflow de Validação:</div>
+            <p className="text-[11px] text-[#6B7280]">
+              Ao concluir, esta rotina entrará em <strong>aguardando validação</strong> pelo
+              Regional da loja antes de ser definitivamente homologada.
+            </p>
+          </div>
+
           {/* Anexar Foto (Opcional) */}
           <div className="space-y-2 pt-2 border-t border-[#E5E7EB]">
             <div className="flex items-center justify-between">
@@ -161,7 +170,9 @@ export const ConcluirRotinaModal: React.FC<ConcluirRotinaModalProps> = ({
             className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-lg shadow-xs transition-colors disabled:opacity-60"
           >
             <Check className="w-4 h-4" />
-            <span>{submitting ? 'Salvando...' : fotoFile ? 'Confirmar com Foto' : 'Concluir'}</span>
+            <span>
+              {submitting ? 'Salvando...' : fotoFile ? 'Confirmar e Enviar' : 'Concluir e Enviar'}
+            </span>
           </button>
         </div>
       </div>

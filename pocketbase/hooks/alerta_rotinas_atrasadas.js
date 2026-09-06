@@ -201,12 +201,12 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
     funcionarios = $app.findRecordsByFilter('funcionarios', 'ativo != false', '', 2000, 0)
   } catch (_) {}
 
-  // Buscar execuções de hoje (concluídas)
+  // Buscar execuções de hoje (concluídas e NÃO devolvidas)
   let execucoesHoje = []
   try {
     execucoesHoje = $app.findRecordsByFilter(
       'execucoes_rotinas',
-      `data_execucao >= "${todayStr} 00:00:00" && concluida = true`,
+      `data_execucao >= "${todayStr} 00:00:00" && concluida = true && status_validacao != "devolvida"`,
       '-created',
       5000,
       0,

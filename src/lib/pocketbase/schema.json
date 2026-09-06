@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-06T11:42:27.928Z",
+  "generatedAt": "2026-09-06T11:49:37.978Z",
   "collections": [
     {
       "name": "users",
@@ -173,9 +173,9 @@
       "apiRules": {
         "list": "@request.auth.id != ''",
         "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != '' && @request.body.usuario = @request.auth.id",
-        "update": "@request.auth.id != '' && usuario = @request.auth.id",
-        "delete": "@request.auth.id != '' && usuario = @request.auth.id"
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'regional' || @request.auth.id = usuario)"
       },
       "fields": [
         {
@@ -223,12 +223,39 @@
           "type": "file",
           "required": false,
           "system": false
+        },
+        {
+          "name": "status_validacao",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["aguardando_validacao", "aprovada", "devolvida"]
+        },
+        {
+          "name": "comentario_validacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "validado_por",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "validado_em",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
         "CREATE INDEX idx_execucoes_rotina ON execucoes_rotinas (rotina)",
         "CREATE INDEX idx_execucoes_usuario ON execucoes_rotinas (usuario)",
-        "CREATE INDEX idx_execucoes_data ON execucoes_rotinas (data_execucao)"
+        "CREATE INDEX idx_execucoes_data ON execucoes_rotinas (data_execucao)",
+        "CREATE INDEX `idx_execs_status_validacao` ON `execucoes_rotinas` (status_validacao)"
       ]
     },
     {

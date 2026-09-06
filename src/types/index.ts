@@ -1,6 +1,6 @@
 import type { RecordModel } from 'pocketbase'
 
-export type PerfilUsuario = 'admin' | 'lider' | 'funcionario'
+export type PerfilUsuario = 'admin' | 'lider' | 'funcionario' | 'regional'
 
 export interface User extends RecordModel {
   id: string
@@ -93,15 +93,22 @@ export interface Rotina extends RecordModel {
   }
 }
 
+export type StatusValidacaoRotina = 'aguardando_validacao' | 'aprovada' | 'devolvida'
+
 export interface ExecucaoRotina extends RecordModel {
   rotina: string
   usuario: string
   data_execucao: string // formato YYYY-MM-DD
   concluida: boolean
   foto?: string
+  status_validacao?: StatusValidacaoRotina
+  comentario_validacao?: string
+  validado_por?: string
+  validado_em?: string
   expand?: {
     rotina?: Rotina
     usuario?: User
+    validado_por?: User
   }
 }
 

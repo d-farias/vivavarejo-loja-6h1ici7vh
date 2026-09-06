@@ -54,12 +54,12 @@ cronAdd('resumo_semanal_clientes', '30 9 * * 1', () => {
     allRotinas = $app.findRecordsByFilter('rotinas', '', '', 2000, 0)
   } catch (_) {}
 
-  // Carregar execuções dos últimos 7 dias
+  // Carregar execuções dos últimos 7 dias (aprovadas ou aguardando validação, NUNCA devolvidas)
   let allExecucoes = []
   try {
     allExecucoes = $app.findRecordsByFilter(
       'execucoes_rotinas',
-      `data_execucao >= "${dateMinStr} 00:00:00" && concluida = true`,
+      `data_execucao >= "${dateMinStr} 00:00:00" && concluida = true && status_validacao != "devolvida"`,
       '-created',
       5000,
       0,

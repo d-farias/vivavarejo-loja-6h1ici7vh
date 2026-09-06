@@ -85,14 +85,17 @@ export const execucoesService = {
     fotoFile?: File | null,
   ): Promise<ExecucaoRotina> {
     if (existingId) {
+      const willBeDone = !currentlyDone
       if (fotoFile) {
         const formData = new FormData()
-        formData.append('concluida', String(!currentlyDone))
+        formData.append('concluida', String(willBeDone))
+        formData.append('status_validacao', willBeDone ? 'aguardando_validacao' : '')
         formData.append('foto', fotoFile)
         return await pb.collection('execucoes_rotinas').update<ExecucaoRotina>(existingId, formData)
       }
       return await pb.collection('execucoes_rotinas').update<ExecucaoRotina>(existingId, {
-        concluida: !currentlyDone,
+        concluida: willBeDone,
+        status_validacao: willBeDone ? 'aguardando_validacao' : undefined,
       })
     }
 
@@ -103,16 +106,21 @@ export const execucoesService = {
         .getFirstListItem<ExecucaoRotina>(
           `usuario = "${userId}" && rotina = "${rotinaId}" && data_execucao >= "${dateStr} 00:00:00" && data_execucao <= "${dateStr} 23:59:59"`,
         )
+      const willBeDone = !existing.concluida
       if (fotoFile) {
         const formData = new FormData()
-        formData.append('concluida', String(!existing.concluida))
+        formData.append('concluida', String(willBeDone))
+        formData.append('status_validacao', willBeDone ? 'aguardando_validacao' : '')
+        formData.append('comentario_validacao', '')
         formData.append('foto', fotoFile)
         return await pb
           .collection('execucoes_rotinas')
           .update<ExecucaoRotina>(existing.id, formData)
       }
       return await pb.collection('execucoes_rotinas').update<ExecucaoRotina>(existing.id, {
-        concluida: !existing.concluida,
+        concluida: willBeDone,
+        status_validacao: willBeDone ? 'aguardando_validacao' : undefined,
+        comentario_validacao: willBeDone ? '' : undefined,
       })
     } catch {
       // Create new execution record
@@ -122,6 +130,7 @@ export const execucoesService = {
         formData.append('usuario', userId)
         formData.append('data_execucao', `${dateStr} 12:00:00.000Z`)
         formData.append('concluida', 'true')
+        formData.append('status_validacao', 'aguardando_validacao')
         formData.append('foto', fotoFile)
         return await pb.collection('execucoes_rotinas').create<ExecucaoRotina>(formData)
       }
@@ -130,7 +139,47 @@ export const execucoesService = {
         usuario: userId,
         data_execucao: `${dateStr} 12:00:00.000Z`,
         concluida: true,
+        status_validacao: 'aguardando_validacao',
       })
+    }
+  },
+
+  async aprovarExecucao(execucaoId: string, validadorId: string): Promise<ExecucaoRotina> {
+    return await pb.collection('execucoes_rotinas').update<ExecucaoRotina>(execucaoId, {
+      status_validacao: 'aprovada',
+      validado_por: validadorId,
+      validado_em: new Date().toISOString(),
+      concluida: true,
+    })
+  },
+
+  async devolverExecucao(
+    execucaoId: string,
+    validadorId: string,
+    comentario: string,
+  ): Promise<ExecucaoRotina> {
+    return await pb.collection('execucoes_rotinas').update<ExecucaoRotina>(execucaoId, {
+      status_validacao: 'devolvida',
+      comentario_validacao: comentario,
+      validado_por: validadorId,
+      validado_em: new Date().toISOString(),
+      concluida: false, // Ao devolver, volta como pendente para a rotina do dia
+    })
+  },
+
+  async aprovarTodas(execucoesIds: string[], validadorId: string): Promise<void> {
+    const validadoEm = new Date().toISOString()
+    for (const id of execucoesIds) {
+      try {
+        await pb.collection('execucoes_rotinas').update(id, {
+          status_validacao: 'aprovada',
+          validado_por: validadorId,
+          validado_em: validadoEm,
+          concluida: true,
+        })
+      } catch (err) {
+        console.error('Erro ao aprovar execução em lote:', id, err)
+      }
     }
   },
 
