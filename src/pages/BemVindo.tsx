@@ -36,7 +36,6 @@ import { VAREJO_SEGMENTOS } from '@/components/EnquadramentoClienteCard'
 const INSTAGRAM_URL = 'https://www.instagram.com/vivavarejo/'
 const LINKEDIN_URL = 'https://www.linkedin.com/company/vivavarejo' // Endereço provisório — atualizar quando confirmado
 const WHATSAPP_URL = 'https://wa.me/5548991817542'
-const WHATSAPP_LABEL = '(48) 99181-7542'
 const CONTACT_EMAIL = 'dfarias53@gmail.com'
 
 interface SegmentOption {
@@ -611,23 +610,15 @@ export default function BemVindo() {
       {/* Rodapé sóbrio */}
       <footer className="w-full border-t border-[#E5E7EB] bg-white py-8 mt-auto">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 space-y-6">
-          {/* Linha superior: Marca + Tagline | Links de acesso */}
+          {/* Linha superior: Rotinas de Gestão | Links de acesso */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-2.5">
-              <div className="w-6 h-6 rounded bg-[#2563EB] flex items-center justify-center text-white shrink-0 mt-0.5">
-                <div className="w-2.5 h-2.5 border border-white rotate-45 transform" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-bold tracking-wider uppercase text-[#1F2937] leading-tight">
-                  VivaVarejo
-                </span>
-                <span className="text-xs font-medium text-[#4B5563] tracking-wider uppercase leading-snug">
-                  Gerando Resultados
-                </span>
-                <span className="text-[11px] text-[#6B7280] leading-none mt-0.5">
-                  Rotinas e liderança para o varejo
-                </span>
-              </div>
+            <div className="flex flex-col">
+              <span className="text-xs font-medium text-[#4B5563] tracking-wider uppercase leading-snug">
+                Rotinas de Gestão
+              </span>
+              <span className="text-[11px] text-[#6B7280] leading-none mt-0.5">
+                Rotinas e liderança para o varejo
+              </span>
             </div>
 
             {/* Links de navegação e dúvidas */}
@@ -679,13 +670,13 @@ export default function BemVindo() {
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`WhatsApp VivaVarejo ${WHATSAPP_LABEL}`}
+                aria-label="WhatsApp VivaVarejo"
                 className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[#E5E7EB] bg-white text-[#4B5563] hover:text-[#2563EB] hover:border-[#2563EB] transition-colors"
               >
                 <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.63C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.04 7.42C8.87 7.42 8.61 7.48 8.38 7.73C8.16 7.97 7.54 8.55 7.54 9.72C7.54 10.89 8.39 12.02 8.51 12.18C8.63 12.34 10.15 14.75 12.53 15.72C14.51 16.53 14.91 16.37 15.34 16.33C15.77 16.29 16.73 15.76 16.93 15.2C17.13 14.64 17.13 14.16 17.07 14.06C17.01 13.96 16.85 13.9 16.6 13.78C16.35 13.66 15.12 13.05 14.89 12.97C14.66 12.89 14.5 12.85 14.33 13.09C14.16 13.33 13.69 13.9 13.55 14.06C13.41 14.22 13.26 14.24 13.02 14.12C12.77 14 11.98 13.74 11.04 12.9C10.31 12.25 9.82 11.45 9.68 11.2C9.54 10.96 9.66 10.83 9.78 10.71C9.9 10.6 10.04 10.42 10.17 10.27C10.3 10.12 10.34 10.02 10.42 9.85C10.5 9.69 10.46 9.55 10.4 9.42C10.34 9.3 9.87 8.14 9.67 7.66C9.48 7.19 9.28 7.25 9.13 7.24C9 7.24 8.87 7.42 9.04 7.42Z" />
                 </svg>
-                <span className="font-medium">WhatsApp {WHATSAPP_LABEL}</span>
+                <span className="font-medium">WhatsApp</span>
               </a>
             </div>
 
