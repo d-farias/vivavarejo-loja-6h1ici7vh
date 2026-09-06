@@ -55,25 +55,48 @@ export default function Signup() {
     } catch (err: unknown) {
       const errorObj = err as {
         data?: { data?: Record<string, { message: string }> }
+        response?: { data?: Record<string, { message: string }> }
         message?: string
       }
       const errors: typeof fieldErrors = {}
 
-      if (errorObj?.data?.data) {
-        if (errorObj.data.data.email) {
-          errors.email = errorObj.data.data.email.message
+      const fieldData = errorObj?.data?.data || errorObj?.response?.data
+      if (fieldData) {
+        if (fieldData.email) {
+          const emailMsg = fieldData.email.message
+          if (
+            emailMsg.toLowerCase().includes('unique') ||
+            emailMsg.toLowerCase().includes('already') ||
+            emailMsg.toLowerCase().includes('exist')
+          ) {
+            errors.email = 'Este e-mail já está cadastrado. Faça login ou use outro e-mail.'
+          } else {
+            errors.email = emailMsg
+          }
         }
-        if (errorObj.data.data.password) {
-          errors.password = errorObj.data.data.password.message
+        if (fieldData.password) {
+          errors.password = fieldData.password.message
         }
-        if (errorObj.data.data.name) {
-          errors.name = errorObj.data.data.name.message
+        if (fieldData.passwordConfirm) {
+          errors.confirmPassword = fieldData.passwordConfirm.message
+        }
+        if (fieldData.name) {
+          errors.name = fieldData.name.message
         }
       }
 
       if (Object.keys(errors).length === 0) {
-        errors.general =
-          errorObj?.message || 'Falha ao criar conta. Verifique os dados e tente novamente.'
+        const rawMsg = errorObj?.message || ''
+        if (
+          rawMsg.toLowerCase().includes('already') ||
+          rawMsg.toLowerCase().includes('unique') ||
+          rawMsg.toLowerCase().includes('email')
+        ) {
+          errors.general =
+            'Este e-mail já está em uso. Acesse a tela de login ou tente outro e-mail.'
+        } else {
+          errors.general = rawMsg || 'Falha ao criar conta. Verifique os dados e tente novamente.'
+        }
       }
 
       setFieldErrors(errors)

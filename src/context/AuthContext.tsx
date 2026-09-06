@@ -89,6 +89,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       password: pass,
       passwordConfirm: pass,
       name: name.trim(),
+      perfil: 'lider',
+      ativo: true,
     })
     // Auto login right after registration
     await login(email, pass)
