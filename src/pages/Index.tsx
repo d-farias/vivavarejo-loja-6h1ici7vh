@@ -12,9 +12,11 @@ import { PlanoAcaoModal } from '@/components/PlanoAcaoModal'
 import { ConcluirRotinaModal } from '@/components/ConcluirRotinaModal'
 import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
 import { EnquadramentoClienteCard } from '@/components/EnquadramentoClienteCard'
+import { VisitasPromotorDiaCard } from '@/components/VisitasPromotorDiaCard'
 import { planosAcaoService } from '@/services/planosAcao'
 import { clientesService } from '@/services/clientes'
-import type { PlanoAcao, Cliente } from '@/types'
+import { visitasPromotorService, rotinasPromotorService } from '@/services/visitasPromotor'
+import type { PlanoAcao, Cliente, VisitaPromotor, RotinaPromotor } from '@/types'
 import {
   CheckCircle2,
   Clock,
@@ -33,15 +35,18 @@ import {
   PlusCircle,
   Eye,
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 export default function Index() {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { lojaSelecionadaId, lojaSelecionada } = useStore()
   const [rotinas, setRotinas] = useState<Rotina[]>([])
   const [execucoes, setExecucoes] = useState<ExecucaoRotina[]>([])
   const [planosAcao, setPlanosAcao] = useState<PlanoAcao[]>([])
   const [clientesAdmin, setClientesAdmin] = useState<Cliente[]>([])
+  const [visitasPromotores, setVisitasPromotores] = useState<VisitaPromotor[]>([])
+  const [rotinasPromotores, setRotinasPromotores] = useState<RotinaPromotor[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [dismissAlert, setDismissAlert] = useState(false)
@@ -66,18 +71,26 @@ export default function Index() {
     if (!user) return
     setError(false)
     try {
-      const [allRoutines, todayExecs, planos, clientes] = await Promise.all([
+      const [allRoutines, todayExecs, planos, clientes, vis, rotProm] = await Promise.all([
         rotinasService.getAll(lojaSelecionadaId),
         execucoesService.getTodayExecutions(user.id),
         planosAcaoService.getAll(lojaSelecionadaId).catch(() => [] as PlanoAcao[]),
         isAdmin
           ? clientesService.getAll().catch(() => [] as Cliente[])
           : Promise.resolve([] as Cliente[]),
+        visitasPromotorService
+          .getAll(lojaSelecionadaId || undefined)
+          .catch(() => [] as VisitaPromotor[]),
+        rotinasPromotorService
+          .getAll(lojaSelecionadaId || undefined)
+          .catch(() => [] as RotinaPromotor[]),
       ])
       setRotinas(allRoutines)
       setExecucoes(todayExecs)
       setPlanosAcao(planos)
       setClientesAdmin(clientes)
+      setVisitasPromotores(vis)
+      setRotinasPromotores(rotProm)
     } catch {
       setError(true)
     } finally {
@@ -589,6 +602,20 @@ export default function Index() {
           />
         </div>
       </div>
+
+      {/* Bloco de Visitas e Rotinas de Promotores no Dia */}
+      <VisitasPromotorDiaCard
+        visitas={visitasPromotores}
+        rotinasPromotor={rotinasPromotores}
+        onConcluirVisita={async (visitaId, params) => {
+          await visitasPromotorService.registrarConclusao(visitaId, {
+            ...params,
+            registrado_por: user?.id,
+          })
+          loadData()
+        }}
+        onNavigateToPromotores={() => navigate('/promotores')}
+      />
 
       {/* Alert Banner se houver rotinas atrasadas */}
       {stats.emAtraso > 0 && !dismissAlert && (

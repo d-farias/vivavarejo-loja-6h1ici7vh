@@ -173,3 +173,71 @@ export interface ModeloRotinaItem extends RecordModel {
 export interface ModeloComContagem extends ModeloRotina {
   totalItens?: number
 }
+
+// ==================== MÓDULO PROMOTORES & FORNECEDORES ====================
+
+export interface Fornecedor extends RecordModel {
+  nome: string
+  contato?: string
+  telefone?: string
+  observacoes?: string
+  ativo?: boolean
+  cliente?: string
+  created: string
+  updated: string
+  expand?: {
+    cliente?: Cliente
+  }
+}
+
+export interface Promotor extends RecordModel {
+  nome: string
+  email?: string
+  telefone?: string
+  fornecedor: string
+  usuario?: string
+  ativo?: boolean
+  created: string
+  updated: string
+  expand?: {
+    fornecedor?: Fornecedor
+    usuario?: User
+  }
+}
+
+export interface RotinaPromotor extends RecordModel {
+  titulo: string
+  descricao?: string
+  fornecedor?: string
+  loja?: string
+  frequencia?: string
+  ativa?: boolean
+  created: string
+  updated: string
+  expand?: {
+    fornecedor?: Fornecedor
+    loja?: Loja
+  }
+}
+
+export type StatusVisitaPromotor = 'agendada' | 'realizada' | 'atrasada' | 'cancelada'
+
+export interface VisitaPromotor extends RecordModel {
+  promotor: string
+  loja: string
+  data_visita: string // YYYY-MM-DD ou ISO
+  hora_prevista?: string // ex: "09:00" ou "14:30"
+  status: StatusVisitaPromotor
+  observacoes?: string
+  conclusao_check?: string
+  rotinas_executadas?: string
+  realizada_em?: string
+  registrado_por?: string
+  created: string
+  updated: string
+  expand?: {
+    promotor?: Promotor
+    loja?: Loja
+    registrado_por?: User
+  }
+}

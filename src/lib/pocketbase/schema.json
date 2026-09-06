@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-06T12:14:41.839Z",
+  "generatedAt": "2026-09-06T12:18:30.695Z",
   "collections": [
     {
       "name": "users",
@@ -760,6 +760,313 @@
         "CREATE INDEX idx_planos_status ON planos_acao (status)",
         "CREATE INDEX idx_planos_prazo ON planos_acao (prazo)",
         "CREATE INDEX idx_planos_created ON planos_acao (created)"
+      ]
+    },
+    {
+      "name": "fornecedores",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "nome",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "contato",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "telefone",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observacoes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ativo",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cliente",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "clientes"
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_fornecedores_nome ON fornecedores (nome)",
+        "CREATE INDEX idx_fornecedores_cliente ON fornecedores (cliente)",
+        "CREATE INDEX idx_fornecedores_ativo ON fornecedores (ativo)"
+      ]
+    },
+    {
+      "name": "promotores",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "nome",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "telefone",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "fornecedor",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "fornecedores"
+        },
+        {
+          "name": "usuario",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "ativo",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_promotores_nome ON promotores (nome)",
+        "CREATE INDEX idx_promotores_fornecedor ON promotores (fornecedor)",
+        "CREATE INDEX idx_promotores_usuario ON promotores (usuario)",
+        "CREATE INDEX idx_promotores_ativo ON promotores (ativo)"
+      ]
+    },
+    {
+      "name": "rotinas_promotor",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "titulo",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "descricao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "fornecedor",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "fornecedores"
+        },
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "frequencia",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ativa",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_rot_prom_fornecedor ON rotinas_promotor (fornecedor)",
+        "CREATE INDEX idx_rot_prom_loja ON rotinas_promotor (loja)",
+        "CREATE INDEX idx_rot_prom_ativa ON rotinas_promotor (ativa)"
+      ]
+    },
+    {
+      "name": "visitas_promotor",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "promotor",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "promotores"
+        },
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "data_visita",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "hora_prevista",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["agendada", "realizada", "atrasada", "cancelada"]
+        },
+        {
+          "name": "observacoes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "conclusao_check",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rotinas_executadas",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "realizada_em",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "registrado_por",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_visitas_promotor ON visitas_promotor (promotor)",
+        "CREATE INDEX idx_visitas_loja ON visitas_promotor (loja)",
+        "CREATE INDEX idx_visitas_data ON visitas_promotor (data_visita)",
+        "CREATE INDEX idx_visitas_status ON visitas_promotor (status)"
       ]
     }
   ]

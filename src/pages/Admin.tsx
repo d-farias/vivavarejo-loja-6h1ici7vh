@@ -57,6 +57,13 @@ import { PlanoAcaoModal } from '../components/PlanoAcaoModal'
 import { planosAcaoService } from '../services/planosAcao'
 import type { PlanoAcao, StatusPlanoAcao } from '../types'
 
+import { PromotoresFornecedoresManager } from '../components/PromotoresFornecedoresManager'
+import { fornecedoresService } from '../services/fornecedores'
+import { promotoresService } from '../services/promotores'
+import { visitasPromotorService, rotinasPromotorService } from '../services/visitasPromotor'
+import type { Fornecedor, Promotor, VisitaPromotor, RotinaPromotor } from '../types'
+import { Handshake } from 'lucide-react'
+
 type TabType =
   | 'painel'
   | 'planos'
@@ -65,6 +72,7 @@ type TabType =
   | 'lojas'
   | 'funcoes'
   | 'funcionarios'
+  | 'promotores'
   | 'usuarios'
 
 export default function Admin() {
@@ -81,6 +89,10 @@ export default function Admin() {
   const [usuarios, setUsuarios] = useState<User[]>([])
   const [modelos, setModelos] = useState<ModeloComContagem[]>([])
   const [planosAcao, setPlanosAcao] = useState<PlanoAcao[]>([])
+  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([])
+  const [promotores, setPromotores] = useState<Promotor[]>([])
+  const [visitas, setVisitas] = useState<VisitaPromotor[]>([])
+  const [rotinasPromotor, setRotinasPromotor] = useState<RotinaPromotor[]>([])
 
   const [loading, setLoading] = useState(true)
   const [feedbackMsg, setFeedbackMsg] = useState<{
@@ -196,7 +208,7 @@ export default function Admin() {
   const loadAll = useCallback(async () => {
     setLoading(true)
     try {
-      const [c, l, fn, fc, u, mod, pl] = await Promise.all([
+      const [c, l, fn, fc, u, mod, pl, forn, prom, vis, rotProm] = await Promise.all([
         clientesService.getAll(),
         lojasService.getAll(),
         funcoesService.getAll(),
@@ -204,6 +216,10 @@ export default function Admin() {
         usersService.getAll(),
         modelosRotinasService.getAllComContagem(),
         planosAcaoService.getAll().catch(() => [] as PlanoAcao[]),
+        fornecedoresService.getAll().catch(() => [] as Fornecedor[]),
+        promotoresService.getAll().catch(() => [] as Promotor[]),
+        visitasPromotorService.getAll().catch(() => [] as VisitaPromotor[]),
+        rotinasPromotorService.getAll().catch(() => [] as RotinaPromotor[]),
       ])
       setClientes(c)
       setLojas(l)
@@ -212,6 +228,10 @@ export default function Admin() {
       setUsuarios(u)
       setModelos(mod)
       setPlanosAcao(pl)
+      setFornecedores(forn)
+      setPromotores(prom)
+      setVisitas(vis)
+      setRotinasPromotor(rotProm)
     } catch (err) {
       console.error('Erro ao carregar dados do admin:', err)
       setFeedbackMsg({ type: 'error', text: 'Erro ao carregar dados do painel ADM.' })
@@ -919,6 +939,21 @@ export default function Admin() {
         >
           <Users className="w-4 h-4" />
           <span>Funcionários ({funcionarios.length})</span>
+        </button>
+
+        <button
+          onClick={() => {
+            setActiveTab('promotores')
+            setSearchTerm('')
+          }}
+          className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+            activeTab === 'promotores'
+              ? 'border-[#2563EB] text-[#2563EB]'
+              : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
+          }`}
+        >
+          <Handshake className="w-4 h-4" />
+          <span>Promotores & Fornecedores ({promotores.length + fornecedores.length})</span>
         </button>
 
         <button
@@ -1762,6 +1797,113 @@ export default function Admin() {
                 </div>
               )}
             </div>
+          )}
+
+          {/* ======================= ABA PROMOTORES & FORNECEDORES ======================= */}
+          {activeTab === 'promotores' && (
+            <PromotoresFornecedoresManager
+              visitas={visitas}
+              promotores={promotores}
+              fornecedores={fornecedores}
+              lojas={lojas}
+              rotinasPromotor={rotinasPromotor}
+              usuarios={usuarios}
+              clientes={clientes}
+              onRefresh={loadAll}
+              onSaveVisita={async (payload, id) => {
+                if (id) {
+                  await visitasPromotorService.update(id, payload)
+                  showFeedback('Visita atualizada!')
+                } else {
+                  await visitasPromotorService.create(payload)
+                  showFeedback('Visita agendada com sucesso!')
+                }
+                loadAll()
+              }}
+              onConcluirVisita={async (visitaId, params) => {
+                await visitasPromotorService.registrarConclusao(visitaId, {
+                  ...params,
+                  registrado_por: user?.id,
+                })
+                showFeedback('Visita concluída com sucesso!')
+                loadAll()
+              }}
+              onCancelarVisita={async (visitaId, motivo) => {
+                await visitasPromotorService.cancelarVisita(visitaId, motivo)
+                showFeedback('Visita cancelada.')
+                loadAll()
+              }}
+              onDeleteVisita={async (visitaId) => {
+                await visitasPromotorService.delete(visitaId)
+                showFeedback('Visita excluída.')
+                loadAll()
+              }}
+              onSavePromotor={async (payload, id) => {
+                if (id) {
+                  await promotoresService.update(id, payload)
+                  showFeedback('Promotor atualizado!')
+                } else {
+                  await promotoresService.create(payload)
+                  showFeedback('Promotor cadastrado!')
+                }
+                loadAll()
+              }}
+              onDeletePromotor={async (prom) => {
+                const dep = await promotoresService.countDependencies(prom.id)
+                if (dep.visitasCount > 0) {
+                  alert(
+                    `Não é possível excluir: existem ${dep.visitasCount} visita(s) vinculadas a este promotor.`,
+                  )
+                  return
+                }
+                if (confirm(`Deseja excluir o promotor "${prom.nome}"?`)) {
+                  await promotoresService.delete(prom.id)
+                  showFeedback('Promotor excluído.')
+                  loadAll()
+                }
+              }}
+              onSaveFornecedor={async (payload, id) => {
+                if (id) {
+                  await fornecedoresService.update(id, payload)
+                  showFeedback('Fornecedor atualizado!')
+                } else {
+                  await fornecedoresService.create(payload)
+                  showFeedback('Fornecedor cadastrado com sucesso!')
+                }
+                loadAll()
+              }}
+              onDeleteFornecedor={async (forn) => {
+                const dep = await fornecedoresService.countDependencies(forn.id)
+                if (dep.promotoresCount > 0 || dep.rotinasCount > 0) {
+                  alert(
+                    `Não é possível excluir: existem ${dep.promotoresCount} promotor(es) e ${dep.rotinasCount} rotina(s) vinculadas a este fornecedor.`,
+                  )
+                  return
+                }
+                if (confirm(`Deseja excluir o fornecedor "${forn.nome}"?`)) {
+                  await fornecedoresService.delete(forn.id)
+                  showFeedback('Fornecedor excluído.')
+                  loadAll()
+                }
+              }}
+              onSaveRotinaPromotor={async (payload, id) => {
+                if (id) {
+                  await rotinasPromotorService.update(id, payload)
+                  showFeedback('Rotina de promotor atualizada!')
+                } else {
+                  await rotinasPromotorService.create(payload)
+                  showFeedback('Rotina de promotor cadastrada!')
+                }
+                loadAll()
+              }}
+              onDeleteRotinaPromotor={async (rot) => {
+                if (confirm(`Deseja excluir a rotina "${rot.titulo}"?`)) {
+                  await rotinasPromotorService.delete(rot.id)
+                  showFeedback('Rotina excluída.')
+                  loadAll()
+                }
+              }}
+            />
           )}
 
           {/* ======================= ABA USUÁRIOS & PERFIS ======================= */}

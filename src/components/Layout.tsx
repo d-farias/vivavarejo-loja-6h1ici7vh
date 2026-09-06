@@ -9,7 +9,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { LogOut, Menu, X, LayoutDashboard, ListChecks, Users, Shield, KeyRound } from 'lucide-react'
+import {
+  LogOut,
+  Menu,
+  X,
+  LayoutDashboard,
+  ListChecks,
+  Users,
+  Shield,
+  KeyRound,
+  Handshake,
+} from 'lucide-react'
 import { ChangePasswordModal } from '@/components/ChangePasswordModal'
 
 export default function Layout() {
@@ -42,11 +52,13 @@ export default function Layout() {
 
   const perfil = user?.perfil || (user?.email === 'dfarias53@gmail.com' ? 'admin' : 'lider')
   const isAdmin = perfil === 'admin'
+  const isLiderOrAdmin = perfil === 'admin' || perfil === 'lider'
 
   const navLinks = [
     { to: '/', label: 'Início', icon: LayoutDashboard },
     { to: '/rotinas', label: 'Rotinas', icon: ListChecks },
     { to: '/equipe', label: 'Minha Equipe', icon: Users },
+    ...(isLiderOrAdmin ? [{ to: '/promotores', label: 'Promotores', icon: Handshake }] : []),
     ...(isAdmin ? [{ to: '/admin', label: 'Admin', icon: Shield }] : []),
   ]
 

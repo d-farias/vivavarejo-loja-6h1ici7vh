@@ -10,6 +10,7 @@ import Index from './pages/Index'
 import Rotinas from './pages/Rotinas'
 import Equipe from './pages/Equipe'
 import Admin from './pages/Admin'
+import Promotores from './pages/Promotores'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import BemVindo from './pages/BemVindo'
@@ -46,6 +47,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Equipe />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/promotores"
+                element={
+                  <ProtectedRoute>
+                    <Promotores />
                   </ProtectedRoute>
                 }
               />
