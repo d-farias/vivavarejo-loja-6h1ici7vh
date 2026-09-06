@@ -296,8 +296,7 @@ export default function BemVindo() {
                   Conte-nos sobre a sua atuação no varejo
                 </h2>
                 <p className="text-xs sm:text-sm text-[#6B7280] mt-1">
-                  Personalizamos modelos prontos de abertura de loja, caixa, reposição e fechamento
-                  de acordo com seu perfil.
+                  Personalizamos conforme a sua realidade, seus interesses e o seu perfil.
                 </p>
               </div>
 
