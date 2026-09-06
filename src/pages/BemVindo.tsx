@@ -136,7 +136,7 @@ export default function BemVindo() {
     <div className="min-h-screen bg-[#F7F7F5] text-[#1F2937] flex flex-col font-sans">
       {/* Header sóbrio */}
       <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-sm border-b border-[#E5E7EB]">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 h-16 flex items-center">
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded bg-[#2563EB] flex items-center justify-center text-white shadow-xs">
               <div className="w-3.5 h-3.5 border-2 border-white rotate-45 transform" />
@@ -145,23 +145,6 @@ export default function BemVindo() {
               VivaVarejo
             </span>
           </Link>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link
-              to="/login"
-              className="px-3.5 py-2 text-xs sm:text-sm font-medium text-[#4B5563] hover:text-[#1F2937] hover:bg-gray-100 rounded-md border border-[#E5E7EB] transition-colors"
-            >
-              Já tenho conta
-            </Link>
-            <button
-              type="button"
-              onClick={handleScrollToInterest}
-              className="px-3.5 py-2 text-xs sm:text-sm font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors inline-flex items-center gap-1.5"
-            >
-              <span>Tenho interesse</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
         </div>
       </header>
 

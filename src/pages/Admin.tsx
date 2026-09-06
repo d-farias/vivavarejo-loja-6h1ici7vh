@@ -46,6 +46,7 @@ import {
   ArrowRight,
   Eye,
   CheckSquare,
+  Sparkles,
 } from 'lucide-react'
 import { PainelGerencial } from '../components/PainelGerencial'
 import { ModeloFormModal } from '../components/ModeloFormModal'
