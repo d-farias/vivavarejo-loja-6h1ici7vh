@@ -7,7 +7,14 @@ interface AuthContextType {
   token: string | null
   loading: boolean
   login: (email: string, pass: string) => Promise<void>
-  signup: (email: string, pass: string, name: string, empresa?: string) => Promise<void>
+  signup: (
+    email: string,
+    pass: string,
+    name: string,
+    empresa?: string,
+    tipoPessoa?: 'PF' | 'PJ',
+    segmento?: string,
+  ) => Promise<void>
   logout: () => void
 }
 
@@ -83,7 +90,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(authData.token)
   }
 
-  const signup = async (email: string, pass: string, name: string, empresa?: string) => {
+  const signup = async (
+    email: string,
+    pass: string,
+    name: string,
+    empresa?: string,
+    tipoPessoa?: 'PF' | 'PJ',
+    segmento?: string,
+  ) => {
     await pb.collection('users').create({
       email: email.trim(),
       password: pass,
@@ -102,6 +116,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await pb.collection('clientes').create({
           nome: empresaTrimmed,
           contato: email.trim(),
+          tipo_pessoa: tipoPessoa || 'PJ',
+          segmento: segmento || 'Moda e Vestuário',
           observacoes: `Criado automaticamente no onboarding de ${name.trim()}`,
         })
       } catch (e) {

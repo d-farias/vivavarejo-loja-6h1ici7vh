@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-06T10:47:04.979Z",
+  "generatedAt": "2026-09-06T11:08:51.445Z",
   "collections": [
     {
       "name": "users",
@@ -217,6 +217,12 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -271,6 +277,19 @@
         {
           "name": "envio_semanal",
           "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tipo_pessoa",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["PF", "PJ"]
+        },
+        {
+          "name": "segmento",
+          "type": "text",
           "required": false,
           "system": false
         }
@@ -603,6 +622,99 @@
       "indexes": [
         "CREATE INDEX idx_modelos_itens_modelo ON modelos_rotinas_itens (modelo)",
         "CREATE INDEX idx_modelos_itens_frequencia ON modelos_rotinas_itens (frequencia)"
+      ]
+    },
+    {
+      "name": "planos_acao",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "descricao",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "rotina",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "rotinas"
+        },
+        {
+          "name": "criado_por",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "responsavel",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "prazo",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["aberta", "em_andamento", "concluida"]
+        },
+        {
+          "name": "prioridade",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["baixa", "media", "alta"]
+        },
+        {
+          "name": "observacoes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_planos_loja ON planos_acao (loja)",
+        "CREATE INDEX idx_planos_rotina ON planos_acao (rotina)",
+        "CREATE INDEX idx_planos_status ON planos_acao (status)",
+        "CREATE INDEX idx_planos_prazo ON planos_acao (prazo)",
+        "CREATE INDEX idx_planos_created ON planos_acao (created)"
       ]
     }
   ]

@@ -45,14 +45,27 @@ import {
   Layers,
   ArrowRight,
   Eye,
+  CheckSquare,
 } from 'lucide-react'
 import { PainelGerencial } from '../components/PainelGerencial'
 import { ModeloFormModal } from '../components/ModeloFormModal'
 import { ModeloDetalhesModal } from '../components/ModeloDetalhesModal'
 import { AplicarModeloModal } from '../components/AplicarModeloModal'
 import { SalvarLojaComoModeloModal } from '../components/SalvarLojaComoModeloModal'
+import { PlanosAcaoCard } from '../components/PlanosAcaoCard'
+import { PlanoAcaoModal } from '../components/PlanoAcaoModal'
+import { planosAcaoService } from '../services/planosAcao'
+import type { PlanoAcao, StatusPlanoAcao } from '../types'
 
-type TabType = 'painel' | 'modelos' | 'clientes' | 'lojas' | 'funcoes' | 'funcionarios' | 'usuarios'
+type TabType =
+  | 'painel'
+  | 'planos'
+  | 'modelos'
+  | 'clientes'
+  | 'lojas'
+  | 'funcoes'
+  | 'funcionarios'
+  | 'usuarios'
 
 export default function Admin() {
   const { user } = useAuth()
@@ -67,6 +80,7 @@ export default function Admin() {
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
   const [usuarios, setUsuarios] = useState<User[]>([])
   const [modelos, setModelos] = useState<ModeloComContagem[]>([])
+  const [planosAcao, setPlanosAcao] = useState<PlanoAcao[]>([])
 
   const [loading, setLoading] = useState(true)
   const [feedbackMsg, setFeedbackMsg] = useState<{
@@ -169,17 +183,27 @@ export default function Admin() {
     open: false,
   })
 
+  // Modal de Plano de Ação
+  const [planoAcaoModal, setPlanoAcaoModal] = useState<{
+    open: boolean
+    data: PlanoAcao | null
+  }>({
+    open: false,
+    data: null,
+  })
+
   // Carregamento unificado
   const loadAll = useCallback(async () => {
     setLoading(true)
     try {
-      const [c, l, fn, fc, u, mod] = await Promise.all([
+      const [c, l, fn, fc, u, mod, pl] = await Promise.all([
         clientesService.getAll(),
         lojasService.getAll(),
         funcoesService.getAll(),
         funcionariosService.getAll(),
         usersService.getAll(),
         modelosRotinasService.getAllComContagem(),
+        planosAcaoService.getAll().catch(() => [] as PlanoAcao[]),
       ])
       setClientes(c)
       setLojas(l)
@@ -187,6 +211,7 @@ export default function Admin() {
       setFuncionarios(fc)
       setUsuarios(u)
       setModelos(mod)
+      setPlanosAcao(pl)
     } catch (err) {
       console.error('Erro ao carregar dados do admin:', err)
       setFeedbackMsg({ type: 'error', text: 'Erro ao carregar dados do painel ADM.' })
@@ -211,16 +236,30 @@ export default function Admin() {
     const formData = new FormData(form)
     const nome = (formData.get('nome') as string)?.trim()
     const contato = (formData.get('contato') as string)?.trim()
+    const tipo_pessoa = (formData.get('tipo_pessoa') as 'PF' | 'PJ') || 'PJ'
+    const segmento = (formData.get('segmento') as string)?.trim() || ''
     const observacoes = (formData.get('observacoes') as string)?.trim()
 
     if (!nome) return
 
     try {
       if (clienteModal.data) {
-        await clientesService.update(clienteModal.data.id, { nome, contato, observacoes })
+        await clientesService.update(clienteModal.data.id, {
+          nome,
+          contato,
+          tipo_pessoa,
+          segmento,
+          observacoes,
+        })
         showFeedback('Cliente atualizado com sucesso!')
       } else {
-        await clientesService.create({ nome, contato, observacoes })
+        await clientesService.create({
+          nome,
+          contato,
+          tipo_pessoa,
+          segmento,
+          observacoes,
+        })
         showFeedback('Cliente cadastrado com sucesso!')
       }
       setClienteModal({ open: false, data: null })
@@ -785,6 +824,21 @@ export default function Admin() {
         {/* Nova aba: Modelos de Rotinas */}
         <button
           onClick={() => {
+            setActiveTab('planos')
+            setSearchTerm('')
+          }}
+          className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+            activeTab === 'planos'
+              ? 'border-[#2563EB] text-[#2563EB]'
+              : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
+          }`}
+        >
+          <CheckSquare className="w-4 h-4" />
+          <span>Plano de Ação ({planosAcao.length})</span>
+        </button>
+
+        <button
+          onClick={() => {
             setActiveTab('modelos')
             setSearchTerm('')
           }}
@@ -890,16 +944,72 @@ export default function Admin() {
         <>
           {/* ======================= ABA PAINEL GERENCIAL ======================= */}
           {activeTab === 'painel' && (
-            <PainelGerencial
-              clientes={clientes}
-              lojas={lojas}
-              isAdmin={perfil === 'admin'}
-              onClienteUpdated={loadAll}
-              onLojaUpdated={loadAll}
-              onOpenAplicarModelo={(lojaId) =>
-                setAplicarModeloModal({ open: true, initialLojaId: lojaId })
-              }
-            />
+            <div className="space-y-6">
+              <PainelGerencial
+                clientes={clientes}
+                lojas={lojas}
+                isAdmin={perfil === 'admin'}
+                onClienteUpdated={loadAll}
+                onLojaUpdated={loadAll}
+                onOpenAplicarModelo={(lojaId) =>
+                  setAplicarModeloModal({ open: true, initialLojaId: lojaId })
+                }
+              />
+
+              {/* Bloco de Planos de Ação direto no Painel Gerencial */}
+              <PlanosAcaoCard
+                planos={planosAcao}
+                lojas={lojas}
+                allowFilterLoja={true}
+                title="Plano de Ação da Rede (5W2H)"
+                subtitle="Gerenciamento consolidado de ações corretivas e de melhoria em todas as lojas"
+                onNewPlano={() => setPlanoAcaoModal({ open: true, data: null })}
+                onEditPlano={(plano) => setPlanoAcaoModal({ open: true, data: plano })}
+                onDeletePlano={async (plano) => {
+                  if (confirm(`Deseja excluir a ação: "${plano.descricao}"?`)) {
+                    await planosAcaoService.delete(plano.id)
+                    showFeedback('Plano de ação excluído!')
+                    loadAll()
+                  }
+                }}
+                onToggleStatus={async (plano, nextStatus) => {
+                  await planosAcaoService.update(plano.id, { status: nextStatus })
+                  showFeedback(
+                    nextStatus === 'concluida' ? 'Ação concluída com sucesso!' : 'Ação reaberta!',
+                  )
+                  loadAll()
+                }}
+              />
+            </div>
+          )}
+
+          {/* ======================= ABA PLANOS DE AÇÃO ======================= */}
+          {activeTab === 'planos' && (
+            <div className="space-y-4">
+              <PlanosAcaoCard
+                planos={planosAcao}
+                lojas={lojas}
+                allowFilterLoja={true}
+                title="Plano de Ação Operacional (5W2H)"
+                subtitle="Ações corretivas, preventivas e plano de melhoria contínua das lojas"
+                onNewPlano={() => setPlanoAcaoModal({ open: true, data: null })}
+                onEditPlano={(plano) => setPlanoAcaoModal({ open: true, data: plano })}
+                onDeletePlano={async (plano) => {
+                  if (confirm(`Deseja excluir a ação: "${plano.descricao}"?`)) {
+                    await planosAcaoService.delete(plano.id)
+                    showFeedback('Plano de ação excluído!')
+                    loadAll()
+                  }
+                }}
+                onToggleStatus={async (plano, nextStatus) => {
+                  await planosAcaoService.update(plano.id, { status: nextStatus })
+                  showFeedback(
+                    nextStatus === 'concluida' ? 'Ação concluída com sucesso!' : 'Ação reaberta!',
+                  )
+                  loadAll()
+                }}
+              />
+            </div>
           )}
 
           {/* ======================= ABA MODELOS DE ROTINAS ======================= */}
@@ -1133,6 +1243,7 @@ export default function Admin() {
                     <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563] text-xs font-semibold uppercase tracking-wider">
                       <tr>
                         <th className="p-3.5">Cliente</th>
+                        <th className="p-3.5">Enquadramento</th>
                         <th className="p-3.5">Contato</th>
                         <th className="p-3.5">Observações</th>
                         <th className="p-3.5 text-right">Ações</th>
@@ -1141,7 +1252,29 @@ export default function Admin() {
                     <tbody className="divide-y divide-[#E5E7EB]">
                       {filteredClientes.map((cliente) => (
                         <tr key={cliente.id} className="hover:bg-gray-50/80 transition-colors">
-                          <td className="p-3.5 font-semibold text-[#1F2937]">{cliente.nome}</td>
+                          <td className="p-3.5 font-semibold text-[#1F2937]">
+                            <div className="flex items-center gap-2">
+                              <span>{cliente.nome}</span>
+                            </div>
+                          </td>
+                          <td className="p-3.5">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span
+                                className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${
+                                  cliente.tipo_pessoa === 'PF'
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : 'bg-blue-100 text-[#2563EB]'
+                                }`}
+                              >
+                                {cliente.tipo_pessoa || 'PJ'}
+                              </span>
+                              {cliente.segmento && (
+                                <span className="text-[11px] font-medium bg-[#F7F7F5] border border-[#E5E7EB] text-[#374151] px-1.5 py-0.5 rounded">
+                                  {cliente.segmento}
+                                </span>
+                              )}
+                            </div>
+                          </td>
                           <td className="p-3.5 text-[#4B5563]">
                             {cliente.contato ? (
                               <span className="flex items-center gap-1.5">
@@ -1894,6 +2027,42 @@ export default function Admin() {
                 />
               </div>
 
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#374151] mb-1">
+                    Tipo de Pessoa
+                  </label>
+                  <select
+                    name="tipo_pessoa"
+                    defaultValue={clienteModal.data?.tipo_pessoa || 'PJ'}
+                    className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  >
+                    <option value="PJ">Pessoa Jurídica (PJ)</option>
+                    <option value="PF">Pessoa Física (PF)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#374151] mb-1">
+                    Segmento de Varejo
+                  </label>
+                  <select
+                    name="segmento"
+                    defaultValue={clienteModal.data?.segmento || 'Moda e Vestuário'}
+                    className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  >
+                    <option value="Moda e Vestuário">Moda e Vestuário</option>
+                    <option value="Supermercado/Food">Supermercado/Food</option>
+                    <option value="Farmácia">Farmácia</option>
+                    <option value="Eletrônicos">Eletrônicos</option>
+                    <option value="Construção/Casa">Construção/Casa</option>
+                    <option value="Cosméticos">Cosméticos</option>
+                    <option value="Pet">Pet</option>
+                    <option value="Outro">Outro</option>
+                  </select>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-semibold text-[#374151] mb-1">
                   Contato / Telefone / E-mail
@@ -2582,6 +2751,27 @@ export default function Admin() {
         lojas={lojas}
         clientes={clientes}
         initialLojaId={salvarLojaComoModeloModal.initialLojaId}
+      />
+
+      {/* ==================== MODAL DE PLANO DE AÇÃO ==================== */}
+      <PlanoAcaoModal
+        isOpen={planoAcaoModal.open}
+        onClose={() => setPlanoAcaoModal({ open: false, data: null })}
+        plano={planoAcaoModal.data}
+        lojas={lojas}
+        onSave={async (data) => {
+          if (planoAcaoModal.data) {
+            await planosAcaoService.update(planoAcaoModal.data.id, data)
+            showFeedback('Plano de ação atualizado com sucesso!')
+          } else {
+            await planosAcaoService.create({
+              ...data,
+              criado_por: user?.id,
+            })
+            showFeedback('Plano de ação criado com sucesso!')
+          }
+          loadAll()
+        }}
       />
 
       {/* ==================== DIÁLOGO DE EXCLUSÃO ==================== */}

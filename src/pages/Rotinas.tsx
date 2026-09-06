@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { RoutineFormModal } from '@/components/RoutineFormModal'
 import { SpreadsheetImportModal } from '@/components/SpreadsheetImportModal'
 import { StoreSelector } from '@/components/StoreSelector'
+import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
 import {
   Search,
   Filter,
@@ -28,6 +29,7 @@ import {
   Trash2,
   AlertTriangle,
   Store,
+  Camera,
 } from 'lucide-react'
 
 export default function Rotinas() {
@@ -45,6 +47,10 @@ export default function Rotinas() {
   const [selectedArea, setSelectedArea] = useState<string>('Todas')
   const [selectedRotina, setSelectedRotina] = useState<Rotina | null>(null)
   const [submittingId, setSubmittingId] = useState<string | null>(null)
+  const [visualizarFotoExecucao, setVisualizarFotoExecucao] = useState<{
+    execucao: ExecucaoRotina
+    rotina?: Rotina
+  } | null>(null)
 
   // Modais de CRUD e Importação
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
@@ -557,6 +563,24 @@ export default function Rotinas() {
                         <span>Concluída hoje</span>
                       </span>
                     )}
+
+                    {isDone && completionMap.get(rotina.id)?.foto && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          const exec = completionMap.get(rotina.id)
+                          if (exec) {
+                            setVisualizarFotoExecucao({ execucao: exec, rotina })
+                          }
+                        }}
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold bg-blue-50 text-[#2563EB] rounded border border-blue-200 hover:bg-blue-100 transition-colors"
+                        title="Ver foto de comprovação"
+                      >
+                        <Camera className="w-3 h-3" />
+                        <span>Foto</span>
+                      </button>
+                    )}
                   </div>
 
                   {/* Metadata Chips */}
@@ -742,7 +766,6 @@ export default function Rotinas() {
                   </>
                 )}
               </div>
-
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setSelectedRotina(null)}
@@ -752,24 +775,41 @@ export default function Rotinas() {
                 </button>
                 {(() => {
                   const isDone = completionMap.has(selectedRotina.id)
+                  const exec = completionMap.get(selectedRotina.id)
                   return (
-                    <button
-                      onClick={() => {
-                        handleToggle(selectedRotina.id)
-                      }}
-                      disabled={submittingId === selectedRotina.id}
-                      className={`px-4 py-2 text-xs font-semibold rounded-md flex items-center gap-2 transition-colors ${
-                        isDone
-                          ? 'bg-gray-100 text-[#4B5563] hover:bg-gray-200'
-                          : 'bg-[#2563EB] text-white hover:bg-[#1D4ED8]'
-                      }`}
-                    >
-                      <Check className="w-4 h-4" />
-                      <span>{isDone ? 'Concluída hoje (desmarcar)' : 'Concluir rotina hoje'}</span>
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      {isDone && exec?.foto && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setVisualizarFotoExecucao({ execucao: exec, rotina: selectedRotina })
+                          }}
+                          className="px-3 py-2 text-xs font-semibold rounded-md bg-blue-50 text-[#2563EB] hover:bg-blue-100 flex items-center gap-1.5 transition-colors border border-blue-200"
+                        >
+                          <Camera className="w-3.5 h-3.5" />
+                          <span>Ver Prova (Foto)</span>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          handleToggle(selectedRotina.id)
+                        }}
+                        disabled={submittingId === selectedRotina.id}
+                        className={`px-4 py-2 text-xs font-semibold rounded-md flex items-center gap-2 transition-colors ${
+                          isDone
+                            ? 'bg-gray-100 text-[#4B5563] hover:bg-gray-200'
+                            : 'bg-[#2563EB] text-white hover:bg-[#1D4ED8]'
+                        }`}
+                      >
+                        <Check className="w-4 h-4" />
+                        <span>
+                          {isDone ? 'Concluída hoje (desmarcar)' : 'Concluir rotina hoje'}
+                        </span>
+                      </button>
+                    </div>
                   )
                 })()}
-              </div>
+              </div>{' '}
             </div>
           </div>
         </div>
@@ -826,6 +866,14 @@ export default function Rotinas() {
         onSuccess={async () => {
           await loadData()
         }}
+      />
+
+      {/* Modal de Visualização da Foto */}
+      <FotoVisualizadorModal
+        isOpen={Boolean(visualizarFotoExecucao)}
+        execucao={visualizarFotoExecucao?.execucao || null}
+        rotina={visualizarFotoExecucao?.rotina || null}
+        onClose={() => setVisualizarFotoExecucao(null)}
       />
     </div>
   )

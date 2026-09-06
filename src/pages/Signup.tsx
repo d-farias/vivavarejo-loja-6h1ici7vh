@@ -9,6 +9,8 @@ export default function Signup() {
 
   const [name, setName] = useState('')
   const [empresa, setEmpresa] = useState('')
+  const [tipoPessoa, setTipoPessoa] = useState<'PF' | 'PJ'>('PJ')
+  const [segmento, setSegmento] = useState('Moda e Vestuário')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -52,7 +54,7 @@ export default function Signup() {
     setFieldErrors({})
 
     try {
-      await signup(email, password, name, empresa)
+      await signup(email, password, name, empresa, tipoPessoa, segmento)
       navigate('/', { replace: true })
     } catch (err: unknown) {
       const errorObj = err as {
@@ -175,6 +177,44 @@ export default function Signup() {
               Cadastraremos sua rede para você gerenciar lojas e modelos de rotinas.
             </p>
           </div>
+
+          {empresa.trim() && (
+            <div className="grid grid-cols-2 gap-3 p-3 bg-[#F7F7F5] rounded-md border border-[#E5E7EB]">
+              <div>
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#374151] mb-1">
+                  Tipo
+                </label>
+                <select
+                  value={tipoPessoa}
+                  onChange={(e) => setTipoPessoa(e.target.value as 'PF' | 'PJ')}
+                  className="w-full px-2 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded outline-none text-[#1F2937]"
+                >
+                  <option value="PJ">Pessoa Jurídica (PJ)</option>
+                  <option value="PF">Pessoa Física (PF)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#374151] mb-1">
+                  Segmento
+                </label>
+                <select
+                  value={segmento}
+                  onChange={(e) => setSegmento(e.target.value)}
+                  className="w-full px-2 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded outline-none text-[#1F2937]"
+                >
+                  <option value="Moda e Vestuário">Moda e Vestuário</option>
+                  <option value="Supermercado/Food">Supermercado/Food</option>
+                  <option value="Farmácia">Farmácia</option>
+                  <option value="Eletrônicos">Eletrônicos</option>
+                  <option value="Construção/Casa">Construção/Casa</option>
+                  <option value="Cosméticos">Cosméticos</option>
+                  <option value="Pet">Pet</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">

@@ -7,6 +7,14 @@ import { parseHorarioLimiteToMinutes, getHorarioStatus } from '@/lib/time-utils'
 import { useRealtime } from '@/hooks/use-realtime'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StoreSelector } from '@/components/StoreSelector'
+import { PlanosAcaoCard } from '@/components/PlanosAcaoCard'
+import { PlanoAcaoModal } from '@/components/PlanoAcaoModal'
+import { ConcluirRotinaModal } from '@/components/ConcluirRotinaModal'
+import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
+import { EnquadramentoClienteCard } from '@/components/EnquadramentoClienteCard'
+import { planosAcaoService } from '@/services/planosAcao'
+import { clientesService } from '@/services/clientes'
+import type { PlanoAcao, Cliente } from '@/types'
 import {
   CheckCircle2,
   Clock,
@@ -21,6 +29,9 @@ import {
   Layers,
   Sparkles,
   Store,
+  Camera,
+  PlusCircle,
+  Eye,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
@@ -29,28 +40,50 @@ export default function Index() {
   const { lojaSelecionadaId, lojaSelecionada } = useStore()
   const [rotinas, setRotinas] = useState<Rotina[]>([])
   const [execucoes, setExecucoes] = useState<ExecucaoRotina[]>([])
+  const [planosAcao, setPlanosAcao] = useState<PlanoAcao[]>([])
+  const [clientesAdmin, setClientesAdmin] = useState<Cliente[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [dismissAlert, setDismissAlert] = useState(false)
   const [submittingId, setSubmittingId] = useState<string | null>(null)
   const [selectedAreaFilter, setSelectedAreaFilter] = useState<string>('Todas')
 
+  // Modais de Plano de Ação
+  const [planoModalOpen, setPlanoModalOpen] = useState(false)
+  const [editingPlano, setEditingPlano] = useState<PlanoAcao | null>(null)
+  const [rotinaOrigemPlano, setRotinaOrigemPlano] = useState<Rotina | null>(null)
+
+  // Modais de Prova de Execução (Foto)
+  const [concluirModalRotina, setConcluirModalRotina] = useState<Rotina | null>(null)
+  const [visualizarFotoExecucao, setVisualizarFotoExecucao] = useState<{
+    execucao: ExecucaoRotina
+    rotina?: Rotina
+  } | null>(null)
+
+  const isAdmin = user?.perfil === 'admin' || user?.email === 'dfarias53@gmail.com'
+
   const loadData = useCallback(async () => {
     if (!user) return
     setError(false)
     try {
-      const [allRoutines, todayExecs] = await Promise.all([
+      const [allRoutines, todayExecs, planos, clientes] = await Promise.all([
         rotinasService.getAll(lojaSelecionadaId),
         execucoesService.getTodayExecutions(user.id),
+        planosAcaoService.getAll(lojaSelecionadaId).catch(() => [] as PlanoAcao[]),
+        isAdmin
+          ? clientesService.getAll().catch(() => [] as Cliente[])
+          : Promise.resolve([] as Cliente[]),
       ])
       setRotinas(allRoutines)
       setExecucoes(todayExecs)
+      setPlanosAcao(planos)
+      setClientesAdmin(clientes)
     } catch {
       setError(true)
     } finally {
       setLoading(false)
     }
-  }, [user, lojaSelecionadaId])
+  }, [user, lojaSelecionadaId, isAdmin])
 
   useEffect(() => {
     loadData()
@@ -243,7 +276,39 @@ export default function Index() {
     })
   }, [rotinas, completionMap, selectedAreaFilter])
 
-  // Toggle routine completion with optimistic update
+  // Concluir rotina com ou sem foto
+  const handleConcluirComFoto = async (rotinaId: string, fotoFile: File | null) => {
+    if (!user || submittingId === rotinaId) return
+
+    const existingExec = execucoes.find((e) => e.rotina === rotinaId && e.usuario === user.id)
+    const isCurrentlyDone = !!existingExec?.concluida
+    const nextState = !isCurrentlyDone
+
+    setSubmittingId(rotinaId)
+
+    try {
+      const saved = await execucoesService.toggleExecution(
+        rotinaId,
+        user.id,
+        isCurrentlyDone,
+        existingExec?.id,
+        getTodayDateString(),
+        fotoFile,
+      )
+      setExecucoes((prev) => {
+        const filtered = prev.filter(
+          (e) => e.id !== saved.id && !(e.rotina === rotinaId && e.usuario === user.id),
+        )
+        return [...filtered, saved]
+      })
+    } catch (err) {
+      console.error('Erro ao registrar execução:', err)
+    } finally {
+      setSubmittingId(null)
+    }
+  }
+
+  // Toggle routine completion: toque rápido direto (1 toque sem atrito)
   const handleToggle = async (rotinaId: string) => {
     if (!user || submittingId === rotinaId) return
 
@@ -261,6 +326,7 @@ export default function Index() {
       usuario: user.id,
       data_execucao: getTodayDateString(),
       concluida: nextState,
+      foto: existingExec?.foto,
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     }
@@ -300,6 +366,13 @@ export default function Index() {
     } finally {
       setSubmittingId(null)
     }
+  }
+
+  // Abertura com 1 clique de plano de ação pré-preenchido vindo de rotina atrasada
+  const handleCriarPlanoDeRotinaAtrasada = (rotina: Rotina) => {
+    setRotinaOrigemPlano(rotina)
+    setEditingPlano(null)
+    setPlanoModalOpen(true)
   }
 
   const firstName = user?.name ? user.name.trim().split(' ')[0] : 'Líder'
@@ -364,6 +437,18 @@ export default function Index() {
         <div className="flex items-center gap-2.5 flex-wrap">
           <StoreSelector />
 
+          <button
+            onClick={() => {
+              setRotinaOrigemPlano(null)
+              setEditingPlano(null)
+              setPlanoModalOpen(true)
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-xs font-semibold text-white rounded-md shadow-xs transition-colors"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span>Novo Plano de Ação</span>
+          </button>
+
           <Link
             to="/rotinas"
             className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-xs font-semibold text-[#1F2937] rounded-md shadow-xs transition-colors"
@@ -373,6 +458,11 @@ export default function Index() {
           </Link>
         </div>
       </div>
+
+      {/* Entrega 3: Menu de Enquadramento do Cliente na tela Inicial (Exclusivo Consultor Admin) */}
+      {isAdmin && clientesAdmin.length > 0 && (
+        <EnquadramentoClienteCard clientes={clientesAdmin} onClienteUpdated={loadData} />
+      )}
 
       {/* 4 Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -700,14 +790,57 @@ export default function Index() {
                         </span>
                       )}
                     </div>
+
+                    {/* Botão de ação rápida: se estiver atrasada, virar plano de ação com 1 clique */}
+                    {!isDone && pastDue && (
+                      <div className="pt-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleCriarPlanoDeRotinaAtrasada(rotina)}
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#B91C1C] hover:text-red-800 bg-red-50 hover:bg-red-100/70 px-2 py-0.5 rounded border border-red-200 transition-colors"
+                        >
+                          <PlusCircle className="w-3 h-3" />
+                          <span>Gerar Plano de Ação (5W2H) em 1 clique</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Circular check toggle */}
-                  <div className="shrink-0 pl-2">
+                  {/* Ações da Rotina: Foto / Concluir */}
+                  <div className="shrink-0 pl-2 flex items-center gap-2">
+                    {/* Se tiver foto concluída, ícone de câmera para ampliar */}
+                    {isDone && completionMap.get(rotina.id)?.foto ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const exec = completionMap.get(rotina.id)
+                          if (exec) {
+                            setVisualizarFotoExecucao({ execucao: exec, rotina })
+                          }
+                        }}
+                        className="inline-flex items-center gap-1 p-2 rounded-lg bg-blue-50 text-[#2563EB] hover:bg-blue-100 transition-colors text-xs font-semibold"
+                        title="Ver foto de comprovação anexada"
+                      >
+                        <Camera className="w-4 h-4" />
+                        <span className="hidden sm:inline">Foto</span>
+                      </button>
+                    ) : !isDone ? (
+                      /* Botão para anexar foto opcional */
+                      <button
+                        type="button"
+                        onClick={() => setConcluirModalRotina(rotina)}
+                        className="p-2 rounded-lg text-[#6B7280] hover:text-[#2563EB] hover:bg-blue-50 transition-colors"
+                        title="Concluir anexando foto de comprovação"
+                      >
+                        <Camera className="w-4 h-4" />
+                      </button>
+                    ) : null}
+
+                    {/* Circular check toggle (1 toque sem atrito) */}
                     <button
                       onClick={() => handleToggle(rotina.id)}
                       disabled={submittingId === rotina.id}
-                      title={isDone ? 'Desmarcar conclusão' : 'Marcar como concluída'}
+                      title={isDone ? 'Desmarcar conclusão' : 'Marcar como concluída em 1 toque'}
                       aria-label={`Marcar ${rotina.nome} como concluída`}
                       className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center transition-all duration-150 transform active:scale-90 ${
                         isDone
@@ -726,6 +859,81 @@ export default function Index() {
           </div>
         )}
       </div>
+
+      {/* Entrega 1: Bloco de Plano de Ação (5W2H) na tela Início */}
+      <PlanosAcaoCard
+        planos={planosAcao}
+        lojas={lojaSelecionada ? [lojaSelecionada] : []}
+        selectedLojaId={lojaSelecionadaId || undefined}
+        title="Plano de Ação Operacional (5W2H)"
+        subtitle="Acompanhe ações corretivas, preventivas e prazos da loja"
+        onNewPlano={() => {
+          setEditingPlano(null)
+          setRotinaOrigemPlano(null)
+          setPlanoModalOpen(true)
+        }}
+        onEditPlano={(plano) => {
+          setEditingPlano(plano)
+          setRotinaOrigemPlano(null)
+          setPlanoModalOpen(true)
+        }}
+        onDeletePlano={async (plano) => {
+          if (confirm(`Deseja excluir a ação: "${plano.descricao}"?`)) {
+            await planosAcaoService.delete(plano.id)
+            loadData()
+          }
+        }}
+        onToggleStatus={async (plano, nextStatus) => {
+          await planosAcaoService.update(plano.id, { status: nextStatus })
+          loadData()
+        }}
+      />
+
+      {/* Modal Nova / Editar Ação */}
+      <PlanoAcaoModal
+        isOpen={planoModalOpen}
+        onClose={() => {
+          setPlanoModalOpen(false)
+          setEditingPlano(null)
+          setRotinaOrigemPlano(null)
+        }}
+        plano={editingPlano}
+        defaultRotina={rotinaOrigemPlano}
+        defaultLojaId={lojaSelecionadaId || undefined}
+        lojas={lojaSelecionada ? [lojaSelecionada] : []}
+        rotinas={rotinas}
+        onSave={async (data) => {
+          if (editingPlano) {
+            await planosAcaoService.update(editingPlano.id, data)
+          } else {
+            await planosAcaoService.create({
+              ...data,
+              criado_por: user?.id,
+            })
+          }
+          loadData()
+        }}
+      />
+
+      {/* Modal Concluir com Foto Opcional */}
+      <ConcluirRotinaModal
+        isOpen={Boolean(concluirModalRotina)}
+        rotina={concluirModalRotina}
+        onClose={() => setConcluirModalRotina(null)}
+        onConfirm={async (fotoFile) => {
+          if (concluirModalRotina) {
+            await handleConcluirComFoto(concluirModalRotina.id, fotoFile)
+          }
+        }}
+      />
+
+      {/* Modal Visualizador de Foto */}
+      <FotoVisualizadorModal
+        isOpen={Boolean(visualizarFotoExecucao)}
+        execucao={visualizarFotoExecucao?.execucao || null}
+        rotina={visualizarFotoExecucao?.rotina || null}
+        onClose={() => setVisualizarFotoExecucao(null)}
+      />
     </div>
   )
 }

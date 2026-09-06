@@ -22,11 +22,15 @@ export type FrequenciaRotina =
 
 export type StatusRotina = 'Ativa' | 'Pendente' | 'Concluída'
 
+export type TipoPessoaCliente = 'PF' | 'PJ'
+
 export interface Cliente extends RecordModel {
   nome: string
   contato?: string
   observacoes?: string
   envio_semanal?: boolean
+  tipo_pessoa?: TipoPessoaCliente
+  segmento?: string
   created: string
   updated: string
 }
@@ -94,9 +98,32 @@ export interface ExecucaoRotina extends RecordModel {
   usuario: string
   data_execucao: string // formato YYYY-MM-DD
   concluida: boolean
+  foto?: string
   expand?: {
     rotina?: Rotina
     usuario?: User
+  }
+}
+
+export type StatusPlanoAcao = 'aberta' | 'em_andamento' | 'concluida'
+export type PrioridadePlanoAcao = 'baixa' | 'media' | 'alta'
+
+export interface PlanoAcao extends RecordModel {
+  descricao: string
+  loja: string
+  rotina?: string
+  criado_por?: string
+  responsavel?: string
+  prazo?: string
+  status: StatusPlanoAcao
+  prioridade: PrioridadePlanoAcao
+  observacoes?: string
+  created: string
+  updated: string
+  expand?: {
+    loja?: Loja
+    rotina?: Rotina
+    criado_por?: User
   }
 }
 

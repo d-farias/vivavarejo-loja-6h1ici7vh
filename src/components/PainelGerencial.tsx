@@ -22,11 +22,13 @@ import {
   X,
 } from 'lucide-react'
 import pb from '../lib/pocketbase/client'
-import { Cliente, Loja, Rotina, ExecucaoRotina } from '../types'
+import { Cliente, Loja, Rotina, ExecucaoRotina, PlanoAcao } from '../types'
 import { isPastDue, getHorarioStatus } from '../lib/time-utils'
 import { getTodayDateString } from '../services/rotinas'
 import { clientesService } from '../services/clientes'
 import { lojasService } from '../services/lojas'
+import { planosAcaoService } from '../services/planosAcao'
+import { isPlanoAtrasado } from './PlanosAcaoCard'
 
 interface PainelGerencialProps {
   clientes: Cliente[]
@@ -110,6 +112,7 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
   // Dados brutos
   const [rotinas, setRotinas] = useState<Rotina[]>([])
   const [execucoes, setExecucoes] = useState<ExecucaoRotina[]>([])
+  const [planosAcao, setPlanosAcao] = useState<PlanoAcao[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
 
@@ -234,7 +237,7 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
         d7.getDate(),
       ).padStart(2, '0')}`
 
-      const [rotinasRes, execRes] = await Promise.all([
+      const [rotinasRes, execRes, planosRes] = await Promise.all([
         pb.collection('rotinas').getFullList<Rotina>({
           sort: 'nome',
           expand: 'loja,funcao',
@@ -244,10 +247,12 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
           sort: '-created',
           expand: 'rotina,usuario,loja',
         }),
+        planosAcaoService.getAll().catch(() => [] as PlanoAcao[]),
       ])
 
       setRotinas(rotinasRes)
       setExecucoes(execRes)
+      setPlanosAcao(planosRes)
       setLastUpdated(new Date())
     } catch (err) {
       console.error('Erro ao carregar dados do Painel Gerencial:', err)
@@ -260,17 +265,21 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
   useEffect(() => {
     loadData()
 
-    // Subscrição Realtime SSE para rotinas e execuções
+    // Subscrição Realtime SSE para rotinas, execuções e planos_acao
     const unsubscribeRotinas = pb.collection('rotinas').subscribe('*', () => {
       loadData()
     })
     const unsubscribeExec = pb.collection('execucoes_rotinas').subscribe('*', () => {
       loadData()
     })
+    const unsubscribePlanos = pb.collection('planos_acao').subscribe('*', () => {
+      loadData()
+    })
 
     return () => {
       unsubscribeRotinas.then((unsub) => unsub()).catch(() => {})
       unsubscribeExec.then((unsub) => unsub()).catch(() => {})
+      unsubscribePlanos.then((unsub) => unsub()).catch(() => {})
     }
   }, [loadData])
 
@@ -342,6 +351,38 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
     const taxaHoje = totalRotinas > 0 ? Math.round((concluidasHoje / totalRotinas) * 100) : 0
     const totalExecucoesPeriodo = execucoesFiltradas.length
 
+    // KPIs de Planos de Ação (Abertas, Atrasadas, Concluídas na Semana)
+    const filteredPlanos = planosAcao.filter((p) => {
+      if (selectedLojaId !== 'todas' && p.loja !== selectedLojaId) return false
+      if (selectedClienteId !== 'todos') {
+        const lj = lojas.find((l) => l.id === p.loja)
+        if (lj && lj.cliente !== selectedClienteId) return false
+      }
+      return true
+    })
+
+    let planosAbertas = 0
+    let planosAtrasadas = 0
+    let planosConcluidasSemana = 0
+
+    const now = new Date()
+    const d7 = new Date(now)
+    d7.setDate(d7.getDate() - 7)
+
+    filteredPlanos.forEach((p) => {
+      if (p.status === 'concluida') {
+        const updatedTime = new Date(p.updated || p.created).getTime()
+        if (updatedTime >= d7.getTime()) {
+          planosConcluidasSemana++
+        }
+      } else {
+        planosAbertas++
+        if (isPlanoAtrasado(p)) {
+          planosAtrasadas++
+        }
+      }
+    })
+
     return {
       totalRotinas,
       concluidasHoje,
@@ -349,8 +390,21 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
       pendentesHoje,
       taxaHoje,
       totalExecucoesPeriodo,
+      planosAbertas,
+      planosAtrasadas,
+      planosConcluidasSemana,
+      totalPlanos: filteredPlanos.length,
     }
-  }, [rotinasFiltradas, concluidasHojeIds, rotinasAtrasadasHoje, execucoesFiltradas])
+  }, [
+    rotinasFiltradas,
+    concluidasHojeIds,
+    rotinasAtrasadasHoje,
+    execucoesFiltradas,
+    planosAcao,
+    selectedLojaId,
+    selectedClienteId,
+    lojas,
+  ])
 
   // Relatório semanal agrupado por dia (últimos 7 dias)
   const relatorioSemanalDias: DiaExecucao[] = useMemo(() => {
@@ -920,6 +974,84 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
             {kpis.totalExecucoesPeriodo}
           </div>
           <div className="text-[11px] text-[#6B7280] mt-0.5">conclusões registradas</div>
+        </div>
+      </div>
+
+      {/* Card Painel Gerencial: KPIs de Plano de Ação (Abertas, Atrasadas, Concluídas na semana) */}
+      <div className="bg-white border border-[#E5E7EB] rounded-lg p-5 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-[#E5E7EB]">
+          <div>
+            <h3 className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
+              <Check className="w-4 h-4 text-[#2563EB]" />
+              <span>Plano de Ação Operacional (5W2H)</span>
+              {kpis.planosAtrasadas > 0 && (
+                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-[#B91C1C]">
+                  {kpis.planosAtrasadas} atrasada{kpis.planosAtrasadas > 1 ? 's' : ''}
+                </span>
+              )}
+            </h3>
+            <p className="text-xs text-[#6B7280]">
+              Acompanhamento de ações corretivas, preventivas e prazos da rede
+            </p>
+          </div>
+          <div className="text-xs text-[#6B7280] font-medium">
+            Total monitoradas: <strong className="text-[#1F2937]">{kpis.totalPlanos}</strong>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="p-3.5 rounded-lg border border-[#E5E7EB] bg-[#F7F7F5]/50">
+            <div className="flex items-center justify-between text-xs text-[#6B7280]">
+              <span className="font-semibold uppercase tracking-wider text-[10px]">
+                Ações Abertas
+              </span>
+              <Clock className="w-4 h-4 text-[#2563EB]" />
+            </div>
+            <div className="text-2xl font-bold text-[#1F2937] mt-1">{kpis.planosAbertas}</div>
+            <p className="text-[11px] text-[#6B7280] mt-0.5">pendentes ou em andamento</p>
+          </div>
+
+          <div
+            className={`p-3.5 rounded-lg border ${
+              kpis.planosAtrasadas > 0
+                ? 'border-red-300 bg-red-50/50'
+                : 'border-[#E5E7EB] bg-[#F7F7F5]/50'
+            }`}
+          >
+            <div className="flex items-center justify-between text-xs">
+              <span
+                className={`font-semibold uppercase tracking-wider text-[10px] ${
+                  kpis.planosAtrasadas > 0 ? 'text-[#B91C1C]' : 'text-[#6B7280]'
+                }`}
+              >
+                Ações Atrasadas
+              </span>
+              <AlertTriangle
+                className={`w-4 h-4 ${kpis.planosAtrasadas > 0 ? 'text-[#B91C1C]' : 'text-gray-400'}`}
+              />
+            </div>
+            <div
+              className={`text-2xl font-bold mt-1 ${
+                kpis.planosAtrasadas > 0 ? 'text-[#B91C1C]' : 'text-[#1F2937]'
+              }`}
+            >
+              {kpis.planosAtrasadas}
+            </div>
+            <p className="text-[11px] text-[#6B7280] mt-0.5">prazo limite estourado</p>
+          </div>
+
+          <div className="p-3.5 rounded-lg border border-[#E5E7EB] bg-[#F7F7F5]/50">
+            <div className="flex items-center justify-between text-xs text-[#6B7280]">
+              <span className="font-semibold uppercase tracking-wider text-[10px]">
+                Concluídas na Semana
+              </span>
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            </div>
+            <div className="text-2xl font-bold text-[#1F2937] mt-1">
+              {kpis.planosConcluidasSemana}
+            </div>
+            <p className="text-[11px] text-[#6B7280] mt-0.5">resolvidas nos últimos 7 dias</p>
+          </div>
         </div>
       </div>
 

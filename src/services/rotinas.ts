@@ -82,8 +82,15 @@ export const execucoesService = {
     currentlyDone: boolean,
     existingId?: string,
     dateStr = getTodayDateString(),
+    fotoFile?: File | null,
   ): Promise<ExecucaoRotina> {
     if (existingId) {
+      if (fotoFile) {
+        const formData = new FormData()
+        formData.append('concluida', String(!currentlyDone))
+        formData.append('foto', fotoFile)
+        return await pb.collection('execucoes_rotinas').update<ExecucaoRotina>(existingId, formData)
+      }
       return await pb.collection('execucoes_rotinas').update<ExecucaoRotina>(existingId, {
         concluida: !currentlyDone,
       })
@@ -96,11 +103,28 @@ export const execucoesService = {
         .getFirstListItem<ExecucaoRotina>(
           `usuario = "${userId}" && rotina = "${rotinaId}" && data_execucao >= "${dateStr} 00:00:00" && data_execucao <= "${dateStr} 23:59:59"`,
         )
+      if (fotoFile) {
+        const formData = new FormData()
+        formData.append('concluida', String(!existing.concluida))
+        formData.append('foto', fotoFile)
+        return await pb
+          .collection('execucoes_rotinas')
+          .update<ExecucaoRotina>(existing.id, formData)
+      }
       return await pb.collection('execucoes_rotinas').update<ExecucaoRotina>(existing.id, {
         concluida: !existing.concluida,
       })
     } catch {
       // Create new execution record
+      if (fotoFile) {
+        const formData = new FormData()
+        formData.append('rotina', rotinaId)
+        formData.append('usuario', userId)
+        formData.append('data_execucao', `${dateStr} 12:00:00.000Z`)
+        formData.append('concluida', 'true')
+        formData.append('foto', fotoFile)
+        return await pb.collection('execucoes_rotinas').create<ExecucaoRotina>(formData)
+      }
       return await pb.collection('execucoes_rotinas').create<ExecucaoRotina>({
         rotina: rotinaId,
         usuario: userId,
@@ -108,5 +132,10 @@ export const execucoesService = {
         concluida: true,
       })
     }
+  },
+
+  getFotoUrl(execucao: ExecucaoRotina, thumb?: string): string | null {
+    if (!execucao.foto) return null
+    return pb.files.getURL(execucao, execucao.foto, { thumb })
   },
 }
