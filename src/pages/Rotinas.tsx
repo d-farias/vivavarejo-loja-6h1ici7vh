@@ -130,7 +130,7 @@ export default function Rotinas() {
   const completionMap = useMemo(() => {
     const map = new Map<string, ExecucaoRotina>()
     for (const exec of execucoes) {
-      if (exec.concluida) {
+      if (exec.concluida && exec.status_validacao !== 'devolvida') {
         map.set(exec.rotina, exec)
       }
     }

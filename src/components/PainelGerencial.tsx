@@ -243,9 +243,9 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
           expand: 'loja,funcao',
         }),
         pb.collection('execucoes_rotinas').getFullList<ExecucaoRotina>({
-          filter: `data >= "${dateMin}"`,
+          filter: `data_execucao >= "${dateMin} 00:00:00"`,
           sort: '-created',
-          expand: 'rotina,usuario,loja',
+          expand: 'rotina,usuario,validado_por',
         }),
         planosAcaoService.getAll().catch(() => [] as PlanoAcao[]),
       ])
@@ -323,11 +323,12 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
 
   const todayStr = useMemo(() => getTodayDateString(), [])
 
-  // Conjunto de rotinas concluídas hoje
+  // Conjunto de rotinas concluídas hoje (concluida = true e status_validacao != 'devolvida')
   const concluidasHojeIds = useMemo(() => {
     const s = new Set<string>()
     execucoesFiltradas.forEach((e) => {
-      if (e.data === todayStr) {
+      const eDate = e.data_execucao ? e.data_execucao.substring(0, 10) : ''
+      if (eDate === todayStr && e.concluida && e.status_validacao !== 'devolvida') {
         s.add(e.rotina)
       }
     })
@@ -419,7 +420,11 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
         d.getDate(),
       ).padStart(2, '0')}`
 
-      const dayExecs = execucoesFiltradas.filter((e) => e.data === dateStr)
+      // Rotinas válidas concluídas no dia (concluida = true e status != 'devolvida')
+      const dayExecs = execucoesFiltradas.filter((e) => {
+        const eDate = e.data_execucao ? e.data_execucao.substring(0, 10) : ''
+        return eDate === dateStr && e.concluida && e.status_validacao !== 'devolvida'
+      })
       // Rotinas únicas concluídas no dia
       const uniqueDone = new Set(dayExecs.map((e) => e.rotina)).size
       const percentual = totalRotinas > 0 ? Math.round((uniqueDone / totalRotinas) * 100) : 0
@@ -456,14 +461,19 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
       const rotIds = new Set(rots.map((r) => r.id))
       const totalEsperadoSemana = rots.length * 7
 
-      // Execuções da semana para essa área
-      const execsArea = execucoesFiltradas.filter((e) => rotIds.has(e.rotina))
+      // Execuções válidas da semana para essa área (não devolvidas)
+      const execsArea = execucoesFiltradas.filter(
+        (e) => rotIds.has(e.rotina) && e.concluida && e.status_validacao !== 'devolvida',
+      )
       const conclusoesSemana = execsArea.length
       const percentualSemana =
         totalEsperadoSemana > 0 ? Math.round((conclusoesSemana / totalEsperadoSemana) * 100) : 0
 
       // Hoje
-      const execsHoje = execsArea.filter((e) => e.data === todayStr)
+      const execsHoje = execsArea.filter((e) => {
+        const eDate = e.data_execucao ? e.data_execucao.substring(0, 10) : ''
+        return eDate === todayStr
+      })
       const conclusoesHoje = new Set(execsHoje.map((e) => e.rotina)).size
       const totalHoje = rots.length
       const percentualHoje = totalHoje > 0 ? Math.round((conclusoesHoje / totalHoje) * 100) : 0
@@ -501,7 +511,9 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
     map.forEach((rots, responsavel) => {
       const rotIds = new Set(rots.map((r) => r.id))
       const totalEsperadoSemana = rots.length * 7
-      const conclusoesSemana = execucoesFiltradas.filter((e) => rotIds.has(e.rotina)).length
+      const conclusoesSemana = execucoesFiltradas.filter(
+        (e) => rotIds.has(e.rotina) && e.concluida && e.status_validacao !== 'devolvida',
+      ).length
       const percentualSemana =
         totalEsperadoSemana > 0 ? Math.round((conclusoesSemana / totalEsperadoSemana) * 100) : 0
 
@@ -526,9 +538,11 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
         const rotIds = new Set(rotsLoja.map((r) => r.id))
         const totalEsperadoSemana = rotsLoja.length * 7
 
-        const execsLoja = execucoes.filter(
-          (e) => (e.loja === loja.id || !e.loja) && rotIds.has(e.rotina),
-        )
+        const execsLoja = execucoes.filter((e) => {
+          if (!rotIds.has(e.rotina)) return false
+          if (!e.concluida || e.status_validacao === 'devolvida') return false
+          return true
+        })
         const conclusoesSemana = execsLoja.length
         const percentualSemana =
           totalEsperadoSemana > 0
@@ -536,7 +550,10 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
             : 0
 
         // Hoje
-        const execsHoje = execsLoja.filter((e) => e.data === todayStr)
+        const execsHoje = execsLoja.filter((e) => {
+          const eDate = e.data_execucao ? e.data_execucao.substring(0, 10) : ''
+          return eDate === todayStr
+        })
         const concluidasHojeSet = new Set(execsHoje.map((e) => e.rotina))
         const taxaHoje =
           rotsLoja.length > 0
