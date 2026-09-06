@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-06T11:49:37.978Z",
+  "generatedAt": "2026-09-06T12:08:07.056Z",
   "collections": [
     {
       "name": "users",
@@ -316,6 +316,24 @@
         },
         {
           "name": "segmento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "info_negocio",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "gargalos",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "inventario_situacao",
           "type": "text",
           "required": false,
           "system": false

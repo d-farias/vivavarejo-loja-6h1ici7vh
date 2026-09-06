@@ -24,6 +24,8 @@ export type StatusRotina = 'Ativa' | 'Pendente' | 'Concluída'
 
 export type TipoPessoaCliente = 'PF' | 'PJ'
 
+export type SituacaoInventario = 'rotativo' | 'anual' | 'sem_controle'
+
 export interface Cliente extends RecordModel {
   nome: string
   contato?: string
@@ -31,6 +33,9 @@ export interface Cliente extends RecordModel {
   envio_semanal?: boolean
   tipo_pessoa?: TipoPessoaCliente
   segmento?: string
+  info_negocio?: string
+  gargalos?: string
+  inventario_situacao?: string
   created: string
   updated: string
 }

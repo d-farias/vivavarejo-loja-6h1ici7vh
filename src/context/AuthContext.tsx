@@ -14,6 +14,9 @@ interface AuthContextType {
     empresa?: string,
     tipoPessoa?: 'PF' | 'PJ',
     segmento?: string,
+    infoNegocio?: string,
+    gargalos?: string,
+    inventarioSituacao?: string,
   ) => Promise<void>
   logout: () => void
 }
@@ -97,6 +100,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     empresa?: string,
     tipoPessoa?: 'PF' | 'PJ',
     segmento?: string,
+    infoNegocio?: string,
+    gargalos?: string,
+    inventarioSituacao?: string,
   ) => {
     await pb.collection('users').create({
       email: email.trim(),
@@ -109,20 +115,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Auto login right after registration
     await login(email, pass)
 
-    // Se informou empresa / rede, cria o registro de Cliente automaticamente
-    const empresaTrimmed = empresa?.trim()
-    if (empresaTrimmed) {
-      try {
-        await pb.collection('clientes').create({
-          nome: empresaTrimmed,
-          contato: email.trim(),
-          tipo_pessoa: tipoPessoa || 'PJ',
-          segmento: segmento || 'Moda e Vestuário',
-          observacoes: `Criado automaticamente no onboarding de ${name.trim()}`,
-        })
-      } catch (e) {
-        console.warn('Erro ao criar cliente automaticamente no onboarding:', e)
-      }
+    // Cria a entidade cliente levando os dados do negócio, enquadramento e diagnóstico operacional
+    const empresaTrimmed =
+      empresa?.trim() ||
+      (tipoPessoa === 'PF' ? `Operação ${name.trim()}` : `Rede / Loja de ${name.trim()}`)
+
+    try {
+      await pb.collection('clientes').create({
+        nome: empresaTrimmed,
+        contato: email.trim(),
+        tipo_pessoa: tipoPessoa || 'PJ',
+        segmento: segmento || 'Moda e Vestuário',
+        info_negocio: infoNegocio?.trim() || '',
+        gargalos: gargalos?.trim() || '',
+        inventario_situacao: inventarioSituacao?.trim() || '',
+        observacoes: `Criado no onboarding de ${name.trim()}`,
+      })
+    } catch (e) {
+      console.warn('Erro ao criar cliente automaticamente no onboarding:', e)
     }
   }
 

@@ -1,7 +1,18 @@
 import React, { useState } from 'react'
 import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
-import { AlertCircle, Building2, Lock, Mail, User, CheckCircle2, ArrowLeft } from 'lucide-react'
+import {
+  AlertCircle,
+  Building2,
+  Lock,
+  Mail,
+  User,
+  CheckCircle2,
+  ArrowLeft,
+  Boxes,
+  HelpCircle,
+  AlertTriangle,
+} from 'lucide-react'
 import { VAREJO_SEGMENTOS } from '@/components/EnquadramentoClienteCard'
 
 export default function Signup() {
@@ -31,6 +42,14 @@ export default function Signup() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+
+  // Novos campos solicitados: Informações do negócio, Maiores gargalos e Controle de inventário
+  const [infoNegocio, setInfoNegocio] = useState('')
+  const [gargalos, setGargalos] = useState('')
+  const [inventarioSituacao, setInventarioSituacao] = useState<
+    'rotativo' | 'anual' | 'sem_controle' | ''
+  >('')
+
   const [loading, setLoading] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<{
     name?: string
@@ -38,6 +57,9 @@ export default function Signup() {
     email?: string
     password?: string
     confirmPassword?: string
+    infoNegocio?: string
+    gargalos?: string
+    inventarioSituacao?: string
     general?: string
   }>({})
 
@@ -79,7 +101,17 @@ export default function Signup() {
         empresa.trim() ||
         (tipoPessoa === 'PF' ? `Operação ${name.trim()}` : `Rede / Loja de ${name.trim()}`)
 
-      await signup(email, password, name, nomeEmpresaFinal, tipoPessoa, finalSegmento)
+      await signup(
+        email,
+        password,
+        name,
+        nomeEmpresaFinal,
+        tipoPessoa,
+        finalSegmento,
+        infoNegocio,
+        gargalos,
+        inventarioSituacao,
+      )
       navigate('/', { replace: true })
     } catch (err: unknown) {
       const errorObj = err as {
@@ -136,7 +168,7 @@ export default function Signup() {
 
   return (
     <div className="min-h-[calc(100vh-140px)] flex items-center justify-center py-10 px-4">
-      <div className="w-full max-w-md bg-white border border-[#E5E7EB] rounded-lg p-6 sm:p-8 shadow-xs">
+      <div className="w-full max-w-lg bg-white border border-[#E5E7EB] rounded-lg p-6 sm:p-8 shadow-xs">
         {/* Header com link de voltar */}
         <div className="flex items-center justify-between mb-4">
           <Link
@@ -155,9 +187,10 @@ export default function Signup() {
           <div className="w-10 h-10 rounded bg-[#2563EB] flex items-center justify-center text-white mb-3 shadow-xs">
             <div className="w-4 h-4 border-2 border-white rotate-45 transform" />
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937]">VivaVarejo</h1>
-          <p className="text-xs sm:text-sm text-[#6B7280] mt-1">
-            Cadastre seu perfil de liderança para gerenciar as rotinas da sua loja
+          <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937]">Criar Conta Gratuita</h1>
+          <p className="text-xs sm:text-sm text-[#6B7280] mt-1 max-w-sm">
+            Configure seu perfil de liderança e diagnóstico operacional para gerenciar as rotinas da
+            sua loja
           </p>
         </div>
 
@@ -301,6 +334,77 @@ export default function Signup() {
             </div>
           )}
 
+          {/* Seção de Diagnóstico Operacional: Informações do negócio, gargalos e inventário */}
+          <div className="pt-2 border-t border-[#E5E7EB] space-y-3.5">
+            <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#2563EB]">
+              <HelpCircle className="w-3.5 h-3.5" />
+              <span>Diagnóstico Inicial da Operação</span>
+            </div>
+
+            {/* (a) Informações do negócio */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1">
+                Informações do negócio{' '}
+                <span className="text-[#9CA3AF] font-normal lowercase">(opcional)</span>
+              </label>
+              <input
+                type="text"
+                value={infoNegocio}
+                onChange={(e) => setInfoNegocio(e.target.value)}
+                placeholder="Ex: 2 lojas, 14 colaboradores, Curitiba - PR"
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-md outline-none focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937] placeholder:text-gray-400"
+                disabled={loading}
+              />
+              <p className="text-[11px] text-[#6B7280] mt-1">
+                Informe número de unidades, quantidade de colaboradores ou cidade de atuação.
+              </p>
+            </div>
+
+            {/* (b) Maiores gargalos ou problemas */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
+                <AlertTriangle className="w-3 h-3 text-amber-500" />
+                <span>Quais são seus maiores gargalos ou problemas?</span>
+                <span className="text-[#9CA3AF] font-normal lowercase">(opcional)</span>
+              </label>
+              <textarea
+                value={gargalos}
+                onChange={(e) => setGargalos(e.target.value)}
+                rows={2}
+                placeholder="Ex: perdas recorrentes, equipe desorganizada, falta de padrão na abertura/fechamento, falta de tempo do gerente..."
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-md outline-none focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937] placeholder:text-gray-400 resize-none"
+                disabled={loading}
+              />
+            </div>
+
+            {/* (c) Pergunta sobre inventário e perdas */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
+                <Boxes className="w-3 h-3 text-[#2563EB]" />
+                <span>Como está o controle de inventário da sua empresa?</span>
+              </label>
+              <select
+                value={inventarioSituacao}
+                onChange={(e) =>
+                  setInventarioSituacao(
+                    e.target.value as 'rotativo' | 'anual' | 'sem_controle' | '',
+                  )
+                }
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-md outline-none focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
+                disabled={loading}
+              >
+                <option value="">Selecione uma opção (opcional)</option>
+                <option value="rotativo">Fazemos inventário rotativo frequente</option>
+                <option value="anual">Só inventário anual / esporádico</option>
+                <option value="sem_controle">Não temos controle formal de inventário</option>
+              </select>
+              <p className="text-[11px] text-[#6B7280] mt-1">
+                O inventário e os processos mapeados são fundamentais para reduzir perdas e proteger
+                sua margem.
+              </p>
+            </div>
+          </div>
+
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
               E-mail
@@ -380,7 +484,7 @@ export default function Signup() {
             disabled={loading}
             className="w-full mt-2 py-2.5 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm rounded-md shadow-xs transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
           >
-            {loading ? 'Criando conta...' : 'Criar conta'}
+            {loading ? 'Criando conta gratuita...' : 'Criar conta gratuita'}
           </button>
         </form>
 

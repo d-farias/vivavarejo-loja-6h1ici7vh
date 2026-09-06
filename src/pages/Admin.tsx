@@ -238,6 +238,9 @@ export default function Admin() {
     const contato = (formData.get('contato') as string)?.trim()
     const tipo_pessoa = (formData.get('tipo_pessoa') as 'PF' | 'PJ') || 'PJ'
     const segmento = (formData.get('segmento') as string)?.trim() || ''
+    const info_negocio = (formData.get('info_negocio') as string)?.trim() || ''
+    const gargalos = (formData.get('gargalos') as string)?.trim() || ''
+    const inventario_situacao = (formData.get('inventario_situacao') as string)?.trim() || ''
     const observacoes = (formData.get('observacoes') as string)?.trim()
 
     if (!nome) return
@@ -249,6 +252,9 @@ export default function Admin() {
           contato,
           tipo_pessoa,
           segmento,
+          info_negocio,
+          gargalos,
+          inventario_situacao,
           observacoes,
         })
         showFeedback('Cliente atualizado com sucesso!')
@@ -258,6 +264,9 @@ export default function Admin() {
           contato,
           tipo_pessoa,
           segmento,
+          info_negocio,
+          gargalos,
+          inventario_situacao,
           observacoes,
         })
         showFeedback('Cliente cadastrado com sucesso!')
@@ -2077,11 +2086,52 @@ export default function Admin() {
 
               <div>
                 <label className="block text-xs font-semibold text-[#374151] mb-1">
+                  Informações do Negócio (unidades, equipe, cidade)
+                </label>
+                <input
+                  name="info_negocio"
+                  defaultValue={clienteModal.data?.info_negocio || ''}
+                  placeholder="Ex: 2 lojas, 15 colaboradores, Curitiba - PR"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#374151] mb-1">
+                  Gargalos e Problemas Operacionais
+                </label>
+                <textarea
+                  name="gargalos"
+                  rows={2}
+                  defaultValue={clienteModal.data?.gargalos || ''}
+                  placeholder="Ex: perdas recorrentes, equipe desorganizada, falta de padrão..."
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#374151] mb-1">
+                  Situação do Controle de Inventário
+                </label>
+                <select
+                  name="inventario_situacao"
+                  defaultValue={clienteModal.data?.inventario_situacao || ''}
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                >
+                  <option value="">Não informado</option>
+                  <option value="rotativo">Inventário rotativo frequente</option>
+                  <option value="anual">Apenas anual / esporádico</option>
+                  <option value="sem_controle">Sem controle formal</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#374151] mb-1">
                   Observações
                 </label>
                 <textarea
                   name="observacoes"
-                  rows={3}
+                  rows={2}
                   defaultValue={clienteModal.data?.observacoes || ''}
                   placeholder="Informações adicionais da consultoria..."
                   className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"

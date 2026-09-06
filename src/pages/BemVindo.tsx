@@ -20,6 +20,9 @@ import {
   ShieldCheck,
   ChevronRight,
   Check,
+  Boxes,
+  TrendingDown,
+  Layers,
 } from 'lucide-react'
 import { TipoPessoaCliente } from '@/types'
 import { VAREJO_SEGMENTOS } from '@/components/EnquadramentoClienteCard'
@@ -147,7 +150,7 @@ export default function BemVindo() {
               to="/signup"
               className="px-3.5 py-2 text-xs sm:text-sm font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors inline-flex items-center gap-1.5"
             >
-              <span>Criar conta</span>
+              <span>Criar conta gratuita</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -174,18 +177,26 @@ export default function BemVindo() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <Link
+                to="/signup"
+                className="w-full sm:w-auto px-6 py-3 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm rounded-md shadow-xs transition-colors inline-flex items-center justify-center gap-2"
+              >
+                <span>Criar conta gratuita</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+
               <button
                 type="button"
                 onClick={handleScrollToInterest}
-                className="w-full sm:w-auto px-6 py-3 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm rounded-md shadow-xs transition-colors inline-flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-6 py-3 bg-[#F7F7F5] hover:bg-gray-200 border border-[#E5E7EB] text-[#374151] font-semibold text-sm rounded-md transition-colors inline-flex items-center justify-center gap-2"
               >
-                <span>Quero começar</span>
-                <ChevronRight className="w-4 h-4" />
+                <span>Tenho interesse</span>
+                <ChevronRight className="w-4 h-4 text-[#6B7280]" />
               </button>
 
               <Link
                 to="/login"
-                className="w-full sm:w-auto px-6 py-3 bg-[#F7F7F5] hover:bg-gray-200 border border-[#E5E7EB] text-[#374151] font-semibold text-sm rounded-md transition-colors inline-flex items-center justify-center"
+                className="w-full sm:w-auto px-5 py-3 text-xs sm:text-sm text-[#4B5563] hover:text-[#1F2937] hover:underline font-medium inline-flex items-center justify-center"
               >
                 Já tenho conta
               </Link>
@@ -195,7 +206,7 @@ export default function BemVindo() {
             <div className="pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-[#6B7280]">
               <span className="inline-flex items-center gap-1.5">
                 <Check className="w-4 h-4 text-emerald-600" />
-                Sem fidelidade
+                Conta gratuita sem cartão
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <Check className="w-4 h-4 text-emerald-600" />
@@ -205,6 +216,84 @@ export default function BemVindo() {
                 <Check className="w-4 h-4 text-emerald-600" />
                 Compatível com celular e desktop
               </span>
+            </div>
+          </div>
+        </section>
+
+        {/* Bloco de Conteúdo Sóbrio: Processos, Inventários e Perdas */}
+        <section className="py-12 sm:py-14 px-4 sm:px-6 bg-[#F7F7F5] border-b border-[#E5E7EB]">
+          <div className="max-w-5xl mx-auto space-y-6">
+            <div className="text-center space-y-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
+                Pilares da Eficiência Operacional
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-[#1F2937]">
+                Por que focar em processos, inventários e controle de perdas?
+              </h2>
+              <p className="text-xs sm:text-sm text-[#6B7280] max-w-2xl mx-auto leading-relaxed">
+                No varejo competitivo, o lucro não vem apenas das vendas — ele nasce da disciplina
+                de chão de loja, da acuracidade de estoque e do combate incansável ao desperdício.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+              {/* Destaque 1: Processos */}
+              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs space-y-3">
+                <div className="w-9 h-9 rounded-md bg-blue-50 border border-blue-100 text-[#2563EB] flex items-center justify-center">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+                    Disciplina Diária
+                  </div>
+                  <h3 className="text-base font-bold text-[#1F2937] mt-0.5">
+                    Processos definidos = operação previsível
+                  </h3>
+                </div>
+                <p className="text-xs text-[#6B7280] leading-relaxed">
+                  Sem procedimento padrão, cada turno executa de uma maneira. Com checklists e
+                  responsáveis claros, sua equipe sabe exatamente o que fazer na abertura, pico e
+                  fechamento.
+                </p>
+              </div>
+
+              {/* Destaque 2: Inventários */}
+              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs space-y-3">
+                <div className="w-9 h-9 rounded-md bg-blue-50 border border-blue-100 text-[#2563EB] flex items-center justify-center">
+                  <Boxes className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+                    Acuracidade
+                  </div>
+                  <h3 className="text-base font-bold text-[#1F2937] mt-0.5">
+                    Inventário em dia = ruptura e overstock sob controle
+                  </h3>
+                </div>
+                <p className="text-xs text-[#6B7280] leading-relaxed">
+                  Contagens rotativas frequentes evitam surpresas de prateleira vazia para o cliente
+                  e impedem capital de giro parado em produtos com baixo giro.
+                </p>
+              </div>
+
+              {/* Destaque 3: Perdas */}
+              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs space-y-3">
+                <div className="w-9 h-9 rounded-md bg-blue-50 border border-blue-100 text-[#2563EB] flex items-center justify-center">
+                  <TrendingDown className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+                    Rentabilidade
+                  </div>
+                  <h3 className="text-base font-bold text-[#1F2937] mt-0.5">
+                    Perdas mapeadas = margem protegida
+                  </h3>
+                </div>
+                <p className="text-xs text-[#6B7280] leading-relaxed">
+                  Vencimento, avaria, furtos e erros operacionais drenam até 3% do faturamento de
+                  uma loja. Mapear os gargalos a tempo salva o resultado do seu mês.
+                </p>
+              </div>
             </div>
           </div>
         </section>
