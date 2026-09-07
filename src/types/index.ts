@@ -97,6 +97,9 @@ export interface Rotina extends RecordModel {
   loja?: string
   funcao?: string
   alerta_enviado_em?: string
+  prioridade_dia?: number
+  adiada_para_data?: string
+  adiada_para_horario?: string
   expand?: {
     loja?: Loja
     funcao?: Funcao
@@ -115,6 +118,10 @@ export interface ExecucaoRotina extends RecordModel {
   comentario_validacao?: string
   validado_por?: string
   validado_em?: string
+  horario_planejado?: string
+  prioridade_dia?: number
+  adiada_para_data?: string
+  motivo_adiamento?: string
   expand?: {
     rotina?: Rotina
     usuario?: User

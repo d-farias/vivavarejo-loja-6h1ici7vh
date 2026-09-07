@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-07T00:56:01.509Z",
+  "generatedAt": "2026-09-07T01:06:25.948Z",
   "collections": [
     {
       "name": "users",
@@ -170,6 +170,24 @@
           "type": "text",
           "required": false,
           "system": false
+        },
+        {
+          "name": "prioridade_dia",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "adiada_para_data",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "adiada_para_horario",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -259,6 +277,30 @@
         },
         {
           "name": "validado_em",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "horario_planejado",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "prioridade_dia",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "adiada_para_data",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "motivo_adiamento",
           "type": "text",
           "required": false,
           "system": false

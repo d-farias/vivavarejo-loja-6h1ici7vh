@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   LayoutDashboard,
+  Calendar,
   ListChecks,
   Users,
   Shield,
@@ -64,6 +65,7 @@ export default function Layout() {
 
   const navLinks = [
     { to: '/', label: 'Início', icon: LayoutDashboard },
+    { to: '/agenda', label: 'Agenda', icon: Calendar },
     { to: '/rotinas', label: 'Rotinas', icon: ListChecks },
     { to: '/equipe', label: 'Minha Equipe', icon: Users },
     ...(isLiderOrAdmin ? [{ to: '/promotores', label: 'Promotores', icon: Handshake }] : []),

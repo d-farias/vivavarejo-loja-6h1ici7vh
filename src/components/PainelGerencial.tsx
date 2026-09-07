@@ -128,7 +128,6 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
   const [editingRegionalLojaId, setEditingRegionalLojaId] = useState<string | null>(null)
   const [tempEmailRegional, setTempEmailRegional] = useState<string>('')
 
-  // Sincroniza localClientes e localLojas quando as props forem atualizadas
   useEffect(() => {
     setLocalClientes(clientes)
   }, [clientes])

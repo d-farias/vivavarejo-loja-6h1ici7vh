@@ -64,10 +64,14 @@ import { fornecedoresService } from '../services/fornecedores'
 import { promotoresService } from '../services/promotores'
 import { visitasPromotorService, rotinasPromotorService } from '../services/visitasPromotor'
 import type { Fornecedor, Promotor, VisitaPromotor, RotinaPromotor } from '../types'
-import { Handshake } from 'lucide-react'
+import { Handshake, FileSpreadsheet } from 'lucide-react'
+import { RelatorioLojaLoja } from '../components/RelatorioLojaLoja'
+import { rotinasService, execucoesService } from '../services/rotinas'
+import type { Rotina, ExecucaoRotina } from '../types'
 
 type TabType =
   | 'painel'
+  | 'relatorios'
   | 'planos'
   | 'modelos'
   | 'clientes'
@@ -95,6 +99,8 @@ export default function Admin() {
   const [promotores, setPromotores] = useState<Promotor[]>([])
   const [visitas, setVisitas] = useState<VisitaPromotor[]>([])
   const [rotinasPromotor, setRotinasPromotor] = useState<RotinaPromotor[]>([])
+  const [rotinasLista, setRotinasLista] = useState<Rotina[]>([])
+  const [execucoesLista, setExecucoesLista] = useState<ExecucaoRotina[]>([])
 
   const [loading, setLoading] = useState(true)
   const [feedbackMsg, setFeedbackMsg] = useState<{
@@ -211,7 +217,7 @@ export default function Admin() {
   const loadAll = useCallback(async () => {
     setLoading(true)
     try {
-      const [c, l, fn, fc, u, mod, pl, forn, prom, vis, rotProm] = await Promise.all([
+      const [c, l, fn, fc, u, mod, pl, forn, prom, vis, rotProm, rList, eList] = await Promise.all([
         clientesService.getAll(),
         lojasService.getAll(),
         funcoesService.getAll(),
@@ -223,6 +229,18 @@ export default function Admin() {
         promotoresService.getAll().catch(() => [] as Promotor[]),
         visitasPromotorService.getAll().catch(() => [] as VisitaPromotor[]),
         rotinasPromotorService.getAll().catch(() => [] as RotinaPromotor[]),
+        rotinasService.getAll().catch(() => [] as Rotina[]),
+        rotinasService
+          .getAll()
+          .then(async () => {
+            const d60 = new Date()
+            d60.setDate(d60.getDate() - 60)
+            const d60Str = `${d60.getFullYear()}-${String(d60.getMonth() + 1).padStart(2, '0')}-${String(d60.getDate()).padStart(2, '0')}`
+            const today = new Date()
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+            return await execucoesService.getExecutionsBetween(d60Str, todayStr)
+          })
+          .catch(() => [] as ExecucaoRotina[]),
       ])
 
       const isAdmRedeUser = user?.perfil === 'adm_rede'
@@ -254,6 +272,9 @@ export default function Admin() {
         const rotPromFiltradas = rotProm.filter(
           (rp) => promIdsSet.has(rp.promotor) || lojaIdsSet.has(rp.loja),
         )
+        const rotinasFiltradas = rList.filter((r) => !r.loja || lojaIdsSet.has(r.loja))
+        const rotinasFiltradasIds = new Set(rotinasFiltradas.map((r) => r.id))
+        const execsFiltradas = eList.filter((e) => rotinasFiltradasIds.has(e.rotina))
 
         setClientes(clientesFiltrados)
         setLojas(lojasDaRede)
@@ -266,6 +287,8 @@ export default function Admin() {
         setPromotores(promFiltrados)
         setVisitas(visFiltradas)
         setRotinasPromotor(rotPromFiltradas)
+        setRotinasLista(rotinasFiltradas)
+        setExecucoesLista(execsFiltradas)
       } else {
         // ADM Geral: vê tudo
         setClientes(c)
@@ -279,6 +302,8 @@ export default function Admin() {
         setPromotores(prom)
         setVisitas(vis)
         setRotinasPromotor(rotProm)
+        setRotinasLista(rList)
+        setExecucoesLista(eList)
       }
     } catch (err) {
       console.error('Erro ao carregar dados do admin:', err)
@@ -909,6 +934,22 @@ export default function Admin() {
           <span>{isAdmRede ? 'Visão da Minha Rede' : 'Painel Gerencial'}</span>
         </button>
 
+        {/* Nova aba: Relatórios Loja a Loja */}
+        <button
+          onClick={() => {
+            setActiveTab('relatorios')
+            setSearchTerm('')
+          }}
+          className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+            activeTab === 'relatorios'
+              ? 'border-[#2563EB] text-[#2563EB]'
+              : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
+          }`}
+        >
+          <FileSpreadsheet className="w-4 h-4" />
+          <span>Relatórios Loja a Loja</span>
+        </button>
+
         {/* Nova aba: Modelos de Rotinas */}
         <button
           onClick={() => {
@@ -1086,6 +1127,21 @@ export default function Admin() {
                   )
                   loadAll()
                 }}
+              />
+            </div>
+          )}
+
+          {/* ======================= ABA RELATÓRIOS LOJA A LOJA ======================= */}
+          {activeTab === 'relatorios' && (
+            <div className="space-y-6">
+              <RelatorioLojaLoja
+                clientes={clientes}
+                lojas={lojas}
+                rotinas={rotinasLista}
+                execucoes={execucoesLista}
+                planosAcao={planosAcao}
+                visitas={visitas}
+                isAdmRede={isAdmRede}
               />
             </div>
           )}

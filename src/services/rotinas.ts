@@ -42,6 +42,39 @@ export const rotinasService = {
     })
   },
 
+  async reordenarPrioridades(itens: { id: string; prioridade_dia: number }[]): Promise<void> {
+    for (const item of itens) {
+      try {
+        await pb.collection('rotinas').update(item.id, {
+          prioridade_dia: item.prioridade_dia,
+        })
+      } catch (err) {
+        console.error('Erro ao salvar prioridade da rotina:', item.id, err)
+      }
+    }
+  },
+
+  async adiarRotina(
+    id: string,
+    params: {
+      adiada_para_data?: string
+      adiada_para_horario?: string
+      observacoes?: string
+    },
+  ): Promise<Rotina> {
+    return await pb.collection('rotinas').update<Rotina>(
+      id,
+      {
+        adiada_para_data: params.adiada_para_data,
+        adiada_para_horario: params.adiada_para_horario,
+        observacoes: params.observacoes,
+      },
+      {
+        expand: 'loja,funcao',
+      },
+    )
+  },
+
   async delete(id: string): Promise<boolean> {
     return await pb.collection('rotinas').delete(id)
   },
@@ -73,6 +106,21 @@ export const execucoesService = {
     if (!userId) return []
     return await pb.collection('execucoes_rotinas').getFullList<ExecucaoRotina>({
       filter: `usuario = "${userId}" && data_execucao >= "${dateStr} 00:00:00" && data_execucao <= "${dateStr} 23:59:59"`,
+      expand: 'rotina,usuario,validado_por',
+    })
+  },
+
+  async getExecutionsByDate(dateStr: string): Promise<ExecucaoRotina[]> {
+    return await pb.collection('execucoes_rotinas').getFullList<ExecucaoRotina>({
+      filter: `data_execucao >= "${dateStr} 00:00:00" && data_execucao <= "${dateStr} 23:59:59"`,
+      expand: 'rotina,usuario,validado_por',
+    })
+  },
+
+  async getExecutionsBetween(startDateStr: string, endDateStr: string): Promise<ExecucaoRotina[]> {
+    return await pb.collection('execucoes_rotinas').getFullList<ExecucaoRotina>({
+      filter: `data_execucao >= "${startDateStr} 00:00:00" && data_execucao <= "${endDateStr} 23:59:59"`,
+      expand: 'rotina,usuario,validado_por',
     })
   },
 
