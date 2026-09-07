@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-07T00:23:00.578Z",
+  "generatedAt": "2026-09-07T00:34:19.285Z",
   "collections": [
     {
       "name": "users",
@@ -47,6 +47,12 @@
         },
         {
           "name": "ativo",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "primeiro_acesso_notificado",
           "type": "bool",
           "required": false,
           "system": false
@@ -1073,6 +1079,94 @@
         "CREATE INDEX idx_visitas_loja ON visitas_promotor (loja)",
         "CREATE INDEX idx_visitas_data ON visitas_promotor (data_visita)",
         "CREATE INDEX idx_visitas_status ON visitas_promotor (status)"
+      ]
+    },
+    {
+      "name": "atendimentos",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != '' && (usuario = @request.auth.id || @request.auth.perfil = 'admin')",
+        "delete": "@request.auth.id != '' && @request.auth.perfil = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "usuario",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "cliente_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "encontrou_solucao",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["sim", "ficou_duvida", "ainda_nao"]
+        },
+        {
+          "name": "no_que_podemos_ajudar",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "prazo_contato",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["hoje", "esta_semana", "so_explorar"]
+        },
+        {
+          "name": "maiores_dores",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "notificado_email",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dispensado",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_atendimentos_usuario ON atendimentos (usuario)",
+        "CREATE INDEX idx_atendimentos_created ON atendimentos (created)"
       ]
     }
   ]

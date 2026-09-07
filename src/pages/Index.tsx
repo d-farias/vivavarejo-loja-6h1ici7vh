@@ -13,8 +13,10 @@ import { ConcluirRotinaModal } from '@/components/ConcluirRotinaModal'
 import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
 import { EnquadramentoClienteCard } from '@/components/EnquadramentoClienteCard'
 import { VisitasPromotorDiaCard } from '@/components/VisitasPromotorDiaCard'
+import { AtendimentoPosAcessoModal } from '@/components/AtendimentoPosAcessoModal'
 import { planosAcaoService } from '@/services/planosAcao'
 import { clientesService } from '@/services/clientes'
+import { atendimentosService } from '@/services/atendimentos'
 import { visitasPromotorService, rotinasPromotorService } from '@/services/visitasPromotor'
 import type { PlanoAcao, Cliente, VisitaPromotor, RotinaPromotor } from '@/types'
 import {
@@ -65,6 +67,10 @@ export default function Index() {
     rotina?: Rotina
   } | null>(null)
 
+  // Atendimento Pós-Acesso Inteligente (Parceiro de Resultados)
+  const [atendimentoModalOpen, setAtendimentoModalOpen] = useState(false)
+  const [clienteDoUsuario, setClienteDoUsuario] = useState<Cliente | null>(null)
+
   const isAdmin = user?.perfil === 'admin' || user?.email === 'dfarias53@gmail.com'
 
   const loadData = useCallback(async () => {
@@ -101,6 +107,45 @@ export default function Index() {
   useEffect(() => {
     loadData()
   }, [loadData])
+
+  // Verificação e exibição do Atendimento Pós-Acesso Inteligente e Notificação de Primeiro Acesso
+  useEffect(() => {
+    if (!user || user.email === 'dfarias53@gmail.com') return
+
+    // 1. Notificar Primeiro Acesso/Navegação ao backend (anti-spam garantido com flag)
+    atendimentosService.notificarPrimeiroAcesso().catch(() => {})
+
+    // 2. Verificar se já respondeu ou dispensou o atendimento pós-acesso
+    const localDispensado = localStorage.getItem(`vivavarejo_atendimento_dispensado_${user.id}`)
+    const localRespondido = localStorage.getItem(`vivavarejo_atendimento_respondido_${user.id}`)
+
+    if (localDispensado || localRespondido) return
+
+    // Buscar dados do cliente cadastrado para obter nome da empresa e maiores gargalos
+    clientesService
+      .getAll()
+      .then((clis) => {
+        const found = clis.find((c) => c.contato && c.contato.includes(user.email))
+        if (found) {
+          setClienteDoUsuario(found)
+        }
+      })
+      .catch(() => {})
+
+    // Checar no backend se já existe registro de atendimento para este usuário
+    atendimentosService
+      .getByUsuario(user.id)
+      .then((existente) => {
+        if (!existente) {
+          // Pequeno delay para a tela carregar suavemente antes de abrir o modal
+          const timer = setTimeout(() => {
+            setAtendimentoModalOpen(true)
+          }, 800)
+          return () => clearTimeout(timer)
+        }
+      })
+      .catch(() => {})
+  }, [user])
 
   // Realtime subscription to rotinas (para refletir adições/edições/importações instantaneamente)
   useRealtime<Rotina>(
@@ -1016,6 +1061,17 @@ export default function Index() {
         execucao={visualizarFotoExecucao?.execucao || null}
         rotina={visualizarFotoExecucao?.rotina || null}
         onClose={() => setVisualizarFotoExecucao(null)}
+      />
+
+      {/* Modal de Atendimento Pós-Acesso Inteligente (Parceiro de Resultados) */}
+      <AtendimentoPosAcessoModal
+        isOpen={atendimentoModalOpen}
+        onClose={() => setAtendimentoModalOpen(false)}
+        usuarioId={user?.id}
+        userEmail={user?.email}
+        userName={user?.name}
+        clienteNome={clienteDoUsuario?.nome}
+        gargalosIniciais={clienteDoUsuario?.gargalos}
       />
     </div>
   )

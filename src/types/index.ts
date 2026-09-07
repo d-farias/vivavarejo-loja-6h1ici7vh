@@ -9,6 +9,7 @@ export interface User extends RecordModel {
   avatar?: string
   perfil?: PerfilUsuario
   ativo?: boolean
+  primeiro_acesso_notificado?: boolean
   created: string
   updated: string
 }
@@ -239,5 +240,27 @@ export interface VisitaPromotor extends RecordModel {
     promotor?: Promotor
     loja?: Loja
     registrado_por?: User
+  }
+}
+
+// ==================== ATENDIMENTO PÓS-ACESSO INTELIGENTE ====================
+
+export type EncontrouSolucao = 'sim' | 'ficou_duvida' | 'ainda_nao'
+export type PrazoContato = 'hoje' | 'esta_semana' | 'so_explorar'
+
+export interface Atendimento extends RecordModel {
+  usuario?: string
+  cliente_nome?: string
+  email?: string
+  encontrou_solucao?: EncontrouSolucao
+  no_que_podemos_ajudar?: string
+  prazo_contato?: PrazoContato
+  maiores_dores?: string
+  notificado_email?: boolean
+  dispensado?: boolean
+  created: string
+  updated: string
+  expand?: {
+    usuario?: User
   }
 }

@@ -187,10 +187,10 @@ export default function Signup() {
           <div className="w-10 h-10 rounded bg-[#2563EB] flex items-center justify-center text-white mb-3 shadow-xs">
             <div className="w-4 h-4 border-2 border-white rotate-45 transform" />
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937]">Criar Conta Gratuita</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937]">Criar Conta de Acesso</h1>
           <p className="text-xs sm:text-sm text-[#6B7280] mt-1 max-w-sm">
-            Configure seu perfil de liderança e diagnóstico operacional para gerenciar as rotinas da
-            sua loja
+            Configure seu perfil de liderança e diagnóstico operacional — queremos ser parceiros dos
+            seus resultados
           </p>
         </div>
 
@@ -484,7 +484,7 @@ export default function Signup() {
             disabled={loading}
             className="w-full mt-2 py-2.5 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm rounded-md shadow-xs transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
           >
-            {loading ? 'Criando conta gratuita...' : 'Criar conta gratuita'}
+            {loading ? 'Criando conta...' : 'Criar conta e começar'}
           </button>
         </form>
 
