@@ -1,18 +1,22 @@
 {
+  "id": "/",
   "name": "VivaVarejo",
   "short_name": "VivaVarejo",
   "description": "VivaVarejo - Gestão Operacional, Validades, Perdas e Rotinas do Varejo",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#F7F7F5",
   "theme_color": "#2563EB",
   "orientation": "portrait-primary",
+  "categories": ["business", "productivity"],
+  "lang": "pt-BR",
   "icons": [
     {
       "src": "/icon-192.svg",
       "sizes": "192x192",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-512.svg",

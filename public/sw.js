@@ -2,7 +2,7 @@
 // Cacheia estáticos essenciais (app shell).
 // NUNCA cacheia requisições para a API do PocketBase (/api/ ou domínios de backend) - sempre rede para dados.
 
-const CACHE_NAME = 'vivavarejo-shell-v1'
+const CACHE_NAME = 'vivavarejo-shell-v2'
 
 const PRECACHE_ASSETS = [
   '/',
