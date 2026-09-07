@@ -502,6 +502,7 @@ export default function Layout() {
       {/* Modal Falar com Especialista */}
       <FalarEspecialistaModal
         open={falarEspecialistaOpen}
+        clienteId={user?.cliente}
         onOpenChange={setFalarEspecialistaOpen}
       />
 

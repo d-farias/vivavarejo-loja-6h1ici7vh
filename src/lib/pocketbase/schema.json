@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-07T02:49:10.178Z",
+  "generatedAt": "2026-09-07T03:00:46.651Z",
   "collections": [
     {
       "name": "users",
@@ -407,6 +407,24 @@
         },
         {
           "name": "inventario_situacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "email_suporte",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "whatsapp_suporte",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nome_atendimento",
           "type": "text",
           "required": false,
           "system": false
@@ -1665,6 +1683,58 @@
         "CREATE INDEX idx_perdas_motivo ON perdas (motivo)",
         "CREATE INDEX idx_perdas_registrado_por ON perdas (registrado_por)"
       ]
+    },
+    {
+      "name": "configuracoes_sistema",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "update": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "delete": "@request.auth.id != '' && @request.auth.perfil = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "chave",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "email_suporte",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "whatsapp_suporte",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nome_atendimento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE UNIQUE INDEX idx_config_chave ON configuracoes_sistema (chave)"]
     }
   ]
 }

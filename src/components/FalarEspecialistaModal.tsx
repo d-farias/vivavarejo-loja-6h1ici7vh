@@ -1,40 +1,58 @@
 import React, { useState } from 'react'
-import { MessageSquare, Mail, Phone, ExternalLink, X, Sparkles, CheckCircle2 } from 'lucide-react'
-
-const WHATSAPP_URL = 'https://wa.me/5548991817542'
-const WHATSAPP_PHONE_LABEL = '(48) 99181-7542'
-const SPECIALIST_EMAIL = 'dfarias53@gmail.com'
-const SPECIALIST_NAME = 'Dalvani Farias'
+import {
+  MessageSquare,
+  Mail,
+  Phone,
+  ExternalLink,
+  X,
+  Sparkles,
+  CheckCircle2,
+  Building2,
+} from 'lucide-react'
+import { useContatosAtendimento } from '@/hooks/use-contatos-atendimento'
 
 interface FalarEspecialistaModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   assuntoContexto?: string
+  clienteId?: string
 }
 
 export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
   open,
   onOpenChange,
   assuntoContexto,
+  clienteId,
 }) => {
   const [copiedEmail, setCopiedEmail] = useState(false)
+  const { contatos } = useContatosAtendimento(clienteId)
 
   if (!open) return null
 
+  const specialistName = contatos.nomeAtendente || 'Especialista'
+  const specialistEmail = contatos.email
+  const whatsappPhoneLabel = contatos.whatsapp
+  const whatsappNumberClean = contatos.whatsappRaw
+  const whatsappUrl = whatsappNumberClean
+    ? `https://wa.me/${whatsappNumberClean}`
+    : 'https://wa.me/5548991817542'
+
   const whatsappMessage = encodeURIComponent(
     assuntoContexto
-      ? `Olá, Dalvani! Gostaria de falar sobre o VivaVarejo: ${assuntoContexto}`
-      : 'Olá, Dalvani! Estou navegando no VivaVarejo e gostaria de falar com o especialista.',
+      ? `Olá, ${specialistName}! Gostaria de falar sobre o VivaVarejo: ${assuntoContexto}`
+      : `Olá, ${specialistName}! Estou navegando no VivaVarejo e gostaria de tirar dúvidas sobre o atendimento/operação.`,
   )
 
-  const mailtoLink = `mailto:${SPECIALIST_EMAIL}?subject=${encodeURIComponent(
-    assuntoContexto ? `[VivaVarejo] ${assuntoContexto}` : '[VivaVarejo] Contato com Especialista',
+  const mailtoLink = `mailto:${specialistEmail}?subject=${encodeURIComponent(
+    assuntoContexto
+      ? `[VivaVarejo] ${assuntoContexto}`
+      : '[VivaVarejo] Contato com Suporte e Especialista',
   )}&body=${encodeURIComponent(
-    'Olá, Dalvani,\n\nGostaria de entender melhor como liberar o acesso e implementar as rotinas operacionais para a minha rede/lojas no VivaVarejo.\n\nAguardo retorno!',
+    `Olá, ${specialistName},\n\nGostaria de entender melhor como liberar o acesso e implementar as rotinas operacionais para a minha rede/lojas no VivaVarejo.\n\nAguardo retorno!`,
   )}`
 
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText(SPECIALIST_EMAIL)
+    navigator.clipboard.writeText(specialistEmail)
     setCopiedEmail(true)
     setTimeout(() => setCopiedEmail(false), 2500)
   }
@@ -59,7 +77,9 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
                 Falar com Especialista
               </h2>
               <p className="text-xs text-[#6B7280]">
-                Consultoria em gestão e padrões operacionais de varejo
+                {contatos.origem === 'rede' && contatos.nomeRede
+                  ? `Suporte e Atendimento • ${contatos.nomeRede}`
+                  : 'Consultoria em gestão e padrões operacionais de varejo'}
               </p>
             </div>
           </div>
@@ -71,6 +91,15 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {contatos.origem === 'rede' && contatos.nomeRede && (
+          <div className="px-3 py-2 rounded-md bg-purple-50 border border-purple-200 text-xs text-purple-900 flex items-center gap-2">
+            <Building2 className="w-4 h-4 text-purple-600 shrink-0" />
+            <span>
+              Contatos de atendimento validados para a rede <strong>{contatos.nomeRede}</strong>.
+            </span>
+          </div>
+        )}
 
         {assuntoContexto && (
           <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-xs text-[#1E40AF] flex items-start gap-2">
@@ -84,9 +113,9 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
 
         <div className="text-xs text-[#4B5563] space-y-2 leading-relaxed">
           <p>
-            O <strong>VivaVarejo</strong> oferece acompanhamento consultivo direto com{' '}
-            <strong className="text-[#1F2937]">{SPECIALIST_NAME}</strong> para implantar processos,
-            auditar rotinas e liberar acesso administrativo personalizado para sua rede.
+            O <strong>VivaVarejo</strong> disponibiliza atendimento direto com{' '}
+            <strong className="text-[#1F2937]">{specialistName}</strong> para sanar dúvidas,
+            implantar processos, auditar rotinas e alinhar demandas operacionais.
           </p>
         </div>
 
@@ -94,7 +123,7 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
         <div className="space-y-3">
           {/* WhatsApp Direct */}
           <a
-            href={`${WHATSAPP_URL}?text=${whatsappMessage}`}
+            href={`${whatsappUrl}?text=${whatsappMessage}`}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full flex items-center justify-between p-3.5 rounded-lg bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200 text-emerald-900 transition-colors group"
@@ -109,7 +138,7 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
                   <ExternalLink className="w-3 h-3 text-emerald-700 opacity-70 group-hover:opacity-100" />
                 </div>
                 <div className="text-[11px] text-emerald-800 font-mono mt-0.5">
-                  {WHATSAPP_PHONE_LABEL}
+                  {whatsappPhoneLabel}
                 </div>
               </div>
             </div>
@@ -126,8 +155,8 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
                   <Mail className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-[#1F2937]">E-mail direto</div>
-                  <div className="text-[11px] text-[#4B5563] font-mono">{SPECIALIST_EMAIL}</div>
+                  <div className="text-xs font-bold text-[#1F2937]">E-mail de suporte</div>
+                  <div className="text-[11px] text-[#4B5563] font-mono">{specialistEmail}</div>
                 </div>
               </div>
             </div>
@@ -158,7 +187,11 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
         </div>
 
         <div className="flex items-center justify-between pt-2 border-t border-[#E5E7EB] text-xs">
-          <span className="text-[11px] text-[#6B7280]">VivaVarejo • Consultoria Estratégica</span>
+          <span className="text-[11px] text-[#6B7280]">
+            {contatos.origem === 'rede' && contatos.nomeRede
+              ? `${contatos.nomeRede} • Suporte ao Usuário`
+              : 'VivaVarejo • Consultoria Estratégica'}
+          </span>
           <button
             type="button"
             onClick={() => onOpenChange(false)}

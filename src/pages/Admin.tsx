@@ -70,7 +70,8 @@ import { RelatorioLojaLoja } from '../components/RelatorioLojaLoja'
 import { MaterialVendaAba } from '../components/MaterialVendaAba'
 import { rotinasService, execucoesService } from '../services/rotinas'
 import type { Rotina, ExecucaoRotina } from '../types'
-import { Presentation } from 'lucide-react'
+import { Presentation, Headphones } from 'lucide-react'
+import { ContatosAtendimentoModal } from '../components/ContatosAtendimentoModal'
 
 type TabType =
   | 'painel'
@@ -223,6 +224,9 @@ export default function Admin() {
     data: null,
   })
 
+  // Modal de Contatos de Atendimento (Suporte e Especialista)
+  const [contatosAtendimentoModalOpen, setContatosAtendimentoModalOpen] = useState(false)
+
   // Carregamento unificado com escopo para ADM Geral vs ADM de Rede
   const loadAll = useCallback(async () => {
     setLoading(true)
@@ -345,6 +349,9 @@ export default function Admin() {
     const gargalos = (formData.get('gargalos') as string)?.trim() || ''
     const inventario_situacao = (formData.get('inventario_situacao') as string)?.trim() || ''
     const observacoes = (formData.get('observacoes') as string)?.trim()
+    const email_suporte = (formData.get('email_suporte') as string)?.trim().toLowerCase() || ''
+    const whatsapp_suporte = (formData.get('whatsapp_suporte') as string)?.trim() || ''
+    const nome_atendimento = (formData.get('nome_atendimento') as string)?.trim() || ''
 
     if (!nome) return
 
@@ -359,6 +366,9 @@ export default function Admin() {
           gargalos,
           inventario_situacao,
           observacoes,
+          email_suporte,
+          whatsapp_suporte,
+          nome_atendimento,
         })
         showFeedback('Cliente atualizado com sucesso!')
       } else {
@@ -371,6 +381,9 @@ export default function Admin() {
           gargalos,
           inventario_situacao,
           observacoes,
+          email_suporte,
+          whatsapp_suporte,
+          nome_atendimento,
         })
         showFeedback('Cliente cadastrado com sucesso!')
       }
@@ -924,14 +937,29 @@ export default function Admin() {
             </div>
           </div>
 
-          <button
-            onClick={loadAll}
-            disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] rounded-md shadow-xs transition-colors self-start sm:self-auto"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-[#2563EB]' : ''}`} />
-            <span>Atualizar dados</span>
-          </button>
+          <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+            <button
+              onClick={() => setContatosAtendimentoModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white border border-emerald-300 hover:border-emerald-500 text-emerald-800 rounded-md shadow-xs transition-colors hover:bg-emerald-50/50"
+              title="Configurar canais de atendimento e especialista da rede ou padrão global"
+            >
+              <Headphones className="w-3.5 h-3.5 text-emerald-600" />
+              <span>
+                {isAdminGeral ? 'Contatos de Atendimento' : 'Contatos de Atendimento da Rede'}
+              </span>
+            </button>
+
+            <button
+              onClick={loadAll}
+              disabled={loading}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] rounded-md shadow-xs transition-colors"
+            >
+              <RefreshCw
+                className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-[#2563EB]' : ''}`}
+              />
+              <span>Atualizar dados</span>
+            </button>
+          </div>
         </div>
 
         {/* Feedback Toast Banner */}
@@ -2485,7 +2513,7 @@ export default function Admin() {
 
               <div>
                 <label className="block text-xs font-semibold text-[#374151] mb-1">
-                  Contato / Telefone / E-mail
+                  Contato Geral / Responsável
                 </label>
                 <input
                   name="contato"
@@ -2493,6 +2521,58 @@ export default function Admin() {
                   placeholder="Ex: (11) 98765-4321 / contato@cliente.com"
                   className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
                 />
+              </div>
+
+              {/* Seção de Contatos de Atendimento / Especialista para os Usuários da Rede */}
+              <div className="p-3 bg-blue-50/50 border border-blue-100 rounded-lg space-y-2.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#1E40AF]">
+                  <Headphones className="w-4 h-4 text-[#2563EB]" />
+                  <span>Contatos de Suporte e Atendimento da Rede</span>
+                </div>
+                <p className="text-[11px] text-[#4B5563] leading-relaxed">
+                  Canais exibidos para os usuários desta rede no botão &ldquo;Falar com
+                  especialista&rdquo;. Se não preenchidos, será usado o padrão global da
+                  consultoria.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[#374151] mb-1">
+                      WhatsApp de Atendimento
+                    </label>
+                    <input
+                      name="whatsapp_suporte"
+                      defaultValue={clienteModal.data?.whatsapp_suporte || ''}
+                      placeholder="(00) 00000-0000"
+                      className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded text-xs outline-none focus:border-[#2563EB]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[#374151] mb-1">
+                      E-mail de Suporte
+                    </label>
+                    <input
+                      type="email"
+                      name="email_suporte"
+                      defaultValue={clienteModal.data?.email_suporte || ''}
+                      placeholder="suporte@rede.com"
+                      className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded text-xs outline-none focus:border-[#2563EB]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-[#374151] mb-1">
+                    Nome do Responsável pelo Atendimento
+                  </label>
+                  <input
+                    name="nome_atendimento"
+                    defaultValue={clienteModal.data?.nome_atendimento || ''}
+                    placeholder="Ex: Suporte Operacional / Dalvani Farias"
+                    className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded text-xs outline-none focus:border-[#2563EB]"
+                  />
+                </div>
               </div>
 
               <div>
@@ -3340,6 +3420,20 @@ export default function Admin() {
             showFeedback('Plano de ação criado com sucesso!')
           }
           loadAll()
+        }}
+      />
+
+      {/* ==================== MODAL DE CONTATOS DE ATENDIMENTO ==================== */}
+      <ContatosAtendimentoModal
+        open={contatosAtendimentoModalOpen}
+        onClose={() => setContatosAtendimentoModalOpen(false)}
+        isAdminGeral={isAdminGeral}
+        isAdmRede={isAdmRede}
+        clientes={clientes}
+        redeUsuarioId={user?.cliente}
+        onSaved={() => {
+          loadAll()
+          showFeedback('Contatos de atendimento atualizados!')
         }}
       />
 

@@ -42,8 +42,29 @@ export interface Cliente extends RecordModel {
   info_negocio?: string
   gargalos?: string
   inventario_situacao?: string
+  email_suporte?: string
+  whatsapp_suporte?: string
+  nome_atendimento?: string
   created: string
   updated: string
+}
+
+export interface ConfiguracaoSistema extends RecordModel {
+  chave: string
+  email_suporte?: string
+  whatsapp_suporte?: string
+  nome_atendimento?: string
+  created: string
+  updated: string
+}
+
+export interface ContatosAtendimento {
+  email: string
+  whatsapp: string
+  whatsappRaw: string
+  nomeAtendente: string
+  origem: 'rede' | 'global'
+  nomeRede?: string
 }
 
 export interface Loja extends RecordModel {
