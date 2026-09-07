@@ -458,19 +458,19 @@ export default function BemVindo() {
               {/* Cabeçalho do Funil */}
               <div className="border-b border-[#E5E7EB] pb-5">
                 <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#2563EB] mb-1">
-                  <span>Opção de Interesse</span>
+                  <span>Perfil de Atuação</span>
                   <span>•</span>
                   <span>Passo {isStep1Complete ? '2 de 2' : '1 de 2'}</span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-bold text-[#1F2937]">
-                  Conte-nos sobre a sua atuação no varejo
+                  Conte sobre a sua atuação no varejo
                 </h2>
                 <p className="text-xs sm:text-sm text-[#6B7280] mt-1">
-                  Personalizamos conforme a sua realidade, seus interesses e o seu perfil.
+                  Personalizamos as rotinas de acordo com o porte e o segmento da sua loja.
                 </p>
               </div>
 
-              {/* Passo 1: PF ou CNPJ */}
+              {/* Passo 1: PF ou PJ */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold uppercase tracking-wider text-[#374151] flex items-center gap-2">
@@ -481,7 +481,7 @@ export default function BemVindo() {
                     >
                       1
                     </span>
-                    <span>Você é pessoa física ou empresa?</span>
+                    <span>Você é pessoa física ou jurídica?</span>
                   </label>
                   {tipoPessoa && (
                     <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-flex items-center gap-1">
@@ -537,7 +537,7 @@ export default function BemVindo() {
                     </div>
                     <div className="text-sm font-bold text-[#1F2937]">Pessoa Física / Lojista</div>
                     <p className="text-xs text-[#6B7280] mt-1 leading-relaxed">
-                      Lojista independente, consultor de varejo, MEI ou líder gerindo loja própria.
+                      Lojista independente, MEI, consultor de varejo ou profissional autônomo.
                     </p>
                   </button>
                 </div>
@@ -555,7 +555,7 @@ export default function BemVindo() {
                       >
                         2
                       </span>
-                      <span>Qual o seu tipo de varejo?</span>
+                      <span>Qual é o segmento da sua loja?</span>
                     </label>
                     {segmento && (
                       <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-flex items-center gap-1">
@@ -614,13 +614,13 @@ export default function BemVindo() {
                   {segmento === 'Outro' && (
                     <div className="pt-2">
                       <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1">
-                        Especifique o seu segmento de varejo:
+                        Especifique o segmento da sua loja:
                       </label>
                       <input
                         type="text"
                         value={outroSegmento}
                         onChange={(e) => setOutroSegmento(e.target.value)}
-                        placeholder="Ex: Ótica, Joalheria, Suplementos, Papelaria..."
+                        placeholder="Ex.: Ótica, Joalheria, Papelaria, Suplementos..."
                         className="w-full px-3.5 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-md outline-none focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
                       />
                     </div>
@@ -632,13 +632,13 @@ export default function BemVindo() {
               <div className="pt-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-xs text-[#6B7280]">
                   {!isStep1Complete ? (
-                    <span>Selecione se é Pessoa Física ou CNPJ para avançar.</span>
+                    <span>Selecione Pessoa Física ou Pessoa Jurídica para avançar.</span>
                   ) : !isStep2Complete ? (
-                    <span>Selecione o seu segmento de varejo para continuar.</span>
+                    <span>Selecione o segmento da sua loja para continuar.</span>
                   ) : (
                     <span className="text-emerald-700 font-semibold inline-flex items-center gap-1.5">
                       <CheckCircle2 className="w-4 h-4" />
-                      Pronto! Clique em Continuar para configurar sua conta com esse enquadramento.
+                      Pronto! Clique em Continuar para configurar sua conta com esse perfil.
                     </span>
                   )}
                 </div>
@@ -661,23 +661,27 @@ export default function BemVindo() {
       {/* Rodapé sóbrio */}
       <footer className="w-full border-t border-[#E5E7EB] bg-white py-8 mt-auto">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 space-y-6">
-          {/* Linha superior: Rotinas de Gestão | Links de acesso */}
+          {/* Linha superior: Identificação da plataforma | Links de acesso */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <span className="text-xs font-medium text-[#4B5563] tracking-wider uppercase leading-snug">
-                Rotinas de Gestão
+              <span className="text-xs font-semibold text-[#1F2937] tracking-wider uppercase leading-snug">
+                VivaVarejo • Plataforma Operacional
               </span>
             </div>
 
-            {/* Links de navegação e dúvidas */}
+            {/* Links de navegação e acesso rápido */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[#4B5563]">
               <Link to="/login" className="hover:text-[#2563EB] font-medium transition-colors">
                 Já tenho conta
               </Link>
               <span className="text-gray-300">•</span>
-              <Link to="/signup" className="hover:text-[#2563EB] font-medium transition-colors">
-                Criar conta
-              </Link>
+              <button
+                type="button"
+                onClick={handleScrollToInterest}
+                className="hover:text-[#2563EB] font-medium transition-colors"
+              >
+                Tenho interesse
+              </button>
             </div>
           </div>
 
