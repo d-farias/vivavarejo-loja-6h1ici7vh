@@ -84,8 +84,8 @@ export default function Layout() {
   const isLiderOrAdmin = perfil === 'admin' || perfil === 'adm_rede' || perfil === 'lider'
 
   const navLinks = [
-    { to: '/', label: 'Início', icon: LayoutDashboard },
-    { to: '/agenda', label: 'Agenda', icon: Calendar },
+    { to: '/', label: 'Início (Dashboard)', icon: LayoutDashboard },
+    { to: '/agenda', label: 'Agenda & Workflow', icon: Calendar },
     { to: '/rotinas', label: 'Rotinas', icon: ListChecks },
     { to: '/equipe', label: 'Minha Equipe', icon: Users },
     ...(isLiderOrAdmin ? [{ to: '/promotores', label: 'Promotores', icon: Handshake }] : []),
@@ -93,7 +93,7 @@ export default function Layout() {
       ? [
           {
             to: '/admin',
-            label: isAdmRede ? 'Minha Rede' : 'Admin Geral',
+            label: isAdmRede ? 'Minha Rede (BI)' : 'Admin Geral (BI)',
             icon: Shield,
           },
         ]
