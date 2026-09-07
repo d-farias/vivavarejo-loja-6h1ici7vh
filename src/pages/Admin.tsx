@@ -67,12 +67,15 @@ import { visitasPromotorService, rotinasPromotorService } from '../services/visi
 import type { Fornecedor, Promotor, VisitaPromotor, RotinaPromotor } from '../types'
 import { Handshake, FileSpreadsheet } from 'lucide-react'
 import { RelatorioLojaLoja } from '../components/RelatorioLojaLoja'
+import { MaterialVendaAba } from '../components/MaterialVendaAba'
 import { rotinasService, execucoesService } from '../services/rotinas'
 import type { Rotina, ExecucaoRotina } from '../types'
+import { Presentation } from 'lucide-react'
 
 type TabType =
   | 'painel'
   | 'relatorios'
+  | 'material_venda'
   | 'planos'
   | 'modelos'
   | 'clientes'
@@ -989,6 +992,22 @@ export default function Admin() {
           <span>Relatórios Loja a Loja</span>
         </button>
 
+        {/* Nova aba: Material de Venda */}
+        <button
+          onClick={() => {
+            setActiveTab('material_venda')
+            setSearchTerm('')
+          }}
+          className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+            activeTab === 'material_venda'
+              ? 'border-[#2563EB] text-[#2563EB]'
+              : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
+          }`}
+        >
+          <Presentation className="w-4 h-4" />
+          <span>Material de Venda</span>
+        </button>
+
         {/* Nova aba: Modelos de Rotinas */}
         <button
           onClick={() => {
@@ -1184,6 +1203,9 @@ export default function Admin() {
               />
             </div>
           )}
+
+          {/* ======================= ABA MATERIAL DE VENDA ======================= */}
+          {activeTab === 'material_venda' && <MaterialVendaAba />}
 
           {/* ======================= ABA PLANOS DE AÇÃO ======================= */}
           {activeTab === 'planos' && (

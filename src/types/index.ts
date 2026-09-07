@@ -331,3 +331,49 @@ export interface TarefaValidade extends RecordModel {
     validado_por?: User
   }
 }
+
+// ==================== MÓDULO PERDAS & INVENTÁRIO ====================
+
+export type TipoInventario = 'rotativo' | 'geral'
+export type StatusInventario = 'planejado' | 'em_andamento' | 'concluido' | 'cancelado'
+
+export interface Inventario extends RecordModel {
+  loja?: string
+  data: string // YYYY-MM-DD
+  setor_categoria: string
+  tipo: TipoInventario
+  status: StatusInventario
+  itens_contados?: number
+  divergencias_encontradas?: number
+  acuracidade_percentual?: number
+  responsavel_nome?: string
+  responsavel_usuario?: string
+  observacao?: string
+  created: string
+  updated: string
+  expand?: {
+    loja?: Loja
+    responsavel_usuario?: User
+  }
+}
+
+export type MotivoPerda = 'vencimento' | 'avaria' | 'roubo' | 'erro de pedido' | 'outro'
+
+export interface Perda extends RecordModel {
+  loja?: string
+  data: string // YYYY-MM-DD
+  setor_categoria: string
+  motivo: MotivoPerda
+  item_descricao?: string
+  quantidade: number
+  valor_estimado: number
+  observacao?: string
+  foto?: string
+  registrado_por?: string
+  created: string
+  updated: string
+  expand?: {
+    loja?: Loja
+    registrado_por?: User
+  }
+}

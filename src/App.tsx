@@ -17,6 +17,7 @@ import Signup from './pages/Signup'
 import BemVindo from './pages/BemVindo'
 import NotFound from './pages/NotFound'
 import Validades from './pages/Validades'
+import Perdas from './pages/Perdas'
 
 const App = () => (
   <BrowserRouter>
@@ -57,6 +58,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Validades />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/perdas"
+                element={
+                  <ProtectedRoute>
+                    <Perdas />
                   </ProtectedRoute>
                 }
               />

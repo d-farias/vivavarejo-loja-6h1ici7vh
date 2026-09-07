@@ -23,9 +23,13 @@ import {
   MessageSquare,
   MoreVertical,
   CalendarCheck,
+  ShieldAlert,
+  Smartphone,
 } from 'lucide-react'
 import { ChangePasswordModal } from '@/components/ChangePasswordModal'
 import { FalarEspecialistaModal } from '@/components/FalarEspecialistaModal'
+import { PwaInstallModal } from '@/components/PwaInstallModal'
+import { usePwaInstall } from '@/hooks/use-pwa-install'
 
 export default function Layout() {
   const { user, logout } = useAuth()
@@ -34,6 +38,20 @@ export default function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
   const [falarEspecialistaOpen, setFalarEspecialistaOpen] = useState(false)
+  const [pwaModalOpen, setPwaModalOpen] = useState(false)
+
+  const { isInstallable, isInstalled, isIOS, promptInstall } = usePwaInstall()
+
+  const handleOpenInstall = async () => {
+    if (isIOS) {
+      setPwaModalOpen(true)
+    } else {
+      const res = await promptInstall()
+      if (res === 'unavailable') {
+        setPwaModalOpen(true)
+      }
+    }
+  }
 
   const isAuthPage =
     location.pathname === '/login' ||
@@ -188,6 +206,44 @@ export default function Layout() {
                         </span>
                       </div>
                     </DropdownMenuItem>
+
+                    {/* Módulo Perdas & Inventário */}
+                    <DropdownMenuItem
+                      onClick={() => navigate('/perdas')}
+                      className={`cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2.5 transition-colors ${
+                        location.pathname === '/perdas'
+                          ? 'bg-[#2563EB]/10 text-[#2563EB] font-semibold'
+                          : 'text-[#1F2937] hover:text-[#2563EB]'
+                      }`}
+                    >
+                      <div className="w-6 h-6 rounded bg-red-100 text-[#B91C1C] flex items-center justify-center shrink-0">
+                        <ShieldAlert className="w-3.5 h-3.5" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-xs">Perdas & Inventário</span>
+                        <span className="text-[10px] text-[#6B7280]">
+                          Quebras × validades pendentes
+                        </span>
+                      </div>
+                    </DropdownMenuItem>
+
+                    {/* Instalar App no Celular */}
+                    {!isInstalled && (
+                      <DropdownMenuItem
+                        onClick={handleOpenInstall}
+                        className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2.5 text-[#2563EB] hover:bg-blue-50/60"
+                      >
+                        <div className="w-6 h-6 rounded bg-blue-100 text-[#2563EB] flex items-center justify-center shrink-0">
+                          <Smartphone className="w-3.5 h-3.5" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-xs">Instalar app no celular</span>
+                          <span className="text-[10px] text-[#6B7280]">
+                            Adicionar à tela de início
+                          </span>
+                        </div>
+                      </DropdownMenuItem>
+                    )}
 
                     <DropdownMenuSeparator className="bg-[#E5E7EB]" />
 
@@ -359,6 +415,35 @@ export default function Layout() {
                   <span>Validade × Calendário</span>
                 </NavLink>
 
+                <NavLink
+                  to="/perdas"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-[#3B82F6]/10 text-[#2563EB] font-semibold'
+                        : 'text-[#4B5563] hover:bg-gray-100 hover:text-[#1F2937]'
+                    }`
+                  }
+                >
+                  <ShieldAlert className="w-4 h-4 text-[#B91C1C]" />
+                  <span>Perdas & Inventário</span>
+                </NavLink>
+
+                {!isInstalled && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false)
+                      handleOpenInstall()
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-semibold text-[#2563EB] bg-blue-50/70 border border-blue-200 hover:bg-blue-100 transition-colors"
+                  >
+                    <Smartphone className="w-4 h-4 text-[#2563EB]" />
+                    <span>Instalar app no celular</span>
+                  </button>
+                )}
+
                 <button
                   type="button"
                   onClick={() => {
@@ -418,6 +503,17 @@ export default function Layout() {
       <FalarEspecialistaModal
         open={falarEspecialistaOpen}
         onOpenChange={setFalarEspecialistaOpen}
+      />
+
+      {/* Modal Instalar App (PWA) */}
+      <PwaInstallModal
+        open={pwaModalOpen}
+        onOpenChange={setPwaModalOpen}
+        isIOS={isIOS}
+        onNativePrompt={async () => {
+          await promptInstall()
+          setPwaModalOpen(false)
+        }}
       />
 
       {/* Footer */}

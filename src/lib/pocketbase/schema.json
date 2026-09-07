@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-07T02:40:03.144Z",
+  "generatedAt": "2026-09-07T02:49:10.178Z",
   "collections": [
     {
       "name": "users",
@@ -1463,6 +1463,207 @@
         "CREATE INDEX idx_tv_data ON tarefas_validade (data_especifica)",
         "CREATE INDEX idx_tv_horario_inicio ON tarefas_validade (horario_inicio)",
         "CREATE INDEX `idx_tv_semana_mes` ON `tarefas_validade` (semana_mes)"
+      ]
+    },
+    {
+      "name": "inventarios",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "data",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "setor_categoria",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "tipo",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["rotativo", "geral"]
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["planejado", "em_andamento", "concluido", "cancelado"]
+        },
+        {
+          "name": "itens_contados",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "divergencias_encontradas",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "acuracidade_percentual",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsavel_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsavel_usuario",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "observacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_inv_loja ON inventarios (loja)",
+        "CREATE INDEX idx_inv_data ON inventarios (data)",
+        "CREATE INDEX idx_inv_setor ON inventarios (setor_categoria)",
+        "CREATE INDEX idx_inv_tipo ON inventarios (tipo)",
+        "CREATE INDEX idx_inv_status ON inventarios (status)"
+      ]
+    },
+    {
+      "name": "perdas",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "data",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "setor_categoria",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "motivo",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["vencimento", "avaria", "roubo", "erro de pedido", "outro"]
+        },
+        {
+          "name": "item_descricao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade",
+          "type": "number",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "valor_estimado",
+          "type": "number",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "observacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "registrado_por",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_perdas_loja ON perdas (loja)",
+        "CREATE INDEX idx_perdas_data ON perdas (data)",
+        "CREATE INDEX idx_perdas_setor ON perdas (setor_categoria)",
+        "CREATE INDEX idx_perdas_motivo ON perdas (motivo)",
+        "CREATE INDEX idx_perdas_registrado_por ON perdas (registrado_por)"
       ]
     }
   ]

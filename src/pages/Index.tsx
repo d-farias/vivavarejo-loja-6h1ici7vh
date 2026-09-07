@@ -12,6 +12,8 @@ import { PlanoAcaoModal } from '@/components/PlanoAcaoModal'
 import { ConcluirRotinaModal } from '@/components/ConcluirRotinaModal'
 import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
 import { BotaoAvisoWhatsApp } from '@/components/BotaoAvisoWhatsApp'
+import { PwaInstallModal } from '@/components/PwaInstallModal'
+import { usePwaInstall } from '@/hooks/use-pwa-install'
 import { EnquadramentoClienteCard } from '@/components/EnquadramentoClienteCard'
 import { VisitasPromotorDiaCard } from '@/components/VisitasPromotorDiaCard'
 import { AtendimentoPosAcessoModal } from '@/components/AtendimentoPosAcessoModal'
@@ -37,6 +39,7 @@ import {
   Camera,
   PlusCircle,
   Eye,
+  Smartphone,
 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -71,6 +74,21 @@ export default function Index() {
   // Atendimento Pós-Acesso Inteligente (Parceiro de Resultados)
   const [atendimentoModalOpen, setAtendimentoModalOpen] = useState(false)
   const [clienteDoUsuario, setClienteDoUsuario] = useState<Cliente | null>(null)
+
+  // PWA Install
+  const [pwaModalOpen, setPwaModalOpen] = useState(false)
+  const { isInstallable, isInstalled, isIOS, promptInstall } = usePwaInstall()
+
+  const handleOpenInstall = async () => {
+    if (isIOS) {
+      setPwaModalOpen(true)
+    } else {
+      const res = await promptInstall()
+      if (res === 'unavailable') {
+        setPwaModalOpen(true)
+      }
+    }
+  }
 
   const isAdmin = user?.perfil === 'admin' || user?.email === 'dfarias53@gmail.com'
 
@@ -512,9 +530,20 @@ export default function Index() {
           </p>
         </div>
 
-        {/* Seletor de Loja persistido no localStorage + Acesso à biblioteca */}
+        {/* Seletor de Loja persistido no localStorage + Acesso à biblioteca + Botão PWA discreto */}
         <div className="flex items-center gap-2.5 flex-wrap">
           <StoreSelector />
+
+          {!isInstalled && (
+            <button
+              onClick={handleOpenInstall}
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-50/80 hover:bg-blue-100 border border-blue-200 text-xs font-semibold text-[#2563EB] rounded-md shadow-2xs transition-colors"
+              title="Instale o VivaVarejo como aplicativo no seu celular"
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>Instalar app no celular</span>
+            </button>
+          )}
 
           <button
             onClick={() => {
@@ -1110,6 +1139,17 @@ export default function Index() {
         execucao={visualizarFotoExecucao?.execucao || null}
         rotina={visualizarFotoExecucao?.rotina || null}
         onClose={() => setVisualizarFotoExecucao(null)}
+      />
+
+      {/* Modal Instalar App (PWA) */}
+      <PwaInstallModal
+        open={pwaModalOpen}
+        onOpenChange={setPwaModalOpen}
+        isIOS={isIOS}
+        onNativePrompt={async () => {
+          await promptInstall()
+          setPwaModalOpen(false)
+        }}
       />
 
       {/* Modal de Atendimento Pós-Acesso Inteligente (Parceiro de Resultados) */}

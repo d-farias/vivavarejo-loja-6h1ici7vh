@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="112" fill="#2563EB" />
+  <!-- Inner diamond shape mimicking the header logo -->
+  <g transform="translate(256, 256) rotate(45)">
+    <rect x="-96" y="-96" width="192" height="192" rx="32" fill="none" stroke="#FFFFFF" stroke-width="36" />
+    <circle cx="0" cy="0" r="28" fill="#FFFFFF" />
+  </g>
+</svg>
