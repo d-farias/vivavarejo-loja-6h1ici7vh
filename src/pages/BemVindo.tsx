@@ -102,7 +102,7 @@ export default function BemVindo() {
   const { contatos } = useContatosAtendimento()
   const { user } = useAuth()
 
-  // Modal de Detalhes dos Pilares para visitantes
+  // Modal de Detalhes dos Pilares para visitantes (sem credenciais de acesso)
   const [pilarModal, setPilarModal] = useState<'dashboard' | 'workflow' | 'fotos' | '5w2h' | null>(
     null,
   )
