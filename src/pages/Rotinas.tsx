@@ -246,9 +246,12 @@ export default function Rotinas() {
     setIsFormModalOpen(true)
   }
 
-  // Filtered routines
+  // Filtered routines (com deduplicação defensiva por id)
   const filteredRotinas = useMemo(() => {
+    const seenIds = new Set<string>()
     return rotinas.filter((r) => {
+      if (seenIds.has(r.id)) return false
+      seenIds.add(r.id)
       // Search
       if (searchTerm.trim()) {
         const query = searchTerm.toLowerCase()

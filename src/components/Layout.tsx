@@ -356,6 +356,7 @@ export default function Layout() {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#6B7280]">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-[#1F2937]">VivaVarejo</span>
+            <span className="text-[11px] text-[#9CA3AF] font-mono">v0.0.34</span>
           </div>
           <div>
             <span>© {new Date().getFullYear()} VivaVarejo. Todos os direitos reservados.</span>

@@ -158,8 +158,13 @@ export default function AgendaPage() {
   }, [execucoes])
 
   // Rotinas do dia (considerando se foi adiada para outra data ou adiada para a data corrente)
+  // Com deduplicação por id e por assinatura na renderização para nunca listar 2x
   const rotinasDoDia = useMemo(() => {
+    const seenIds = new Set<string>()
     return rotinas.filter((r) => {
+      if (seenIds.has(r.id)) return false
+      seenIds.add(r.id)
+
       // Se tiver campo adiada_para_data e for diferente da data atual, não aparece hoje
       if (r.adiada_para_data && r.adiada_para_data !== currentDateStr) {
         return false

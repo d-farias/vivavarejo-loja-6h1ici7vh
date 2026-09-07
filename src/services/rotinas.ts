@@ -17,10 +17,18 @@ export const rotinasService = {
       filter = `loja = "${lojaId}" || loja = ""`
     }
 
-    return await pb.collection('rotinas').getFullList<Rotina>({
+    const list = await pb.collection('rotinas').getFullList<Rotina>({
       filter: filter || undefined,
       sort: 'horario_limite,nome',
       expand: 'loja,funcao',
+    })
+
+    // Deduplicação defensiva na camada de dados: garante que nunca retorne registros duplicados
+    const seen = new Set<string>()
+    return list.filter((item) => {
+      if (seen.has(item.id)) return false
+      seen.add(item.id)
+      return true
     })
   },
 

@@ -303,7 +303,14 @@ export default function Index() {
   // 3. Rotinas sem horário / integrais
   // 4. Rotinas já concluídas no final
   const sortedRoutines = useMemo(() => {
-    let list = [...rotinas]
+    // Deduplicação defensiva por id
+    const seenIds = new Set<string>()
+    let list = rotinas.filter((r) => {
+      if (seenIds.has(r.id)) return false
+      seenIds.add(r.id)
+      return true
+    })
+
     if (selectedAreaFilter !== 'Todas') {
       list = list.filter((r) => {
         const area = (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim()) || 'Geral'

@@ -45,6 +45,7 @@ export function AplicarModeloModal({
   })
   const [selectedLojaId, setSelectedLojaId] = useState<string>(initialLojaId || lojas[0]?.id || '')
   const [modo, setModo] = useState<'append' | 'replace'>('append')
+  const [deduplicar, setDeduplicar] = useState(true)
   const [loading, setLoading] = useState(false)
   const [progressMsg, setProgressMsg] = useState('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -89,12 +90,16 @@ export function AplicarModeloModal({
         modeloId: selectedModeloId,
         lojaId: selectedLojaId,
         modo,
+        deduplicar,
         onProgress: (m) => setProgressMsg(m),
       })
 
-      onSuccess(
-        `Modelo "${selectedModelo?.nome}" aplicado com sucesso! ${res.totalAplicadas} rotinas clonadas para a loja "${selectedLoja?.nome}".`,
-      )
+      const feedback =
+        res.ignoradasOuAtualizadas > 0
+          ? `Modelo "${selectedModelo?.nome}" aplicado com sucesso! ${res.totalAplicadas} novas rotinas adicionadas e ${res.ignoradasOuAtualizadas} rotinas existentes atualizadas/não duplicadas.`
+          : `Modelo "${selectedModelo?.nome}" aplicado com sucesso! ${res.totalAplicadas} rotinas clonadas para a loja "${selectedLoja?.nome}".`
+
+      onSuccess(feedback)
       onClose()
     } catch (err: any) {
       setErrorMessage(err?.message || 'Falha ao aplicar modelo na loja selecionada.')
@@ -280,6 +285,26 @@ export function AplicarModeloModal({
                 </div>
               </label>
             </div>
+
+            {/* Proteção anti-duplicidade no modo Adicionar */}
+            {modo === 'append' && (
+              <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-md">
+                <label className="flex items-start gap-2 text-xs cursor-pointer text-[#92400E]">
+                  <input
+                    type="checkbox"
+                    checked={deduplicar}
+                    onChange={(e) => setDeduplicar(e.target.checked)}
+                    className="mt-0.5 text-[#2563EB] focus:ring-[#2563EB]"
+                    disabled={loading}
+                  />
+                  <span>
+                    <strong>Anti-duplicidade ativado (Recomendado):</strong> se a loja já possuir
+                    rotinas com o mesmo nome e horário, não criar cópias duplicadas — atualizar os
+                    dados da rotina existente.
+                  </span>
+                </label>
+              </div>
+            )}
 
             {modo === 'replace' && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-md">

@@ -12,6 +12,7 @@ export interface AplicarModeloOptions {
   modeloId: string
   lojaId: string
   modo: 'append' | 'replace'
+  deduplicar?: boolean // se true (padrão no modo append), ignora ou substitui rotinas com mesmo nome/área/função/horário
   onProgress?: (message: string) => void
 }
 
@@ -228,8 +229,10 @@ export const modelosRotinasService = {
    * - Resolve funções existentes por nome dentro da loja de destino ou cria se não existir
    * - Suporta substituir ou adicionar
    */
-  async aplicarModeloNaLoja(options: AplicarModeloOptions): Promise<{ totalAplicadas: number }> {
-    const { modeloId, lojaId, modo, onProgress } = options
+  async aplicarModeloNaLoja(
+    options: AplicarModeloOptions,
+  ): Promise<{ totalAplicadas: number; ignoradasOuAtualizadas: number }> {
+    const { modeloId, lojaId, modo, deduplicar = true, onProgress } = options
 
     onProgress?.('Carregando itens do modelo...')
     const itens = await pb.collection('modelos_rotinas_itens').getFullList<ModeloRotinaItem>({
@@ -257,6 +260,39 @@ export const modelosRotinasService = {
       }
     }
 
+    // Mapear rotinas já existentes na loja para prevenir duplicidade no modo append
+    const rotinasExistentesNaLoja =
+      modo === 'append'
+        ? await pb.collection('rotinas').getFullList<Rotina>({
+            filter: `loja = "${lojaId}" || loja = ""`,
+          })
+        : []
+
+    // Helper para gerar assinatura de uma rotina
+    const buildSignature = (
+      nome: string,
+      horario: string | undefined,
+      resp: string | undefined,
+      area: string | undefined,
+    ) => {
+      const n = (nome || '').trim().toLowerCase()
+      const h = (horario || '').trim().toLowerCase()
+      const r = (resp || '').trim().toLowerCase()
+      const a = (area || '').trim().toLowerCase()
+      return `${n}:::${h}:::${r}:::${a}`
+    }
+
+    const assinaturasExistentes = new Map<string, string>() // assinatura -> id existente
+    for (const ex of rotinasExistentesNaLoja) {
+      const sig = buildSignature(ex.nome, ex.horario_limite, ex.responsavel, ex.area)
+      assinaturasExistentes.set(sig, ex.id)
+      // Chave alternativa apenas por nome minúsculo para segurança adicional caso horário seja idêntico
+      assinaturasExistentes.set(
+        `${(ex.nome || '').trim().toLowerCase()}:::${(ex.horario_limite || '').trim().toLowerCase()}`,
+        ex.id,
+      )
+    }
+
     // Carregar funções já existentes na loja de destino para resolver por nome
     onProgress?.('Mapeando funções operacionais da loja...')
     const funcoesLoja = await pb.collection('funcoes').getFullList<Funcao>({
@@ -270,9 +306,38 @@ export const modelosRotinasService = {
     }
 
     let contador = 0
+    let criadas = 0
+    let ignoradasOuAtualizadas = 0
+
     for (const it of itens) {
       contador++
-      onProgress?.(`Clonando rotina ${contador} de ${itens.length}: ${it.nome}...`)
+      onProgress?.(`Processando rotina ${contador} de ${itens.length}: ${it.nome}...`)
+
+      // Checar se já existe rotina idêntica na loja de destino (anti-duplicação)
+      if (modo === 'append' && deduplicar) {
+        const sigCompleta = buildSignature(it.nome, it.horario_limite, it.responsavel, it.area)
+        const sigSimples = `${(it.nome || '').trim().toLowerCase()}:::${(it.horario_limite || '').trim().toLowerCase()}`
+
+        const idExistente =
+          assinaturasExistentes.get(sigCompleta) || assinaturasExistentes.get(sigSimples)
+
+        if (idExistente) {
+          // Atualiza as observações e ferramenta da existente em vez de clonar de novo
+          try {
+            await pb.collection('rotinas').update(idExistente, {
+              frequencia: it.frequencia || 'Diária',
+              ferramenta: it.ferramenta || '',
+              validacao: it.validacao || '',
+              area: it.area || '',
+              observacoes: it.observacoes || '',
+            })
+          } catch (e) {
+            console.warn('Erro ao atualizar rotina já existente:', idExistente, e)
+          }
+          ignoradasOuAtualizadas++
+          continue
+        }
+      }
 
       // Resolver função responsável
       let funcaoId: string | undefined = undefined
@@ -293,14 +358,13 @@ export const modelosRotinasService = {
             funcaoMap.set(chave, novaFuncao.id)
           } catch (e) {
             console.warn('Não foi possível criar função automática:', nomeFuncaoDesejada, e)
-            // Se falhar a criação de função, continua sem quebrar
             funcaoId = undefined
           }
         }
       }
 
       // Criar a rotina na loja
-      await pb.collection('rotinas').create({
+      const novaRotina = await pb.collection('rotinas').create({
         nome: it.nome,
         responsavel: it.responsavel || it.funcao_nome || 'Geral',
         frequencia: it.frequencia || 'Diária',
@@ -313,9 +377,14 @@ export const modelosRotinasService = {
         loja: lojaId,
         funcao: funcaoId || undefined,
       })
+
+      // Registrar nova assinatura criada para evitar duplicar itens repetidos no próprio modelo
+      const sigCriada = buildSignature(it.nome, it.horario_limite, it.responsavel, it.area)
+      assinaturasExistentes.set(sigCriada, novaRotina.id)
+      criadas++
     }
 
     onProgress?.('Modelo aplicado com sucesso!')
-    return { totalAplicadas: itens.length }
+    return { totalAplicadas: criadas, ignoradasOuAtualizadas }
   },
 }

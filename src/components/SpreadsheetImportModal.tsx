@@ -39,6 +39,7 @@ export function SpreadsheetImportModal({
   const [parsedData, setParsedData] = useState<ParsedSheetRoutine[]>([])
   const [detectedHeaders, setDetectedHeaders] = useState<string[]>([])
   const [importMode, setImportMode] = useState<'append' | 'replace'>('append')
+  const [deduplicateOnImport, setDeduplicateOnImport] = useState(true)
   const [progressMsg, setProgressMsg] = useState('')
 
   // Opção de salvar importação como modelo reutilizável
@@ -99,11 +100,31 @@ export function SpreadsheetImportModal({
         await rotinasService.deleteAll(targetLojaId || null)
       }
 
+      // Se modo for append e deduplicateOnImport ativo, checar rotinas existentes
+      let existentesNaLoja: Rotina[] = []
+      if (importMode === 'append' && deduplicateOnImport) {
+        existentesNaLoja = await rotinasService.getAll(targetLojaId || null)
+      }
+      const existingSignatures = new Set(
+        existentesNaLoja.map(
+          (r) =>
+            `${(r.nome || '').trim().toLowerCase()}:::${(r.horario_limite || '').trim().toLowerCase()}`,
+        ),
+      )
+
       let insertedCount = 0
+      let skippedCount = 0
       for (const item of parsedData) {
         insertedCount++
+        const itemSig = `${(item.nome || '').trim().toLowerCase()}:::${(item.horario_limite || '').trim().toLowerCase()}`
+
+        if (importMode === 'append' && deduplicateOnImport && existingSignatures.has(itemSig)) {
+          skippedCount++
+          continue
+        }
+
         setProgressMsg(`Importando rotina ${insertedCount} de ${parsedData.length}...`)
-        await rotinasService.create({
+        const created = await rotinasService.create({
           nome: item.nome,
           responsavel: item.responsavel,
           frequencia: item.frequencia,
@@ -115,6 +136,7 @@ export function SpreadsheetImportModal({
           status: 'Ativa',
           loja: targetLojaId || undefined,
         })
+        existingSignatures.add(itemSig)
       }
 
       // Se marcou para salvar como modelo reutilizável
@@ -341,6 +363,23 @@ export function SpreadsheetImportModal({
                       </div>
                     </label>
                   </div>
+
+                  {importMode === 'append' && (
+                    <div className="pt-1">
+                      <label className="flex items-center gap-2 text-xs text-[#4B5563] cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={deduplicateOnImport}
+                          onChange={(e) => setDeduplicateOnImport(e.target.checked)}
+                          className="rounded text-[#2563EB] focus:ring-[#2563EB]"
+                        />
+                        <span>
+                          Ignorar rotinas com mesmo nome e horário já cadastradas na loja (evita
+                          duplicidade).
+                        </span>
+                      </label>
+                    </div>
+                  )}
                 </div>
               )}
 
