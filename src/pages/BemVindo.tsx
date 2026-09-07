@@ -24,6 +24,7 @@ import { useContatosAtendimento } from '@/hooks/use-contatos-atendimento'
 
 /**
  * Endereços de redes sociais do rodapé da landing page.
+ * Versão sincronizada com os blocos completos da página institucional.
  */
 const INSTAGRAM_URL = 'https://www.instagram.com/vivavarejo/'
 const LINKEDIN_PERSONAL_URL = 'https://br.linkedin.com/in/dalvanifarias'
