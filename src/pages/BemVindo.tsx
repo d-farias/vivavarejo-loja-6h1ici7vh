@@ -141,30 +141,29 @@ export default function BemVindo() {
 
       {/* Main Content */}
       <main className="flex-1 w-full">
-        {/* Seção Hero: Novo Framing Operacional */}
-        <section className="pt-12 pb-14 sm:pt-16 sm:pb-20 px-4 sm:px-6 border-b border-[#E5E7EB] bg-white">
-          <div className="max-w-4xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#2563EB]">
-              <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-              <span>Apoio à Operação do Dia a Dia</span>
+        {/* Seção Hero: Visual aprovado pelo usuário */}
+        <section className="pt-10 pb-12 sm:pt-16 sm:pb-16 px-4 sm:px-6 border-b border-[#E5E7EB] bg-white">
+          <div className="max-w-3xl mx-auto text-center space-y-6">
+            {/* Chip pequeno no topo */}
+            <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-blue-50/80 border border-blue-200 text-xs sm:text-sm font-semibold text-[#2563EB] max-w-full">
+              <ShieldCheck className="w-4 h-4 shrink-0 text-[#2563EB]" />
+              <span className="leading-snug">
+                Plataforma de Operação para Líderes, Gerentes e Redes
+              </span>
             </div>
 
-            <div className="space-y-3">
-              <p className="text-sm sm:text-base font-semibold uppercase tracking-wider text-[#2563EB]">
-                VivaVarejo não é apenas uma ferramenta de diagnóstico.
-              </p>
-              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[#1F2937] tracking-tight leading-tight sm:leading-tight max-w-3xl mx-auto">
-                É uma plataforma de apoio à operação que transforma processos em rotinas práticas,
-                orienta o que fazer, apresenta alternativas, acompanha a execução e alerta
-                imediatamente quando algo precisa de atenção.
+            {/* Título grande em negrito + Descrição de apoio */}
+            <div className="space-y-4">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[#1F2937] tracking-tight leading-tight sm:leading-tight">
+                Organize as rotinas da sua loja e lidere com clareza
               </h1>
+              <p className="text-sm sm:text-base text-[#6B7280] max-w-2xl mx-auto leading-relaxed">
+                Elimine o improviso no chão de loja. Defina responsáveis, horários limite, validação
+                com fotos e acompanhe a execução em tempo real na palma da mão ou no painel.
+              </p>
             </div>
 
-            <p className="text-sm sm:text-base text-[#6B7280] max-w-2xl mx-auto leading-relaxed">
-              O teste que define o VivaVarejo: ajudar você e sua equipe a operar a loja com precisão
-              amanhã às 8h da manhã.
-            </p>
-
+            {/* CTAs */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <button
                 type="button"
@@ -183,127 +182,115 @@ export default function BemVindo() {
               </Link>
             </div>
 
-            {/* Micro métricas de credibilidade */}
-            <div className="pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-[#6B7280]">
-              <span className="inline-flex items-center gap-1.5">
-                <Check className="w-4 h-4 text-emerald-600" />
+            {/* Três linhas com check (conforme foto) */}
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-[#4B5563]">
+              <span className="inline-flex items-center gap-2 font-medium">
+                <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
                 Sem necessidade de cartão
               </span>
-              <span className="inline-flex items-center gap-1.5">
-                <Check className="w-4 h-4 text-emerald-600" />
+              <span className="inline-flex items-center gap-2 font-medium">
+                <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
                 Ativação em menos de 2 minutos
               </span>
-              <span className="inline-flex items-center gap-1.5">
-                <Check className="w-4 h-4 text-emerald-600" />
-                Alertas em tempo real
+              <span className="inline-flex items-center gap-2 font-medium">
+                <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
+                Compatível com celular e desktop
               </span>
             </div>
           </div>
         </section>
 
-        {/* Seção "O que você ganha no dia a dia" (6 itens com ✓) */}
+        {/* Seção "O que você ganha no dia a dia" (6 itens com ✓ com ênfase na solução) */}
         <section className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5] border-b border-[#E5E7EB]">
           <div className="max-w-5xl mx-auto space-y-8">
-            <div className="text-center space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
+            <div className="text-center space-y-3">
+              <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#2563EB]">
                 Operação Real de Loja
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#1F2937]">
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
                 O que você ganha no dia a dia
               </h2>
-              <p className="text-xs sm:text-sm text-[#6B7280] max-w-2xl mx-auto leading-relaxed">
+              <p className="text-sm sm:text-base text-[#6B7280] max-w-2xl mx-auto leading-relaxed">
                 Menos improviso e mais clareza para líderes, encarregados e equipe de chão de loja.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Item 1 */}
-              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs space-y-2">
-                <div className="flex items-start gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-blue-50 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-[#1F2937]">Rotinas estruturadas</h3>
-                    <p className="text-xs text-[#6B7280] mt-1 leading-relaxed">
-                      Saiba o que precisa ser feito, quando e como.
-                    </p>
-                  </div>
+              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs flex items-start gap-3">
+                <div className="w-6 h-6 rounded-full bg-blue-50 border border-blue-200 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-4 h-4 stroke-[2.5]" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm font-bold text-[#1F2937]">Rotinas estruturadas</h3>
+                  <p className="text-xs sm:text-sm text-[#6B7280] leading-relaxed">
+                    Saiba o que precisa ser feito, quando e como.
+                  </p>
                 </div>
               </div>
 
               {/* Item 2 */}
-              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs space-y-2">
-                <div className="flex items-start gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-blue-50 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-[#1F2937]">Orientação operacional</h3>
-                    <p className="text-xs text-[#6B7280] mt-1 leading-relaxed">
-                      Tenha alternativas e recomendações para cada situação.
-                    </p>
-                  </div>
+              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs flex items-start gap-3">
+                <div className="w-6 h-6 rounded-full bg-blue-50 border border-blue-200 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-4 h-4 stroke-[2.5]" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm font-bold text-[#1F2937]">Orientação operacional</h3>
+                  <p className="text-xs sm:text-sm text-[#6B7280] leading-relaxed">
+                    Tenha alternativas e recomendações para cada situação.
+                  </p>
                 </div>
               </div>
 
               {/* Item 3 */}
-              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs space-y-2">
-                <div className="flex items-start gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-blue-50 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-[#1F2937]">Alertas imediatos</h3>
-                    <p className="text-xs text-[#6B7280] mt-1 leading-relaxed">
-                      Não espere o fechamento do mês para descobrir um problema.
-                    </p>
-                  </div>
+              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs flex items-start gap-3">
+                <div className="w-6 h-6 rounded-full bg-blue-50 border border-blue-200 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-4 h-4 stroke-[2.5]" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm font-bold text-[#1F2937]">Alertas imediatos</h3>
+                  <p className="text-xs sm:text-sm text-[#6B7280] leading-relaxed">
+                    Não espere o fechamento do mês para descobrir um problema.
+                  </p>
                 </div>
               </div>
 
               {/* Item 4 */}
-              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs space-y-2">
-                <div className="flex items-start gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-blue-50 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-[#1F2937]">Acompanhamento</h3>
-                    <p className="text-xs text-[#6B7280] mt-1 leading-relaxed">
-                      Saiba o que foi realizado, o que está pendente e onde atuar.
-                    </p>
-                  </div>
+              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs flex items-start gap-3">
+                <div className="w-6 h-6 rounded-full bg-blue-50 border border-blue-200 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-4 h-4 stroke-[2.5]" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm font-bold text-[#1F2937]">Acompanhamento</h3>
+                  <p className="text-xs sm:text-sm text-[#6B7280] leading-relaxed">
+                    Saiba o que foi realizado, o que está pendente e onde atuar.
+                  </p>
                 </div>
               </div>
 
               {/* Item 5 */}
-              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs space-y-2">
-                <div className="flex items-start gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-blue-50 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-[#1F2937]">Padronização</h3>
-                    <p className="text-xs text-[#6B7280] mt-1 leading-relaxed">
-                      Faça a operação acontecer de acordo com o processo definido.
-                    </p>
-                  </div>
+              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs flex items-start gap-3">
+                <div className="w-6 h-6 rounded-full bg-blue-50 border border-blue-200 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-4 h-4 stroke-[2.5]" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm font-bold text-[#1F2937]">Padronização</h3>
+                  <p className="text-xs sm:text-sm text-[#6B7280] leading-relaxed">
+                    Faça a operação acontecer de acordo com o processo definido.
+                  </p>
                 </div>
               </div>
 
               {/* Item 6 */}
-              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs space-y-2">
-                <div className="flex items-start gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-blue-50 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-[#1F2937]">Gestão na ponta</h3>
-                    <p className="text-xs text-[#6B7280] mt-1 leading-relaxed">
-                      Transforme conhecimento operacional em ação dentro da loja.
-                    </p>
-                  </div>
+              <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-xs flex items-start gap-3">
+                <div className="w-6 h-6 rounded-full bg-blue-50 border border-blue-200 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-4 h-4 stroke-[2.5]" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm font-bold text-[#1F2937]">Gestão na ponta</h3>
+                  <p className="text-xs sm:text-sm text-[#6B7280] leading-relaxed">
+                    Transforme conhecimento operacional em ação dentro da loja.
+                  </p>
                 </div>
               </div>
             </div>
@@ -311,40 +298,44 @@ export default function BemVindo() {
         </section>
 
         {/* Seção Frase de Impacto */}
-        <section className="py-12 sm:py-14 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]">
+        <section className="py-12 sm:py-16 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]">
           <div className="max-w-4xl mx-auto">
             <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-6 sm:p-10 text-center space-y-5">
-              <span className="inline-block text-xs font-bold uppercase tracking-wider text-[#2563EB]">
-                Operação em tempo real
-              </span>
-              <blockquote className="text-2xl sm:text-4xl font-extrabold text-[#1F2937] tracking-tight">
-                “Não espere o relatório para agir.”
-              </blockquote>
-              <p className="text-base sm:text-lg font-medium text-[#4B5563]">
-                O VivaVarejo acompanha a operação enquanto ela acontece.
-              </p>
+              <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#2563EB]">
+                Operação em Tempo Real
+              </div>
+
+              <div className="space-y-3">
+                <h2 className="text-2xl sm:text-4xl font-extrabold text-[#1F2937] tracking-tight">
+                  Não espere o relatório para agir
+                </h2>
+                <p className="text-sm sm:text-base text-[#6B7280] max-w-2xl mx-auto leading-relaxed">
+                  O VivaVarejo acompanha a operação enquanto ela acontece, permitindo corrigir
+                  desvios na hora.
+                </p>
+              </div>
 
               {/* Apoio visual sóbrio com a lógica do produto */}
               <div className="pt-4 border-t border-[#E5E7EB] max-w-2xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
-                <div className="p-2 rounded bg-white border border-[#E5E7EB]">
+                <div className="p-2.5 rounded bg-white border border-[#E5E7EB]">
                   <span className="block text-[10px] uppercase font-bold text-[#9CA3AF]">
                     Relatório
                   </span>
                   <span className="font-semibold text-[#6B7280]">é passado</span>
                 </div>
-                <div className="p-2 rounded bg-white border border-[#E5E7EB]">
+                <div className="p-2.5 rounded bg-white border border-[#E5E7EB]">
                   <span className="block text-[10px] uppercase font-bold text-[#2563EB]">
                     Alerta
                   </span>
                   <span className="font-bold text-[#2563EB]">é presente</span>
                 </div>
-                <div className="p-2 rounded bg-white border border-[#E5E7EB]">
+                <div className="p-2.5 rounded bg-white border border-[#E5E7EB]">
                   <span className="block text-[10px] uppercase font-bold text-[#1F2937]">
                     Orientação
                   </span>
                   <span className="font-semibold text-[#1F2937]">é ação</span>
                 </div>
-                <div className="p-2 rounded bg-white border border-[#E5E7EB]">
+                <div className="p-2.5 rounded bg-white border border-[#E5E7EB]">
                   <span className="block text-[10px] uppercase font-bold text-emerald-700">
                     Acompanhamento
                   </span>
@@ -355,59 +346,60 @@ export default function BemVindo() {
           </div>
         </section>
 
-        {/* Nova Seção: As Três Camadas do VivaVarejo */}
+        {/* Seção: As Três Camadas do VivaVarejo */}
         <section className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5] border-b border-[#E5E7EB]">
           <div className="max-w-4xl mx-auto space-y-8">
-            <div className="text-center space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
+            <div className="text-center space-y-3">
+              <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#2563EB]">
                 Arquitetura Operacional
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#1F2937]">
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
                 Como o VivaVarejo funciona na prática
               </h2>
-              <p className="text-xs sm:text-sm text-[#6B7280] max-w-xl mx-auto leading-relaxed">
+              <p className="text-sm sm:text-base text-[#6B7280] max-w-xl mx-auto leading-relaxed">
                 Três camadas integradas que tiram o conhecimento da teoria e colocam a loja em
-                movimento.
+                movimento com foco em execução e resultados.
               </p>
             </div>
 
             <div className="space-y-4">
               {/* Camada 1: Conhecimento */}
               <div className="bg-white p-5 sm:p-6 rounded-lg border border-[#E5E7EB] shadow-xs flex flex-col sm:flex-row sm:items-start gap-4">
-                <div className="w-9 h-9 rounded-md bg-blue-50 border border-blue-100 text-[#2563EB] font-bold text-sm flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-md bg-blue-50 border border-blue-200 text-[#2563EB] font-bold text-base flex items-center justify-center shrink-0">
                   1
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1.5 flex-1">
                   <div className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
                     Camada 1
                   </div>
-                  <h3 className="text-base font-bold text-[#1F2937]">CONHECIMENTO</h3>
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                    A experiência de varejo acumulada.
+                  <h3 className="text-lg font-extrabold text-[#1F2937]">CONHECIMENTO</h3>
+                  <p className="text-xs sm:text-sm text-[#6B7280] leading-relaxed">
+                    A experiência de varejo acumulada. As melhores práticas organizadas para apoiar
+                    as decisões diárias da sua equipe.
                   </p>
                 </div>
               </div>
 
               {/* Camada 2: Processo */}
               <div className="bg-white p-5 sm:p-6 rounded-lg border border-[#E5E7EB] shadow-xs flex flex-col sm:flex-row sm:items-start gap-4">
-                <div className="w-9 h-9 rounded-md bg-blue-50 border border-blue-100 text-[#2563EB] font-bold text-sm flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-md bg-blue-50 border border-blue-200 text-[#2563EB] font-bold text-base flex items-center justify-center shrink-0">
                   2
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1.5 flex-1">
                   <div className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
                     Camada 2
                   </div>
-                  <h3 className="text-base font-bold text-[#1F2937]">PROCESSO</h3>
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+                  <h3 className="text-lg font-extrabold text-[#1F2937]">PROCESSO</h3>
+                  <p className="text-xs sm:text-sm text-[#6B7280] leading-relaxed">
                     Essa experiência transformada em rotinas, checklists, padrões, alternativas e
-                    procedimentos.
+                    procedimentos práticos no dia a dia.
                   </p>
                 </div>
               </div>
 
               {/* Camada 3: Inteligência Operacional */}
               <div className="bg-white p-5 sm:p-6 rounded-lg border-2 border-[#2563EB]/40 shadow-xs flex flex-col sm:flex-row sm:items-start gap-4">
-                <div className="w-9 h-9 rounded-md bg-[#2563EB] text-white font-bold text-sm flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-md bg-[#2563EB] text-white font-bold text-base flex items-center justify-center shrink-0 shadow-xs">
                   3
                 </div>
                 <div className="space-y-3 flex-1">
@@ -415,14 +407,16 @@ export default function BemVindo() {
                     <div className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
                       Camada 3 • Em tempo real
                     </div>
-                    <h3 className="text-base font-bold text-[#1F2937]">INTELIGÊNCIA OPERACIONAL</h3>
+                    <h3 className="text-lg font-extrabold text-[#1F2937]">
+                      INTELIGÊNCIA OPERACIONAL
+                    </h3>
+                    <p className="text-xs sm:text-sm text-[#6B7280] mt-1 leading-relaxed">
+                      Orientação ativa durante o turno com alertas em tempo real. O sistema dizendo
+                      no momento exato:
+                    </p>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-[#4B5563] font-medium leading-relaxed">
-                    O sistema dizendo no momento exato:
-                  </p>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
                     <div className="p-2.5 rounded bg-[#F7F7F5] border border-[#E5E7EB] text-[#374151]">
                       “Aconteceu isso.”
                     </div>
@@ -442,7 +436,8 @@ export default function BemVindo() {
 
                   <div className="pt-2 border-t border-[#E5E7EB]">
                     <p className="text-xs font-semibold text-[#2563EB]">
-                      Isso é muito mais valioso que um dashboard.
+                      Isso é muito mais valioso que um dashboard: é suporte à decisão onde o
+                      resultado acontece.
                     </p>
                   </div>
                 </div>
@@ -451,21 +446,21 @@ export default function BemVindo() {
           </div>
         </section>
 
-        {/* Bloco "Opção de interesse" (Núcleo do pedido) */}
+        {/* Bloco "Opção de interesse" / Funil PF/CNPJ */}
         <section id="opcao-interesse" className="py-12 sm:py-16 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto">
             <div className="bg-white border border-[#E5E7EB] rounded-xl p-6 sm:p-8 shadow-xs space-y-8">
               {/* Cabeçalho do Funil */}
-              <div className="border-b border-[#E5E7EB] pb-5">
-                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#2563EB] mb-1">
+              <div className="border-b border-[#E5E7EB] pb-5 space-y-2">
+                <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#2563EB]">
                   <span>Perfil de Atuação</span>
                   <span>•</span>
                   <span>Passo {isStep1Complete ? '2 de 2' : '1 de 2'}</span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-bold text-[#1F2937]">
-                  Conte sobre a sua atuação no varejo
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
+                  Perfil de Atuação
                 </h2>
-                <p className="text-xs sm:text-sm text-[#6B7280] mt-1">
+                <p className="text-sm sm:text-base text-[#6B7280] leading-relaxed">
                   Personalizamos as rotinas de acordo com o porte e o segmento da sua loja.
                 </p>
               </div>
@@ -665,7 +660,7 @@ export default function BemVindo() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <span className="text-xs font-semibold text-[#1F2937] tracking-wider uppercase leading-snug">
-                VivaVarejo • Plataforma Operacional
+                VivaVarejo • Rotinas de Gestão
               </span>
             </div>
 
