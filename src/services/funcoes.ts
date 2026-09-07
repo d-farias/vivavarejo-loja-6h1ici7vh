@@ -29,7 +29,11 @@ export const funcoesService = {
     telefone?: string
     chefe_imediato_funcao?: string
   }): Promise<Funcao> {
-    return await pb.collection('funcoes').create<Funcao>(data, {
+    const payload: Record<string, any> = { ...data }
+    if (!payload.chefe_imediato_funcao) {
+      delete payload.chefe_imediato_funcao
+    }
+    return await pb.collection('funcoes').create<Funcao>(payload, {
       expand: 'loja,chefe_imediato_funcao',
     })
   },

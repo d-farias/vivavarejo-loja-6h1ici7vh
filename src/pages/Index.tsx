@@ -11,6 +11,7 @@ import { PlanosAcaoCard } from '@/components/PlanosAcaoCard'
 import { PlanoAcaoModal } from '@/components/PlanoAcaoModal'
 import { ConcluirRotinaModal } from '@/components/ConcluirRotinaModal'
 import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
+import { BotaoAvisoWhatsApp } from '@/components/BotaoAvisoWhatsApp'
 import { EnquadramentoClienteCard } from '@/components/EnquadramentoClienteCard'
 import { VisitasPromotorDiaCard } from '@/components/VisitasPromotorDiaCard'
 import { AtendimentoPosAcessoModal } from '@/components/AtendimentoPosAcessoModal'
@@ -928,7 +929,7 @@ export default function Index() {
 
                     {/* Botão de ação rápida: se estiver atrasada, virar plano de ação com 1 clique */}
                     {!isDone && pastDue && (
-                      <div className="pt-1.5">
+                      <div className="pt-1.5 flex flex-wrap items-center gap-2">
                         <button
                           type="button"
                           onClick={() => handleCriarPlanoDeRotinaAtrasada(rotina)}
@@ -937,6 +938,47 @@ export default function Index() {
                           <PlusCircle className="w-3 h-3" />
                           <span>Gerar Plano de Ação (5W2H) em 1 clique</span>
                         </button>
+
+                        <BotaoAvisoWhatsApp
+                          lojaNome={rotina.expand?.loja?.nome || lojaSelecionada?.nome}
+                          tarefaTitulo={rotina.nome}
+                          setor={rotina.area || 'Operação Loja'}
+                          horario={status.normalizedHorario || rotina.horario_limite}
+                          situacao="Atrasada no painel operacional"
+                          telefoneResponsavel={
+                            rotina.telefone_responsavel || rotina.expand?.funcao?.telefone
+                          }
+                          telefoneChefe={
+                            rotina.telefone_chefe ||
+                            rotina.expand?.funcao?.expand?.chefe_imediato_funcao?.telefone
+                          }
+                          nomeResponsavel={rotina.responsavel}
+                          nomeChefe={rotina.expand?.funcao?.expand?.chefe_imediato_funcao?.nome}
+                          compact
+                        />
+                      </div>
+                    )}
+
+                    {/* Se estiver no prazo e próxima do limite (mas não atrasada) também exibe aviso rápido */}
+                    {!isDone && !pastDue && status.hasHorario && (
+                      <div className="pt-1">
+                        <BotaoAvisoWhatsApp
+                          lojaNome={rotina.expand?.loja?.nome || lojaSelecionada?.nome}
+                          tarefaTitulo={rotina.nome}
+                          setor={rotina.area || 'Operação Loja'}
+                          horario={status.normalizedHorario || rotina.horario_limite}
+                          situacao="Pendente (próxima do prazo)"
+                          telefoneResponsavel={
+                            rotina.telefone_responsavel || rotina.expand?.funcao?.telefone
+                          }
+                          telefoneChefe={
+                            rotina.telefone_chefe ||
+                            rotina.expand?.funcao?.expand?.chefe_imediato_funcao?.telefone
+                          }
+                          nomeResponsavel={rotina.responsavel}
+                          nomeChefe={rotina.expand?.funcao?.expand?.chefe_imediato_funcao?.nome}
+                          compact
+                        />
                       </div>
                     )}
                   </div>

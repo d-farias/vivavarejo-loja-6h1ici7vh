@@ -10,6 +10,7 @@ import { ConcluirRotinaModal } from '@/components/ConcluirRotinaModal'
 import { ConcluirVisitaModal } from '@/components/ConcluirVisitaModal'
 import { PlanoAcaoModal } from '@/components/PlanoAcaoModal'
 import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
+import { BotaoAvisoWhatsApp } from '@/components/BotaoAvisoWhatsApp'
 import { isPlanoAtrasado } from '@/components/PlanosAcaoCard'
 import { isVisitaAtrasada } from '@/services/visitasPromotor'
 import { parseHorarioLimiteToMinutes, getHorarioStatus } from '@/lib/time-utils'
@@ -1049,6 +1050,27 @@ export default function AgendaPage() {
                         <Plus className="w-3.5 h-3.5" />
                         <span>5W2H</span>
                       </button>
+                    )}
+
+                    {/* Botão WhatsApp para aviso rápido se atrasada ou no prazo */}
+                    {!concluida && (isAtrasada || horarioEfetivo) && (
+                      <BotaoAvisoWhatsApp
+                        lojaNome={rotina.expand?.loja?.nome || lojaSelecionada?.nome}
+                        tarefaTitulo={rotina.nome}
+                        setor={rotina.area || 'Operação Loja'}
+                        horario={horarioEfetivo || rotina.horario_limite}
+                        situacao={isAtrasada ? 'Atrasada na Agenda' : 'Pendente na Agenda do dia'}
+                        telefoneResponsavel={
+                          rotina.telefone_responsavel || rotina.expand?.funcao?.telefone
+                        }
+                        telefoneChefe={
+                          rotina.telefone_chefe ||
+                          rotina.expand?.funcao?.expand?.chefe_imediato_funcao?.telefone
+                        }
+                        nomeResponsavel={rotina.responsavel}
+                        nomeChefe={rotina.expand?.funcao?.expand?.chefe_imediato_funcao?.nome}
+                        compact
+                      />
                     )}
                   </div>
                 </div>

@@ -6,8 +6,11 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { CalendarCheck, Store } from 'lucide-react'
-import type { TarefaValidade, Loja, Funcao } from '@/types'
+import { CalendarCheck, Store, Phone, Briefcase } from 'lucide-react'
+import type { TarefaValidade, Loja, Funcao, Funcionario } from '@/types'
+import { formatPhoneBR } from '@/lib/phone-utils'
+import { funcoesService } from '@/services/funcoes'
+import { funcionariosService } from '@/services/funcionarios'
 
 interface TarefaValidadeFormModalProps {
   isOpen: boolean
@@ -46,7 +49,33 @@ export function TarefaValidadeFormModal({
   const [validadorFuncaoNome, setValidadorFuncaoNome] = useState<string>(
     initialData?.validador_funcao_nome || 'Líder Prevenção',
   )
-  const [saving, setSaving] = useState(false)
+
+  // Telefones WhatsApp para alerta e autopreenchimento
+  const [telefoneResponsavel, setTelefoneResponsavel] = useState<string>(
+    formatPhoneBR(initialData?.telefone_responsavel || ''),
+  )
+  const [telefoneChefe, setTelefoneChefe] = useState<string>(
+    formatPhoneBR(initialData?.telefone_chefe || ''),
+  )
+
+  const [funcoesLoja, setFuncoesLoja] = useState<Funcao[]>([])
+  const [funcionariosLoja, setFuncionariosLoja] = useState<Funcionario[]>([])
+  const [funcaoResponsavelId, setFuncaoResponsavelId] = useState<string>('')
+
+  useEffect(() => {
+    if (lojaId) {
+      Promise.all([
+        funcoesService.getByLoja(lojaId).catch(() => [] as Funcao[]),
+        funcionariosService.getByLoja(lojaId).catch(() => [] as Funcionario[]),
+      ]).then(([funcs, colabs]) => {
+        setFuncoesLoja(funcs)
+        setFuncionariosLoja(colabs)
+      })
+    } else {
+      setFuncoesLoja([])
+      setFuncionariosLoja([])
+    }
+  }, [lojaId])
   const [error, setError] = useState<string | null>(null)
 
   if (!isOpen) return null
@@ -75,6 +104,8 @@ export function TarefaValidadeFormModal({
         horario_fim: horarioFim.trim() || undefined,
         executor_nome: executorNome.trim() || undefined,
         validador_funcao_nome: validadorFuncaoNome.trim() || 'Líder Prevenção',
+        telefone_responsavel: telefoneResponsavel.trim() || undefined,
+        telefone_chefe: telefoneChefe.trim() || undefined,
       })
       onClose()
     } catch (err: any) {
@@ -243,6 +274,59 @@ export function TarefaValidadeFormModal({
             </div>
           </div>
 
+          {/* Seleção de Função Responsável (para autopreencher executor e telefones) */}
+          {funcoesLoja.length > 0 && (
+            <div className="space-y-1 p-2.5 rounded-md bg-[#F7F7F5] border border-[#E5E7EB]">
+              <label className="text-xs font-semibold text-[#374151] flex items-center gap-1">
+                <Briefcase className="w-3.5 h-3.5 text-[#2563EB]" />
+                <span>Autopreencher por Função / Cargo da Loja</span>
+              </label>
+              <select
+                value={funcaoResponsavelId}
+                onChange={(e) => {
+                  const fid = e.target.value
+                  setFuncaoResponsavelId(fid)
+                  const fObj = funcoesLoja.find((f) => f.id === fid)
+                  if (fObj) {
+                    if (!executorNome) {
+                      setExecutorNome(fObj.nome)
+                    }
+                    if (fObj.telefone && !telefoneResponsavel) {
+                      setTelefoneResponsavel(formatPhoneBR(fObj.telefone))
+                    }
+                    // Resolver chefe imediato da função
+                    if (fObj.chefe_imediato_funcao) {
+                      const cargoChefe = funcoesLoja.find(
+                        (cf) => cf.id === fObj.chefe_imediato_funcao,
+                      )
+                      if (cargoChefe) {
+                        setValidadorFuncaoNome(cargoChefe.nome)
+                        if (cargoChefe.telefone && !telefoneChefe) {
+                          setTelefoneChefe(formatPhoneBR(cargoChefe.telefone))
+                        } else {
+                          const colabChefe = funcionariosLoja.find(
+                            (fc) => fc.funcao === cargoChefe.id && fc.telefone,
+                          )
+                          if (colabChefe?.telefone && !telefoneChefe) {
+                            setTelefoneChefe(formatPhoneBR(colabChefe.telefone))
+                          }
+                        }
+                      }
+                    }
+                  }
+                }}
+                className="w-full px-3 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+              >
+                <option value="">Selecione uma função para autopreenchimento...</option>
+                {funcoesLoja.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {/* Quem Executa e Quem Valida */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
@@ -270,6 +354,44 @@ export function TarefaValidadeFormModal({
               <span className="text-[10px] text-[#6B7280]">
                 Padrão: Líder Prevenção (avalia prova/foto)
               </span>
+            </div>
+          </div>
+
+          {/* Telefones de Alerta WhatsApp */}
+          <div className="p-3 rounded-lg border border-emerald-200 bg-emerald-50/50 space-y-2.5">
+            <div className="flex items-center gap-2">
+              <Phone className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider">
+                Avisos WhatsApp da Tarefa (Opcional)
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-emerald-950">
+                  Telefone do Responsável
+                </label>
+                <input
+                  type="text"
+                  placeholder="(00) 00000-0000"
+                  value={telefoneResponsavel}
+                  onChange={(e) => setTelefoneResponsavel(formatPhoneBR(e.target.value))}
+                  className="w-full px-3 py-1.5 text-xs bg-white border border-emerald-300 rounded-md outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 text-[#1F2937]"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-emerald-950">
+                  Telefone do Chefe Imediato
+                </label>
+                <input
+                  type="text"
+                  placeholder="(00) 00000-0000"
+                  value={telefoneChefe}
+                  onChange={(e) => setTelefoneChefe(formatPhoneBR(e.target.value))}
+                  className="w-full px-3 py-1.5 text-xs bg-white border border-emerald-300 rounded-md outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 text-[#1F2937]"
+                />
+              </div>
             </div>
           </div>
 

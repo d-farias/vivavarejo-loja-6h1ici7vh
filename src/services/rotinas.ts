@@ -20,7 +20,7 @@ export const rotinasService = {
     const list = await pb.collection('rotinas').getFullList<Rotina>({
       filter: filter || undefined,
       sort: 'horario_limite,nome',
-      expand: 'loja,funcao',
+      expand: 'loja,funcao,funcao.chefe_imediato_funcao',
     })
 
     // Deduplicação defensiva na camada de dados: garante que nunca retorne registros duplicados
@@ -79,13 +79,13 @@ export const rotinasService = {
     }
 
     return await pb.collection('rotinas').create<Rotina>(data, {
-      expand: 'loja,funcao',
+      expand: 'loja,funcao,funcao.chefe_imediato_funcao',
     })
   },
 
   async update(id: string, data: Partial<Rotina>): Promise<Rotina> {
     return await pb.collection('rotinas').update<Rotina>(id, data, {
-      expand: 'loja,funcao',
+      expand: 'loja,funcao,funcao.chefe_imediato_funcao',
     })
   },
 

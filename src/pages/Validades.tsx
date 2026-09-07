@@ -23,6 +23,7 @@ import { useStore } from '@/context/StoreContext'
 import { useAuth } from '@/context/AuthContext'
 import { StoreSelector } from '@/components/StoreSelector'
 import { ImportarValidadeModal } from '@/components/ImportarValidadeModal'
+import { BotaoAvisoWhatsApp } from '@/components/BotaoAvisoWhatsApp'
 import { TarefaValidadeFormModal } from '@/components/TarefaValidadeFormModal'
 import { ConcluirValidadeModal } from '@/components/ConcluirValidadeModal'
 import { ValidarValidadeModal } from '@/components/ValidarValidadeModal'
@@ -653,6 +654,28 @@ export default function ValidadesPage() {
                         <Camera className="w-3.5 h-3.5" />
                         <span>Ver Foto</span>
                       </a>
+                    )}
+
+                    {/* Botão WhatsApp para aviso quando pendente/atrasada */}
+                    {(st === 'pendente' || st === 'em_andamento' || st === 'devolvida') && (
+                      <BotaoAvisoWhatsApp
+                        lojaNome={tarefa.expand?.loja?.nome || lojaSelecionada?.nome}
+                        tarefaTitulo={`Validade: ${tarefa.setor_categoria}`}
+                        setor={tarefa.setor_categoria}
+                        horario={`${tarefa.horario_inicio}${tarefa.horario_fim ? ` às ${tarefa.horario_fim}` : ''}`}
+                        situacao={
+                          isAtrasada
+                            ? 'Atrasada / Não aberta após 15h'
+                            : st === 'devolvida'
+                              ? 'Devolvida para ajuste'
+                              : 'Auditoria de Validade pendente'
+                        }
+                        telefoneResponsavel={tarefa.telefone_responsavel}
+                        telefoneChefe={tarefa.telefone_chefe}
+                        nomeResponsavel={tarefa.executor_nome}
+                        nomeChefe={tarefa.validador_funcao_nome}
+                        compact
+                      />
                     )}
 
                     {/* Botão Iniciar (para status pendente) */}

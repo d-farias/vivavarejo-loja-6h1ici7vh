@@ -15,7 +15,9 @@ import {
   ChevronRight,
   UserCheck,
   Store,
+  Phone,
 } from 'lucide-react'
+import { formatPhoneBR } from '@/lib/phone-utils'
 import { Link } from 'react-router-dom'
 
 export default function Equipe() {
@@ -145,6 +147,12 @@ export default function Equipe() {
                     <div className="text-[10px] text-[#6B7280] flex items-center gap-1 mt-1">
                       <Store className="w-3.5 h-3.5 text-[#9CA3AF]" />
                       <span>{fc.expand.loja.nome}</span>
+                    </div>
+                  )}
+                  {fc.telefone && (
+                    <div className="text-[10px] text-gray-700 flex items-center gap-1 mt-1 font-mono">
+                      <Phone className="w-3 h-3 text-emerald-600" />
+                      <span>{formatPhoneBR(fc.telefone)}</span>
                     </div>
                   )}
                 </div>

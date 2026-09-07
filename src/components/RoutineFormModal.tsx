@@ -4,7 +4,20 @@ import { formatHorarioLimite } from '@/lib/time-utils'
 import { useStore } from '@/context/StoreContext'
 import { funcoesService } from '@/services/funcoes'
 import type { Funcao } from '@/types'
-import { X, Clock, Wrench, ShieldCheck, Info, Store, Briefcase } from 'lucide-react'
+import {
+  X,
+  Clock,
+  Wrench,
+  ShieldCheck,
+  Info,
+  Store,
+  Briefcase,
+  Phone,
+  User as UserIcon,
+} from 'lucide-react'
+import { formatPhoneBR } from '@/lib/phone-utils'
+import { funcionariosService } from '@/services/funcionarios'
+import type { Funcionario } from '@/types'
 
 interface RoutineFormModalProps {
   isOpen: boolean
@@ -47,15 +60,29 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
   })
   const [funcaoId, setFuncaoId] = useState<string>(initialData?.funcao || '')
   const [funcoesLoja, setFuncoesLoja] = useState<Funcao[]>([])
+  const [funcionariosLoja, setFuncionariosLoja] = useState<Funcionario[]>([])
+  const [funcionarioId, setFuncionarioId] = useState<string>('')
+
+  // Telefones WhatsApp para alertas
+  const [telefoneResponsavel, setTelefoneResponsavel] = useState<string>(
+    formatPhoneBR(initialData?.telefone_responsavel || ''),
+  )
+  const [telefoneChefe, setTelefoneChefe] = useState<string>(
+    formatPhoneBR(initialData?.telefone_chefe || ''),
+  )
 
   useEffect(() => {
     if (lojaId) {
-      funcoesService
-        .getByLoja(lojaId)
-        .then(setFuncoesLoja)
-        .catch(() => setFuncoesLoja([]))
+      Promise.all([
+        funcoesService.getByLoja(lojaId).catch(() => [] as Funcao[]),
+        funcionariosService.getByLoja(lojaId).catch(() => [] as Funcionario[]),
+      ]).then(([funcs, colabs]) => {
+        setFuncoesLoja(funcs)
+        setFuncionariosLoja(colabs)
+      })
     } else {
       setFuncoesLoja([])
+      setFuncionariosLoja([])
     }
   }, [lojaId])
 
@@ -98,6 +125,8 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
         observacoes: observacoes.trim(),
         loja: lojaId || undefined,
         funcao: funcaoId || undefined,
+        telefone_responsavel: telefoneResponsavel.trim() || undefined,
+        telefone_chefe: telefoneChefe.trim() || undefined,
       })
       onClose()
     } finally {
@@ -172,10 +201,32 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
                 onChange={(e) => {
                   const val = e.target.value
                   setFuncaoId(val)
-                  // Se escolheu função, atualiza o responsável automaticamente se estiver em branco
                   const fObj = funcoesLoja.find((f) => f.id === val)
-                  if (fObj && !responsavel) {
-                    setResponsavel(fObj.nome)
+                  if (fObj) {
+                    if (!responsavel) {
+                      setResponsavel(fObj.nome)
+                    }
+                    // Autopreenchimento do telefone do responsável a partir da função se tiver
+                    if (fObj.telefone && !telefoneResponsavel) {
+                      setTelefoneResponsavel(formatPhoneBR(fObj.telefone))
+                    }
+                    // Autopreenchimento do telefone do chefe imediato se a função apontar para uma função superior
+                    if (fObj.chefe_imediato_funcao) {
+                      const chefeFuncao = funcoesLoja.find(
+                        (cf) => cf.id === fObj.chefe_imediato_funcao,
+                      )
+                      if (chefeFuncao?.telefone && !telefoneChefe) {
+                        setTelefoneChefe(formatPhoneBR(chefeFuncao.telefone))
+                      } else {
+                        // Tenta encontrar um funcionário que ocupa o cargo de chefe imediato
+                        const chefeColab = funcionariosLoja.find(
+                          (fc) => fc.funcao === fObj.chefe_imediato_funcao && fc.telefone,
+                        )
+                        if (chefeColab?.telefone && !telefoneChefe) {
+                          setTelefoneChefe(formatPhoneBR(chefeColab.telefone))
+                        }
+                      }
+                    }
                   }
                 }}
                 disabled={!lojaId || funcoesLoja.length === 0}
@@ -190,6 +241,62 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
               </select>
             </div>
           </div>
+
+          {/* Autopreenchimento por Funcionário da loja (opcional para preencher contatos) */}
+          {funcionariosLoja.length > 0 && (
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
+                <UserIcon className="w-3.5 h-3.5 text-[#2563EB]" />
+                <span>Atribuir a Funcionário Específico (opcional)</span>
+              </label>
+              <select
+                value={funcionarioId}
+                onChange={(e) => {
+                  const fid = e.target.value
+                  setFuncionarioId(fid)
+                  const fColab = funcionariosLoja.find((fc) => fc.id === fid)
+                  if (fColab) {
+                    setResponsavel(fColab.nome)
+                    if (fColab.funcao && !funcaoId) {
+                      setFuncaoId(fColab.funcao)
+                    }
+                    if (fColab.telefone) {
+                      setTelefoneResponsavel(formatPhoneBR(fColab.telefone))
+                    }
+                    // Resolver chefe imediato da função desse funcionário
+                    const fCargo = funcoesLoja.find((fc) => fc.id === fColab.funcao)
+                    if (fCargo?.chefe_imediato_funcao) {
+                      const cargoChefe = funcoesLoja.find(
+                        (cf) => cf.id === fCargo.chefe_imediato_funcao,
+                      )
+                      if (cargoChefe?.telefone && !telefoneChefe) {
+                        setTelefoneChefe(formatPhoneBR(cargoChefe.telefone))
+                      } else {
+                        const colabChefe = funcionariosLoja.find(
+                          (fc) => fc.funcao === fCargo.chefe_imediato_funcao && fc.telefone,
+                        )
+                        if (colabChefe?.telefone && !telefoneChefe) {
+                          setTelefoneChefe(formatPhoneBR(colabChefe.telefone))
+                        }
+                      }
+                    }
+                  }
+                }}
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+              >
+                <option value="">Nenhum funcionário específico selecionado</option>
+                {funcionariosLoja.map((fc) => (
+                  <option key={fc.id} value={fc.id}>
+                    {fc.nome} {fc.expand?.funcao?.nome ? `— ${fc.expand.funcao.nome}` : ''}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[11px] text-[#6B7280] mt-0.5">
+                Ao selecionar, preenche o responsável e seus contatos telefônicos de alerta
+                automaticamente.
+              </p>
+            </div>
+          )}
 
           {/* Nome da Rotina */}
           <div>
@@ -309,6 +416,48 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
                 placeholder="Ex: Coletor RF, Checklist, Manual"
                 className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
               />
+            </div>
+          </div>
+
+          {/* Seção WhatsApp: Telefones do Responsável e do Chefe Imediato (com máscara formatPhoneBR) */}
+          <div className="p-3.5 rounded-lg border border-emerald-200 bg-emerald-50/50 space-y-3">
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-emerald-600" />
+              <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider">
+                Avisos e Alertas por WhatsApp (Opcional)
+              </span>
+            </div>
+            <p className="text-[11px] text-emerald-800 leading-relaxed">
+              Informe ou ajuste os números para disparo rápido de lembretes e cobranças operacionais
+              de prazos.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-emerald-950 mb-1">
+                  Telefone do Responsável
+                </label>
+                <input
+                  type="text"
+                  value={telefoneResponsavel}
+                  onChange={(e) => setTelefoneResponsavel(formatPhoneBR(e.target.value))}
+                  placeholder="(00) 00000-0000"
+                  className="w-full px-3 py-2 text-sm bg-white border border-emerald-300 rounded-md outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 text-[#1F2937]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-emerald-950 mb-1">
+                  Telefone do Chefe Imediato
+                </label>
+                <input
+                  type="text"
+                  value={telefoneChefe}
+                  onChange={(e) => setTelefoneChefe(formatPhoneBR(e.target.value))}
+                  placeholder="(00) 00000-0000"
+                  className="w-full px-3 py-2 text-sm bg-white border border-emerald-300 rounded-md outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 text-[#1F2937]"
+                />
+              </div>
             </div>
           </div>
 

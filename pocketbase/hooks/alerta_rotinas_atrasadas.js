@@ -428,75 +428,127 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
     // Determinar destinatários:
     // 1. Regional da loja (email_regional no registro da loja)
     // 2. Gerente da loja (funcionário com cargo contendo 'gerente' ou usuário com perfil 'lider' vinculado a esta loja)
-    // 3. Fallback: contato do cliente (se tiver email)
+    // 3. Responsável direto de cada rotina atrasada E o chefe imediato de sua função
+    // 4. Fallback: contato do cliente (se tiver email)
     const emailsDestinatarios = new Set()
     const destinatariosDetalhes = []
 
+    const addDestinatario = (rawEmail, nomeFallback) => {
+      const cleanEmail = extractEmail(rawEmail)
+      if (cleanEmail && !emailsDestinatarios.has(cleanEmail)) {
+        emailsDestinatarios.add(cleanEmail)
+        destinatariosDetalhes.push({ address: cleanEmail, name: nomeFallback || cleanEmail })
+      }
+    }
+
     // 1. Regional
     if (lojaEfetiva) {
-      const emailReg = extractEmail(lojaEfetiva.getString('email_regional'))
-      if (emailReg) {
-        emailsDestinatarios.add(emailReg)
-        destinatariosDetalhes.push({ address: emailReg, name: `Regional - ${lojaNome}` })
-      }
+      const emailReg = lojaEfetiva.getString('email_regional')
+      addDestinatario(emailReg, `Regional - ${lojaNome}`)
     }
 
     // 2. Gerente da loja (buscar nos funcionários desta loja)
-    if (lojaEfetiva) {
-      const funcsDaLoja = funcionarios.filter((fc) => fc.getString('loja') === lojaEfetiva.id)
+    const funcsDaLoja = lojaEfetiva
+      ? funcionarios.filter((fc) => fc.getString('loja') === lojaEfetiva.id)
+      : []
+
+    for (let f = 0; f < funcsDaLoja.length; f++) {
+      const fc = funcsDaLoja[f]
+      const funcaoId = fc.getString('funcao')
+      const funcaoObj = funcoesMap[funcaoId]
+      const funcaoNome = funcaoObj ? (funcaoObj.getString('nome') || '').toLowerCase() : ''
+      const fcNome = fc.getString('nome')
+
+      // Se a função indica Gerência / Gerente / Líder de Loja
+      const isGerente =
+        funcaoNome.includes('gerente') ||
+        funcaoNome.includes('lider') ||
+        funcaoNome.includes('líder') ||
+        funcaoNome.includes('encarregado geral')
+
+      if (isGerente) {
+        const userId = fc.getString('usuario')
+        if (userId && usersMap[userId]) {
+          const userObj = usersMap[userId]
+          addDestinatario(userObj.getString('email'), fcNome || `Gerente ${lojaNome}`)
+        }
+      }
+    }
+
+    // Se ainda não achou gerente por cargo, procurar qualquer funcionário com login na loja
+    if (destinatariosDetalhes.length === 0) {
       for (let f = 0; f < funcsDaLoja.length; f++) {
-        const fc = funcsDaLoja[f]
-        const funcaoId = fc.getString('funcao')
-        const funcaoObj = funcoesMap[funcaoId]
-        const funcaoNome = funcaoObj ? (funcaoObj.getString('nome') || '').toLowerCase() : ''
-        const fcNome = fc.getString('nome')
+        const userId = funcsDaLoja[f].getString('usuario')
+        if (userId && usersMap[userId]) {
+          const userObj = usersMap[userId]
+          addDestinatario(userObj.getString('email'), funcsDaLoja[f].getString('nome'))
+        }
+      }
+    }
 
-        // Se a função indica Gerência / Gerente / Líder de Loja
-        const isGerente =
-          funcaoNome.includes('gerente') ||
-          funcaoNome.includes('lider') ||
-          funcaoNome.includes('líder') ||
-          funcaoNome.includes('encarregado geral')
+    // 3. Responsável direto de cada rotina atrasada E o chefe imediato de sua função
+    for (let rIdx = 0; rIdx < atrasadas.length; rIdx++) {
+      const rRec = atrasadas[rIdx].record
+      const fId = rRec.getString('funcao')
+      const respTxt = (rRec.getString('responsavel') || '').toLowerCase().trim()
 
-        if (isGerente) {
-          const userId = fc.getString('usuario')
-          if (userId && usersMap[userId]) {
-            const userObj = usersMap[userId]
-            const uEmail = extractEmail(userObj.getString('email'))
-            if (uEmail && !emailsDestinatarios.has(uEmail)) {
-              emailsDestinatarios.add(uEmail)
-              destinatariosDetalhes.push({ address: uEmail, name: fcNome || `Gerente ${lojaNome}` })
-            }
-          }
+      // Tentar localizar funcionário responsável direto por função ou nome
+      let funcResponsavel = null
+      if (funcsDaLoja.length > 0) {
+        if (fId) {
+          funcResponsavel = funcsDaLoja.find((fc) => fc.getString('funcao') === fId)
+        }
+        if (!funcResponsavel && respTxt) {
+          funcResponsavel = funcsDaLoja.find(
+            (fc) => (fc.getString('nome') || '').toLowerCase().trim() === respTxt,
+          )
         }
       }
 
-      // Se ainda não achou gerente por cargo, procurar qualquer funcionário com login na loja
-      if (destinatariosDetalhes.length === 0) {
-        for (let f = 0; f < funcsDaLoja.length; f++) {
-          const userId = funcsDaLoja[f].getString('usuario')
-          if (userId && usersMap[userId]) {
-            const userObj = usersMap[userId]
-            const uEmail = extractEmail(userObj.getString('email'))
-            if (uEmail && !emailsDestinatarios.has(uEmail)) {
-              emailsDestinatarios.add(uEmail)
-              destinatariosDetalhes.push({
-                address: uEmail,
-                name: funcsDaLoja[f].getString('nome'),
-              })
+      // Se o responsável direto tiver login/usuário, incluir email
+      if (funcResponsavel) {
+        const uId = funcResponsavel.getString('usuario')
+        if (uId && usersMap[uId]) {
+          addDestinatario(
+            usersMap[uId].getString('email'),
+            funcResponsavel.getString('nome') || 'Responsável',
+          )
+        }
+      }
+
+      // Resolver o chefe imediato a partir da função da rotina
+      const funcObj = fId
+        ? funcoesMap[fId]
+        : funcResponsavel
+          ? funcoesMap[funcResponsavel.getString('funcao')]
+          : null
+      if (funcObj) {
+        const chefeFuncaoId = funcObj.getString('chefe_imediato_funcao')
+        if (chefeFuncaoId) {
+          const chefeFuncaoObj = funcoesMap[chefeFuncaoId]
+          const chefeFuncaoNome = chefeFuncaoObj
+            ? chefeFuncaoObj.getString('nome')
+            : 'Chefe Imediato'
+
+          // Encontrar funcionário da loja que ocupa a função de chefe imediato
+          const funcChefe = funcsDaLoja.find((fc) => fc.getString('funcao') === chefeFuncaoId)
+          if (funcChefe) {
+            const uId = funcChefe.getString('usuario')
+            if (uId && usersMap[uId]) {
+              addDestinatario(
+                usersMap[uId].getString('email'),
+                `${funcChefe.getString('nome')} (${chefeFuncaoNome})`,
+              )
             }
           }
         }
       }
     }
 
-    // 3. Fallback: se nenhum regional ou gerente for encontrado, tentar contato do cliente
+    // 4. Fallback: se nenhum regional, gerente ou responsável for encontrado, tentar contato do cliente
     if (destinatariosDetalhes.length === 0 && cliente) {
-      const emailCli = extractEmail(cliente.getString('contato'))
-      if (emailCli && !emailsDestinatarios.has(emailCli)) {
-        emailsDestinatarios.add(emailCli)
-        destinatariosDetalhes.push({ address: emailCli, name: clienteNome })
-      }
+      const emailCli = cliente.getString('contato')
+      addDestinatario(emailCli, clienteNome)
     }
 
     // Blindagem 2: Se não houver NENHUM destinatário válido, pular a loja com log claro
@@ -912,8 +964,54 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
           }
         }
 
+        // Resolver contatos do Responsável Direto e Chefe Imediato da tarefa de validade
+        const emailsResponsaveisValidade = new Set()
+        const responsaveisValidadeDetalhes = []
+
+        const addRespValidade = (rawEmail, nomeFallback) => {
+          const cleanEmail = extractEmail(rawEmail)
+          if (cleanEmail && !emailsResponsaveisValidade.has(cleanEmail)) {
+            emailsResponsaveisValidade.add(cleanEmail)
+            responsaveisValidadeDetalhes.push({
+              address: cleanEmail,
+              name: nomeFallback || cleanEmail,
+            })
+          }
+        }
+
+        // Tentar encontrar o funcionário executor_nome na loja
+        const execNome = (tv.getString('executor_nome') || '').toLowerCase().trim()
+        if (execNome && lojaEfetiva) {
+          const funcsDaLoja = funcionarios.filter((fc) => fc.getString('loja') === lojaEfetiva.id)
+          const colabExec = funcsDaLoja.find(
+            (fc) => (fc.getString('nome') || '').toLowerCase().trim() === execNome,
+          )
+          if (colabExec) {
+            const uId = colabExec.getString('usuario')
+            if (uId && usersMap[uId]) {
+              addRespValidade(usersMap[uId].getString('email'), colabExec.getString('nome'))
+            }
+            // Chefe imediato da função desse funcionário
+            const fObj = funcoesMap[colabExec.getString('funcao')]
+            if (fObj && fObj.getString('chefe_imediato_funcao')) {
+              const chefeFId = fObj.getString('chefe_imediato_funcao')
+              const chefeColab = funcsDaLoja.find((fc) => fc.getString('funcao') === chefeFId)
+              if (chefeColab) {
+                const cUid = chefeColab.getString('usuario')
+                if (cUid && usersMap[cUid]) {
+                  addRespValidade(
+                    usersMap[cUid].getString('email'),
+                    `${chefeColab.getString('nome')} (Chefe Imediato)`,
+                  )
+                }
+              }
+            }
+          }
+        }
+
         // ===================================================================
-        // ALERTA 1: Aviso prévio 1 hora antes do horário de início para o GERENTE
+        // ALERTA 1: Aviso prévio 1 hora antes do horário de início
+        // Destinatários: Gerente + Responsável Direto da tarefa de validade
         // Janela de disparo: quando currentMinutes está entre (inicio - 60) e inicio
         // ===================================================================
         const alertaPrevioEnviado = tv.getString('alerta_previo_enviado_em')
@@ -925,10 +1023,24 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
           !jaEnviouPrevioHoje &&
           currentMinutes >= umAHoraAntesMinutos &&
           currentMinutes < parsedInicio.minutes &&
-          gerenteDetalhes.length > 0 &&
+          (gerenteDetalhes.length > 0 || responsaveisValidadeDetalhes.length > 0) &&
           status !== 'aprovada' &&
           status !== 'aguardando_validacao'
         ) {
+          const destinatariosPrevio = []
+          const previoMails = new Set()
+          for (const g of gerenteDetalhes) {
+            if (!previoMails.has(g.address)) {
+              previoMails.add(g.address)
+              destinatariosPrevio.push(g)
+            }
+          }
+          for (const r of responsaveisValidadeDetalhes) {
+            if (!previoMails.has(r.address)) {
+              previoMails.add(r.address)
+              destinatariosPrevio.push(r)
+            }
+          }
           const setorCat = tv.getString('setor_categoria')
           const descTarefa =
             tv.getString('descricao') || 'Auditoria / Verificação de Validade de Produtos'
@@ -995,7 +1107,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
             const senderName = $app.settings().meta.senderName || 'VivaVarejo Alertas'
             const msg = new MailerMessage({
               from: { address: senderAddress, name: senderName },
-              to: gerenteDetalhes,
+              to: destinatariosPrevio,
               subject: subjectPrevio,
               html: htmlPrevio,
             })
@@ -1036,6 +1148,13 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
             if (!atrasoMails.has(v.address)) {
               atrasoMails.add(v.address)
               destinatariosAtraso.push(v)
+            }
+          }
+          // Incluir também responsável direto e chefe imediato da tarefa de validade
+          for (const r of responsaveisValidadeDetalhes) {
+            if (!atrasoMails.has(r.address)) {
+              atrasoMails.add(r.address)
+              destinatariosAtraso.push(r)
             }
           }
 

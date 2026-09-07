@@ -6,6 +6,7 @@ import { lojasService } from '@/services/lojas'
 import { funcoesService } from '@/services/funcoes'
 import { funcionariosService, usersService } from '@/services/funcionarios'
 import { modelosRotinasService } from '@/services/modelosRotinas'
+import { formatPhoneBR } from '@/lib/phone-utils'
 import type {
   Cliente,
   Loja,
@@ -135,11 +136,17 @@ export default function Admin() {
   }>({ open: false, data: null })
 
   // Modal de Criação / Edição de Usuário
+  const [userTelefoneVal, setUserTelefoneVal] = useState<string>('')
   const [userModal, setUserModal] = useState<{
     open: boolean
     mode: 'create' | 'edit'
     user: User | null
   }>({ open: false, mode: 'create', user: null })
+
+  const handleOpenUserModal = (mode: 'create' | 'edit', u: User | null) => {
+    setUserTelefoneVal(formatPhoneBR(u?.telefone || ''))
+    setUserModal({ open: true, mode, user: u })
+  }
 
   // Modal de Reset de Senha pelo Admin
   const [resetModal, setResetModal] = useState<{
@@ -462,21 +469,45 @@ export default function Admin() {
   }
 
   // ==================== GESTÃO DE FUNÇÕES ====================
+  const [funcaoTelefoneVal, setFuncaoTelefoneVal] = useState('')
+  const [funcaoChefeImediatoVal, setFuncaoChefeImediatoVal] = useState('')
+  const [funcaoFormLojaId, setFuncaoFormLojaId] = useState('')
+
+  const handleOpenFuncaoModal = (fn: Funcao | null) => {
+    const defaultLoja = fn?.loja || (lojas.length > 0 ? lojas[0].id : '')
+    setFuncaoFormLojaId(defaultLoja)
+    setFuncaoTelefoneVal(formatPhoneBR(fn?.telefone || ''))
+    setFuncaoChefeImediatoVal(fn?.chefe_imediato_funcao || '')
+    setFuncaoModal({ open: true, data: fn })
+  }
+
   const handleSaveFuncao = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const form = e.currentTarget
     const formData = new FormData(form)
     const nome = (formData.get('nome') as string)?.trim()
-    const loja = formData.get('loja') as string
+    const loja = (formData.get('loja') as string) || funcaoFormLojaId
+    const telefone = (formData.get('telefone') as string)?.trim() || ''
+    const chefe_imediato_funcao = (formData.get('chefe_imediato_funcao') as string) || ''
 
     if (!nome || !loja) return
 
     try {
       if (funcaoModal.data) {
-        await funcoesService.update(funcaoModal.data.id, { nome, loja })
+        await funcoesService.update(funcaoModal.data.id, {
+          nome,
+          loja,
+          telefone: telefone || undefined,
+          chefe_imediato_funcao: chefe_imediato_funcao || undefined,
+        })
         showFeedback('Função atualizada com sucesso!')
       } else {
-        await funcoesService.create({ nome, loja })
+        await funcoesService.create({
+          nome,
+          loja,
+          telefone: telefone || undefined,
+          chefe_imediato_funcao: chefe_imediato_funcao || undefined,
+        })
         showFeedback('Função cadastrada com sucesso!')
       }
       setFuncaoModal({ open: false, data: null })
@@ -511,10 +542,12 @@ export default function Admin() {
 
   // ==================== GESTÃO DE FUNCIONÁRIOS ====================
   const [formLojaId, setFormLojaId] = useState<string>('')
+  const [funcTelefoneVal, setFuncTelefoneVal] = useState<string>('')
 
   const handleOpenFuncionarioModal = (func: Funcionario | null) => {
     const defaultLoja = func?.loja || (lojas.length > 0 ? lojas[0].id : '')
     setFormLojaId(defaultLoja)
+    setFuncTelefoneVal(formatPhoneBR(func?.telefone || ''))
     setFuncionarioModal({ open: true, data: func })
   }
 
@@ -525,6 +558,7 @@ export default function Admin() {
     const nome = (formData.get('nome') as string)?.trim()
     const loja = formData.get('loja') as string
     const funcao = formData.get('funcao') as string
+    const telefone = (formData.get('telefone') as string)?.trim() || ''
     const usuario = (formData.get('usuario') as string) || ''
     const ativo = formData.get('ativo') === 'true'
 
@@ -536,6 +570,7 @@ export default function Admin() {
           nome,
           loja,
           funcao,
+          telefone: telefone || undefined,
           usuario: usuario || undefined,
           ativo,
         })
@@ -545,6 +580,7 @@ export default function Admin() {
           nome,
           loja,
           funcao,
+          telefone: telefone || undefined,
           usuario: usuario || undefined,
           ativo,
         })
@@ -645,6 +681,7 @@ export default function Admin() {
     const name = (formData.get('name') as string)?.trim()
     const emailVal = (formData.get('email') as string)?.trim().toLowerCase()
     const perfilVal = (formData.get('perfil') as PerfilUsuario) || 'funcionario'
+    const telefoneVal = (formData.get('telefone') as string)?.trim() || ''
     const funcionarioId = (formData.get('funcionarioId') as string) || ''
     const passwordVal = (formData.get('password') as string) || ''
     const ativoVal = formData.get('ativo') === 'true'
@@ -669,6 +706,7 @@ export default function Admin() {
           passwordConfirm: passwordVal,
           perfil: perfilVal,
           cliente: clienteVal || undefined,
+          telefone: telefoneVal || undefined,
           ativo: ativoVal,
         })
 
@@ -684,6 +722,7 @@ export default function Admin() {
           name,
           perfil: perfilVal,
           cliente: clienteVal || undefined,
+          telefone: telefoneVal || undefined,
           ativo: ativoVal,
         })
 
@@ -1697,7 +1736,7 @@ export default function Admin() {
                       showFeedback('Cadastre ao menos uma loja antes de criar funções.', 'error')
                       return
                     }
-                    setFuncaoModal({ open: true, data: null })
+                    handleOpenFuncaoModal(null)
                   }}
                   className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors self-start sm:self-auto"
                 >
@@ -1721,6 +1760,8 @@ export default function Admin() {
                       <tr>
                         <th className="p-3.5">Função</th>
                         <th className="p-3.5">Loja Vinculada</th>
+                        <th className="p-3.5">Chefe Imediato</th>
+                        <th className="p-3.5">Telefone / WhatsApp</th>
                         <th className="p-3.5 text-right">Ações</th>
                       </tr>
                     </thead>
@@ -1734,10 +1775,29 @@ export default function Admin() {
                               <span>{fn.expand?.loja?.nome || 'Loja não vinculada'}</span>
                             </span>
                           </td>
+                          <td className="p-3.5 text-[#4B5563]">
+                            {fn.expand?.chefe_imediato_funcao ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 text-[11px] font-medium text-blue-700 border border-blue-200">
+                                <span>{fn.expand.chefe_imediato_funcao.nome}</span>
+                              </span>
+                            ) : (
+                              <span className="text-xs text-gray-400 italic">Não definido</span>
+                            )}
+                          </td>
+                          <td className="p-3.5 text-[#4B5563]">
+                            {fn.telefone ? (
+                              <span className="inline-flex items-center gap-1 text-xs font-mono text-gray-700">
+                                <Phone className="w-3 h-3 text-emerald-600" />
+                                {formatPhoneBR(fn.telefone)}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-gray-400 italic">—</span>
+                            )}
+                          </td>
                           <td className="p-3.5 text-right">
                             <div className="inline-flex items-center gap-1">
                               <button
-                                onClick={() => setFuncaoModal({ open: true, data: fn })}
+                                onClick={() => handleOpenFuncaoModal(fn)}
                                 className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
                                 title="Editar função"
                               >
@@ -1848,6 +1908,7 @@ export default function Admin() {
                         <th className="p-3.5">Nome</th>
                         <th className="p-3.5">Função</th>
                         <th className="p-3.5">Loja</th>
+                        <th className="p-3.5">Telefone / WhatsApp</th>
                         <th className="p-3.5">Acesso ao Sistema</th>
                         <th className="p-3.5">Status</th>
                         <th className="p-3.5 text-right">Ações</th>
@@ -1869,6 +1930,27 @@ export default function Admin() {
                                 </span>
                               )}
                             </div>
+                          </td>
+                          <td className="p-3.5 text-[#374151]">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-100 text-[11px] font-medium">
+                              <Briefcase className="w-3 h-3 text-[#6B7280]" />
+                              <span>{fc.expand?.funcao?.nome || 'Função não atribuída'}</span>
+                            </span>
+                          </td>
+                          <td className="p-3.5 text-[#4B5563]">
+                            <span className="text-xs">
+                              {fc.expand?.loja?.nome || 'Loja não vinculada'}
+                            </span>
+                          </td>
+                          <td className="p-3.5 text-[#4B5563]">
+                            {fc.telefone ? (
+                              <span className="inline-flex items-center gap-1 text-xs font-mono text-gray-700">
+                                <Phone className="w-3 h-3 text-emerald-600" />
+                                {formatPhoneBR(fc.telefone)}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-gray-400 italic">—</span>
+                            )}
                           </td>
                           <td className="p-3.5 text-[#374151]">
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-100 text-[11px] font-medium">
@@ -2101,7 +2183,7 @@ export default function Admin() {
                 </div>
 
                 <button
-                  onClick={() => setUserModal({ open: true, mode: 'create', user: null })}
+                  onClick={() => handleOpenUserModal('create', null)}
                   className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors self-start lg:self-auto"
                 >
                   <UserPlus className="w-4 h-4" />
@@ -2124,6 +2206,7 @@ export default function Admin() {
                     <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563] text-xs font-semibold uppercase tracking-wider">
                       <tr>
                         <th className="p-3.5">Usuário</th>
+                        <th className="p-3.5">Telefone / WhatsApp</th>
                         <th className="p-3.5">Perfil de Acesso</th>
                         <th className="p-3.5">Cargo / Função e Loja</th>
                         <th className="p-3.5">Status</th>
@@ -2158,6 +2241,18 @@ export default function Admin() {
                                   <div className="text-xs text-[#6B7280] font-mono">{u.email}</div>
                                 </div>
                               </div>
+                            </td>
+
+                            {/* Telefone */}
+                            <td className="p-3.5 text-[#4B5563]">
+                              {u.telefone ? (
+                                <span className="inline-flex items-center gap-1 text-xs font-mono text-gray-700">
+                                  <Phone className="w-3 h-3 text-emerald-600" />
+                                  {formatPhoneBR(u.telefone)}
+                                </span>
+                              ) : (
+                                <span className="text-xs text-gray-400 italic">—</span>
+                              )}
                             </td>
 
                             {/* Badge do Perfil com Cores */}
@@ -2259,9 +2354,7 @@ export default function Admin() {
 
                                 {/* Botão Editar Usuário */}
                                 <button
-                                  onClick={() =>
-                                    setUserModal({ open: true, mode: 'edit', user: u })
-                                  }
+                                  onClick={() => handleOpenUserModal('edit', u)}
                                   className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
                                   title="Editar perfil e vínculo"
                                 >
@@ -2608,7 +2701,8 @@ export default function Admin() {
                 </label>
                 <select
                   name="loja"
-                  defaultValue={funcaoModal.data?.loja || (lojas[0]?.id ?? '')}
+                  value={funcaoFormLojaId}
+                  onChange={(e) => setFuncaoFormLojaId(e.target.value)}
                   required
                   className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
                 >
@@ -2631,6 +2725,50 @@ export default function Admin() {
                   placeholder="Ex: Gerente Geral, Cartazista, Analista"
                   className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#374151] mb-1">
+                  Telefone / WhatsApp da Função
+                </label>
+                <input
+                  name="telefone"
+                  value={funcaoTelefoneVal}
+                  onChange={(e) => setFuncaoTelefoneVal(formatPhoneBR(e.target.value))}
+                  placeholder="(00) 00000-0000"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                />
+                <p className="text-[11px] text-[#6B7280] mt-0.5">
+                  Número de contato da função ou setor para envio de avisos.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#374151] mb-1">
+                  Chefe Imediato por Função
+                </label>
+                <select
+                  name="chefe_imediato_funcao"
+                  value={funcaoChefeImediatoVal}
+                  onChange={(e) => setFuncaoChefeImediatoVal(e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                >
+                  <option value="">Nenhum chefe imediato direto</option>
+                  {funcoes
+                    .filter(
+                      (f) =>
+                        f.id !== funcaoModal.data?.id &&
+                        (!funcaoFormLojaId || f.loja === funcaoFormLojaId),
+                    )
+                    .map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.nome}
+                      </option>
+                    ))}
+                </select>
+                <p className="text-[11px] text-[#6B7280] mt-0.5">
+                  Função superior direta para escalonamento automático de alertas e avisos WhatsApp.
+                </p>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E7EB]">
@@ -2725,6 +2863,19 @@ export default function Admin() {
                       </option>
                     ))}
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#374151] mb-1">
+                  Telefone / WhatsApp (Celular)
+                </label>
+                <input
+                  name="telefone"
+                  value={funcTelefoneVal}
+                  onChange={(e) => setFuncTelefoneVal(formatPhoneBR(e.target.value))}
+                  placeholder="(00) 00000-0000"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                />
               </div>
 
               <div>
@@ -2828,6 +2979,19 @@ export default function Admin() {
                   className={`w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] ${
                     userModal.mode === 'edit' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                   }`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#374151] mb-1">
+                  Telefone / WhatsApp
+                </label>
+                <input
+                  name="telefone"
+                  value={userTelefoneVal}
+                  onChange={(e) => setUserTelefoneVal(formatPhoneBR(e.target.value))}
+                  placeholder="(00) 00000-0000"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
                 />
               </div>
 
