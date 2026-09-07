@@ -57,6 +57,7 @@ export const usersService = {
   async getAll(): Promise<User[]> {
     return await pb.collection('users').getFullList<User>({
       sort: 'name,email',
+      expand: 'cliente',
     })
   },
 
@@ -74,6 +75,7 @@ export const usersService = {
     passwordConfirm: string
     name: string
     perfil: PerfilUsuario
+    cliente?: string
     ativo?: boolean
   }): Promise<User> {
     return await pb.collection('users').create<User>(data)

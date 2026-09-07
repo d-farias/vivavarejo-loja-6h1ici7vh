@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-07T00:34:19.285Z",
+  "generatedAt": "2026-09-07T00:56:01.509Z",
   "collections": [
     {
       "name": "users",
@@ -8,7 +8,7 @@
         "list": "@request.auth.id != ''",
         "view": "@request.auth.id != ''",
         "create": "",
-        "update": "@request.auth.id != '' && (id = @request.auth.id || @request.auth.perfil = 'admin')",
+        "update": "@request.auth.id != '' && (id = @request.auth.id || @request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
         "delete": "@request.auth.id != '' && (id = @request.auth.id || @request.auth.perfil = 'admin')"
       },
       "fields": [
@@ -43,7 +43,7 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": ["admin", "lider", "funcionario"]
+          "selectValues": ["admin", "adm_rede", "lider", "funcionario"]
         },
         {
           "name": "ativo",
@@ -56,6 +56,13 @@
           "type": "bool",
           "required": false,
           "system": false
+        },
+        {
+          "name": "cliente",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "clientes"
         }
       ],
       "indexes": [
@@ -69,9 +76,9 @@
       "apiRules": {
         "list": "@request.auth.id != ''",
         "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'lider' || @request.auth.perfil = '')",
-        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'lider' || @request.auth.perfil = '')",
-        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'lider' || @request.auth.perfil = '')"
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede' || @request.auth.perfil = 'lider' || @request.auth.perfil = '')",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede' || @request.auth.perfil = 'lider' || @request.auth.perfil = '')",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede' || @request.auth.perfil = 'lider' || @request.auth.perfil = '')"
       },
       "fields": [
         {
@@ -271,7 +278,7 @@
         "list": "@request.auth.id != ''",
         "view": "@request.auth.id != ''",
         "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && @request.auth.cliente = id))",
         "delete": "@request.auth.id != '' && @request.auth.perfil = 'admin'"
       },
       "fields": [
@@ -353,9 +360,9 @@
       "apiRules": {
         "list": "@request.auth.id != ''",
         "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
-        "update": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
-        "delete": "@request.auth.id != '' && @request.auth.perfil = 'admin'"
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')"
       },
       "fields": [
         {
@@ -421,9 +428,9 @@
       "apiRules": {
         "list": "@request.auth.id != ''",
         "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
-        "update": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
-        "delete": "@request.auth.id != '' && @request.auth.perfil = 'admin'"
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')"
       },
       "fields": [
         {
@@ -465,9 +472,9 @@
       "apiRules": {
         "list": "@request.auth.id != ''",
         "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
-        "update": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
-        "delete": "@request.auth.id != '' && @request.auth.perfil = 'admin'"
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')"
       },
       "fields": [
         {
@@ -531,9 +538,9 @@
       "apiRules": {
         "list": "@request.auth.id != ''",
         "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')"
       },
       "fields": [
         {
@@ -575,6 +582,12 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "segmento",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

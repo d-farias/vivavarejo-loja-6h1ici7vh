@@ -10,6 +10,9 @@ import { RoutineFormModal } from '@/components/RoutineFormModal'
 import { SpreadsheetImportModal } from '@/components/SpreadsheetImportModal'
 import { StoreSelector } from '@/components/StoreSelector'
 import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
+import { ModelosSegmentoVitrine } from '@/components/ModelosSegmentoVitrine'
+import { clientesService } from '@/services/clientes'
+import type { Cliente } from '@/types'
 import {
   Search,
   Filter,
@@ -34,12 +37,13 @@ import {
 
 export default function Rotinas() {
   const { user } = useAuth()
-  const { lojaSelecionadaId, lojaSelecionada } = useStore()
+  const { lojaSelecionadaId, lojaSelecionada, lojas } = useStore()
   const perfil = user?.perfil || (user?.email === 'dfarias53@gmail.com' ? 'admin' : 'lider')
-  const podeGerenciar = perfil === 'admin' || perfil === 'lider'
+  const podeGerenciar = perfil === 'admin' || perfil === 'adm_rede' || perfil === 'lider'
 
   const [rotinas, setRotinas] = useState<Rotina[]>([])
   const [execucoes, setExecucoes] = useState<ExecucaoRotina[]>([])
+  const [clientes, setClientes] = useState<Cliente[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -62,12 +66,14 @@ export default function Rotinas() {
     if (!user) return
     setError(false)
     try {
-      const [allRoutines, todayExecs] = await Promise.all([
+      const [allRoutines, todayExecs, allClientes] = await Promise.all([
         rotinasService.getAll(lojaSelecionadaId),
         execucoesService.getTodayExecutions(user.id),
+        clientesService.getAll().catch(() => [] as Cliente[]),
       ])
       setRotinas(allRoutines)
       setExecucoes(todayExecs)
+      setClientes(allClientes)
     } catch {
       setError(true)
     } finally {
@@ -341,6 +347,14 @@ export default function Rotinas() {
 
   return (
     <div className="space-y-6">
+      {/* Seção 1: Modelos do meu Segmento (Vitrine / Demonstração / Aplicação) */}
+      <ModelosSegmentoVitrine
+        userPerfil={perfil}
+        lojas={lojas}
+        clientes={clientes}
+        onRotinasAtualizadas={loadData}
+      />
+
       {/* Header Row: Título + Seletor de Loja + Ações de Gestão */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div>

@@ -19,8 +19,10 @@ import {
   Shield,
   KeyRound,
   Handshake,
+  MessageSquare,
 } from 'lucide-react'
 import { ChangePasswordModal } from '@/components/ChangePasswordModal'
+import { FalarEspecialistaModal } from '@/components/FalarEspecialistaModal'
 
 export default function Layout() {
   const { user, logout } = useAuth()
@@ -28,6 +30,7 @@ export default function Layout() {
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
+  const [falarEspecialistaOpen, setFalarEspecialistaOpen] = useState(false)
 
   const isAuthPage =
     location.pathname === '/login' ||
@@ -54,15 +57,25 @@ export default function Layout() {
   }
 
   const perfil = user?.perfil || (user?.email === 'dfarias53@gmail.com' ? 'admin' : 'lider')
-  const isAdmin = perfil === 'admin'
-  const isLiderOrAdmin = perfil === 'admin' || perfil === 'lider'
+  const isAdminGeral = perfil === 'admin'
+  const isAdmRede = perfil === 'adm_rede'
+  const hasAdminAccess = isAdminGeral || isAdmRede
+  const isLiderOrAdmin = perfil === 'admin' || perfil === 'adm_rede' || perfil === 'lider'
 
   const navLinks = [
     { to: '/', label: 'Início', icon: LayoutDashboard },
     { to: '/rotinas', label: 'Rotinas', icon: ListChecks },
     { to: '/equipe', label: 'Minha Equipe', icon: Users },
     ...(isLiderOrAdmin ? [{ to: '/promotores', label: 'Promotores', icon: Handshake }] : []),
-    ...(isAdmin ? [{ to: '/admin', label: 'Admin', icon: Shield }] : []),
+    ...(hasAdminAccess
+      ? [
+          {
+            to: '/admin',
+            label: isAdmRede ? 'Minha Rede' : 'Admin Geral',
+            icon: Shield,
+          },
+        ]
+      : []),
   ]
 
   return (
@@ -119,6 +132,18 @@ export default function Layout() {
 
           {/* Right Action / Avatar */}
           <div className="flex items-center gap-2">
+            {!isAuthPage && user && (
+              <button
+                type="button"
+                onClick={() => setFalarEspecialistaOpen(true)}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#2563EB] hover:text-[#2563EB] text-[#374151] shadow-2xs transition-colors"
+                title="Fale diretamente com o consultor especialista"
+              >
+                <MessageSquare className="w-3.5 h-3.5 text-[#2563EB]" />
+                <span>Falar com especialista</span>
+              </button>
+            )}
+
             {!isAuthPage && user ? (
               <div className="flex items-center gap-2">
                 <DropdownMenu>
@@ -148,14 +173,14 @@ export default function Layout() {
                         <p className="text-xs text-[#6B7280] truncate leading-none">{user.email}</p>
                       </div>
                     </DropdownMenuLabel>
-                    {isAdmin && (
+                    {hasAdminAccess && (
                       <>
                         <DropdownMenuItem
                           onClick={() => navigate('/admin')}
                           className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2 text-[#2563EB]"
                         >
                           <Shield className="w-4 h-4" />
-                          <span>Painel Administrativo</span>
+                          <span>{isAdmRede ? 'Minha Rede' : 'Painel Administrativo'}</span>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator className="bg-[#E5E7EB]" />
                       </>
@@ -261,6 +286,20 @@ export default function Layout() {
                   </NavLink>
                 )
               })}
+
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    setFalarEspecialistaOpen(true)
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-semibold text-[#2563EB] bg-blue-50/60 border border-blue-100 hover:bg-blue-100/60 transition-colors"
+                >
+                  <MessageSquare className="w-4 h-4 text-[#2563EB]" />
+                  <span>Falar com especialista</span>
+                </button>
+              </div>
             </nav>
 
             <div className="p-3 border-t border-[#E5E7EB] space-y-1">
@@ -303,6 +342,12 @@ export default function Layout() {
           userId={user.id}
         />
       )}
+
+      {/* Modal Falar com Especialista */}
+      <FalarEspecialistaModal
+        open={falarEspecialistaOpen}
+        onOpenChange={setFalarEspecialistaOpen}
+      />
 
       {/* Footer */}
       <footer className="w-full border-t border-[#E5E7EB] bg-white py-4 mt-auto">

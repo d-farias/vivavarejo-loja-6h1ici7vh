@@ -39,9 +39,18 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const perfil = user.perfil || (user.email === 'dfarias53@gmail.com' ? 'admin' : 'lider')
 
       if (perfil === 'admin') {
-        // Admin vê todas as lojas de todos os clientes
+        // ADM Geral vê todas as lojas de todas as redes
         const todasLojas = await lojasService.getAll()
         setLojas(todasLojas)
+      } else if (perfil === 'adm_rede') {
+        // ADM de Rede vê apenas as lojas da sua rede/cliente
+        const todasLojas = await lojasService.getAll()
+        if (user.cliente) {
+          const lojasDaRede = todasLojas.filter((l) => l.cliente === user.cliente)
+          setLojas(lojasDaRede)
+        } else {
+          setLojas(todasLojas)
+        }
       } else {
         // Líder ou funcionário: vê apenas as lojas às quais está vinculado via funcionario.usuario
         const vinculos = await funcionariosService.getByUsuario(user.id)
@@ -57,8 +66,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           const permitidas = todasLojas.filter((l) => lojaIdsVinculadas.has(l.id))
           setLojas(permitidas)
         } else {
-          // Se não há vínculo formal cadastrado em funcionários, para líder permitir todas as lojas
-          // ou manter lista vazia com fallback
+          // Fallback para líder sem vínculo restrito explícito
           const todasLojas = await lojasService.getAll()
           setLojas(todasLojas)
         }

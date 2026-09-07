@@ -70,6 +70,7 @@ export const modelosRotinasService = {
   async create(data: {
     nome: string
     cliente?: string
+    segmento?: string
     descricao?: string
     criado_por?: string
   }): Promise<ModeloRotina> {
@@ -127,11 +128,12 @@ export const modelosRotinasService = {
   async salvarLojaComoModelo(params: {
     lojaId: string
     nomeModelo: string
+    segmento?: string
     descricao?: string
     clienteId?: string
     criadoPorId?: string
   }): Promise<{ modelo: ModeloRotina; totalRotinas: number }> {
-    const { lojaId, nomeModelo, descricao, clienteId, criadoPorId } = params
+    const { lojaId, nomeModelo, segmento, descricao, clienteId, criadoPorId } = params
 
     // 1. Buscar todas as rotinas da loja com expansão da função
     const rotinas = await pb.collection('rotinas').getFullList<Rotina>({
@@ -143,6 +145,7 @@ export const modelosRotinasService = {
     const modelo = await pb.collection('modelos_rotinas').create<ModeloRotina>({
       nome: nomeModelo,
       cliente: clienteId || undefined,
+      segmento: segmento || undefined,
       descricao:
         descricao || `Criado a partir da loja em ${new Date().toLocaleDateString('pt-BR')}`,
       criado_por: criadoPorId || undefined,
@@ -174,6 +177,7 @@ export const modelosRotinasService = {
   async salvarImportacaoComoModelo(params: {
     nomeModelo: string
     descricao?: string
+    segmento?: string
     clienteId?: string
     criadoPorId?: string
     itens: Array<{
@@ -188,11 +192,12 @@ export const modelosRotinasService = {
       observacoes?: string
     }>
   }): Promise<ModeloRotina> {
-    const { nomeModelo, descricao, clienteId, criadoPorId, itens } = params
+    const { nomeModelo, descricao, segmento, clienteId, criadoPorId, itens } = params
 
     const modelo = await pb.collection('modelos_rotinas').create<ModeloRotina>({
       nome: nomeModelo,
       cliente: clienteId || undefined,
+      segmento: segmento || undefined,
       descricao:
         descricao ||
         `Criado via importação de planilha em ${new Date().toLocaleDateString('pt-BR')}`,

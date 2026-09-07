@@ -207,7 +207,7 @@ export default function Admin() {
     data: null,
   })
 
-  // Carregamento unificado
+  // Carregamento unificado com escopo para ADM Geral vs ADM de Rede
   const loadAll = useCallback(async () => {
     setLoading(true)
     try {
@@ -224,24 +224,69 @@ export default function Admin() {
         visitasPromotorService.getAll().catch(() => [] as VisitaPromotor[]),
         rotinasPromotorService.getAll().catch(() => [] as RotinaPromotor[]),
       ])
-      setClientes(c)
-      setLojas(l)
-      setFuncoes(fn)
-      setFuncionarios(fc)
-      setUsuarios(u)
-      setModelos(mod)
-      setPlanosAcao(pl)
-      setFornecedores(forn)
-      setPromotores(prom)
-      setVisitas(vis)
-      setRotinasPromotor(rotProm)
+
+      const isAdmRedeUser = user?.perfil === 'adm_rede'
+      const redeId = user?.cliente
+
+      if (isAdmRedeUser && redeId) {
+        // Escopo restrito do ADM de Rede: apenas sua rede e suas lojas
+        const clientesFiltrados = c.filter((cli) => cli.id === redeId)
+        const lojasDaRede = l.filter((loja) => loja.cliente === redeId)
+        const lojaIdsSet = new Set(lojasDaRede.map((loja) => loja.id))
+
+        const funcoesFiltradas = fn.filter((f) => lojaIdsSet.has(f.loja))
+        const funcionariosFiltrados = fc.filter((func) => lojaIdsSet.has(func.loja))
+        const usuarioIdsSet = new Set(
+          funcionariosFiltrados.map((func) => func.usuario).filter(Boolean),
+        )
+        // Adicionar o próprio ADM de rede
+        usuarioIdsSet.add(user.id)
+        const usuariosFiltrados = u.filter(
+          (usr) => usuarioIdsSet.has(usr.id) || usr.cliente === redeId,
+        )
+
+        const planosFiltrados = pl.filter((p) => p.loja && lojaIdsSet.has(p.loja))
+        const modelosFiltrados = mod.filter((m) => !m.cliente || m.cliente === redeId)
+        const fornFiltrados = forn.filter((item) => !item.cliente || item.cliente === redeId)
+        const promFiltrados = prom.filter((item) => !item.cliente || item.cliente === redeId)
+        const promIdsSet = new Set(promFiltrados.map((p) => p.id))
+        const visFiltradas = vis.filter((v) => lojaIdsSet.has(v.loja))
+        const rotPromFiltradas = rotProm.filter(
+          (rp) => promIdsSet.has(rp.promotor) || lojaIdsSet.has(rp.loja),
+        )
+
+        setClientes(clientesFiltrados)
+        setLojas(lojasDaRede)
+        setFuncoes(funcoesFiltradas)
+        setFuncionarios(funcionariosFiltrados)
+        setUsuarios(usuariosFiltrados)
+        setModelos(modelosFiltrados)
+        setPlanosAcao(planosFiltrados)
+        setFornecedores(fornFiltrados)
+        setPromotores(promFiltrados)
+        setVisitas(visFiltradas)
+        setRotinasPromotor(rotPromFiltradas)
+      } else {
+        // ADM Geral: vê tudo
+        setClientes(c)
+        setLojas(l)
+        setFuncoes(fn)
+        setFuncionarios(fc)
+        setUsuarios(u)
+        setModelos(mod)
+        setPlanosAcao(pl)
+        setFornecedores(forn)
+        setPromotores(prom)
+        setVisitas(vis)
+        setRotinasPromotor(rotProm)
+      }
     } catch (err) {
       console.error('Erro ao carregar dados do admin:', err)
       setFeedbackMsg({ type: 'error', text: 'Erro ao carregar dados do painel ADM.' })
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [user?.perfil, user?.cliente, user?.id])
 
   useEffect(() => {
     loadAll()
@@ -591,12 +636,14 @@ export default function Admin() {
           return
         }
 
+        const clienteVal = (formData.get('cliente') as string) || ''
         const newUser = await usersService.create({
           name,
           email: emailVal,
           password: passwordVal,
           passwordConfirm: passwordVal,
           perfil: perfilVal,
+          cliente: clienteVal || undefined,
           ativo: ativoVal,
         })
 
@@ -607,9 +654,11 @@ export default function Admin() {
 
         showFeedback(`Usuário ${name} cadastrado com sucesso!`)
       } else if (userModal.user) {
+        const clienteVal = (formData.get('cliente') as string) || ''
         await usersService.update(userModal.user.id, {
           name,
           perfil: perfilVal,
+          cliente: clienteVal || undefined,
           ativo: ativoVal,
         })
 
@@ -779,8 +828,11 @@ export default function Admin() {
     })
   }, [usuarios, funcionarios, selectedPerfilFilter, selectedUsuarioLojaFilter, searchTerm])
 
-  // Redireciona se não for admin
-  if (perfil !== 'admin') {
+  const isAdmRede = perfil === 'adm_rede'
+  const isAdminGeral = perfil === 'admin'
+
+  // Redireciona se não for admin geral nem adm de rede
+  if (!isAdminGeral && !isAdmRede) {
     return <Navigate to="/" replace />
   }
 
@@ -793,10 +845,14 @@ export default function Admin() {
             <Shield className="w-5 h-5 text-[#2563EB]" />
             <div>
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F2937]">
-                Painel Administrativo & Gerencial
+                {isAdmRede ? 'Painel de Gestão da Minha Rede' : 'Painel Administrativo & Gerencial'}
               </h1>
               <p className="text-xs text-[#6B7280]">
-                Visão consolidada de indicadores, propostas de melhoria e gestão de rede
+                {isAdmRede
+                  ? `Configuração de lojas, equipes e acompanhamento de rotinas da rede ${
+                      clientes[0]?.nome ? `(${clientes[0].nome})` : ''
+                    }`
+                  : 'Visão consolidada de indicadores, propostas de melhoria e gestão global de redes'}
               </p>
             </div>
           </div>
@@ -850,7 +906,7 @@ export default function Admin() {
           }`}
         >
           <BarChart3 className="w-4 h-4" />
-          <span>Painel Gerencial</span>
+          <span>{isAdmRede ? 'Visão da Minha Rede' : 'Painel Gerencial'}</span>
         </button>
 
         {/* Nova aba: Modelos de Rotinas */}
@@ -884,6 +940,7 @@ export default function Admin() {
           <span>Modelos ({modelos.length})</span>
         </button>
 
+        {/* Clientes: Apenas ADM Geral pode ver lista de todas as redes/clientes; ADM de Rede vê como "Dados da Rede" */}
         <button
           onClick={() => {
             setActiveTab('clientes')
@@ -896,7 +953,7 @@ export default function Admin() {
           }`}
         >
           <Building2 className="w-4 h-4" />
-          <span>Clientes ({clientes.length})</span>
+          <span>{isAdmRede ? 'Dados da Rede' : `Clientes (${clientes.length})`}</span>
         </button>
 
         <button
@@ -959,20 +1016,23 @@ export default function Admin() {
           <span>Promotores & Fornecedores ({promotores.length + fornecedores.length})</span>
         </button>
 
-        <button
-          onClick={() => {
-            setActiveTab('usuarios')
-            setSearchTerm('')
-          }}
-          className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === 'usuarios'
-              ? 'border-[#2563EB] text-[#2563EB]'
-              : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
-          }`}
-        >
-          <UserCheck className="w-4 h-4" />
-          <span>Usuários & Perfis ({usuarios.length})</span>
-        </button>
+        {/* Usuários & Perfis: apenas ADM Geral tem a prerrogativa de criar/desativar ADMs e gerenciar perfis globais */}
+        {isAdminGeral && (
+          <button
+            onClick={() => {
+              setActiveTab('usuarios')
+              setSearchTerm('')
+            }}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+              activeTab === 'usuarios'
+                ? 'border-[#2563EB] text-[#2563EB]'
+                : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
+            }`}
+          >
+            <UserCheck className="w-4 h-4" />
+            <span>Usuários & Perfis ({usuarios.length})</span>
+          </button>
+        )}
       </div>
       {/* Skeletons on loading */}
       {loading ? (
@@ -1959,10 +2019,11 @@ export default function Admin() {
                       className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
                     >
                       <option value="todos">Todos os Perfis</option>
-                      <option value="admin">Administrador (Total)</option>
-                      <option value="lider">Líder (Gerencial)</option>
-                      <option value="funcionario">Funcionário (Operacional)</option>
-                    </select>
+                      <option value="admin">ADM Geral</option>
+                      <option value="adm_rede">ADM de Rede</option>
+                      <option value="lider">Líder</option>
+                      <option value="funcionario">Funcionário</option>
+                    </select>{' '}
                   </div>
 
                   {/* Filtro por Loja */}
@@ -2048,7 +2109,13 @@ export default function Admin() {
                               {userPerfil === 'admin' && (
                                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-[#2563EB] border border-blue-200">
                                   <Shield className="w-3.5 h-3.5" />
-                                  <span>Administrador</span>
+                                  <span>ADM Geral</span>
+                                </span>
+                              )}
+                              {userPerfil === 'adm_rede' && (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700 border border-purple-200">
+                                  <Building2 className="w-3.5 h-3.5 text-purple-600" />
+                                  <span>ADM de Rede</span>
                                 </span>
                               )}
                               {userPerfil === 'lider' && (
@@ -2065,12 +2132,24 @@ export default function Admin() {
                               )}
                             </td>
 
-                            {/* Cargo / Loja Vinculados */}
+                            {/* Cargo / Loja / Rede Vinculados */}
                             <td className="p-3.5 text-xs text-[#4B5563]">
                               {userPerfil === 'admin' ? (
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 text-[#2563EB] font-medium text-[11px] border border-blue-100">
-                                  Superusuário (Todas as Lojas)
+                                  Superusuário (Todas as Redes e Lojas)
                                 </span>
+                              ) : userPerfil === 'adm_rede' ? (
+                                <div className="space-y-1">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-purple-50 text-purple-700 font-semibold text-[11px] border border-purple-200">
+                                    <Building2 className="w-3 h-3 text-purple-600" />
+                                    <span>
+                                      Rede:{' '}
+                                      {clientes.find((c) => c.id === u.cliente)?.nome ||
+                                        u.expand?.cliente?.nome ||
+                                        'Rede não vinculada'}
+                                    </span>
+                                  </span>
+                                </div>
                               ) : userFuncs.length > 0 ? (
                                 <div className="space-y-1">
                                   {userFuncs.map((f) => (
@@ -2763,10 +2842,37 @@ export default function Admin() {
                   <option value="lider">
                     Líder (Gerencial de loja: gerencia rotinas, prazos e equipe da loja)
                   </option>
+                  <option value="adm_rede">
+                    ADM de Rede (Gerencia exclusivamente a sua própria rede, lojas e demandas)
+                  </option>
                   <option value="admin">
-                    Administrador (Superusuário: controle total e acesso a todas as lojas)
+                    ADM Geral / Consultor Dono (Superusuário global: cria ADMs de rede e visão
+                    global)
                   </option>
                 </select>
+              </div>
+
+              {/* Vínculo de Rede (Obrigatório para adm_rede e opcional para outros) */}
+              <div>
+                <label className="block text-xs font-semibold text-[#374151] mb-1">
+                  Rede / Cliente Vinculado (Obrigatório para ADM de Rede)
+                </label>
+                <select
+                  name="cliente"
+                  defaultValue={userModal.user?.cliente || ''}
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                >
+                  <option value="">Nenhuma rede vinculada</option>
+                  {clientes.map((cli) => (
+                    <option key={cli.id} value={cli.id}>
+                      {cli.nome} {cli.segmento ? `(${cli.segmento})` : ''}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[11px] text-[#6B7280] mt-0.5">
+                  Para o perfil <strong>ADM de Rede</strong>, este vínculo define quais lojas e
+                  dados ele terá permissão para administrar.
+                </p>
               </div>
 
               {/* Status Ativo */}

@@ -1,6 +1,6 @@
 import type { RecordModel } from 'pocketbase'
 
-export type PerfilUsuario = 'admin' | 'lider' | 'funcionario' | 'regional'
+export type PerfilUsuario = 'admin' | 'adm_rede' | 'lider' | 'funcionario' | 'regional'
 
 export interface User extends RecordModel {
   id: string
@@ -8,10 +8,14 @@ export interface User extends RecordModel {
   name?: string
   avatar?: string
   perfil?: PerfilUsuario
+  cliente?: string // ID do Cliente/Rede vinculado (obrigatório para adm_rede)
   ativo?: boolean
   primeiro_acesso_notificado?: boolean
   created: string
   updated: string
+  expand?: {
+    cliente?: Cliente
+  }
 }
 
 export type FrequenciaRotina =
@@ -143,6 +147,7 @@ export interface PlanoAcao extends RecordModel {
 export interface ModeloRotina extends RecordModel {
   nome: string
   cliente?: string
+  segmento?: string
   descricao?: string
   criado_por?: string
   created: string
