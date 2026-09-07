@@ -112,19 +112,32 @@ export function SpreadsheetImportModal({
         ),
       )
 
+      // Mapa mais rigoroso por assinatura completa (loja + nome + horario + resp + area)
+      const buildSig = (n?: string, h?: string, r?: string, a?: string) =>
+        `${(n || '').trim().toLowerCase()}:::${(h || '').trim().toLowerCase()}:::${(r || '').trim().toLowerCase()}:::${(a || '').trim().toLowerCase()}`
+
+      const existingFullSignatures = new Set(
+        existentesNaLoja.map((r) => buildSig(r.nome, r.horario_limite, r.responsavel, r.area)),
+      )
+
       let insertedCount = 0
       let skippedCount = 0
       for (const item of parsedData) {
         insertedCount++
         const itemSig = `${(item.nome || '').trim().toLowerCase()}:::${(item.horario_limite || '').trim().toLowerCase()}`
+        const itemFullSig = buildSig(item.nome, item.horario_limite, item.responsavel, item.area)
 
-        if (importMode === 'append' && deduplicateOnImport && existingSignatures.has(itemSig)) {
+        if (
+          importMode === 'append' &&
+          deduplicateOnImport &&
+          (existingSignatures.has(itemSig) || existingFullSignatures.has(itemFullSig))
+        ) {
           skippedCount++
           continue
         }
 
         setProgressMsg(`Importando rotina ${insertedCount} de ${parsedData.length}...`)
-        const created = await rotinasService.create({
+        await rotinasService.create({
           nome: item.nome,
           responsavel: item.responsavel,
           frequencia: item.frequencia,
@@ -137,6 +150,7 @@ export function SpreadsheetImportModal({
           loja: targetLojaId || undefined,
         })
         existingSignatures.add(itemSig)
+        existingFullSignatures.add(itemFullSig)
       }
 
       // Se marcou para salvar como modelo reutilizável

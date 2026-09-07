@@ -16,6 +16,7 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import BemVindo from './pages/BemVindo'
 import NotFound from './pages/NotFound'
+import Validades from './pages/Validades'
 
 const App = () => (
   <BrowserRouter>
@@ -48,6 +49,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Rotinas />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/validades"
+                element={
+                  <ProtectedRoute>
+                    <Validades />
                   </ProtectedRoute>
                 }
               />

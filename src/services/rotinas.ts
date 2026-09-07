@@ -38,7 +38,46 @@ export const rotinasService = {
     })
   },
 
-  async create(data: Partial<Rotina>): Promise<Rotina> {
+  /**
+   * Cria ou atualiza (upsert) rotina com base na assinatura única:
+   * (loja + nome + horario_limite + responsavel + area)
+   * Evita duplicar tarefas mesmo em chamadas repetidas ou concorrência.
+   */
+  async create(data: Partial<Rotina>, options?: { allowDuplicate?: boolean }): Promise<Rotina> {
+    const nomeNorm = (data.nome || '').trim()
+    const lojaId = data.loja || ''
+    const horarioNorm = (data.horario_limite || '').trim()
+    const respNorm = (data.responsavel || '').trim()
+    const areaNorm = (data.area || '').trim()
+
+    if (!options?.allowDuplicate && nomeNorm) {
+      try {
+        // Buscar rotinas existentes na loja para verificar assinatura
+        const lojaFilter = lojaId ? `loja = "${lojaId}"` : 'loja = "" || loja = null'
+        const existingList = await pb.collection('rotinas').getFullList<Rotina>({
+          filter: lojaFilter,
+          fields: 'id,nome,horario_limite,responsavel,area',
+        })
+
+        const buildSig = (n?: string, h?: string, r?: string, a?: string) =>
+          `${(n || '').trim().toLowerCase()}:::${(h || '').trim().toLowerCase()}:::${(r || '').trim().toLowerCase()}:::${(a || '').trim().toLowerCase()}`
+
+        const targetSig = buildSig(nomeNorm, horarioNorm, respNorm, areaNorm)
+        const match = existingList.find(
+          (ex) => buildSig(ex.nome, ex.horario_limite, ex.responsavel, ex.area) === targetSig,
+        )
+
+        if (match) {
+          // Atualiza registro existente (upsert) em vez de criar duplicata cega
+          return await pb.collection('rotinas').update<Rotina>(match.id, data, {
+            expand: 'loja,funcao',
+          })
+        }
+      } catch (err) {
+        console.warn('Erro ao verificar duplicidade de rotina antes de criar:', err)
+      }
+    }
+
     return await pb.collection('rotinas').create<Rotina>(data, {
       expand: 'loja,funcao',
     })

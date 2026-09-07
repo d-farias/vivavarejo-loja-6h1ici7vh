@@ -276,3 +276,47 @@ export interface Atendimento extends RecordModel {
     usuario?: User
   }
 }
+
+// ==================== MÓDULO VALIDADE X CALENDÁRIO ====================
+
+export type StatusTarefaValidade =
+  | 'pendente'
+  | 'em_andamento'
+  | 'aguardando_validacao'
+  | 'aprovada'
+  | 'devolvida'
+
+export interface TarefaValidade extends RecordModel {
+  loja?: string
+  setor_categoria: string
+  descricao?: string
+  data_especifica?: string // YYYY-MM-DD
+  recorrencia?: string // "diaria", "toda terça", "pontual", etc.
+  horario_inicio: string // ex: "14:00"
+  horario_fim?: string // ex: "15:00"
+  status?: StatusTarefaValidade
+  executor_nome?: string
+  executor_usuario?: string
+  validador_funcao_nome?: string // ex: "Líder Prevenção"
+  validador_funcao?: string
+  validador_usuario?: string
+  observacao_execucao?: string
+  foto?: string
+  concluida_em?: string
+  concluida_por?: string
+  comentario_validacao?: string
+  validado_por?: string
+  validado_em?: string
+  alerta_previo_enviado_em?: string
+  alerta_atraso_enviado_em?: string
+  created: string
+  updated: string
+  expand?: {
+    loja?: Loja
+    executor_usuario?: User
+    validador_funcao?: Funcao
+    validador_usuario?: User
+    concluida_por?: User
+    validado_por?: User
+  }
+}

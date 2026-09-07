@@ -739,4 +739,383 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
   console.log(
     `[AlertaRotinas] Varredura finalizada. Total de e-mails enviados: ${totalEmailsEnviados}.`,
   )
+
+  // =========================================================================
+  // 4. MÓDULO VALIDADE X CALENDÁRIO: ALERTAS INTELIGENTES DE VALIDADE
+  // - Alerta 1 hora antes do horário de início: avisa o GERENTE qual setor/categoria realizar
+  // - Alerta de não abertura: janela ultrapassada (+1 min do horário_inicio) sem abertura/conclusão
+  //   avisa o GERENTE e o VALIDADOR configurado (ex: Líder Prevenção)
+  // Anti-spam: 1 aviso por tarefa por dia (marcado em alerta_previo_enviado_em e alerta_atraso_enviado_em)
+  // =========================================================================
+  try {
+    const diaDaSemanaIdx = brasilTime.getUTCDay() // 0 = Domingo, 1 = Segunda, ..., 6 = Sábado
+    const diasSemanaNomes = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado']
+    const diaHojeNome = diasSemanaNomes[diaDaSemanaIdx]
+
+    // Buscar tarefas de validade
+    let tarefasValidade = []
+    try {
+      tarefasValidade = $app.findRecordsByFilter('tarefas_validade', '', 'horario_inicio', 1000, 0)
+    } catch (tvErr) {
+      // Se a tabela ainda não estiver disponível, ignora silenciosamente
+      tarefasValidade = []
+    }
+
+    if (tarefasValidade.length > 0) {
+      console.log(
+        `[AlertaValidade] Verificando ${tarefasValidade.length} tarefa(s) de validade para o dia de hoje (${todayStr}, ${diaHojeNome})...`,
+      )
+
+      for (let tIdx = 0; tIdx < tarefasValidade.length; tIdx++) {
+        const tv = tarefasValidade[tIdx]
+
+        // 1. Verificar se a tarefa aplica-se a HOJE
+        const dataEsp = (tv.getString('data_especifica') || '').substring(0, 10)
+        const rec = (tv.getString('recorrencia') || '').toLowerCase().trim()
+
+        let aplicaHoje = false
+        if (dataEsp) {
+          aplicaHoje = dataEsp === todayStr
+        } else if (rec) {
+          if (rec === 'diaria' || rec === 'diária' || rec === 'todos os dias') {
+            aplicaHoje = true
+          } else if (
+            rec.includes(diaHojeNome) ||
+            (diaHojeNome === 'terça' && rec.includes('terca'))
+          ) {
+            aplicaHoje = true
+          }
+        } else {
+          // Sem data e sem recorrência: considera ativa diariamente
+          aplicaHoje = true
+        }
+
+        if (!aplicaHoje) {
+          continue
+        }
+
+        const status = tv.getString('status') || 'pendente'
+        const horarioInicioStr = tv.getString('horario_inicio')
+        const horarioFimStr = tv.getString('horario_fim')
+        const parsedInicio = parseHorarioLimite(horarioInicioStr)
+
+        if (parsedInicio.minutes === null) {
+          continue
+        }
+
+        const lojaId = tv.getString('loja')
+        let lojaEfetiva = lojaId ? lojasMap[lojaId] : null
+        if (!lojaEfetiva && lojas.length === 1) {
+          lojaEfetiva = lojas[0]
+        }
+
+        // Se a loja desativou alertas, pula
+        if (lojaEfetiva && lojaEfetiva.getBool('alertas_ativos') === false) {
+          continue
+        }
+
+        const lojaNome = lojaEfetiva ? lojaEfetiva.getString('nome') : 'Loja Geral'
+        const clienteId = lojaEfetiva ? lojaEfetiva.getString('cliente') : ''
+        const cliente = clienteId ? clientesMap[clienteId] : null
+        const clienteNome = cliente ? cliente.getString('nome') : 'VivaVarejo'
+
+        // Descobrir Gerente da loja
+        const emailsGerente = new Set()
+        const gerenteDetalhes = []
+        if (lojaEfetiva) {
+          const funcsDaLoja = funcionarios.filter((fc) => fc.getString('loja') === lojaEfetiva.id)
+          for (let f = 0; f < funcsDaLoja.length; f++) {
+            const fc = funcsDaLoja[f]
+            const fnObj = funcoesMap[fc.getString('funcao')]
+            const fnNome = fnObj ? (fnObj.getString('nome') || '').toLowerCase() : ''
+            if (
+              fnNome.includes('gerente') ||
+              fnNome.includes('lider') ||
+              fnNome.includes('líder') ||
+              fnNome.includes('encarregado geral')
+            ) {
+              const uId = fc.getString('usuario')
+              if (uId && usersMap[uId]) {
+                const mail = extractEmail(usersMap[uId].getString('email'))
+                if (mail && !emailsGerente.has(mail)) {
+                  emailsGerente.add(mail)
+                  gerenteDetalhes.push({ address: mail, name: fc.getString('nome') || 'Gerente' })
+                }
+              }
+            }
+          }
+          // Se não encontrou cargo de gerente, pegar regional ou primeiro login da loja
+          if (gerenteDetalhes.length === 0) {
+            const regMail = extractEmail(lojaEfetiva.getString('email_regional'))
+            if (regMail) {
+              emailsGerente.add(regMail)
+              gerenteDetalhes.push({ address: regMail, name: `Regional ${lojaNome}` })
+            }
+          }
+        }
+
+        // Descobrir Validador (Líder Prevenção ou validador configurado na tarefa/loja)
+        const emailsValidador = new Set()
+        const validadorDetalhes = []
+
+        // Se a tarefa tem validador usuário direto
+        const vUserId = tv.getString('validador_usuario')
+        if (vUserId && usersMap[vUserId]) {
+          const vMail = extractEmail(usersMap[vUserId].getString('email'))
+          if (vMail) {
+            emailsValidador.add(vMail)
+            validadorDetalhes.push({
+              address: vMail,
+              name: usersMap[vUserId].getString('name') || 'Validador',
+            })
+          }
+        }
+
+        // Se tem função validadora configurada ou padrão Líder Prevenção
+        const validadorFuncaoNome = (
+          tv.getString('validador_funcao_nome') || 'prevenção'
+        ).toLowerCase()
+        if (lojaEfetiva) {
+          const funcsDaLoja = funcionarios.filter((fc) => fc.getString('loja') === lojaEfetiva.id)
+          for (let f = 0; f < funcsDaLoja.length; f++) {
+            const fc = funcsDaLoja[f]
+            const fnObj = funcoesMap[fc.getString('funcao')]
+            const fnNome = fnObj ? (fnObj.getString('nome') || '').toLowerCase() : ''
+            if (
+              fnNome.includes('prevenção') ||
+              fnNome.includes('prevencao') ||
+              (validadorFuncaoNome && fnNome.includes(validadorFuncaoNome))
+            ) {
+              const uId = fc.getString('usuario')
+              if (uId && usersMap[uId]) {
+                const mail = extractEmail(usersMap[uId].getString('email'))
+                if (mail && !emailsValidador.has(mail)) {
+                  emailsValidador.add(mail)
+                  validadorDetalhes.push({
+                    address: mail,
+                    name: fc.getString('nome') || 'Líder Prevenção',
+                  })
+                }
+              }
+            }
+          }
+        }
+
+        // ===================================================================
+        // ALERTA 1: Aviso prévio 1 hora antes do horário de início para o GERENTE
+        // Janela de disparo: quando currentMinutes está entre (inicio - 60) e inicio
+        // ===================================================================
+        const alertaPrevioEnviado = tv.getString('alerta_previo_enviado_em')
+        const jaEnviouPrevioHoje = alertaPrevioEnviado && alertaPrevioEnviado.startsWith(todayStr)
+
+        const umAHoraAntesMinutos = parsedInicio.minutes - 60
+        // Se a tarefa começa por ex às 14:00 (840m), 1h antes é 13:00 (780m). Dispara entre 13:00 e 13:59.
+        if (
+          !jaEnviouPrevioHoje &&
+          currentMinutes >= umAHoraAntesMinutos &&
+          currentMinutes < parsedInicio.minutes &&
+          gerenteDetalhes.length > 0 &&
+          status !== 'aprovada' &&
+          status !== 'aguardando_validacao'
+        ) {
+          const setorCat = tv.getString('setor_categoria')
+          const descTarefa =
+            tv.getString('descricao') || 'Auditoria / Verificação de Validade de Produtos'
+          const janelaFormatada = `${parsedInicio.normalized}${horarioFimStr ? ` às ${horarioFimStr}` : ''}`
+
+          const subjectPrevio = `[VivaVarejo] Alerta de Validade em 1h — Setor: ${setorCat} (${lojaNome})`
+          const htmlPrevio = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Aviso Prévio de Validade - VivaVarejo</title>
+</head>
+<body style="margin: 0; padding: 20px; background-color: #F7F7F5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1F2937;">
+  <div style="max-width: 650px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden;">
+    <div style="background: #FFFFFF; border-bottom: 2px solid #2563EB; padding: 20px 24px;">
+      <div style="font-size: 18px; font-weight: 800; color: #2563EB; letter-spacing: -0.5px;">VIVAVAREJO • CRONOGRAMA DE VALIDADES</div>
+      <div style="font-size: 15px; font-weight: 700; color: #1F2937; margin-top: 4px;">
+        Aviso Prévio: Tarefa de Validade Programada em 1 Hora
+      </div>
+      <div style="font-size: 11px; color: #6B7280; margin-top: 4px;">
+        Loja: <strong>${escapeHtml(lojaNome)}</strong> • Rede: ${escapeHtml(clienteNome)} • Data: ${todayStr}
+      </div>
+    </div>
+    <div style="padding: 20px 24px;">
+      <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-left: 4px solid #2563EB; border-radius: 6px; padding: 12px 14px; margin-bottom: 18px;">
+        <div style="font-size: 13px; font-weight: 700; color: #1E40AF;">
+          Atenção Gerência: Programação Operacional
+        </div>
+        <div style="font-size: 12px; color: #1E3A8A; line-height: 1.5; margin-top: 4px;">
+          Em 1 hora terá início a verificação de validade agendada para o setor <strong>${escapeHtml(setorCat)}</strong>. Prepare a equipe responsável para execução.
+        </div>
+      </div>
+      <div style="border: 1px solid #E5E7EB; border-radius: 6px; overflow: hidden; margin-bottom: 18px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <tr style="background: #F7F7F5; border-bottom: 1px solid #E5E7EB;">
+            <td style="padding: 10px 14px; font-weight: 700; width: 140px; color: #4B5563;">Setor / Categoria:</td>
+            <td style="padding: 10px 14px; font-weight: 700; color: #1F2937;">${escapeHtml(setorCat)}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #E5E7EB;">
+            <td style="padding: 10px 14px; font-weight: 700; color: #4B5563;">Janela Horária:</td>
+            <td style="padding: 10px 14px; font-weight: 700; color: #2563EB;">${escapeHtml(janelaFormatada)}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #E5E7EB;">
+            <td style="padding: 10px 14px; font-weight: 700; color: #4B5563;">Descrição / Tarefa:</td>
+            <td style="padding: 10px 14px; color: #1F2937;">${escapeHtml(descTarefa)}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 14px; font-weight: 700; color: #4B5563;">Validação:</td>
+            <td style="padding: 10px 14px; color: #1F2937;">${escapeHtml(tv.getString('validador_funcao_nome') || 'Líder Prevenção')}</td>
+          </tr>
+        </table>
+      </div>
+      <div style="background: #F7F7F5; border: 1px solid #E5E7EB; border-radius: 6px; padding: 10px 12px; font-size: 11px; color: #4B5563; line-height: 1.4;">
+        Assim que a auditoria for iniciada e concluída na loja, registre a conclusão com foto no VivaVarejo no menu <em>Validade x Calendário</em>.
+      </div>
+    </div>
+  </div>
+</body>
+</html>`
+
+          try {
+            const senderAddress = $app.settings().meta.senderAddress || 'no-reply@vivavarejo.com.br'
+            const senderName = $app.settings().meta.senderName || 'VivaVarejo Alertas'
+            const msg = new MailerMessage({
+              from: { address: senderAddress, name: senderName },
+              to: gerenteDetalhes,
+              subject: subjectPrevio,
+              html: htmlPrevio,
+            })
+            $app.newMailClient().send(msg)
+            tv.set('alerta_previo_enviado_em', `${todayStr} ${currentHourFormatted}`)
+            $app.save(tv)
+            console.log(
+              `[AlertaValidade] Alerta prévio (1h antes) enviado com sucesso para a tarefa "${setorCat}" da loja "${lojaNome}".`,
+            )
+          } catch (mErr) {
+            console.error('[AlertaValidade] Erro ao enviar alerta prévio:', mErr)
+          }
+        }
+
+        // ===================================================================
+        // ALERTA 2: Alerta de NÃO ABERTURA (quando passa horario_inicio + 1 min sem abertura/conclusão)
+        // Dispara para o GERENTE e para quem VALIDA (ex: Líder Prevenção)
+        // ===================================================================
+        const alertaAtrasoEnviado = tv.getString('alerta_atraso_enviado_em')
+        const jaEnviouAtrasoHoje = alertaAtrasoEnviado && alertaAtrasoEnviado.startsWith(todayStr)
+
+        // Se currentMinutes ultrapassou o horário de início (horario_inicio + 1 min)
+        // e status AINDA É 'pendente' (ou seja, NÃO foi aberta/em_andamento nem concluída)
+        const minutosPassadosAposInicio = currentMinutes - parsedInicio.minutes
+
+        if (!jaEnviouAtrasoHoje && minutosPassadosAposInicio >= 1 && status === 'pendente') {
+          // Destinatários: Gerente + Quem Valida
+          const destinatariosAtraso = []
+          const atrasoMails = new Set()
+
+          for (const g of gerenteDetalhes) {
+            if (!atrasoMails.has(g.address)) {
+              atrasoMails.add(g.address)
+              destinatariosAtraso.push(g)
+            }
+          }
+          for (const v of validadorDetalhes) {
+            if (!atrasoMails.has(v.address)) {
+              atrasoMails.add(v.address)
+              destinatariosAtraso.push(v)
+            }
+          }
+
+          if (destinatariosAtraso.length > 0) {
+            const setorCat = tv.getString('setor_categoria')
+            const janelaFormatada = `${parsedInicio.normalized}${horarioFimStr ? ` às ${horarioFimStr}` : ''}`
+            const subjectAtraso = `[VivaVarejo] URGENTE: Tarefa de Validade não aberta no sistema — ${setorCat} (${lojaNome})`
+
+            const htmlAtraso = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Tarefa de Validade Não Aberta - VivaVarejo</title>
+</head>
+<body style="margin: 0; padding: 20px; background-color: #F7F7F5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1F2937;">
+  <div style="max-width: 650px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden;">
+    <div style="background: #FFFFFF; border-bottom: 2px solid #B91C1C; padding: 20px 24px;">
+      <div style="font-size: 18px; font-weight: 800; color: #B91C1C; letter-spacing: -0.5px;">VIVAVAREJO • CRONOGRAMA DE VALIDADES</div>
+      <div style="font-size: 15px; font-weight: 700; color: #1F2937; margin-top: 4px;">
+        Alerta de Não Abertura: Tarefa de Validade Pendente
+      </div>
+      <div style="font-size: 11px; color: #6B7280; margin-top: 4px;">
+        Loja: <strong>${escapeHtml(lojaNome)}</strong> • Horário de início previsto: <strong>${escapeHtml(parsedInicio.normalized)}</strong> • Verificação: ${currentHourFormatted}
+      </div>
+    </div>
+    <div style="padding: 20px 24px;">
+      <div style="background: #FEF2F2; border: 1px solid #FCA5A5; border-left: 4px solid #B91C1C; border-radius: 6px; padding: 12px 14px; margin-bottom: 18px;">
+        <div style="font-size: 13px; font-weight: 700; color: #991B1B;">
+          Atenção Gerência e Validador (Líder Prevenção)
+        </div>
+        <div style="font-size: 12px; color: #7F1D1D; line-height: 1.5; margin-top: 4px;">
+          A tarefa de verificação de validade do setor <strong>${escapeHtml(setorCat)}</strong> tinha início previsto para <strong>${escapeHtml(janelaFormatada)}</strong>, porém <strong>não foi aberta no sistema e permanece pendente</strong>.
+        </div>
+      </div>
+      <div style="border: 1px solid #E5E7EB; border-radius: 6px; overflow: hidden; margin-bottom: 18px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <tr style="background: #F7F7F5; border-bottom: 1px solid #E5E7EB;">
+            <td style="padding: 10px 14px; font-weight: 700; width: 140px; color: #4B5563;">Setor / Categoria:</td>
+            <td style="padding: 10px 14px; font-weight: 700; color: #1F2937;">${escapeHtml(setorCat)}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #E5E7EB;">
+            <td style="padding: 10px 14px; font-weight: 700; color: #4B5563;">Janela Programada:</td>
+            <td style="padding: 10px 14px; font-weight: 700; color: #B91C1C;">${escapeHtml(janelaFormatada)}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #E5E7EB;">
+            <td style="padding: 10px 14px; font-weight: 700; color: #4B5563;">Situação Atual:</td>
+            <td style="padding: 10px 14px;">
+              <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; background-color: #FEE2E2; color: #B91C1C;">
+                NÃO ABERTA NO SISTEMA • PENDENTE
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 14px; font-weight: 700; color: #4B5563;">Validador Responsável:</td>
+            <td style="padding: 10px 14px; color: #1F2937;">${escapeHtml(tv.getString('validador_funcao_nome') || 'Líder Prevenção')}</td>
+          </tr>
+        </table>
+      </div>
+      <div style="background: #F7F7F5; border: 1px solid #E5E7EB; border-radius: 6px; padding: 10px 12px; font-size: 11px; color: #4B5563; line-height: 1.4;">
+        Por favor, alinhem com a equipe de loja para iniciar a verificação de validade imediatamente e registrar no sistema.
+      </div>
+    </div>
+  </div>
+</body>
+</html>`
+
+            try {
+              const senderAddress =
+                $app.settings().meta.senderAddress || 'no-reply@vivavarejo.com.br'
+              const senderName = $app.settings().meta.senderName || 'VivaVarejo Alertas'
+              const msg = new MailerMessage({
+                from: { address: senderAddress, name: senderName },
+                to: destinatariosAtraso,
+                subject: subjectAtraso,
+                html: htmlAtraso,
+              })
+              $app.newMailClient().send(msg)
+              tv.set('alerta_atraso_enviado_em', `${todayStr} ${currentHourFormatted}`)
+              $app.save(tv)
+              console.log(
+                `[AlertaValidade] Alerta de não abertura enviado com sucesso para ${destinatariosAtraso.length} destinatários da tarefa "${setorCat}" na loja "${lojaNome}".`,
+              )
+            } catch (aErr) {
+              console.error('[AlertaValidade] Erro ao enviar alerta de não abertura:', aErr)
+            }
+          }
+        }
+      }
+    }
+  } catch (valErr) {
+    console.error('[AlertaValidade] Erro inesperado no processamento de validades:', valErr)
+  }
 })

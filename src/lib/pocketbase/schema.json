@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-07T01:42:02.156Z",
+  "generatedAt": "2026-09-07T01:53:14.715Z",
   "collections": [
     {
       "name": "users",
@@ -1222,6 +1222,185 @@
       "indexes": [
         "CREATE INDEX idx_atendimentos_usuario ON atendimentos (usuario)",
         "CREATE INDEX idx_atendimentos_created ON atendimentos (created)"
+      ]
+    },
+    {
+      "name": "tarefas_validade",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "setor_categoria",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "descricao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_especifica",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "recorrencia",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "horario_inicio",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "horario_fim",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "pendente",
+            "em_andamento",
+            "aguardando_validacao",
+            "aprovada",
+            "devolvida"
+          ]
+        },
+        {
+          "name": "executor_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "executor_usuario",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "validador_funcao_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "validador_funcao",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "funcoes"
+        },
+        {
+          "name": "validador_usuario",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "observacao_execucao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "concluida_em",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "concluida_por",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "comentario_validacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "validado_por",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "validado_em",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "alerta_previo_enviado_em",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "alerta_atraso_enviado_em",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_tv_loja ON tarefas_validade (loja)",
+        "CREATE INDEX idx_tv_status ON tarefas_validade (status)",
+        "CREATE INDEX idx_tv_setor ON tarefas_validade (setor_categoria)",
+        "CREATE INDEX idx_tv_data ON tarefas_validade (data_especifica)",
+        "CREATE INDEX idx_tv_horario_inicio ON tarefas_validade (horario_inicio)"
       ]
     }
   ]

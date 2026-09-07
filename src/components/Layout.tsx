@@ -21,6 +21,8 @@ import {
   KeyRound,
   Handshake,
   MessageSquare,
+  MoreVertical,
+  CalendarCheck,
 } from 'lucide-react'
 import { ChangePasswordModal } from '@/components/ChangePasswordModal'
 import { FalarEspecialistaModal } from '@/components/FalarEspecialistaModal'
@@ -138,7 +140,7 @@ export default function Layout() {
               <button
                 type="button"
                 onClick={() => setFalarEspecialistaOpen(true)}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#2563EB] hover:text-[#2563EB] text-[#374151] shadow-2xs transition-colors"
+                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#2563EB] hover:text-[#2563EB] text-[#374151] shadow-2xs transition-colors"
                 title="Fale diretamente com o consultor especialista"
               >
                 <MessageSquare className="w-3.5 h-3.5 text-[#2563EB]" />
@@ -147,7 +149,59 @@ export default function Layout() {
             )}
 
             {!isAuthPage && user ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
+                {/* Menu de 3 Pontos (⋮) no Cabeçalho / Topbar à Direita */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="w-9 h-9 rounded-md border border-[#E5E7EB] hover:border-[#2563EB] bg-white text-[#4B5563] hover:text-[#2563EB] flex items-center justify-center transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]/30"
+                      title="Mais opções do sistema"
+                      aria-label="Menu de opções"
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-60 bg-white border border-[#E5E7EB] shadow-lg"
+                  >
+                    <DropdownMenuLabel className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] px-3 py-2">
+                      Módulos Operacionais
+                    </DropdownMenuLabel>
+
+                    {/* Módulo Validade x Calendário */}
+                    <DropdownMenuItem
+                      onClick={() => navigate('/validades')}
+                      className={`cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2.5 transition-colors ${
+                        location.pathname === '/validades'
+                          ? 'bg-[#2563EB]/10 text-[#2563EB] font-semibold'
+                          : 'text-[#1F2937] hover:text-[#2563EB]'
+                      }`}
+                    >
+                      <div className="w-6 h-6 rounded bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0">
+                        <CalendarCheck className="w-3.5 h-3.5" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-xs">Validade × Calendário</span>
+                        <span className="text-[10px] text-[#6B7280]">
+                          Cronograma e alertas por setor
+                        </span>
+                      </div>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuSeparator className="bg-[#E5E7EB]" />
+
+                    <DropdownMenuItem
+                      onClick={() => setFalarEspecialistaOpen(true)}
+                      className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2.5 text-[#374151] hover:text-[#2563EB]"
+                    >
+                      <MessageSquare className="w-4 h-4 text-[#2563EB]" />
+                      <span>Falar com especialista</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* Avatar do Usuário */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
@@ -289,7 +343,22 @@ export default function Layout() {
                 )
               })}
 
-              <div className="pt-2">
+              <div className="pt-2 space-y-1">
+                <NavLink
+                  to="/validades"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-[#3B82F6]/10 text-[#2563EB] font-semibold'
+                        : 'text-[#4B5563] hover:bg-gray-100 hover:text-[#1F2937]'
+                    }`
+                  }
+                >
+                  <CalendarCheck className="w-4 h-4 text-[#2563EB]" />
+                  <span>Validade × Calendário</span>
+                </NavLink>
+
                 <button
                   type="button"
                   onClick={() => {
@@ -356,7 +425,7 @@ export default function Layout() {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#6B7280]">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-[#1F2937]">VivaVarejo</span>
-            <span className="text-[11px] text-[#9CA3AF] font-mono">v0.0.34</span>
+            <span className="text-[11px] text-[#9CA3AF] font-mono">v0.0.35</span>
           </div>
           <div>
             <span>© {new Date().getFullYear()} VivaVarejo. Todos os direitos reservados.</span>
