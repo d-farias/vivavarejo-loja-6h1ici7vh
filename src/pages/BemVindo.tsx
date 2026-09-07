@@ -20,7 +20,6 @@ import {
   Linkedin,
 } from 'lucide-react'
 import { TipoPessoaCliente } from '@/types'
-import { VAREJO_SEGMENTOS } from '@/components/EnquadramentoClienteCard'
 import { useContatosAtendimento } from '@/hooks/use-contatos-atendimento'
 
 /**
