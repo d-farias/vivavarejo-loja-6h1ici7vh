@@ -172,11 +172,11 @@ export default function Signup() {
         {/* Header com link de voltar */}
         <div className="flex items-center justify-between mb-4">
           <Link
-            to="/"
+            to="/bem-vindo"
             className="inline-flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#1F2937] transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Voltar à página inicial</span>
+            <span>Voltar à apresentação</span>
           </Link>
           <Link to="/login" className="text-xs font-semibold text-[#2563EB] hover:underline">
             Já tenho conta
@@ -484,7 +484,7 @@ export default function Signup() {
             disabled={loading}
             className="w-full mt-2 py-2.5 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm rounded-md shadow-xs transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
           >
-            {loading ? 'Criando conta...' : 'Criar conta e começar'}
+            {loading ? 'Cadastrando...' : 'Cadastre-se'}
           </button>
         </form>
 

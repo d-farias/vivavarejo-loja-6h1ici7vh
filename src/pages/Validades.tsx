@@ -217,9 +217,10 @@ export default function ValidadesPage() {
   const handleIniciar = async (t: TarefaValidade) => {
     try {
       await tarefasValidadeService.iniciarTarefa(t.id)
-      loadData()
+      await loadData()
     } catch (err) {
       console.error('Erro ao iniciar tarefa:', err)
+      alert('Não foi possível iniciar a tarefa. Tente novamente.')
     }
   }
 
@@ -227,9 +228,10 @@ export default function ValidadesPage() {
     if (confirm('Deseja realmente remover esta tarefa do cronograma de validades?')) {
       try {
         await tarefasValidadeService.delete(id)
-        loadData()
+        await loadData()
       } catch (err) {
         console.error('Erro ao deletar tarefa:', err)
+        alert('Não foi possível excluir a tarefa. Tente novamente.')
       }
     }
   }

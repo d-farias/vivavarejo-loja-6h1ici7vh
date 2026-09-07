@@ -48,11 +48,6 @@ export function BotaoAvisoWhatsApp({
   const hasResponsavel = Boolean(telefoneResponsavel && telefoneResponsavel.trim())
   const hasChefe = Boolean(telefoneChefe && telefoneChefe.trim())
 
-  // Se não há nenhum telefone configurado, o botão não é exibido
-  if (!hasResponsavel && !hasChefe) {
-    return null
-  }
-
   // Fechar ao clicar fora
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -67,6 +62,11 @@ export function BotaoAvisoWhatsApp({
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [open])
+
+  // Se não há nenhum telefone configurado, o botão não é exibido
+  if (!hasResponsavel && !hasChefe) {
+    return null
+  }
 
   const linkResponsavel = hasResponsavel
     ? buildWhatsAppLink({

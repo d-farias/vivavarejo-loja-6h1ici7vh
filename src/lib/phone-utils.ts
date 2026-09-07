@@ -64,15 +64,53 @@ export function gerarMensagemAlertaWhatsApp(params: AlertaWhatsAppParams): strin
       ? 'Aviso ao Chefe Imediato / Gerência:'
       : 'Aviso ao Responsável Direto:'
 
-  return `🔔 *VIVAVAREJO — ALERTA OPERACIONAL*\n${papel}\n\n*Tarefa:* ${params.tarefaNome}\n${loja}${setor}${horario}${statusStr}\nPor favor, verificar e registrar o andamento no sistema VivaVarejo.`
+  return `🔔 *VIVAVAREJO — ALERTA OPERACIONAL*\n${papel}\n\n*Tarefa:* ${params.tarefaNome}\n${loja}${setor}${horario}${statusStr}\nTarefa não foi aberta no sistema e está pendente. Por favor, acesse o VivaVarejo para verificar e registrar o andamento.`
 }
 
 /**
  * Cria a URL do WhatsApp (wa.me) para envio direto com mensagem pré-preenchida
  */
-export function buildWhatsAppLink(phone: string | undefined | null, text: string): string {
+export interface BuildWhatsAppLinkOptions {
+  loja?: string
+  tarefa: string
+  setor?: string
+  horario?: string
+  situacao?: string
+  telefone: string
+  destinatario?: string
+}
+
+/**
+ * Cria a URL do WhatsApp (wa.me) para envio direto com mensagem pré-preenchida
+ * Suporta assinatura por objeto de opções ou direta (phone, text).
+ */
+export function buildWhatsAppLink(
+  optionsOrPhone: BuildWhatsAppLinkOptions | string | undefined | null,
+  rawText?: string,
+): string {
+  if (typeof optionsOrPhone === 'object' && optionsOrPhone !== null) {
+    const opts = optionsOrPhone
+    const text = gerarMensagemAlertaWhatsApp({
+      lojaNome: opts.loja,
+      tarefaNome: opts.tarefa,
+      setorOuArea: opts.setor,
+      horarioLimiteOuJanela: opts.horario,
+      status: opts.situacao,
+      destinatarioPapel: opts.destinatario?.toLowerCase().includes('chefe')
+        ? 'chefe'
+        : 'responsavel',
+    })
+    const sanitized = sanitizePhoneForWaMe(opts.telefone)
+    const encodedText = encodeURIComponent(text)
+    if (!sanitized) {
+      return `https://wa.me/?text=${encodedText}`
+    }
+    return `https://wa.me/${sanitized}?text=${encodedText}`
+  }
+
+  const phone = typeof optionsOrPhone === 'string' ? optionsOrPhone : undefined
   const sanitized = sanitizePhoneForWaMe(phone)
-  const encodedText = encodeURIComponent(text)
+  const encodedText = encodeURIComponent(rawText || '')
   if (!sanitized) {
     return `https://wa.me/?text=${encodedText}`
   }

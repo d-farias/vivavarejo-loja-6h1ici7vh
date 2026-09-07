@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -61,6 +61,7 @@ export function TarefaValidadeFormModal({
   const [funcoesLoja, setFuncoesLoja] = useState<Funcao[]>([])
   const [funcionariosLoja, setFuncionariosLoja] = useState<Funcionario[]>([])
   const [funcaoResponsavelId, setFuncaoResponsavelId] = useState<string>('')
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (lojaId) {

@@ -177,7 +177,7 @@ export default function BemVindo() {
 
               <Link
                 to="/login"
-                className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-[#F7F7F5] border border-[#E5E7EB] text-[#374151] font-semibold text-sm rounded-md transition-colors inline-flex items-center justify-center"
+                className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-blue-50 border-2 border-[#2563EB] text-[#2563EB] font-semibold text-sm rounded-md transition-colors inline-flex items-center justify-center shadow-xs"
               >
                 Já tenho conta
               </Link>
@@ -574,7 +574,7 @@ export default function BemVindo() {
               </button>
               <Link
                 to="/login"
-                className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-[#F7F7F5] border border-[#E5E7EB] text-[#374151] font-semibold text-sm rounded-md transition-colors inline-flex items-center justify-center"
+                className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-blue-50 border-2 border-[#2563EB] text-[#2563EB] font-semibold text-sm rounded-md transition-colors inline-flex items-center justify-center shadow-xs"
               >
                 Já tenho conta
               </Link>

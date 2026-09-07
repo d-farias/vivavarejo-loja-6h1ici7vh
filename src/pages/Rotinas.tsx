@@ -34,6 +34,7 @@ import {
   AlertTriangle,
   Store,
   Camera,
+  Phone,
 } from 'lucide-react'
 
 export default function Rotinas() {
@@ -562,7 +563,9 @@ export default function Rotinas() {
                       {!isDone && pastDue && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold bg-red-100 text-[#B91C1C] rounded border border-red-200">
                           <AlertTriangle className="w-3 h-3" />
-                          <span>ATRASADA ({status.normalizedHorario || rotina.horario_limite})</span>
+                          <span>
+                            ATRASADA ({status.normalizedHorario || rotina.horario_limite})
+                          </span>
                         </span>
                       )}
                       {!isDone && !pastDue && status.hasHorario && (
@@ -603,18 +606,6 @@ export default function Rotinas() {
                         nomeChefe={rotina.expand?.funcao?.expand?.chefe_imediato_funcao?.nome}
                         compact
                       />
-                    )}
-                  </div>
-                    {!isDone && status.isIntegral && (
-                      <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-medium bg-gray-100 text-[#4B5563] rounded border border-gray-200">
-                        Integral (dia todo)
-                      </span>
-                    )}
-                    {isDone && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium bg-[#3B82F6]/10 text-[#2563EB] rounded border border-[#3B82F6]/25">
-                        <Check className="w-3 h-3" />
-                        <span>Concluída hoje</span>
-                      </span>
                     )}
 
                     {isDone && completionMap.get(rotina.id)?.foto && (
@@ -799,16 +790,15 @@ export default function Rotinas() {
                       horario={selectedRotina.horario_limite}
                       situacao="Aviso operacional de rotina"
                       telefoneResponsavel={
-                        selectedRotina.telefone_responsavel || selectedRotina.expand?.funcao?.telefone
+                        selectedRotina.telefone_responsavel ||
+                        selectedRotina.expand?.funcao?.telefone
                       }
                       telefoneChefe={
                         selectedRotina.telefone_chefe ||
                         selectedRotina.expand?.funcao?.expand?.chefe_imediato_funcao?.telefone
                       }
                       nomeResponsavel={selectedRotina.responsavel}
-                      nomeChefe={
-                        selectedRotina.expand?.funcao?.expand?.chefe_imediato_funcao?.nome
-                      }
+                      nomeChefe={selectedRotina.expand?.funcao?.expand?.chefe_imediato_funcao?.nome}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs">
