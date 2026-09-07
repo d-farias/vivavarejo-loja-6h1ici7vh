@@ -703,7 +703,7 @@ export default function AgendaPage() {
               </div>
               <div>
                 <h3 className="text-sm font-bold text-[#1F2937]">
-                  Planos de Ação 5W2H (Prazo Hoje)
+                  Planos de ação 5W2H (prazo hoje)
                 </h3>
                 <p className="text-[11px] text-[#6B7280]">
                   Ações corretivas com vencimento repactuado para esta data
@@ -772,7 +772,7 @@ export default function AgendaPage() {
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs self-start sm:self-auto"
                     >
                       <Check className="w-3.5 h-3.5" />
-                      <span>Concluir Ação</span>
+                      <span>Concluir ação</span>
                     </button>
                   )}
                 </div>
@@ -789,7 +789,7 @@ export default function AgendaPage() {
           <div>
             <h2 className="text-base font-bold text-[#1F2937] flex items-center gap-2">
               <Clock className="w-4 h-4 text-[#2563EB]" />
-              <span>Rotinas Previstas do Dia</span>
+              <span>Rotinas previstas do dia</span>
               <span className="text-xs font-normal text-[#6B7280]">
                 ({itensFiltrados.length} de {itensAgenda.length})
               </span>
@@ -808,7 +808,7 @@ export default function AgendaPage() {
                 onChange={(e) => setFiltroArea(e.target.value)}
                 className="px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
               >
-                <option value="Todas">Todas as Áreas</option>
+                <option value="Todas">Todas as áreas</option>
                 {areasDisponiveis.map((a) => (
                   <option key={a} value={a}>
                     {a}
@@ -823,12 +823,12 @@ export default function AgendaPage() {
               onChange={(e) => setFiltroStatus(e.target.value)}
               className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
             >
-              <option value="todos">Todos os Status</option>
-              <option value="pendentes">Pendentes / Em Aberto</option>
-              <option value="atrasadas">Apenas Atrasadas</option>
-              <option value="aguardando">Aguardando Validação</option>
+              <option value="todos">Todos os status</option>
+              <option value="pendentes">Pendentes / Em aberto</option>
+              <option value="atrasadas">Apenas atrasadas</option>
+              <option value="aguardando">Aguardando validação</option>
               <option value="devolvidas">Devolvidas</option>
-              <option value="concluidas">Apenas Concluídas</option>
+              <option value="concluidas">Apenas concluídas</option>
             </select>
           </div>
         </div>
@@ -1026,7 +1026,7 @@ export default function AgendaPage() {
                         title="Concluir rotina anexando foto"
                       >
                         <Camera className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">Com Prova</span>
+                        <span className="hidden sm:inline">Com foto</span>
                       </button>
                     )}
 

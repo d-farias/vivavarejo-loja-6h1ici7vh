@@ -248,7 +248,7 @@ export default function Index() {
         validatorCounts[r.validacao] = (validatorCounts[r.validacao] || 0) + 1
       }
     })
-    let topValidator = 'Gerente/GO'
+    let topValidator = 'Gerente Operacional (GO)'
     let maxCount = 0
     for (const [val, count] of Object.entries(validatorCounts)) {
       if (count > maxCount) {
@@ -525,7 +525,7 @@ export default function Index() {
             className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-xs font-semibold text-white rounded-md shadow-xs transition-colors"
           >
             <PlusCircle className="w-3.5 h-3.5" />
-            <span>Novo Plano de Ação</span>
+            <span>Novo plano de ação</span>
           </button>
 
           <Link
@@ -533,7 +533,7 @@ export default function Index() {
             className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-xs font-semibold text-[#1F2937] rounded-md shadow-xs transition-colors"
           >
             <Layers className="w-3.5 h-3.5 text-[#2563EB]" />
-            <span>Biblioteca de Rotinas</span>
+            <span>Biblioteca de rotinas</span>
           </Link>
         </div>
       </div>
@@ -623,7 +623,7 @@ export default function Index() {
             </div>
             <div>
               <span className="text-sm font-bold text-[#1F2937]">
-                Progresso Operacional de Hoje
+                Progresso operacional de hoje
               </span>
               <span className="text-xs text-[#6B7280] ml-2">
                 {stats.concluidas} de {stats.total} rotinas concluídas ({stats.percentual}%)
@@ -696,7 +696,7 @@ export default function Index() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-sm font-bold text-[#1F2937] uppercase tracking-wider">
-                Acompanhamento por Área da Loja
+                Acompanhamento por área da loja
               </h2>
               <p className="text-xs text-[#6B7280]">
                 Status de execução consolidado por setor operacional
@@ -936,7 +936,7 @@ export default function Index() {
                           className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#B91C1C] hover:text-red-800 bg-red-50 hover:bg-red-100/70 px-2 py-0.5 rounded border border-red-200 transition-colors"
                         >
                           <PlusCircle className="w-3 h-3" />
-                          <span>Gerar Plano de Ação (5W2H) em 1 clique</span>
+                          <span>Gerar plano de ação (5W2H)</span>
                         </button>
 
                         <BotaoAvisoWhatsApp
@@ -1042,7 +1042,7 @@ export default function Index() {
         planos={planosAcao}
         lojas={lojaSelecionada ? [lojaSelecionada] : []}
         selectedLojaId={lojaSelecionadaId || undefined}
-        title="Plano de Ação Operacional (5W2H)"
+        title="Planos de Ação Operacionais (5W2H)"
         subtitle="Acompanhe ações corretivas, preventivas e prazos da loja"
         onNewPlano={() => {
           setEditingPlano(null)

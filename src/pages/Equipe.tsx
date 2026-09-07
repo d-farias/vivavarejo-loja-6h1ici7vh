@@ -128,7 +128,7 @@ export default function Equipe() {
           <div className="flex items-center gap-2">
             <UserCheck className="w-4 h-4 text-[#2563EB]" />
             <h2 className="text-sm font-bold text-[#1F2937] uppercase tracking-wider">
-              Membros da Equipe ({funcionarios.length})
+              Membros da equipe ({funcionarios.length})
             </h2>
           </div>
 
@@ -143,6 +143,12 @@ export default function Equipe() {
                   <div className="text-[11px] text-[#2563EB] font-medium mt-0.5">
                     {fc.expand?.funcao?.nome || 'Função operacional'}
                   </div>
+                  {fc.expand?.funcao?.chefe_imediato_funcao && (
+                    <div className="text-[10px] text-[#6B7280] mt-0.5">
+                      Chefe imediato:{' '}
+                      {fc.expand.funcao.expand?.chefe_imediato_funcao?.nome || 'Definido na função'}
+                    </div>
+                  )}
                   {fc.expand?.loja && (
                     <div className="text-[10px] text-[#6B7280] flex items-center gap-1 mt-1">
                       <Store className="w-3.5 h-3.5 text-[#9CA3AF]" />
@@ -164,7 +170,7 @@ export default function Equipe() {
                   <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-gray-100 text-[#6B7280]">
                     Inativo
                   </span>
-                )}{' '}
+                )}
               </div>
             ))}
           </div>
@@ -179,10 +185,12 @@ export default function Equipe() {
           </div>
           <div>
             <div className="text-sm font-bold text-[#1F2937]">
-              {groupedData.length} Áreas Operacionais Mapeadas
+              {groupedData.length} Áreas operacionais mapeadas
             </div>
             <div className="text-xs text-[#6B7280]">
-              Total de {rotinas.length} rotinas distribuídas entre funções de loja
+              Total de {rotinas.length}{' '}
+              {rotinas.length === 1 ? 'rotina distribuída' : 'rotinas distribuídas'} entre funções
+              de loja
             </div>
           </div>
         </div>

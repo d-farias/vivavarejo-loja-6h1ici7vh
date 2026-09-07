@@ -367,10 +367,10 @@ export function RelatorioLojaLoja({
       '% Execução Rotinas',
       'Rotinas Concluídas',
       'Rotinas Esperadas',
-      'Rotinas Atrasadas',
-      'Rotinas Devolvidas',
-      'Planos de Ação Abertos',
-      'Planos Atrasados',
+      'Rotinas atrasadas',
+      'Visitas realizadas',
+      'Planos de Ação abertos',
+      'Planos atrasados',
       'Visitas Promotores Agendadas',
       'Visitas Promotores Realizadas',
       '% Visitas Promotores',
@@ -692,7 +692,7 @@ export function RelatorioLojaLoja({
             >
               <option value="taxa_desc">Maior % de Execução</option>
               <option value="taxa_asc">Menor % de Execução</option>
-              <option value="atrasadas_desc">Mais Rotinas Atrasadas</option>
+              <option value="atrasadas_desc">Mais rotinas atrasadas</option>
               <option value="nome">Ordem Alfabética</option>
             </select>
           </div>

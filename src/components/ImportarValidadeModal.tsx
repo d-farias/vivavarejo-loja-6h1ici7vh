@@ -47,7 +47,7 @@ export function ImportarValidadeModal({
   const [horarioInicioGlobal, setHorarioInicioGlobal] = useState('09:00')
   const [horarioFimGlobal, setHorarioFimGlobal] = useState('15:00')
   const [observacaoGeral, setObservacaoGeral] = useState('')
-  const [validadorPadrao, setValidadorPadrao] = useState('Gerente')
+  const [validadorPadrao, setValidadorPadrao] = useState('Líder Prevenção')
   const [hasRodizio, setHasRodizio] = useState(false)
 
   // Filtro na prévia
@@ -271,8 +271,9 @@ export function ImportarValidadeModal({
                   ignora automaticamente finais de semana vazios.
                 </p>
                 <p>
-                  • <strong>Herança de Funções:</strong> Siglas <em>GO</em> (Gerente Operacional) e{' '}
-                  <em>LP</em> (Líder Prevenção) são mapeadas e herdadas do cabeçalho de cada semana.
+                  • <strong>Herança de Funções:</strong> Siglas <em>GO</em> (Gerente Operacional
+                  (GO)) e <em>LP</em> (Líder Prevenção) são mapeadas e herdadas do cabeçalho de cada
+                  semana.{' '}
                 </p>
                 <p>
                   • <strong>Deadline Implícito:</strong> Tarefas com &quot;até 15hs&quot; sugerem

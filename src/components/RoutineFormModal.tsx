@@ -319,7 +319,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1">
-                Responsável <span className="text-red-500">*</span>
+                Responsável direto <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -399,7 +399,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
                 type="text"
                 value={validacao}
                 onChange={(e) => setValidacao(e.target.value)}
-                placeholder="Ex: Gerente/GO, Prev/Gerente"
+                placeholder="Ex: Gerente Operacional (GO), Líder Prevenção"
                 className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
               />
             </div>
@@ -435,7 +435,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-semibold text-emerald-950 mb-1">
-                  Telefone do Responsável
+                  Telefone do Responsável direto
                 </label>
                 <input
                   type="text"
@@ -448,7 +448,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
 
               <div>
                 <label className="block text-xs font-semibold text-emerald-950 mb-1">
-                  Telefone do Chefe Imediato
+                  Telefone do Chefe imediato
                 </label>
                 <input
                   type="text"

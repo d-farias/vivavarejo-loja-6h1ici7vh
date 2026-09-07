@@ -61,10 +61,14 @@ export function gerarMensagemAlertaWhatsApp(params: AlertaWhatsAppParams): strin
     : '*Situação:* Atenção necessária\n'
   const papel =
     params.destinatarioPapel === 'chefe'
-      ? 'Aviso ao Chefe Imediato / Gerência:'
-      : 'Aviso ao Responsável Direto:'
+      ? 'Aviso ao Chefe imediato / Gerência:'
+      : params.destinatarioPapel === 'validador'
+        ? 'Aviso ao Validador (Líder Prevenção):'
+        : params.destinatarioPapel === 'gerente'
+          ? 'Aviso ao Gerente Operacional (GO):'
+          : 'Aviso ao Responsável direto:'
 
-  return `🔔 *VIVAVAREJO — ALERTA OPERACIONAL*\n${papel}\n\n*Tarefa:* ${params.tarefaNome}\n${loja}${setor}${horario}${statusStr}\nTarefa não foi aberta no sistema e está pendente. Por favor, acesse o VivaVarejo para verificar e registrar o andamento.`
+  return `🔔 *VIVAVAREJO — ALERTA OPERACIONAL*\n${papel}\n\n*Tarefa:* ${params.tarefaNome}\n${loja}${setor}${horario}${statusStr}\nA tarefa não foi aberta no sistema e está pendente. Por favor, acesse o VivaVarejo para verificar e registrar o andamento.`
 }
 
 /**

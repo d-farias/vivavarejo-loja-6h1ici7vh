@@ -1683,7 +1683,8 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
 
                         {!isEditingRegional && (
                           <span className="text-[10px] text-[#9CA3AF] shrink-0">
-                            Destinatários: Responsável direto + Chefe imediato + Gerente da loja + Regional
+                            Destinatários: Responsável direto + Chefe imediato + Gerente da loja +
+                            Regional
                           </span>
                         )}
                       </div>

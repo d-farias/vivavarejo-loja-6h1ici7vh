@@ -1002,7 +1002,7 @@ export default function Admin() {
           }`}
         >
           <CheckSquare className="w-4 h-4" />
-          <span>Plano de Ação ({planosAcao.length})</span>
+          <span>Planos de Ação ({planosAcao.length})</span>
         </button>
 
         <button
@@ -1148,7 +1148,7 @@ export default function Admin() {
                 planos={planosAcao}
                 lojas={lojas}
                 allowFilterLoja={true}
-                title="Plano de Ação da Rede (5W2H)"
+                title="Planos de Ação da Rede (5W2H)"
                 subtitle="Gerenciamento consolidado de ações corretivas e de melhoria em todas as lojas"
                 onNewPlano={() => setPlanoAcaoModal({ open: true, data: null })}
                 onEditPlano={(plano) => setPlanoAcaoModal({ open: true, data: plano })}
@@ -1192,8 +1192,8 @@ export default function Admin() {
                 planos={planosAcao}
                 lojas={lojas}
                 allowFilterLoja={true}
-                title="Plano de Ação Operacional (5W2H)"
-                subtitle="Ações corretivas, preventivas e plano de melhoria contínua das lojas"
+                title="Planos de Ação Operacionais (5W2H)"
+                subtitle="Ações corretivas, preventivas e planos de melhoria contínua das lojas"
                 onNewPlano={() => setPlanoAcaoModal({ open: true, data: null })}
                 onEditPlano={(plano) => setPlanoAcaoModal({ open: true, data: plano })}
                 onDeletePlano={async (plano) => {
@@ -1265,7 +1265,7 @@ export default function Admin() {
                       title="Salvar todas as rotinas de uma loja como novo modelo reutilizável"
                     >
                       <Store className="w-3.5 h-3.5 text-[#2563EB]" />
-                      <span>Salvar Loja como Modelo</span>
+                      <span>Salvar loja como modelo</span>
                     </button>
                   )}
 
@@ -1276,7 +1276,7 @@ export default function Admin() {
                       title="Replicar modelo de rotinas em uma loja de destino"
                     >
                       <ArrowRight className="w-3.5 h-3.5 text-[#2563EB]" />
-                      <span>Aplicar Modelo em Loja</span>
+                      <span>Aplicar modelo em loja</span>
                     </button>
                   )}
 
@@ -1285,7 +1285,7 @@ export default function Admin() {
                     className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#2563EB] text-[#2563EB] hover:bg-blue-50 text-xs font-semibold rounded-md shadow-xs transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    <span>Novo Modelo</span>
+                    <span>Novo modelo</span>
                   </button>
                 </div>
               </div>

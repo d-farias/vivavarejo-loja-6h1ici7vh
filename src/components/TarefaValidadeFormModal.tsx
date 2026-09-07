@@ -370,7 +370,7 @@ export function TarefaValidadeFormModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
                 <label className="text-[11px] font-semibold text-emerald-950">
-                  Telefone do Responsável
+                  Telefone do Responsável direto
                 </label>
                 <input
                   type="text"
@@ -383,7 +383,7 @@ export function TarefaValidadeFormModal({
 
               <div className="space-y-1">
                 <label className="text-[11px] font-semibold text-emerald-950">
-                  Telefone do Chefe Imediato
+                  Telefone do Chefe imediato
                 </label>
                 <input
                   type="text"

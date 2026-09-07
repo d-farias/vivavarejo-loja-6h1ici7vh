@@ -655,7 +655,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
           Atenção Gerência & Regional da Loja
         </div>
         <div style="font-size: 12px; color: #7F1D1D; line-height: 1.5; margin-top: 4px;">
-          O horário programado para o(s) item(ns) abaixo foi ultrapassado sem registro de realização no sistema. Por favor, alinhe com os responsáveis operacionais imediatamente.
+          O horário programado para o(s) item(ns) abaixo foi ultrapassado sem registro de realização no sistema. Por favor, alinhe com o Responsável direto e o Chefe imediato imediatamente.
         </div>
       </div>
 
@@ -793,7 +793,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
   )
 
   // =========================================================================
-  // 4. MÓDULO VALIDADE X CALENDÁRIO: ALERTAS INTELIGENTES DE VALIDADE
+  // 4. MÓDULO VALIDADE × CALENDÁRIO: ALERTAS INTELIGENTES DE VALIDADE
   // - Alerta 1 hora antes do horário de início: avisa o GERENTE qual setor/categoria realizar
   // - Alerta de não abertura: janela ultrapassada (+1 min do horário_inicio) sem abertura/conclusão
   //   avisa o GERENTE e o VALIDADOR configurado (ex: Líder Prevenção)
@@ -1048,17 +1048,16 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
 
           const subjectPrevio = `[VivaVarejo] Alerta de Validade em 1h — Setor: ${setorCat} (${lojaNome})`
           const htmlPrevio = `
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8">
-  <title>Aviso Prévio de Validade - VivaVarejo</title>
-</head>
-<body style="margin: 0; padding: 20px; background-color: #F7F7F5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1F2937;">
-  <div style="max-width: 650px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden;">
-    <div style="background: #FFFFFF; border-bottom: 2px solid #2563EB; padding: 20px 24px;">
-      <div style="font-size: 18px; font-weight: 800; color: #2563EB; letter-spacing: -0.5px;">VIVAVAREJO • CRONOGRAMA DE VALIDADES</div>
-      <div style="font-size: 15px; font-weight: 700; color: #1F2937; margin-top: 4px;">
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8">
+      <title>Aviso Prévio de Validade - VivaVarejo</title>
+    </head>
+    <body style="margin: 0; padding: 20px; background-color: #F7F7F5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1F2937;">
+      <div style="max-width: 650px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden;">
+        <div style="background: #FFFFFF; border-bottom: 2px solid #2563EB; padding: 20px 24px;">
+          <div style="font-size: 18px; font-weight: 800; color: #2563EB; letter-spacing: -0.5px;">VIVAVAREJO • VALIDADE × CALENDÁRIO</div>      <div style="font-size: 15px; font-weight: 700; color: #1F2937; margin-top: 4px;">
         Aviso Prévio: Tarefa de Validade Programada em 1 Hora
       </div>
       <div style="font-size: 11px; color: #6B7280; margin-top: 4px;">
@@ -1095,7 +1094,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
         </table>
       </div>
       <div style="background: #F7F7F5; border: 1px solid #E5E7EB; border-radius: 6px; padding: 10px 12px; font-size: 11px; color: #4B5563; line-height: 1.4;">
-        Assim que a auditoria for iniciada e concluída na loja, registre a conclusão com foto no VivaVarejo no menu <em>Validade x Calendário</em>.
+        Assim que a auditoria for iniciada e concluída na loja, registre a conclusão com foto no VivaVarejo no menu <em>Validade × Calendário</em>.
       </div>
     </div>
   </div>
@@ -1173,7 +1172,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
 <body style="margin: 0; padding: 20px; background-color: #F7F7F5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1F2937;">
   <div style="max-width: 650px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden;">
     <div style="background: #FFFFFF; border-bottom: 2px solid #B91C1C; padding: 20px 24px;">
-      <div style="font-size: 18px; font-weight: 800; color: #B91C1C; letter-spacing: -0.5px;">VIVAVAREJO • CRONOGRAMA DE VALIDADES</div>
+      <div style="font-size: 18px; font-weight: 800; color: #B91C1C; letter-spacing: -0.5px;">VIVAVAREJO • VALIDADE × CALENDÁRIO</div>
       <div style="font-size: 15px; font-weight: 700; color: #1F2937; margin-top: 4px;">
         Alerta de Não Abertura: Tarefa de Validade Pendente
       </div>

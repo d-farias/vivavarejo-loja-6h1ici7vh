@@ -367,7 +367,7 @@ export default function ValidadesPage() {
         >
           <span className="text-[11px] font-medium flex items-center justify-between">
             <span className={stats.atrasadas > 0 ? 'font-bold' : 'text-[#6B7280]'}>
-              Não Abertas / Atrasadas
+              Não abertas / atrasadas
             </span>
             <AlertTriangle
               className={`w-3.5 h-3.5 ${stats.atrasadas > 0 ? 'text-[#B91C1C]' : 'text-gray-400'}`}
@@ -602,13 +602,14 @@ export default function ValidadesPage() {
 
                     <div className="flex items-center gap-3 text-xs text-[#6B7280] flex-wrap pt-0.5">
                       <span>
-                        Validador: <strong>{tarefa.validador_funcao_nome || 'Gerente'}</strong>
+                        Validador:{' '}
+                        <strong>{tarefa.validador_funcao_nome || 'Líder Prevenção'}</strong>
                       </span>
                       {tarefa.executor_nome && (
                         <>
                           <span>•</span>
                           <span>
-                            Responsável: <strong>{tarefa.executor_nome}</strong>
+                            Responsável direto: <strong>{tarefa.executor_nome}</strong>
                           </span>
                         </>
                       )}

@@ -483,7 +483,7 @@ export function PromotoresFornecedoresManager({
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="px-2.5 py-1.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
               >
-                <option value="todos">Todos os Status</option>
+                <option value="todos">Todos os status</option>
                 <option value="agendada">Agendadas</option>
                 <option value="realizada">Realizadas</option>
                 <option value="atrasada">Atrasadas</option>
@@ -495,7 +495,7 @@ export function PromotoresFornecedoresManager({
                 onChange={(e) => setFilterLoja(e.target.value)}
                 className="px-2.5 py-1.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
               >
-                <option value="todas">Todas as Lojas</option>
+                <option value="todas">Todas as lojas</option>
                 {lojas.map((l) => (
                   <option key={l.id} value={l.id}>
                     {l.nome}
@@ -508,7 +508,7 @@ export function PromotoresFornecedoresManager({
                 onChange={(e) => setFilterFornecedor(e.target.value)}
                 className="px-2.5 py-1.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
               >
-                <option value="todos">Todos Fornecedores</option>
+                <option value="todos">Todos os fornecedores</option>
                 {fornecedores.map((f) => (
                   <option key={f.id} value={f.id}>
                     {f.nome}
@@ -521,10 +521,10 @@ export function PromotoresFornecedoresManager({
                 onChange={(e) => setFilterPeriodo(e.target.value)}
                 className="px-2.5 py-1.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
               >
-                <option value="todos">Todo o Período</option>
+                <option value="todos">Todo o período</option>
                 <option value="hoje">Hoje</option>
-                <option value="semana">Esta Semana</option>
-                <option value="mes">Este Mês</option>
+                <option value="semana">Esta semana</option>
+                <option value="mes">Este mês</option>
               </select>
             </div>
           </div>
@@ -547,7 +547,7 @@ export function PromotoresFornecedoresManager({
                   className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Agendar Primeira Visita</span>
+                  <span>Agendar primeira visita</span>
                 </button>
               )}
             </div>
