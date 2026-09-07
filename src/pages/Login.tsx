@@ -112,6 +112,38 @@ export default function Login() {
           </div>
         )}
 
+        {/* Banner de Demonstração / Teste para Parceiros */}
+        <div className="mb-5 p-3 rounded-lg bg-blue-50/70 border border-blue-200/80 text-xs">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="font-semibold text-blue-900 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+              Acesso Demonstração para Parceiros
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('demo@vivavarejo.com.br')
+                setPassword('vivavarejo123')
+              }}
+              className="text-[11px] font-bold text-blue-700 hover:text-blue-900 underline hover:no-underline"
+            >
+              Preencher dados
+            </button>
+          </div>
+          <div className="text-[11px] text-blue-800 space-y-0.5">
+            <p>
+              <strong className="font-medium">E-mail:</strong>{' '}
+              <code className="bg-white/80 px-1 py-0.5 rounded text-blue-950">
+                demo@vivavarejo.com.br
+              </code>
+            </p>
+            <p>
+              <strong className="font-medium">Senha:</strong>{' '}
+              <code className="bg-white/80 px-1 py-0.5 rounded text-blue-950">vivavarejo123</code>
+            </p>
+          </div>
+        </div>
+
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
