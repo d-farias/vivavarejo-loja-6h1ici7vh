@@ -48,6 +48,7 @@ export default function ValidadesPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('todas')
   const [setorFilter, setSetorFilter] = useState<string>('todos')
+  const [semanaFilter, setSemanaFilter] = useState<string>('todas')
 
   // Modais
   const [importModalOpen, setImportModalOpen] = useState(false)
@@ -110,9 +111,22 @@ export default function ValidadesPage() {
   const now = new Date()
   const currentMinutes = now.getHours() * 60 + now.getMinutes()
 
-  // Tarefas que se aplicam ao dia selecionado
+  // Semana do mês da visualização atual (1 a 4)
+  const semanaDoMes = useMemo(() => {
+    const diaNum = Number(dataParts[2])
+    return Math.min(Math.ceil(diaNum / 7), 4)
+  }, [dataParts])
+
+  // Tarefas que se aplicam ao dia selecionado (respeitando rodízio de semanas do mês)
   const tarefasDoDia = useMemo(() => {
     return tarefas.filter((t) => {
+      // 1. Checar se a tarefa tem semana do mês associada
+      if (t.semana_mes && t.semana_mes > 0) {
+        if (t.semana_mes !== semanaDoMes) {
+          return false
+        }
+      }
+
       const dataEsp = (t.data_especifica || '').substring(0, 10)
       const rec = (t.recorrencia || '').toLowerCase().trim()
 
@@ -123,11 +137,13 @@ export default function ValidadesPage() {
         if (rec === 'diaria' || rec === 'diária' || rec === 'todos os dias') return true
         if (rec.includes(diaDaSemana) || (diaDaSemana === 'terça' && rec.includes('terca')))
           return true
+        if (diaDaSemana === 'sábado' && rec.includes('sabado')) return true
+        if (diaDaSemana === 'domingo' && rec.includes('domingo')) return true
         return false
       }
       return true
     })
-  }, [tarefas, dataVisualizacao, diaDaSemana])
+  }, [tarefas, dataVisualizacao, diaDaSemana, semanaDoMes])
 
   // Filtradas por busca, status e setor
   const tarefasFiltradas = useMemo(() => {
@@ -149,9 +165,13 @@ export default function ValidadesPage() {
         if (t.setor_categoria !== setorFilter) return false
       }
 
+      if (semanaFilter !== 'todas') {
+        if (String(t.semana_mes || '') !== semanaFilter) return false
+      }
+
       return true
     })
-  }, [tarefasDoDia, searchTerm, statusFilter, setorFilter])
+  }, [tarefasDoDia, searchTerm, statusFilter, setorFilter, semanaFilter])
 
   // Lista de setores disponíveis para o filtro
   const setoresDisponiveis = useMemo(() => {
@@ -284,8 +304,12 @@ export default function ValidadesPage() {
                   </span>
                 )}
               </div>
-              <div className="text-[11px] text-[#6B7280]">
-                {dataParts[2]}/{dataParts[1]}/{dataParts[0]}
+              <div className="text-[11px] text-[#6B7280] flex items-center gap-1.5">
+                <span>
+                  {dataParts[2]}/{dataParts[1]}/{dataParts[0]}
+                </span>
+                <span>•</span>
+                <span className="font-semibold text-[#2563EB]">Semana {semanaDoMes} do mês</span>
               </div>
             </div>
           </div>
@@ -505,6 +529,13 @@ export default function ValidadesPage() {
                         {tarefa.setor_categoria}
                       </span>
 
+                      {/* Selo de Semana do Mês se houver rodízio */}
+                      {tarefa.semana_mes ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-[#1E40AF]">
+                          Semana {tarefa.semana_mes}
+                        </span>
+                      ) : null}
+
                       {/* Selo de Horário / Janela */}
                       <span className="inline-flex items-center gap-1 font-mono text-xs font-bold px-2 py-0.5 rounded bg-blue-50 text-[#2563EB] border border-blue-200">
                         <Clock className="w-3 h-3" />
@@ -568,13 +599,20 @@ export default function ValidadesPage() {
 
                     <div className="flex items-center gap-3 text-xs text-[#6B7280] flex-wrap pt-0.5">
                       <span>
-                        Validador:{' '}
-                        <strong>{tarefa.validador_funcao_nome || 'Líder Prevenção'}</strong>
+                        Validador: <strong>{tarefa.validador_funcao_nome || 'Gerente'}</strong>
                       </span>
                       {tarefa.executor_nome && (
                         <>
                           <span>•</span>
-                          <span>Executor: {tarefa.executor_nome}</span>
+                          <span>
+                            Responsável: <strong>{tarefa.executor_nome}</strong>
+                          </span>
+                        </>
+                      )}
+                      {tarefa.observacoes && (
+                        <>
+                          <span>•</span>
+                          <span className="text-[#4B5563]">Nota: {tarefa.observacoes}</span>
                         </>
                       )}
                       {tarefa.expand?.loja && (

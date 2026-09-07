@@ -290,16 +290,18 @@ export interface TarefaValidade extends RecordModel {
   loja?: string
   setor_categoria: string
   descricao?: string
+  semana_mes?: number // 1, 2, 3, 4 (rodízio mensal) ou undefined para todas as semanas
   data_especifica?: string // YYYY-MM-DD
   recorrencia?: string // "diaria", "toda terça", "pontual", etc.
-  horario_inicio: string // ex: "14:00"
+  horario_inicio: string // ex: "09:00" ou "14:00"
   horario_fim?: string // ex: "15:00"
   status?: StatusTarefaValidade
   executor_nome?: string
   executor_usuario?: string
-  validador_funcao_nome?: string // ex: "Líder Prevenção"
+  validador_funcao_nome?: string // ex: "Gerente", "Líder Prevenção"
   validador_funcao?: string
   validador_usuario?: string
+  observacoes?: string
   observacao_execucao?: string
   foto?: string
   concluida_em?: string

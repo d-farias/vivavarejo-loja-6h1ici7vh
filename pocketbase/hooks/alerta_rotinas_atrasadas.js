@@ -752,6 +752,10 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
     const diasSemanaNomes = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado']
     const diaHojeNome = diasSemanaNomes[diaDaSemanaIdx]
 
+    // Calcular semana do mês atual (1 a 4/5) para suporte a rodízio mensal
+    const diaDoMes = brasilTime.getUTCDate()
+    const semanaDoMesAtual = Math.min(Math.ceil(diaDoMes / 7), 4)
+
     // Buscar tarefas de validade
     let tarefasValidade = []
     try {
@@ -763,7 +767,7 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
 
     if (tarefasValidade.length > 0) {
       console.log(
-        `[AlertaValidade] Verificando ${tarefasValidade.length} tarefa(s) de validade para o dia de hoje (${todayStr}, ${diaHojeNome})...`,
+        `[AlertaValidade] Verificando ${tarefasValidade.length} tarefa(s) de validade para hoje (${todayStr}, ${diaHojeNome}, semana ${semanaDoMesAtual} do mês)...`,
       )
 
       for (let tIdx = 0; tIdx < tarefasValidade.length; tIdx++) {
@@ -772,6 +776,12 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
         // 1. Verificar se a tarefa aplica-se a HOJE
         const dataEsp = (tv.getString('data_especifica') || '').substring(0, 10)
         const rec = (tv.getString('recorrencia') || '').toLowerCase().trim()
+        const semMes = tv.getInt('semana_mes') || 0
+
+        // Se a tarefa tiver semana_mes definida (rodízio semanal), ela DEVE bater com a semana do mês atual
+        if (semMes > 0 && semMes !== semanaDoMesAtual) {
+          continue
+        }
 
         let aplicaHoje = false
         if (dataEsp) {
@@ -781,7 +791,8 @@ cronAdd('alerta_rotinas_atrasadas', '*/5 * * * *', () => {
             aplicaHoje = true
           } else if (
             rec.includes(diaHojeNome) ||
-            (diaHojeNome === 'terça' && rec.includes('terca'))
+            (diaHojeNome === 'terça' && rec.includes('terca')) ||
+            (diaHojeNome === 'sábado' && rec.includes('sabado'))
           ) {
             aplicaHoje = true
           }

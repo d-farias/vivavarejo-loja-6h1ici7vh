@@ -5,6 +5,7 @@ export interface CreateTarefaValidadeData {
   loja?: string
   setor_categoria: string
   descricao?: string
+  semana_mes?: number
   data_especifica?: string
   recorrencia?: string
   horario_inicio: string
@@ -15,12 +16,16 @@ export interface CreateTarefaValidadeData {
   validador_funcao_nome?: string
   validador_funcao?: string
   validador_usuario?: string
+  observacoes?: string
 }
 
 export interface ParsedValidadeRow {
   dataOuRecorrencia?: string
   data_especifica?: string
   recorrencia?: string
+  semana_mes?: number // 1, 2, 3, 4
+  semana_rotulo?: string // "Primeira Semana", "Segunda Semana", etc.
+  dia_semana?: string // "Segunda-feira", "Terça-feira", etc.
   setor_categoria: string
   descricao?: string
   horario_inicio: string
@@ -29,6 +34,7 @@ export interface ParsedValidadeRow {
   loja_id?: string
   validador_funcao_nome?: string
   executor_nome?: string
+  observacoes?: string
 }
 
 export const tarefasValidadeService = {
@@ -64,10 +70,12 @@ export const tarefasValidadeService = {
 
   /**
    * Cria ou atualiza (upsert) tarefa de validade com verificação por assinatura
-   * (loja + setor_categoria + horario_inicio + data/recorrencia) para não duplicar.
+   * (tarefa/descrição + semana do mês + dia da semana/recorrência + loja + setor) para não duplicar.
    */
   async create(data: CreateTarefaValidadeData): Promise<TarefaValidade> {
     const lojaId = data.loja || ''
+    const desc = (data.descricao || '').trim().toLowerCase()
+    const semMes = data.semana_mes || 0
     const setor = (data.setor_categoria || '').trim().toLowerCase()
     const inicio = (data.horario_inicio || '').trim().toLowerCase()
     const dataEsp = (data.data_especifica || '').trim()
@@ -77,19 +85,35 @@ export const tarefasValidadeService = {
       const lojaFilter = lojaId ? `loja = "${lojaId}"` : 'loja = "" || loja = null'
       const existing = await pb.collection('tarefas_validade').getFullList<TarefaValidade>({
         filter: lojaFilter,
-        fields: 'id,setor_categoria,horario_inicio,data_especifica,recorrencia',
+        fields:
+          'id,setor_categoria,descricao,horario_inicio,data_especifica,recorrencia,semana_mes',
       })
 
       const match = existing.find((ex) => {
+        const exSemMes = ex.semana_mes || 0
         const exSetor = (ex.setor_categoria || '').trim().toLowerCase()
-        const exInicio = (ex.horario_inicio || '').trim().toLowerCase()
+        const exDesc = (ex.descricao || '').trim().toLowerCase()
         const exData = (ex.data_especifica || '').trim().substring(0, 10)
         const exRec = (ex.recorrencia || '').trim().toLowerCase()
 
-        if (exSetor !== setor || exInicio !== inicio) return false
-        if (dataEsp && exData === dataEsp) return true
-        if (rec && exRec === rec) return true
-        if (!dataEsp && !rec && !exData && !exRec) return true
+        // 1. Assinatura forte com semana do mês:
+        // Tarefa + Semana do mês + Dia da semana (recorrência) + Loja
+        if (semMes > 0 && exSemMes > 0) {
+          if (exSemMes === semMes && exRec === rec) {
+            // Se tiver descrição igual ou setor correspondente
+            if (desc && exDesc && desc === exDesc) return true
+            if (exSetor === setor) return true
+          }
+        }
+
+        // 2. Assinatura tradicional por setor + horário + dia/recorrência
+        const exInicio = (ex.horario_inicio || '').trim().toLowerCase()
+        if (exSetor === setor && exInicio === inicio && exSemMes === semMes) {
+          if (dataEsp && exData === dataEsp) return true
+          if (rec && exRec === rec) return true
+          if (!dataEsp && !rec && !exData && !exRec) return true
+        }
+
         return false
       })
 
@@ -239,17 +263,39 @@ export const tarefasValidadeService = {
     const lojaFilter = defaultLojaId ? `loja = "${defaultLojaId}"` : undefined
     const existentes = await pb.collection('tarefas_validade').getFullList<TarefaValidade>({
       filter: lojaFilter,
-      fields: 'id,setor_categoria,horario_inicio,data_especifica,recorrencia,loja',
+      fields:
+        'id,setor_categoria,descricao,horario_inicio,data_especifica,recorrencia,loja,semana_mes',
     })
 
-    const buildKey = (loja: string | undefined, setor: string, inicio: string, dataOuRec: string) =>
-      `${(loja || '').trim().toLowerCase()}:::${(setor || '').trim().toLowerCase()}:::${(inicio || '').trim().toLowerCase()}:::${(dataOuRec || '').trim().toLowerCase()}`
+    // Assinatura anti-duplicação solicitada:
+    // tarefa + semana do mês + dia da semana/recorrência + loja
+    const buildKey = (
+      loja: string | undefined,
+      tarefaDesc: string,
+      semanaMes: number | undefined,
+      diaOuRec: string,
+      setor: string,
+    ) => {
+      const cleanLoja = (loja || '').trim().toLowerCase()
+      const cleanDesc = (tarefaDesc || '').trim().toLowerCase()
+      const cleanSem = semanaMes ? String(semanaMes) : '0'
+      const cleanDia = (diaOuRec || '').trim().toLowerCase()
+      const cleanSetor = (setor || '').trim().toLowerCase()
+      // Chave composta com fallback de setor
+      return `${cleanLoja}:::${cleanDesc}:::sem${cleanSem}:::${cleanDia}:::${cleanSetor}`
+    }
 
     const mapExistentes = new Map<string, string>() // key -> id
     for (const ex of existentes) {
       const dataStr = (ex.data_especifica || '').substring(0, 10)
       const recStr = ex.recorrencia || ''
-      const key = buildKey(ex.loja, ex.setor_categoria, ex.horario_inicio, dataStr || recStr)
+      const key = buildKey(
+        ex.loja,
+        ex.descricao || '',
+        ex.semana_mes,
+        dataStr || recStr,
+        ex.setor_categoria,
+      )
       mapExistentes.set(key, ex.id)
     }
 
@@ -262,19 +308,32 @@ export const tarefasValidadeService = {
       const rec = it.recorrencia || (dataEsp ? undefined : 'diaria')
       const dataOuRec = dataEsp || rec || ''
 
-      const key = buildKey(lojaId, it.setor_categoria, it.horario_inicio, dataOuRec)
-      const existingId = mapExistentes.get(key)
+      const key = buildKey(lojaId, it.descricao || '', it.semana_mes, dataOuRec, it.setor_categoria)
+      let existingId = mapExistentes.get(key)
+
+      // Fallback: se não achar com setor idêntico, tenta sem setor para o caso de ter mudado o texto do setor na mesma semana/dia
+      if (!existingId && it.semana_mes) {
+        for (const [mKey, mId] of mapExistentes.entries()) {
+          const prefix = `${(lojaId || '').trim().toLowerCase()}:::${(it.descricao || '').trim().toLowerCase()}:::sem${it.semana_mes}:::${dataOuRec.trim().toLowerCase()}:::`
+          if (mKey.startsWith(prefix)) {
+            existingId = mId
+            break
+          }
+        }
+      }
 
       const payload = {
         loja: lojaId,
         setor_categoria: it.setor_categoria,
         descricao: it.descricao || '',
+        semana_mes: it.semana_mes || undefined,
         data_especifica: dataEsp,
         recorrencia: rec,
         horario_inicio: it.horario_inicio,
         horario_fim: it.horario_fim || '',
         executor_nome: it.executor_nome || '',
-        validador_funcao_nome: it.validador_funcao_nome || 'Líder Prevenção',
+        validador_funcao_nome: it.validador_funcao_nome || 'Gerente',
+        observacoes: it.observacoes || '',
       }
 
       if (existingId) {
