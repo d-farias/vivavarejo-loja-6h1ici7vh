@@ -25,6 +25,7 @@ import {
   CalendarCheck,
   ShieldAlert,
   Smartphone,
+  GitBranch,
 } from 'lucide-react'
 import { ChangePasswordModal } from '@/components/ChangePasswordModal'
 import { FalarEspecialistaModal } from '@/components/FalarEspecialistaModal'
@@ -84,17 +85,19 @@ export default function Layout() {
   const isLiderOrAdmin = perfil === 'admin' || perfil === 'adm_rede' || perfil === 'lider'
 
   const navLinks = [
-    { to: '/', label: 'Início (Dashboard)', icon: LayoutDashboard },
-    { to: '/agenda', label: 'Agenda & Workflow', icon: Calendar },
+    { to: '/agenda', label: 'Agenda', icon: Calendar },
     { to: '/rotinas', label: 'Rotinas', icon: ListChecks },
+    { to: '/validades', label: 'Validade × Calendário', icon: CalendarCheck },
+    { to: '/perdas', label: 'Perdas & Inventário', icon: ShieldAlert },
     { to: '/equipe', label: 'Minha Equipe', icon: Users },
     ...(isLiderOrAdmin ? [{ to: '/promotores', label: 'Promotores', icon: Handshake }] : []),
+    { to: '/', label: 'Dashboard', icon: LayoutDashboard },
     ...(hasAdminAccess
       ? [
           {
             to: '/admin',
-            label: isAdmRede ? 'Minha Rede (BI)' : 'Admin Geral (BI)',
-            icon: Shield,
+            label: isAdmRede ? 'Workflow Rede' : 'Workflow Geral',
+            icon: GitBranch,
           },
         ]
       : []),
@@ -168,85 +171,21 @@ export default function Layout() {
 
             {!isAuthPage && user ? (
               <div className="flex items-center gap-1 sm:gap-2">
-                {/* Menu de 3 Pontos (⋮) no Cabeçalho / Topbar à Direita */}
+                {/* Menu de 3 Pontos (⋮) no Cabeçalho / Topbar à Direita — apenas contato especializado */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
                       className="w-9 h-9 rounded-md border border-[#E5E7EB] hover:border-[#2563EB] bg-white text-[#4B5563] hover:text-[#2563EB] flex items-center justify-center transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]/30"
-                      title="Mais opções do sistema"
-                      aria-label="Menu de opções"
+                      title="Contato com especialista"
+                      aria-label="Contato com especialista"
                     >
                       <MoreVertical className="w-4 h-4" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="w-60 bg-white border border-[#E5E7EB] shadow-lg"
+                    className="w-56 bg-white border border-[#E5E7EB] shadow-lg"
                   >
-                    <DropdownMenuLabel className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] px-3 py-2">
-                      Módulos Operacionais
-                    </DropdownMenuLabel>
-
-                    {/* Módulo Validade x Calendário */}
-                    <DropdownMenuItem
-                      onClick={() => navigate('/validades')}
-                      className={`cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2.5 transition-colors ${
-                        location.pathname === '/validades'
-                          ? 'bg-[#2563EB]/10 text-[#2563EB] font-semibold'
-                          : 'text-[#1F2937] hover:text-[#2563EB]'
-                      }`}
-                    >
-                      <div className="w-6 h-6 rounded bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0">
-                        <CalendarCheck className="w-3.5 h-3.5" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-xs">Validade × Calendário</span>
-                        <span className="text-[10px] text-[#6B7280]">
-                          Cronograma e alertas por setor
-                        </span>
-                      </div>
-                    </DropdownMenuItem>
-
-                    {/* Módulo Perdas & Inventário */}
-                    <DropdownMenuItem
-                      onClick={() => navigate('/perdas')}
-                      className={`cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2.5 transition-colors ${
-                        location.pathname === '/perdas'
-                          ? 'bg-[#2563EB]/10 text-[#2563EB] font-semibold'
-                          : 'text-[#1F2937] hover:text-[#2563EB]'
-                      }`}
-                    >
-                      <div className="w-6 h-6 rounded bg-red-100 text-[#B91C1C] flex items-center justify-center shrink-0">
-                        <ShieldAlert className="w-3.5 h-3.5" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-xs">Perdas & Inventário</span>
-                        <span className="text-[10px] text-[#6B7280]">
-                          Quebras × validades pendentes
-                        </span>
-                      </div>
-                    </DropdownMenuItem>
-
-                    {/* Instalar App no Celular */}
-                    {!isInstalled && (
-                      <DropdownMenuItem
-                        onClick={handleOpenInstall}
-                        className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2.5 text-[#2563EB] hover:bg-blue-50/60"
-                      >
-                        <div className="w-6 h-6 rounded bg-blue-100 text-[#2563EB] flex items-center justify-center shrink-0">
-                          <Smartphone className="w-3.5 h-3.5" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-xs">Instalar app no celular</span>
-                          <span className="text-[10px] text-[#6B7280]">
-                            Adicionar à tela de início
-                          </span>
-                        </div>
-                      </DropdownMenuItem>
-                    )}
-
-                    <DropdownMenuSeparator className="bg-[#E5E7EB]" />
-
                     <DropdownMenuItem
                       onClick={() => setFalarEspecialistaOpen(true)}
                       className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2.5 text-[#374151] hover:text-[#2563EB]"
@@ -291,8 +230,8 @@ export default function Layout() {
                           onClick={() => navigate('/admin')}
                           className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2 text-[#2563EB]"
                         >
-                          <Shield className="w-4 h-4" />
-                          <span>{isAdmRede ? 'Minha Rede' : 'Painel Administrativo'}</span>
+                          <GitBranch className="w-4 h-4" />
+                          <span>{isAdmRede ? 'Workflow Rede' : 'Workflow Geral'}</span>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator className="bg-[#E5E7EB]" />
                       </>
@@ -400,36 +339,6 @@ export default function Layout() {
               })}
 
               <div className="pt-2 space-y-1">
-                <NavLink
-                  to="/validades"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-[#3B82F6]/10 text-[#2563EB] font-semibold'
-                        : 'text-[#4B5563] hover:bg-gray-100 hover:text-[#1F2937]'
-                    }`
-                  }
-                >
-                  <CalendarCheck className="w-4 h-4 text-[#2563EB]" />
-                  <span>Validade × Calendário</span>
-                </NavLink>
-
-                <NavLink
-                  to="/perdas"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-[#3B82F6]/10 text-[#2563EB] font-semibold'
-                        : 'text-[#4B5563] hover:bg-gray-100 hover:text-[#1F2937]'
-                    }`
-                  }
-                >
-                  <ShieldAlert className="w-4 h-4 text-[#B91C1C]" />
-                  <span>Perdas & Inventário</span>
-                </NavLink>
-
                 {!isInstalled && (
                   <button
                     type="button"
