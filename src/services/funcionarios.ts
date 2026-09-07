@@ -34,6 +34,7 @@ export const funcionariosService = {
     nome: string
     funcao: string
     loja: string
+    telefone?: string
     usuario?: string
     ativo?: boolean
   }): Promise<Funcionario> {
@@ -76,6 +77,7 @@ export const usersService = {
     name: string
     perfil: PerfilUsuario
     cliente?: string
+    telefone?: string
     ativo?: boolean
   }): Promise<User> {
     return await pb.collection('users').create<User>(data)

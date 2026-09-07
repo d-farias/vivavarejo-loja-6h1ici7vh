@@ -5,33 +5,38 @@ export const funcoesService = {
   async getAll(): Promise<Funcao[]> {
     return await pb.collection('funcoes').getFullList<Funcao>({
       sort: 'nome',
-      expand: 'loja,loja.cliente',
+      expand: 'loja,loja.cliente,chefe_imediato_funcao',
     })
   },
 
   async getByLoja(lojaId: string): Promise<Funcao[]> {
     return await pb.collection('funcoes').getFullList<Funcao>({
-      filter: `loja = "${lojaId}"`,
+      filter: `loja = "${lojaId}" || loja = ""`,
       sort: 'nome',
-      expand: 'loja',
+      expand: 'loja,chefe_imediato_funcao',
     })
   },
 
   async getById(id: string): Promise<Funcao> {
     return await pb.collection('funcoes').getOne<Funcao>(id, {
-      expand: 'loja',
+      expand: 'loja,chefe_imediato_funcao',
     })
   },
 
-  async create(data: { nome: string; loja: string }): Promise<Funcao> {
+  async create(data: {
+    nome: string
+    loja?: string
+    telefone?: string
+    chefe_imediato_funcao?: string
+  }): Promise<Funcao> {
     return await pb.collection('funcoes').create<Funcao>(data, {
-      expand: 'loja',
+      expand: 'loja,chefe_imediato_funcao',
     })
   },
 
   async update(id: string, data: Partial<Funcao>): Promise<Funcao> {
     return await pb.collection('funcoes').update<Funcao>(id, data, {
-      expand: 'loja',
+      expand: 'loja,chefe_imediato_funcao',
     })
   },
 

@@ -7,6 +7,7 @@ export interface User extends RecordModel {
   email: string
   name?: string
   avatar?: string
+  telefone?: string
   perfil?: PerfilUsuario
   cliente?: string // ID do Cliente/Rede vinculado (obrigatório para adm_rede)
   ativo?: boolean
@@ -61,11 +62,14 @@ export interface Loja extends RecordModel {
 
 export interface Funcao extends RecordModel {
   nome: string
-  loja: string
+  loja?: string
+  telefone?: string
+  chefe_imediato_funcao?: string // ID da função que chefia imediatamente esta função
   created: string
   updated: string
   expand?: {
     loja?: Loja
+    chefe_imediato_funcao?: Funcao
   }
 }
 
@@ -73,6 +77,7 @@ export interface Funcionario extends RecordModel {
   nome: string
   funcao: string
   loja: string
+  telefone?: string
   usuario?: string
   ativo?: boolean
   created: string
@@ -96,6 +101,8 @@ export interface Rotina extends RecordModel {
   area?: string
   loja?: string
   funcao?: string
+  telefone_responsavel?: string
+  telefone_chefe?: string
   alerta_enviado_em?: string
   prioridade_dia?: number
   adiada_para_data?: string
@@ -301,6 +308,8 @@ export interface TarefaValidade extends RecordModel {
   validador_funcao_nome?: string // ex: "Gerente", "Líder Prevenção"
   validador_funcao?: string
   validador_usuario?: string
+  telefone_responsavel?: string
+  telefone_chefe?: string
   observacoes?: string
   observacao_execucao?: string
   foto?: string

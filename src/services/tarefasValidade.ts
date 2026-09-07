@@ -16,6 +16,8 @@ export interface CreateTarefaValidadeData {
   validador_funcao_nome?: string
   validador_funcao?: string
   validador_usuario?: string
+  telefone_responsavel?: string
+  telefone_chefe?: string
   observacoes?: string
 }
 

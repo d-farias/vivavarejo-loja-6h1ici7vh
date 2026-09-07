@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-07T02:01:33.665Z",
+  "generatedAt": "2026-09-07T02:16:41.768Z",
   "collections": [
     {
       "name": "users",
@@ -63,6 +63,12 @@
           "required": false,
           "system": false,
           "collectionRef": "clientes"
+        },
+        {
+          "name": "telefone",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -185,6 +191,18 @@
         },
         {
           "name": "adiada_para_horario",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "telefone_responsavel",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "telefone_chefe",
           "type": "text",
           "required": false,
           "system": false
@@ -501,6 +519,19 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "telefone",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "chefe_imediato_funcao",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "funcoes"
         }
       ],
       "indexes": [
@@ -565,6 +596,12 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "telefone",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -1402,6 +1439,18 @@
         },
         {
           "name": "observacoes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "telefone_responsavel",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "telefone_chefe",
           "type": "text",
           "required": false,
           "system": false
