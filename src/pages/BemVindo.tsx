@@ -31,10 +31,8 @@ import { VAREJO_SEGMENTOS } from '@/components/EnquadramentoClienteCard'
 
 /**
  * Endereços de contato e redes sociais do rodapé da landing page.
- * O LinkedIn é provisório — edite a constante LINKEDIN_URL abaixo para atualizar quando confirmado.
  */
 const INSTAGRAM_URL = 'https://www.instagram.com/vivavarejo/'
-const LINKEDIN_COMPANY_URL = 'https://www.linkedin.com/company/vivavarejo' // Endereço provisório — atualizar quando confirmado
 const LINKEDIN_PERSONAL_URL = 'https://br.linkedin.com/in/dalvanifarias'
 const WHATSAPP_URL = 'https://wa.me/5548991817542'
 const CONTACT_EMAIL = 'dfarias53@gmail.com'
@@ -628,28 +626,16 @@ export default function BemVindo() {
                 <span className="font-medium">Instagram</span>
               </a>
 
-              {/* LinkedIn VivaVarejo (empresa) */}
-              <a
-                href={LINKEDIN_COMPANY_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn da empresa VivaVarejo"
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[#E5E7EB] bg-white text-[#4B5563] hover:text-[#2563EB] hover:border-[#2563EB] transition-colors"
-              >
-                <Linkedin className="w-3.5 h-3.5" />
-                <span className="font-medium">LinkedIn VivaVarejo</span>
-              </a>
-
-              {/* LinkedIn Dalvani Farias (perfil pessoal) */}
+              {/* LinkedIn */}
               <a
                 href={LINKEDIN_PERSONAL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="LinkedIn de Dalvani Farias"
+                aria-label="LinkedIn"
                 className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[#E5E7EB] bg-white text-[#4B5563] hover:text-[#2563EB] hover:border-[#2563EB] transition-colors"
               >
                 <Linkedin className="w-3.5 h-3.5" />
-                <span className="font-medium">Dalvani Farias</span>
+                <span className="font-medium">LinkedIn</span>
               </a>
 
               {/* WhatsApp */}
