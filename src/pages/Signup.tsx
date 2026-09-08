@@ -112,7 +112,7 @@ export default function Signup() {
         gargalos,
         inventarioSituacao,
       )
-      navigate('/', { replace: true })
+      navigate('/agenda', { replace: true })
     } catch (err: unknown) {
       const errorObj = err as {
         data?: { data?: Record<string, { message: string }> }

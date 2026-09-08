@@ -31,8 +31,8 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
   }
 
   if (!user) {
-    // Primeiro acesso via endereço da página (/): quem não está logado cai na landing de boas-vindas (/bem-vindo).
-    // Demais rotas protegidas redirecionam para /login (2ª página) preservando a intenção de acesso.
+    // Primeiro acesso via endereço da raiz (/): quem não está logado cai na landing de boas-vindas (/bem-vindo).
+    // Demais rotas protegidas redirecionam para /login preservando a intenção de acesso.
     const target = location.pathname === '/' ? '/bem-vindo' : '/login'
     return <Navigate to={target} state={{ from: location }} replace />
   }

@@ -8,7 +8,10 @@ export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/'
+  // Destino pós-login padrão é a Agenda (/agenda), conforme solicitação do usuário.
+  // Se o usuário foi interceptado de uma rota específica (que não seja a raiz ou a própria agenda), preserva o destino pretendido.
+  const stateFrom = (location.state as { from?: { pathname: string } })?.from?.pathname
+  const from = stateFrom && stateFrom !== '/' && stateFrom !== '/login' ? stateFrom : '/agenda'
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
