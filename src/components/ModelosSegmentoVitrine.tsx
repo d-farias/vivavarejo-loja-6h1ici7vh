@@ -44,15 +44,9 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
   // A biblioteca volta a ficar aberta/visível normalmente na tela (revertido para como era antes da v0.0.60)
   const [isAberta, setIsAberta] = useState<boolean>(true)
 
-  // Segmento persistido no localStorage para preservar a escolha do usuário
-  // (ex.: supermercado) sem resetar ao navegar entre telas
-  const [selectedSegmento, setSelectedSegmento] = useState<string>(() => {
-    try {
-      return localStorage.getItem(STORAGE_KEY_SEGMENTO) || 'Supermercado/Food'
-    } catch {
-      return 'Supermercado/Food'
-    }
-  })
+  // Segmento neutro por padrão: nenhum segmento pré-selecionado nem fallback fixo
+  // Torna-se ativo apenas quando o usuário filtra pelos pills ou escolhe um modelo
+  const [selectedSegmento, setSelectedSegmento] = useState<string>('Todos')
 
   const [modelos, setModelos] = useState<ModeloComContagem[]>([])
   const [loading, setLoading] = useState(false)
@@ -94,7 +88,11 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
   const handleSelectSegmento = (seg: string) => {
     setSelectedSegmento(seg)
     try {
-      localStorage.setItem(STORAGE_KEY_SEGMENTO, seg)
+      if (seg === 'Todos') {
+        localStorage.removeItem(STORAGE_KEY_SEGMENTO)
+      } else {
+        localStorage.setItem(STORAGE_KEY_SEGMENTO, seg)
+      }
     } catch {
       // noop
     }
@@ -110,6 +108,9 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
   })
 
   const handleActionAplicar = (modelo: ModeloComContagem) => {
+    if (modelo.segmento) {
+      setSelectedSegmento(modelo.segmento)
+    }
     if (onSelectModelo) {
       onSelectModelo(modelo)
     }
@@ -125,6 +126,9 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
   }
 
   const handleVisualizarRotinas = (modelo: ModeloComContagem) => {
+    if (modelo.segmento) {
+      setSelectedSegmento(modelo.segmento)
+    }
     if (onSelectModelo) {
       onSelectModelo(modelo)
     }
@@ -144,7 +148,7 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
               <h2 className="text-sm sm:text-base font-bold text-[#1F2937]">
                 Biblioteca de Modelos por Segmento
               </h2>
-              {selectedSegmento && (
+              {selectedSegmento && selectedSegmento !== 'Todos' && (
                 <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-[#2563EB] border border-blue-200">
                   {selectedSegmento}
                 </span>
@@ -215,9 +219,18 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
               )}
             </p>
 
-            <span className="text-[11px] text-[#6B7280] shrink-0 font-medium">
-              Segmento ativo: <strong className="text-[#1F2937]">{selectedSegmento}</strong>
-            </span>
+            {selectedSegmento && selectedSegmento !== 'Todos' ? (
+              <span className="text-[11px] text-[#6B7280] shrink-0 font-medium">
+                Segmento filtrado:{' '}
+                <strong className="text-[#1F2937]">
+                  {selectedSegmento === 'Todos' ? 'Todos os segmentos' : selectedSegmento}
+                </strong>
+              </span>
+            ) : (
+              <span className="text-[11px] text-[#6B7280] shrink-0 font-medium">
+                Todos os modelos disponíveis
+              </span>
+            )}
           </div>
 
           {/* Segment Filter Pills */}

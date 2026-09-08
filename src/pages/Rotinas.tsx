@@ -68,14 +68,8 @@ export default function Rotinas() {
   const [departamentosAberto, setDepartamentosAberto] = useState<boolean>(false)
 
   // Controle de escolha do modelo na biblioteca para exibir rotinas
-  const [modeloSelecionado, setModeloSelecionado] = useState<ModeloComContagem | null>(() => {
-    try {
-      const saved = localStorage.getItem('vivavarejo_rotinas_modelo_ativo')
-      return saved ? JSON.parse(saved) : null
-    } catch {
-      return null
-    }
-  })
+  // Inicia sempre neutro (null): o usuário precisa tocar/escolher um modelo na biblioteca
+  const [modeloSelecionado, setModeloSelecionado] = useState<ModeloComContagem | null>(null)
 
   // Modais de CRUD e Importação
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
@@ -426,11 +420,6 @@ export default function Rotinas() {
         onRotinasAtualizadas={loadData}
         onSelectModelo={(mod) => {
           setModeloSelecionado(mod)
-          try {
-            localStorage.setItem('vivavarejo_rotinas_modelo_ativo', JSON.stringify(mod))
-          } catch {
-            // noop
-          }
         }}
         selectedModeloId={modeloSelecionado?.id || null}
       />
@@ -615,6 +604,7 @@ export default function Rotinas() {
                 setModeloSelecionado(null)
                 try {
                   localStorage.removeItem('vivavarejo_rotinas_modelo_ativo')
+                  localStorage.removeItem('vivavarejo_vitrine_segmento')
                 } catch {
                   // noop
                 }
