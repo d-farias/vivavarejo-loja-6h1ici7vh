@@ -561,32 +561,31 @@ export default function Rotinas() {
                   <div className="mb-2.5 flex items-center justify-between gap-2 flex-wrap">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {!isDone && pastDue && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold bg-red-100 text-[#B91C1C] rounded border border-red-200">
-                          <AlertTriangle className="w-3 h-3" />
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold bg-red-100 text-[#B91C1C] rounded border border-red-200">
+                          <AlertTriangle className="w-3.5 h-3.5" />
                           <span>
                             ATRASADA ({status.normalizedHorario || rotina.horario_limite})
                           </span>
                         </span>
                       )}
                       {!isDone && !pastDue && status.hasHorario && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium bg-[#3B82F6]/10 text-[#2563EB] rounded border border-[#3B82F6]/25">
-                          <Clock className="w-3 h-3" />
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-[#2563EB]/10 text-[#2563EB] rounded border border-[#2563EB]/20">
+                          <Clock className="w-3.5 h-3.5" />
                           <span>{status.displayLabel}</span>
                         </span>
                       )}
                       {!isDone && status.isIntegral && (
-                        <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-medium bg-gray-100 text-[#4B5563] rounded border border-gray-200">
+                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 text-[#4B5563] rounded border border-gray-200">
                           Integral (dia todo)
                         </span>
                       )}
                       {isDone && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium bg-[#3B82F6]/10 text-[#2563EB] rounded border border-[#3B82F6]/25">
-                          <Check className="w-3 h-3" />
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded border border-emerald-200">
+                          <Check className="w-3.5 h-3.5" />
                           <span>Concluída hoje</span>
                         </span>
                       )}
                     </div>
-
                     {/* Botão Avisar por WhatsApp quando não concluída */}
                     {!isDone && (pastDue || status.hasHorario) && (
                       <BotaoAvisoWhatsApp

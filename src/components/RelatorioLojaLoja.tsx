@@ -560,25 +560,25 @@ export function RelatorioLojaLoja({
       {/* Cards de Destaque: Melhor Loja, Pior Loja e Média Geral */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
         {/* Melhor Loja */}
-        <div className="bg-white border border-emerald-200 rounded-xl p-4 shadow-xs relative overflow-hidden">
+        <div className="bg-white border border-emerald-200 rounded-xl p-4 sm:p-5 shadow-xs relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none" />
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
               <Award className="w-4 h-4 text-emerald-600" />
               <span>Melhor Performance</span>
             </span>
             {destaques.melhor && (
-              <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
                 {destaques.melhor.taxaExecucao}%
               </span>
             )}
           </div>
           {destaques.melhor ? (
-            <div className="mt-2">
-              <h3 className="text-base font-bold text-[#1F2937] truncate">
+            <div className="mt-2.5">
+              <h3 className="text-base sm:text-lg font-bold text-[#1F2937] truncate">
                 {destaques.melhor.lojaNome}
               </h3>
-              <p className="text-xs text-[#6B7280] mt-0.5">
+              <p className="text-xs text-[#6B7280] mt-1">
                 {destaques.melhor.totalConcluidas} de {destaques.melhor.totalEsperadoPeriodo}{' '}
                 rotinas concluídas
               </p>
@@ -598,25 +598,25 @@ export function RelatorioLojaLoja({
         </div>
 
         {/* Pior Loja / Maior Atenção */}
-        <div className="bg-white border border-red-200 rounded-xl p-4 shadow-xs relative overflow-hidden">
+        <div className="bg-white border border-red-200 rounded-xl p-4 sm:p-5 shadow-xs relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-red-50 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none" />
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#B91C1C] flex items-center gap-1.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#B91C1C] flex items-center gap-1.5">
               <AlertTriangle className="w-4 h-4 text-[#B91C1C]" />
               <span>Ponto de Atenção</span>
             </span>
             {destaques.pior && (
-              <span className="text-xs font-bold text-[#B91C1C] bg-red-100 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-bold text-[#B91C1C] bg-red-100 px-2.5 py-0.5 rounded-full">
                 {destaques.pior.taxaExecucao}%
               </span>
             )}
           </div>
           {destaques.pior ? (
-            <div className="mt-2">
-              <h3 className="text-base font-bold text-[#1F2937] truncate">
+            <div className="mt-2.5">
+              <h3 className="text-base sm:text-lg font-bold text-[#1F2937] truncate">
                 {destaques.pior.lojaNome}
               </h3>
-              <p className="text-xs text-[#6B7280] mt-0.5">
+              <p className="text-xs text-[#6B7280] mt-1">
                 {destaques.pior.rotinasAtrasadas} rotina(s) em atraso /{' '}
                 {destaques.pior.planosAtrasados} plano(s) atrasados
               </p>

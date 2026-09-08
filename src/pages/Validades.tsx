@@ -349,56 +349,80 @@ export default function ValidadesPage() {
 
       {/* KPI Cards do Cronograma */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
-        <div className="p-3 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
-          <span className="text-[11px] text-[#6B7280] font-medium flex items-center justify-between">
+        <div className="p-3.5 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
+          <span className="text-xs text-[#6B7280] font-medium flex items-center justify-between">
             <span>Tarefas Programadas</span>
-            <CalendarIcon className="w-3.5 h-3.5 text-[#2563EB]" />
+            <CalendarIcon className="w-4 h-4 text-[#2563EB]" />
           </span>
-          <div className="text-xl sm:text-2xl font-bold text-[#1F2937] mt-1">{stats.total}</div>
-          <span className="text-[10px] text-[#6B7280]">{stats.aprovadas} aprovadas</span>
+          <div className="text-2xl sm:text-3xl font-bold text-[#1F2937] mt-1 leading-none">
+            {stats.total}
+          </div>
+          <span className="text-xs text-[#6B7280] mt-1 block">{stats.aprovadas} aprovadas</span>
         </div>
 
         <div
-          className={`p-3 rounded-lg shadow-2xs border ${
+          className={`p-3.5 sm:p-4 rounded-lg shadow-2xs border ${
             stats.atrasadas > 0
               ? 'bg-red-50/60 border-red-200 text-[#B91C1C]'
               : 'bg-white border-[#E5E7EB]'
           }`}
         >
-          <span className="text-[11px] font-medium flex items-center justify-between">
-            <span className={stats.atrasadas > 0 ? 'font-bold' : 'text-[#6B7280]'}>
+          <span className="text-xs font-medium flex items-center justify-between">
+            <span className={stats.atrasadas > 0 ? 'font-bold text-[#B91C1C]' : 'text-[#6B7280]'}>
               Não abertas / atrasadas
             </span>
             <AlertTriangle
-              className={`w-3.5 h-3.5 ${stats.atrasadas > 0 ? 'text-[#B91C1C]' : 'text-gray-400'}`}
+              className={`w-4 h-4 ${stats.atrasadas > 0 ? 'text-[#B91C1C]' : 'text-gray-400'}`}
             />
           </span>
-          <div className="text-xl sm:text-2xl font-bold mt-1">{stats.atrasadas}</div>
-          <span className="text-[10px] opacity-80">
+          <div
+            className={`text-2xl sm:text-3xl font-bold mt-1 leading-none ${
+              stats.atrasadas > 0 ? 'text-[#B91C1C]' : 'text-[#1F2937]'
+            }`}
+          >
+            {stats.atrasadas}
+          </div>
+          <span className="text-xs opacity-80 mt-1 block">
             {stats.atrasadas > 0 ? 'Janela ultrapassada sem abertura' : 'Tudo no horário'}
           </span>
         </div>
 
-        <div className="p-3 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
-          <span className="text-[11px] text-[#6B7280] font-medium flex items-center justify-between">
+        <div className="p-3.5 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
+          <span className="text-xs text-[#6B7280] font-medium flex items-center justify-between">
             <span>Aguardando Validação</span>
-            <Shield className="w-3.5 h-3.5 text-amber-600" />
+            <Shield className="w-4 h-4 text-amber-600" />
           </span>
-          <div className="text-xl sm:text-2xl font-bold text-amber-800 mt-1">
+          <div className="text-2xl sm:text-3xl font-bold text-amber-800 mt-1 leading-none">
             {stats.aguardando}
           </div>
-          <span className="text-[10px] text-[#6B7280]">Líder Prevenção</span>
+          <span className="text-xs text-[#6B7280] mt-1 block">Líder Prevenção</span>
         </div>
 
-        <div className="p-3 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
-          <span className="text-[11px] text-[#6B7280] font-medium flex items-center justify-between">
+        <div className="p-3.5 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
+          <span className="text-xs text-[#6B7280] font-medium flex items-center justify-between">
             <span>Aprovadas</span>
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <CheckCircle2
+              className={`w-4 h-4 ${
+                stats.concluidaPct >= 90
+                  ? 'text-emerald-600'
+                  : stats.concluidaPct >= 70
+                    ? 'text-amber-600'
+                    : 'text-red-600'
+              }`}
+            />
           </span>
-          <div className="text-xl sm:text-2xl font-bold text-emerald-700 mt-1">
+          <div
+            className={`text-2xl sm:text-3xl font-bold mt-1 leading-none ${
+              stats.concluidaPct >= 90
+                ? 'text-emerald-700'
+                : stats.concluidaPct >= 70
+                  ? 'text-amber-700'
+                  : 'text-red-700'
+            }`}
+          >
             {stats.aprovadas}
           </div>
-          <span className="text-[10px] text-[#6B7280]">{stats.concluidaPct}% concluído</span>
+          <span className="text-xs text-[#6B7280] mt-1 block">{stats.concluidaPct}% concluído</span>
         </div>
 
         <div className="p-3 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs col-span-2 sm:col-span-1">

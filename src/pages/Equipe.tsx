@@ -138,36 +138,36 @@ export default function Equipe() {
                 key={fc.id}
                 className="p-3 rounded-md border border-[#E5E7EB] bg-[#F7F7F5]/40 flex items-start justify-between gap-2"
               >
-                <div>
-                  <div className="font-semibold text-xs text-[#1F2937]">{fc.nome}</div>
-                  <div className="text-[11px] text-[#2563EB] font-medium mt-0.5">
+                <div className="min-w-0">
+                  <div className="font-bold text-sm text-[#1F2937]">{fc.nome}</div>
+                  <div className="text-xs text-[#2563EB] font-medium mt-0.5">
                     {fc.expand?.funcao?.nome || 'Função operacional'}
                   </div>
                   {fc.expand?.funcao?.chefe_imediato_funcao && (
-                    <div className="text-[10px] text-[#6B7280] mt-0.5">
+                    <div className="text-xs text-[#6B7280] mt-0.5">
                       Chefe imediato:{' '}
                       {fc.expand.funcao.expand?.chefe_imediato_funcao?.nome || 'Definido na função'}
                     </div>
                   )}
                   {fc.expand?.loja && (
-                    <div className="text-[10px] text-[#6B7280] flex items-center gap-1 mt-1">
+                    <div className="text-xs text-[#6B7280] flex items-center gap-1 mt-1">
                       <Store className="w-3.5 h-3.5 text-[#9CA3AF]" />
                       <span>{fc.expand.loja.nome}</span>
                     </div>
                   )}
                   {fc.telefone && (
-                    <div className="text-[10px] text-gray-700 flex items-center gap-1 mt-1 font-mono">
-                      <Phone className="w-3 h-3 text-emerald-600" />
+                    <div className="text-xs text-gray-700 flex items-center gap-1 mt-1 font-mono">
+                      <Phone className="w-3.5 h-3.5 text-emerald-600" />
                       <span>{formatPhoneBR(fc.telefone)}</span>
                     </div>
                   )}
                 </div>
                 {fc.ativo !== false ? (
-                  <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-[#3B82F6]/10 text-[#2563EB]">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
                     Ativo
                   </span>
                 ) : (
-                  <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-gray-100 text-[#6B7280]">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded bg-gray-100 text-[#6B7280]">
                     Inativo
                   </span>
                 )}

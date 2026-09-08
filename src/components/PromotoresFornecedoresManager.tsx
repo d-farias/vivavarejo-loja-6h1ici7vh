@@ -423,42 +423,78 @@ export function PromotoresFornecedoresManager({
         <div className="space-y-6">
           {/* KPIs no Topo */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3.5 bg-white border border-[#E5E7EB] rounded-lg shadow-xs">
+            <div className="p-3.5 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-xs">
               <div className="flex items-center justify-between text-xs text-[#6B7280]">
                 <span>Visitas da Semana</span>
                 <Calendar className="w-4 h-4 text-[#2563EB]" />
               </div>
-              <div className="mt-1 text-2xl font-bold text-[#1F2937]">{kpis.daSemana}</div>
-              <div className="text-[11px] text-[#6B7280] mt-0.5">
-                {kpis.total} registradas no total
+              <div className="mt-1 text-2xl sm:text-3xl font-bold text-[#1F2937] leading-none">
+                {kpis.daSemana}
               </div>
+              <div className="text-xs text-[#6B7280] mt-1">{kpis.total} registradas no total</div>
             </div>
 
-            <div className="p-3.5 bg-white border border-[#E5E7EB] rounded-lg shadow-xs">
+            <div className="p-3.5 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-xs">
               <div className="flex items-center justify-between text-xs text-[#6B7280]">
                 <span>Realizadas</span>
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <CheckCircle2
+                  className={`w-4 h-4 ${
+                    kpis.taxaRealizacao >= 90
+                      ? 'text-emerald-600'
+                      : kpis.taxaRealizacao >= 70
+                        ? 'text-amber-600'
+                        : 'text-red-600'
+                  }`}
+                />
               </div>
-              <div className="mt-1 text-2xl font-bold text-emerald-600">{kpis.realizadas}</div>
-              <div className="text-[11px] text-[#6B7280] mt-0.5">Taxa: {kpis.taxaRealizacao}%</div>
+              <div
+                className={`mt-1 text-2xl sm:text-3xl font-bold leading-none ${
+                  kpis.taxaRealizacao >= 90
+                    ? 'text-emerald-700'
+                    : kpis.taxaRealizacao >= 70
+                      ? 'text-amber-700'
+                      : 'text-red-700'
+                }`}
+              >
+                {kpis.realizadas}
+              </div>
+              <div className="text-xs text-[#6B7280] mt-1">Taxa: {kpis.taxaRealizacao}%</div>
             </div>
 
-            <div className="p-3.5 bg-white border border-[#E5E7EB] rounded-lg shadow-xs">
-              <div className="flex items-center justify-between text-xs text-[#6B7280]">
-                <span>Atrasadas</span>
-                <AlertTriangle className="w-4 h-4 text-[#B91C1C]" />
+            <div
+              className={`p-3.5 sm:p-4 rounded-lg shadow-xs border ${
+                kpis.atrasadas > 0 ? 'bg-red-50/50 border-red-200' : 'bg-white border-[#E5E7EB]'
+              }`}
+            >
+              <div className="flex items-center justify-between text-xs">
+                <span
+                  className={kpis.atrasadas > 0 ? 'font-bold text-[#B91C1C]' : 'text-[#6B7280]'}
+                >
+                  Atrasadas
+                </span>
+                <AlertTriangle
+                  className={`w-4 h-4 ${kpis.atrasadas > 0 ? 'text-[#B91C1C]' : 'text-gray-400'}`}
+                />
               </div>
-              <div className="mt-1 text-2xl font-bold text-[#B91C1C]">{kpis.atrasadas}</div>
-              <div className="text-[11px] text-[#6B7280] mt-0.5">Prazo expirado sem check</div>
+              <div
+                className={`mt-1 text-2xl sm:text-3xl font-bold leading-none ${
+                  kpis.atrasadas > 0 ? 'text-[#B91C1C]' : 'text-[#1F2937]'
+                }`}
+              >
+                {kpis.atrasadas}
+              </div>
+              <div className="text-xs opacity-80 mt-1">Prazo expirado sem check</div>
             </div>
 
-            <div className="p-3.5 bg-white border border-[#E5E7EB] rounded-lg shadow-xs">
+            <div className="p-3.5 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-xs">
               <div className="flex items-center justify-between text-xs text-[#6B7280]">
                 <span>Agendadas</span>
                 <Clock className="w-4 h-4 text-[#2563EB]" />
               </div>
-              <div className="mt-1 text-2xl font-bold text-[#2563EB]">{kpis.agendadas}</div>
-              <div className="text-[11px] text-[#6B7280] mt-0.5">Aguardando atendimento</div>
+              <div className="mt-1 text-2xl sm:text-3xl font-bold text-[#2563EB] leading-none">
+                {kpis.agendadas}
+              </div>
+              <div className="text-xs text-[#6B7280] mt-1">Aguardando atendimento</div>
             </div>
           </div>
 

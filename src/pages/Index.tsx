@@ -283,6 +283,32 @@ export default function Index() {
     const taxaAprovacao =
       concluidas > 0 ? Math.min(100, Math.round((aprovadas / concluidas) * 100)) : 0
 
+    // Semântica sóbria de cores conforme resultado:
+    // Conclusão/Aderência: >= 90% esmeralda sóbrio (#059669), 70-89% âmbar (#D97706), < 70% vermelho (#DC2626)
+    const conclusaoColorClass =
+      taxaConclusao >= 90
+        ? 'text-emerald-700'
+        : taxaConclusao >= 70
+          ? 'text-amber-700'
+          : 'text-red-700'
+
+    const conclusaoBadgeClass =
+      taxaConclusao >= 90
+        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+        : taxaConclusao >= 70
+          ? 'bg-amber-50 text-amber-800 border-amber-200'
+          : 'bg-red-50 text-red-700 border-red-200'
+
+    const conclusaoIconClass =
+      taxaConclusao >= 90
+        ? 'bg-emerald-50 text-emerald-600'
+        : taxaConclusao >= 70
+          ? 'bg-amber-50 text-amber-600'
+          : 'bg-red-50 text-red-600'
+
+    const conclusaoHex =
+      taxaConclusao >= 90 ? '#059669' : taxaConclusao >= 70 ? '#D97706' : '#DC2626'
+
     return {
       totalTarefas: totalProgramadas,
       concluidas,
@@ -291,18 +317,22 @@ export default function Index() {
       atrasadas,
       taxaConclusao,
       taxaAprovacao,
+      conclusaoColorClass,
+      conclusaoBadgeClass,
+      conclusaoIconClass,
+      conclusaoHex,
     }
   }, [rotinas, execucoesPeriodo, dateRange.daysCount, periodo, todayExecMap])
 
   // Dados para Gráfico de Rosca / Donut de Aderência
   const donutData = useMemo(() => {
     return [
-      { name: 'Aprovadas / Validadas', value: kpis.aprovadas, color: '#2563EB' },
-      { name: 'Aguardando Validação', value: kpis.aguardandoValidacao, color: '#60A5FA' },
+      { name: 'Aprovadas / Validadas', value: kpis.aprovadas, color: '#059669' },
+      { name: 'Aguardando Validação', value: kpis.aguardandoValidacao, color: '#2563EB' },
       {
         name: 'Atrasadas / Pendentes',
         value: Math.max(0, kpis.atrasadas),
-        color: '#94A3B8',
+        color: kpis.atrasadas > 0 ? '#DC2626' : '#94A3B8',
       },
     ].filter((item) => item.value > 0)
   }, [kpis])
@@ -479,12 +509,12 @@ export default function Index() {
         <div className="flex items-center gap-2.5 flex-wrap">
           <StoreSelector />
 
-          {/* Seletor de Período Analítico */}
+          {/* Seletor de Período Analítico com tap target confortável */}
           <div className="inline-flex items-center p-1 bg-gray-100 rounded-lg border border-[#E5E7EB]">
             <button
               type="button"
               onClick={() => setPeriodo('hoje')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+              className={`px-3.5 py-2 text-xs font-semibold rounded-md transition-all min-h-[40px] flex items-center justify-center ${
                 periodo === 'hoje'
                   ? 'bg-white text-[#2563EB] shadow-xs'
                   : 'text-[#4B5563] hover:text-[#1F2937]'
@@ -495,7 +525,7 @@ export default function Index() {
             <button
               type="button"
               onClick={() => setPeriodo('semana')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+              className={`px-3.5 py-2 text-xs font-semibold rounded-md transition-all min-h-[40px] flex items-center justify-center ${
                 periodo === 'semana'
                   ? 'bg-white text-[#2563EB] shadow-xs'
                   : 'text-[#4B5563] hover:text-[#1F2937]'
@@ -506,7 +536,7 @@ export default function Index() {
             <button
               type="button"
               onClick={() => setPeriodo('mes')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+              className={`px-3.5 py-2 text-xs font-semibold rounded-md transition-all min-h-[40px] flex items-center justify-center ${
                 periodo === 'mes'
                   ? 'bg-white text-[#2563EB] shadow-xs'
                   : 'text-[#4B5563] hover:text-[#1F2937]'
@@ -516,7 +546,7 @@ export default function Index() {
             </button>
           </div>
 
-          {/* Ações de atalho direto */}
+          {/* Ações de atalho direto com tap target confortável */}
           <button
             type="button"
             onClick={() => {
@@ -524,7 +554,7 @@ export default function Index() {
               setEditingPlano(null)
               setPlanoModalOpen(true)
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-xs font-semibold text-white rounded-md shadow-xs transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] bg-[#2563EB] hover:bg-[#1D4ED8] text-xs font-semibold text-white rounded-md shadow-xs transition-colors"
           >
             <Wrench className="w-3.5 h-3.5" />
             <span>Abrir Chamado / Ação</span>
@@ -552,49 +582,55 @@ export default function Index() {
       {/* 4 KPIs Curtos no Topo */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total de Tarefas Programadas */}
-        <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 sm:p-5 shadow-xs flex items-center gap-3">
+        <div className="bg-white border border-[#E5E7EB] rounded-lg p-3.5 sm:p-5 shadow-xs flex items-center gap-3">
           <div className="w-10 h-10 rounded-md bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0">
             <Calendar className="w-5 h-5" />
           </div>
-          <div>
-            <div className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1F2937]">
+          <div className="min-w-0">
+            <div className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1F2937] leading-none">
               {kpis.totalTarefas}
             </div>
-            <div className="text-xs text-[#6B7280] font-medium">Tarefas programadas</div>
+            <div className="text-xs text-[#6B7280] font-medium mt-1">Tarefas programadas</div>
           </div>
         </div>
 
-        {/* Taxa de Conclusão */}
-        <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 sm:p-5 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-md bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0">
+        {/* Taxa de Conclusão - Destaque de cor conforme resultado */}
+        <div className="bg-white border border-[#E5E7EB] rounded-lg p-3.5 sm:p-5 shadow-xs flex items-center gap-3">
+          <div
+            className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 ${kpis.conclusaoIconClass}`}
+          >
             <TrendingUp className="w-5 h-5" />
           </div>
-          <div>
-            <div className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1F2937]">
+          <div className="min-w-0">
+            <div
+              className={`text-2xl sm:text-3xl font-bold tracking-tight leading-none ${kpis.conclusaoColorClass}`}
+            >
               {kpis.taxaConclusao}%
             </div>
-            <div className="text-xs text-[#6B7280] font-medium">Concluídas ({kpis.concluidas})</div>
+            <div className="text-xs text-[#6B7280] font-medium mt-1 truncate">
+              Concluídas ({kpis.concluidas})
+            </div>
           </div>
         </div>
 
         {/* Aprovadas / Validadas */}
-        <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 sm:p-5 shadow-xs flex items-center gap-3">
+        <div className="bg-white border border-[#E5E7EB] rounded-lg p-3.5 sm:p-5 shadow-xs flex items-center gap-3">
           <div className="w-10 h-10 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
             <CheckCircle2 className="w-5 h-5" />
           </div>
-          <div>
-            <div className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1F2937]">
+          <div className="min-w-0">
+            <div className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1F2937] leading-none">
               {kpis.aprovadas}
             </div>
-            <div className="text-xs text-[#6B7280] font-medium">
+            <div className="text-xs text-[#6B7280] font-medium mt-1 truncate">
               Aprovadas ({kpis.taxaAprovacao}%)
             </div>
           </div>
         </div>
 
-        {/* Atrasadas / Em Risco */}
+        {/* Atrasadas / Em Risco - Vermelho sóbrio se > 0, neutro se 0 */}
         <div
-          className={`bg-white border rounded-lg p-4 sm:p-5 shadow-xs flex items-center gap-3 transition-colors ${
+          className={`bg-white border rounded-lg p-3.5 sm:p-5 shadow-xs flex items-center gap-3 transition-colors ${
             kpis.atrasadas > 0 ? 'border-red-300 bg-red-50/20' : 'border-[#E5E7EB]'
           }`}
         >
@@ -605,15 +641,19 @@ export default function Index() {
           >
             <AlertTriangle className="w-5 h-5" />
           </div>
-          <div>
+          <div className="min-w-0">
             <div
-              className={`text-2xl sm:text-3xl font-bold tracking-tight ${
+              className={`text-2xl sm:text-3xl font-bold tracking-tight leading-none ${
                 kpis.atrasadas > 0 ? 'text-[#B91C1C]' : 'text-[#1F2937]'
               }`}
             >
               {kpis.atrasadas}
             </div>
-            <div className="text-xs text-[#6B7280] font-medium">
+            <div
+              className={`text-xs font-medium mt-1 truncate ${
+                kpis.atrasadas > 0 ? 'text-[#B91C1C]' : 'text-[#6B7280]'
+              }`}
+            >
               {periodo === 'hoje' ? 'Tarefas atrasadas' : 'Desvios pendentes'}
             </div>
           </div>
@@ -736,13 +776,15 @@ export default function Index() {
               </ResponsiveContainer>
             )}
 
-            {/* Taxa centralizada no centro do Donut */}
+            {/* Taxa centralizada no centro do Donut destacando cor conforme resultado */}
             {donutData.length > 0 && (
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-xl font-extrabold text-[#1F2937] leading-none">
+                <span
+                  className={`text-2xl font-extrabold leading-none ${kpis.conclusaoColorClass}`}
+                >
                   {kpis.taxaConclusao}%
                 </span>
-                <span className="text-[10px] text-[#6B7280] uppercase tracking-wider font-semibold">
+                <span className="text-[10px] text-[#6B7280] uppercase tracking-wider font-semibold mt-0.5">
                   Aderência
                 </span>
               </div>
@@ -803,23 +845,32 @@ export default function Index() {
             {desviosCriticos.map((desvio) => (
               <div
                 key={desvio.id}
-                className="p-3 rounded-lg border border-red-200 bg-red-50/20 flex items-center justify-between gap-3 shadow-2xs"
+                className="p-3.5 rounded-lg border border-red-200 bg-red-50/20 flex items-center justify-between gap-3 shadow-2xs"
               >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <span className="text-[10px] font-bold uppercase px-1.5 py-0.2 rounded bg-red-100 text-[#B91C1C]">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-red-100 text-[#B91C1C] border border-red-200">
                       {desvio.tipo}
                     </span>
                     <span
-                      className="text-xs font-bold text-[#1F2937] truncate"
+                      className="text-xs sm:text-sm font-bold text-[#1F2937] truncate"
                       title={desvio.titulo}
                     >
                       {desvio.titulo}
                     </span>
                   </div>
-                  <div className="text-[11px] text-[#6B7280] truncate">
-                    Setor: {desvio.setor} • {desvio.responsavel || 'Sem responsável'}
-                    {desvio.horario ? ` • Limite: ${desvio.horario}` : ''}
+                  <div className="text-xs text-[#6B7280] flex items-center gap-2 flex-wrap">
+                    <span className="font-medium text-[#4B5563]">Setor: {desvio.setor}</span>
+                    <span>•</span>
+                    <span>{desvio.responsavel || 'Sem responsável'}</span>
+                    {desvio.horario && (
+                      <>
+                        <span>•</span>
+                        <span className="text-[#B91C1C] font-semibold">
+                          Limite: {desvio.horario}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
 

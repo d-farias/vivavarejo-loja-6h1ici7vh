@@ -564,19 +564,19 @@ export default function PerdasPage() {
           {/* KPI 1: Perda Total do Período */}
           <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs relative overflow-hidden">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
                 <TrendingDown className="w-4 h-4 text-[#B91C1C]" />
                 <span>Perda Total no Período</span>
               </span>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-[#B91C1C]">
+              <span className="text-xs font-bold px-2 py-0.5 rounded bg-red-100 text-[#B91C1C]">
                 {perdasFiltradas.length} reg.
               </span>
             </div>
             <div className="mt-2.5">
-              <div className="text-xl sm:text-2xl font-extrabold text-[#B91C1C] tracking-tight">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#B91C1C] tracking-tight leading-none">
                 {formatCurrency(perdaTotalR$)}
               </div>
-              <p className="text-[11px] text-[#6B7280] mt-1">
+              <p className="text-xs text-[#6B7280] mt-1.5">
                 Soma estimada de perdas físicas e quebras apontadas
               </p>
             </div>
@@ -585,19 +585,19 @@ export default function PerdasPage() {
           {/* KPI 2: Top Setor Crítico */}
           <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs relative overflow-hidden">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
                 <AlertTriangle className="w-4 h-4 text-amber-500" />
                 <span>Top Setor Crítico</span>
               </span>
             </div>
             <div className="mt-2.5">
               <div
-                className="text-base sm:text-lg font-bold text-[#1F2937] truncate"
+                className="text-lg sm:text-xl font-bold text-[#1F2937] truncate leading-tight"
                 title={topSetorCritico.setor}
               >
                 {topSetorCritico.setor}
               </div>
-              <p className="text-[11px] text-[#B91C1C] font-semibold mt-0.5">
+              <p className="text-xs text-[#B91C1C] font-semibold mt-1">
                 {topSetorCritico.valor > 0
                   ? formatCurrency(topSetorCritico.valor)
                   : 'Sem perdas apontadas'}
@@ -608,22 +608,26 @@ export default function PerdasPage() {
           {/* KPI 3: Tarefas de Validade Perdidas / Não Abertas no Prazo */}
           <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs relative overflow-hidden">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
                 <CalendarCheck className="w-4 h-4 text-[#2563EB]" />
                 <span>Validades Pendentes</span>
               </span>
               {tarefasValidadeNaoAbertas.length > 0 && (
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-[#B91C1C]">
+                <span className="text-xs font-bold px-2 py-0.5 rounded bg-red-100 text-[#B91C1C]">
                   Risco Ativo
                 </span>
               )}
             </div>
             <div className="mt-2.5">
-              <div className="text-xl sm:text-2xl font-extrabold text-[#1F2937] tracking-tight flex items-baseline gap-2">
+              <div
+                className={`text-2xl sm:text-3xl font-extrabold tracking-tight leading-none flex items-baseline gap-2 ${
+                  tarefasValidadeNaoAbertas.length > 0 ? 'text-[#B91C1C]' : 'text-[#1F2937]'
+                }`}
+              >
                 <span>{tarefasValidadeNaoAbertas.length}</span>
                 <span className="text-xs font-normal text-[#6B7280]">não concluídas</span>
               </div>
-              <p className="text-[11px] text-[#6B7280] mt-1">
+              <p className="text-xs text-[#6B7280] mt-1.5">
                 Rotinas de validação não finalizadas que aumentam a quebra
               </p>
             </div>
@@ -632,16 +636,24 @@ export default function PerdasPage() {
           {/* KPI 4: Cobertura de Inventário (últimos 30 dias) */}
           <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs relative overflow-hidden">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
                 <ClipboardCheck className="w-4 h-4 text-emerald-600" />
                 <span>Cobertura de Inventário</span>
               </span>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">
+              <span className="text-xs font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700">
                 30 dias
               </span>
             </div>
             <div className="mt-2.5">
-              <div className="text-xl sm:text-2xl font-extrabold text-[#1F2937] tracking-tight">
+              <div
+                className={`text-2xl sm:text-3xl font-extrabold tracking-tight leading-none ${
+                  coberturaInventario.percentual >= 90
+                    ? 'text-emerald-700'
+                    : coberturaInventario.percentual >= 70
+                      ? 'text-amber-700'
+                      : 'text-red-700'
+                }`}
+              >
                 {coberturaInventario.percentual}%
               </div>
               <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2 overflow-hidden">

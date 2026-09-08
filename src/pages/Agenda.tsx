@@ -849,89 +849,123 @@ export default function AgendaPage() {
 
       {/* KPI Cards do Dia */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-        <div className="p-3 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
-          <span className="text-[11px] text-[#6B7280] font-medium flex items-center justify-between">
+        <div className="p-3 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
+          <span className="text-xs text-[#6B7280] font-medium flex items-center justify-between">
             <span>Rotinas do Dia</span>
-            <Layers className="w-3.5 h-3.5 text-[#2563EB]" />
+            <Layers className="w-4 h-4 text-[#2563EB]" />
           </span>
-          <div className="text-xl sm:text-2xl font-bold text-[#1F2937] mt-1">{statsDia.total}</div>
-          <span className="text-[10px] text-[#6B7280]">{statsDia.concluidas} concluídas</span>
+          <div className="text-2xl sm:text-3xl font-bold text-[#1F2937] mt-1 leading-none">
+            {statsDia.total}
+          </div>
+          <span className="text-xs text-[#6B7280] mt-1 block">
+            {statsDia.concluidas} concluídas
+          </span>
         </div>
 
-        <div className="p-3 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
-          <span className="text-[11px] text-[#6B7280] font-medium flex items-center justify-between">
+        <div className="p-3 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
+          <span className="text-xs text-[#6B7280] font-medium flex items-center justify-between">
             <span>% Concluído</span>
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <CheckCircle2
+              className={`w-4 h-4 ${
+                statsDia.taxa >= 90
+                  ? 'text-emerald-600'
+                  : statsDia.taxa >= 70
+                    ? 'text-amber-600'
+                    : 'text-red-600'
+              }`}
+            />
           </span>
-          <div className="text-xl sm:text-2xl font-bold text-emerald-700 mt-1">
+          <div
+            className={`text-2xl sm:text-3xl font-bold mt-1 leading-none ${
+              statsDia.taxa >= 90
+                ? 'text-emerald-700'
+                : statsDia.taxa >= 70
+                  ? 'text-amber-700'
+                  : 'text-red-700'
+            }`}
+          >
             {statsDia.taxa}%
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-1.5 mt-1.5 overflow-hidden">
+          <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2 overflow-hidden">
             <div
-              className="bg-emerald-600 h-1.5 rounded-full transition-all duration-300"
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                statsDia.taxa >= 90
+                  ? 'bg-emerald-600'
+                  : statsDia.taxa >= 70
+                    ? 'bg-amber-500'
+                    : 'bg-red-500'
+              }`}
               style={{ width: `${statsDia.taxa}%` }}
             />
           </div>
         </div>
 
         <div
-          className={`p-3 rounded-lg shadow-2xs border ${
+          className={`p-3 sm:p-4 rounded-lg shadow-2xs border ${
             statsDia.atrasadas > 0
               ? 'bg-red-50/60 border-red-200 text-[#B91C1C]'
               : 'bg-white border-[#E5E7EB]'
           }`}
         >
-          <span className="text-[11px] font-medium flex items-center justify-between">
-            <span className={statsDia.atrasadas > 0 ? 'font-bold' : 'text-[#6B7280]'}>
+          <span className="text-xs font-medium flex items-center justify-between">
+            <span
+              className={statsDia.atrasadas > 0 ? 'font-bold text-[#B91C1C]' : 'text-[#6B7280]'}
+            >
               Atrasadas
             </span>
             <AlertTriangle
-              className={`w-3.5 h-3.5 ${statsDia.atrasadas > 0 ? 'text-[#B91C1C]' : 'text-gray-400'}`}
+              className={`w-4 h-4 ${statsDia.atrasadas > 0 ? 'text-[#B91C1C]' : 'text-gray-400'}`}
             />
           </span>
-          <div className="text-xl sm:text-2xl font-bold mt-1">{statsDia.atrasadas}</div>
-          <span className="text-[10px] opacity-80">
+          <div
+            className={`text-2xl sm:text-3xl font-bold mt-1 leading-none ${
+              statsDia.atrasadas > 0 ? 'text-[#B91C1C]' : 'text-[#1F2937]'
+            }`}
+          >
+            {statsDia.atrasadas}
+          </div>
+          <span className="text-xs opacity-80 mt-1 block">
             {statsDia.atrasadas > 0 ? 'Necessita readequação' : 'Tudo no prazo'}
           </span>
         </div>
 
-        <div className="p-3 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
-          <span className="text-[11px] text-[#6B7280] font-medium flex items-center justify-between">
+        <div className="p-3 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
+          <span className="text-xs text-[#6B7280] font-medium flex items-center justify-between">
             <span>Validação Regional</span>
-            <Clock className="w-3.5 h-3.5 text-amber-600" />
+            <Clock className="w-4 h-4 text-amber-600" />
           </span>
-          <div className="text-xl sm:text-2xl font-bold text-amber-800 mt-1">
+          <div className="text-2xl sm:text-3xl font-bold text-amber-800 mt-1 leading-none">
             {statsDia.aguardando}
           </div>
-          <span className="text-[10px] text-[#6B7280]">
+          <span className="text-xs text-[#6B7280] mt-1 block">
             {statsDia.devolvidas > 0
               ? `${statsDia.devolvidas} devolvida(s)`
               : 'Aguardando validação'}
           </span>
         </div>
 
-        <div className="p-3 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
-          <span className="text-[11px] text-[#6B7280] font-medium flex items-center justify-between">
+        <div className="p-3 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
+          <span className="text-xs text-[#6B7280] font-medium flex items-center justify-between">
             <span>Visitas Promotores</span>
-            <Handshake className="w-3.5 h-3.5 text-[#2563EB]" />
+            <Handshake className="w-4 h-4 text-[#2563EB]" />
           </span>
-          <div className="text-xl sm:text-2xl font-bold text-[#1F2937] mt-1">
+          <div className="text-2xl sm:text-3xl font-bold text-[#1F2937] mt-1 leading-none">
             {statsDia.visitasCount}
           </div>
-          <span className="text-[10px] text-[#6B7280]">
+          <span className="text-xs text-[#6B7280] mt-1 block">
             {visitasDoDia.filter((v) => v.status === 'realizada').length} realizadas hoje
           </span>
         </div>
 
-        <div className="p-3 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
-          <span className="text-[11px] text-[#6B7280] font-medium flex items-center justify-between">
+        <div className="p-3 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
+          <span className="text-xs text-[#6B7280] font-medium flex items-center justify-between">
             <span>Planos 5W2H (Prazo)</span>
-            <CheckSquare className="w-3.5 h-3.5 text-[#2563EB]" />
+            <CheckSquare className="w-4 h-4 text-[#2563EB]" />
           </span>
-          <div className="text-xl sm:text-2xl font-bold text-[#1F2937] mt-1">
+          <div className="text-2xl sm:text-3xl font-bold text-[#1F2937] mt-1 leading-none">
             {statsDia.planosCount}
           </div>
-          <span className="text-[10px] text-[#6B7280]">
+          <span className="text-xs text-[#6B7280] mt-1 block">
             {planosDoDia.filter((p) => p.status === 'concluida').length} concluídos
           </span>
         </div>
@@ -1473,23 +1507,23 @@ export default function AgendaPage() {
                   {/* Informações da Tarefa */}
                   <div className="space-y-1.5 flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      {/* Checkbox de Conclusão Rápida */}
+                      {/* Checkbox de Conclusão Rápida com tap target generoso */}
                       <button
                         type="button"
                         onClick={() => handleToggleConclusao(rotina.id)}
                         disabled={submittingId === rotina.id}
-                        className={`w-5 h-5 rounded border flex items-center justify-center transition-colors shrink-0 ${
+                        className={`w-6 h-6 rounded border flex items-center justify-center transition-colors shrink-0 ${
                           concluida
                             ? 'bg-emerald-600 border-emerald-600 text-white'
                             : 'border-[#D1D5DB] hover:border-[#2563EB] bg-white'
                         }`}
                         title={concluida ? 'Marcar como não concluída' : 'Marcar como concluída'}
                       >
-                        {concluida && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                        {concluida && <Check className="w-4 h-4 stroke-[3]" />}
                       </button>
 
                       <span
-                        className={`font-semibold text-xs sm:text-sm ${
+                        className={`font-semibold text-sm ${
                           concluida ? 'line-through text-[#6B7280]' : 'text-[#1F2937]'
                         }`}
                       >
@@ -1589,34 +1623,34 @@ export default function AgendaPage() {
                   </div>
 
                   {/* Ações da Linha na Agenda */}
-                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center flex-wrap">
                     {/* Botão de Ver Foto se houver comprovação */}
                     {execucao?.foto && (
                       <button
                         onClick={() => setVisualizarFoto({ execucao, rotina })}
-                        className="p-1.5 rounded text-[#2563EB] hover:bg-blue-50 border border-blue-200"
+                        className="p-2 min-h-[38px] min-w-[38px] flex items-center justify-center rounded text-[#2563EB] hover:bg-blue-50 border border-blue-200"
                         title="Ver foto comprovatória enviada"
                       >
                         <Camera className="w-4 h-4" />
                       </button>
                     )}
 
-                    {/* Botão Concluir com Foto */}
+                    {/* Botão Concluir com Foto com tap target confortável */}
                     {!concluida && (
                       <button
                         onClick={() => setConcluirModalRotina(rotina)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold bg-white border border-[#2563EB] text-[#2563EB] hover:bg-blue-50 transition-colors"
+                        className="inline-flex items-center gap-1 px-3 py-2 min-h-[38px] rounded-md text-xs font-semibold bg-white border border-[#2563EB] text-[#2563EB] hover:bg-blue-50 transition-colors"
                         title="Concluir rotina anexando foto"
                       >
                         <Camera className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">Com foto</span>
+                        <span>Com foto</span>
                       </button>
                     )}
 
                     {/* Botão Readequar (Mudar horário ou adiar para outro dia) */}
                     <button
                       onClick={() => setReadequarModal({ open: true, rotina })}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#374151] hover:text-[#2563EB] transition-colors"
+                      className="inline-flex items-center gap-1 px-3 py-2 min-h-[38px] rounded-md text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#374151] hover:text-[#2563EB] transition-colors"
                       title="Readequar horário, prioridade ou adiar dia"
                     >
                       <ArrowUpDown className="w-3.5 h-3.5 text-[#2563EB]" />
