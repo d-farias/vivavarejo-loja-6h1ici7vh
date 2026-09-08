@@ -566,7 +566,7 @@ export default function AgendaPage() {
       }
     }
 
-    // 3. PLANOS DE AÇÃO 5W2H ABERTOS
+    // 3. PLANOS DE AÇÃO / CHAMADOS DE MANUTENÇÃO & ALERTA ABERTOS
     for (const plano of planosDoDia) {
       if (plano.status === 'concluida') continue // Concluídos somem
 
@@ -575,24 +575,33 @@ export default function AgendaPage() {
       const atrasado = isPlanoAtrasado(plano)
 
       if (atrasado) {
-        score += 110 // Plano 5W2H atrasado é desvio não corrigido
-        motivos.push('Plano de ação 5W2H atrasado')
+        score += 110 // Plano/Chamado atrasado é desvio não corrigido
+        motivos.push(
+          plano.area_demandante
+            ? `Chamado (${plano.area_demandante}) atrasado`
+            : 'Ação 5W2H atrasada',
+        )
       } else {
         score += 35
-        motivos.push('Prazo repactuado para hoje')
+        motivos.push('Prazo hoje')
       }
 
       if (plano.prioridade === 'alta') {
         score += 30
-        motivos.push('Prioridade alta')
+        motivos.push('Prioridade alta / crítica')
       }
 
       const pPrazo = plano.prazo ? plano.prazo.substring(0, 10) : ''
+      const setorExibicao = plano.area_demandante || plano.expand?.rotina?.area || 'Operações'
+      const prefixoTitulo = plano.area_demandante
+        ? `Chamado [${plano.area_demandante}]: `
+        : 'Ação 5W2H: '
+
       list.push({
         id: plano.id,
         tipo: 'plano',
-        titulo: `Ação 5W2H: ${plano.descricao}`,
-        setor: plano.expand?.rotina?.area || 'Operação Loja',
+        titulo: `${prefixoTitulo}${plano.descricao}`,
+        setor: setorExibicao,
         responsavel: plano.responsavel || 'Responsável',
         prazo: pPrazo ? `Prazo: ${pPrazo.split('-').reverse().slice(0, 2).join('/')}` : 'Sem prazo',
         statusBadge: atrasado ? 'Atrasada' : 'No prazo',
@@ -1091,22 +1100,45 @@ export default function AgendaPage() {
                       </button>
                     )}
 
-                    {/* Caso 3: Plano 5W2H */}
+                    {/* Caso 3: Plano 5W2H / Chamado de Manutenção */}
                     {item.tipo === 'plano' && item.planoRef && (
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          await planosAcaoService.update(item.planoRef!.id, {
-                            status: 'concluida',
-                          })
-                          loadData()
-                        }}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs"
-                        title="Marcar plano 5W2H como concluído"
-                      >
-                        <Check className="w-3.5 h-3.5" />
-                        <span>Concluir Ação</span>
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await planosAcaoService.update(item.planoRef!.id, {
+                              status: 'concluida',
+                            })
+                            loadData()
+                          }}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs"
+                          title="Marcar chamado ou plano como concluído"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Concluir</span>
+                        </button>
+                        <BotaoAvisoWhatsApp
+                          lojaNome={lojaSelecionada?.nome || item.planoRef.expand?.loja?.nome}
+                          tarefaTitulo={`Chamado: ${item.planoRef.descricao}`}
+                          setor={
+                            item.planoRef.area_demandante ||
+                            item.planoRef.expand?.rotina?.area ||
+                            'Operações'
+                          }
+                          horario={
+                            item.planoRef.prazo
+                              ? new Date(item.planoRef.prazo).toLocaleDateString('pt-BR')
+                              : undefined
+                          }
+                          situacao={
+                            item.statusVariant === 'atrasada'
+                              ? 'Chamado/Ação Atrasada'
+                              : 'Atenção Operacional'
+                          }
+                          nomeResponsavel={item.planoRef.responsavel}
+                          compact
+                        />
+                      </>
                     )}
 
                     {/* Caso 4: Visita de Promotor */}
@@ -1281,8 +1313,14 @@ export default function AgendaPage() {
                       <span
                         className={`font-semibold text-xs sm:text-sm ${isDone ? 'line-through text-[#6B7280]' : 'text-[#1F2937]'}`}
                       >
+                        {plano.area_demandante ? `[${plano.area_demandante}] ` : ''}
                         {plano.descricao}
                       </span>
+                      {plano.area_demandante && (
+                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-50 text-[#2563EB] border border-blue-200">
+                          {plano.area_demandante}
+                        </span>
+                      )}
                       <span className="text-[10px] font-bold uppercase px-1.5 py-0.2 rounded bg-gray-100 text-[#4B5563]">
                         {plano.prioridade}
                       </span>

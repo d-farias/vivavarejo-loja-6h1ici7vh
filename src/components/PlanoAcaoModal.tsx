@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { X, Calendar, AlertTriangle, User, Store, CheckSquare } from 'lucide-react'
+import { X, Calendar, AlertTriangle, User, Store, CheckSquare, Wrench } from 'lucide-react'
 import type { PlanoAcao, Loja, Rotina, StatusPlanoAcao, PrioridadePlanoAcao } from '@/types'
+import { AREAS_DEMANDANTES_CHAMADO } from '@/types'
 
 interface PlanoAcaoModalProps {
   isOpen: boolean
@@ -11,6 +12,7 @@ interface PlanoAcaoModalProps {
   rotinas?: Rotina[]
   defaultLojaId?: string
   defaultRotina?: Rotina | null
+  defaultAreaDemandante?: string
 }
 
 export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
@@ -22,10 +24,12 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
   rotinas = [],
   defaultLojaId,
   defaultRotina,
+  defaultAreaDemandante,
 }) => {
   const [descricao, setDescricao] = useState('')
   const [lojaId, setLojaId] = useState('')
   const [rotinaId, setRotinaId] = useState('')
+  const [areaDemandante, setAreaDemandante] = useState<string>('Operações')
   const [responsavel, setResponsavel] = useState('')
   const [prazo, setPrazo] = useState('')
   const [status, setStatus] = useState<StatusPlanoAcao>('aberta')
@@ -40,6 +44,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
         setDescricao(plano.descricao || '')
         setLojaId(plano.loja || '')
         setRotinaId(plano.rotina || '')
+        setAreaDemandante(plano.area_demandante || 'Operações')
         setResponsavel(plano.responsavel || '')
         setPrazo(plano.prazo ? plano.prazo.split(' ')[0] : '')
         setStatus(plano.status || 'aberta')
@@ -57,6 +62,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
         if (defaultRotina) {
           setDescricao(`Ajustar e normalizar execução da rotina: ${defaultRotina.nome}`)
           setRotinaId(defaultRotina.id)
+          setAreaDemandante(defaultRotina.area || 'Operações')
           setResponsavel(defaultRotina.responsavel || '')
           setPrioridade('alta')
           setObservacoes(
@@ -68,6 +74,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
         } else {
           setDescricao('')
           setRotinaId('')
+          setAreaDemandante(defaultAreaDemandante || 'Operações')
           setResponsavel('')
           setPrioridade('media')
           setObservacoes('')
@@ -84,15 +91,21 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
       }
       setError(null)
     }
-  }, [isOpen, plano, defaultLojaId, defaultRotina, lojas])
+  }, [isOpen, plano, defaultLojaId, defaultRotina, defaultAreaDemandante, lojas])
 
   if (!isOpen) return null
+
+  const handleExemploRapido = (area: string, desc: string, prio: PrioridadePlanoAcao) => {
+    setAreaDemandante(area)
+    setDescricao(desc)
+    setPrioridade(prio)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const trimmedDesc = descricao.trim()
     if (!trimmedDesc) {
-      setError('Por favor, informe o que será feito (descrição da ação).')
+      setError('Por favor, informe o que será feito (descrição da ação ou chamado).')
       return
     }
     if (!lojaId) {
@@ -107,6 +120,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
         descricao: trimmedDesc,
         loja: lojaId,
         rotina: rotinaId || undefined,
+        area_demandante: areaDemandante || undefined,
         responsavel: responsavel.trim() || undefined,
         prazo: prazo ? `${prazo} 23:59:59.000Z` : undefined,
         status,
@@ -115,7 +129,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
       })
       onClose()
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Erro ao salvar plano de ação'
+      const msg = err instanceof Error ? err.message : 'Erro ao salvar plano de ação/chamado'
       setError(msg)
     } finally {
       setSaving(false)
@@ -133,10 +147,12 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
             </div>
             <div>
               <h3 className="text-base font-bold text-[#1F2937]">
-                {plano ? 'Editar Plano de Ação' : 'Novo Plano de Ação (5W2H)'}
+                {plano
+                  ? 'Editar Chamado / Plano de Ação'
+                  : 'Novo Chamado de Manutenção / Ação (5W2H)'}
               </h3>
               <p className="text-xs text-[#6B7280]">
-                Defina o quê, quem, prazo e loja para resolução rápida
+                Área demandante, o quê, quem, prazo e loja com disparo na Agenda
               </p>
             </div>
           </div>
@@ -160,15 +176,85 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
             </div>
           )}
 
+          {/* Área Demandante */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151]">
+                Área Demandante <span className="text-red-500">*</span>
+              </label>
+              <span className="text-[11px] text-[#6B7280]">Compras, Logística, Manutenção...</span>
+            </div>
+            <div className="relative">
+              <Wrench className="w-3.5 h-3.5 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
+              <select
+                value={areaDemandante}
+                onChange={(e) => setAreaDemandante(e.target.value)}
+                className="w-full pl-8 pr-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-lg outline-none text-[#1F2937] font-medium"
+              >
+                {AREAS_DEMANDANTES_CHAMADO.map((area) => (
+                  <option key={area} value={area}>
+                    {area}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Exemplos rápidos para acelerar cadastro */}
+            <div className="flex flex-wrap items-center gap-1.5 mt-2">
+              <span className="text-[10px] text-[#9CA3AF] uppercase font-bold mr-0.5">
+                Exemplos:
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  handleExemploRapido(
+                    'Logística',
+                    'Caminhão atrasado: aguardando descarregamento na doca',
+                    'alta',
+                  )
+                }
+                className="text-[11px] px-2 py-0.5 rounded bg-gray-100 hover:bg-blue-50 hover:text-[#2563EB] text-[#4B5563] transition-colors"
+              >
+                Caminhão atrasado (Logística)
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  handleExemploRapido(
+                    'Manutenção',
+                    'Câmara fria com oscilação térmica acima do padrão',
+                    'alta',
+                  )
+                }
+                className="text-[11px] px-2 py-0.5 rounded bg-gray-100 hover:bg-blue-50 hover:text-[#2563EB] text-[#4B5563] transition-colors"
+              >
+                Câmara fria (Manutenção)
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  handleExemploRapido(
+                    'Abastecimento',
+                    'Ruptura crítica na gôndola de itens de curva A',
+                    'alta',
+                  )
+                }
+                className="text-[11px] px-2 py-0.5 rounded bg-gray-100 hover:bg-blue-50 hover:text-[#2563EB] text-[#4B5563] transition-colors"
+              >
+                Ruptura de Curva A (Abastecimento)
+              </button>
+            </div>
+          </div>
+
           {/* O quê (Descrição) */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-              O que fazer (Descrição da Ação) <span className="text-red-500">*</span>
+              O que fazer / Descrição do Chamado <span className="text-red-500">*</span>
             </label>
             <textarea
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
-              placeholder="Ex: Treinar equipe de fechamento no checklist de limpeza e contagem"
+              placeholder="Ex: Troca de vedação da porta da câmara frigorífica ou cobrança de caminhão atrasado"
               rows={2}
               required
               className="w-full px-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-lg outline-none focus:ring-2 focus:ring-[#3B82F6]/20 text-[#1F2937] resize-none"

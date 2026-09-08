@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08T04:28:50.933Z",
+  "generatedAt": "2026-09-08T04:54:10.600Z",
   "collections": [
     {
       "name": "users",
@@ -868,6 +868,12 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "area_demandante",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -875,7 +881,8 @@
         "CREATE INDEX idx_planos_rotina ON planos_acao (rotina)",
         "CREATE INDEX idx_planos_status ON planos_acao (status)",
         "CREATE INDEX idx_planos_prazo ON planos_acao (prazo)",
-        "CREATE INDEX idx_planos_created ON planos_acao (created)"
+        "CREATE INDEX idx_planos_created ON planos_acao (created)",
+        "CREATE INDEX `idx_planos_area_demandante` ON `planos_acao` (area_demandante)"
       ]
     },
     {

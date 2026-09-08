@@ -160,6 +160,30 @@ export interface ExecucaoRotina extends RecordModel {
 export type StatusPlanoAcao = 'aberta' | 'em_andamento' | 'concluida'
 export type PrioridadePlanoAcao = 'baixa' | 'media' | 'alta'
 
+export type AreaDemandanteChamado =
+  | 'Compras'
+  | 'Abastecimento'
+  | 'RH'
+  | 'Marketing'
+  | 'Logística'
+  | 'Financeiro'
+  | 'Operações'
+  | 'Prevenção de Perdas'
+  | 'Manutenção'
+  | 'Outro'
+
+export const AREAS_DEMANDANTES_CHAMADO: AreaDemandanteChamado[] = [
+  'Compras',
+  'Abastecimento',
+  'RH',
+  'Marketing',
+  'Logística',
+  'Financeiro',
+  'Operações',
+  'Prevenção de Perdas',
+  'Manutenção',
+]
+
 export interface PlanoAcao extends RecordModel {
   descricao: string
   loja: string
@@ -169,6 +193,7 @@ export interface PlanoAcao extends RecordModel {
   prazo?: string
   status: StatusPlanoAcao
   prioridade: PrioridadePlanoAcao
+  area_demandante?: string
   observacoes?: string
   created: string
   updated: string

@@ -30,6 +30,7 @@ interface PlanosAcaoCardProps {
   title?: string
   subtitle?: string
   allowFilterLoja?: boolean
+  selectedAreaDemandante?: string
 }
 
 export function isPlanoAtrasado(plano: PlanoAcao): boolean {
@@ -48,12 +49,14 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
   onDeletePlano,
   onToggleStatus,
   selectedLojaId,
-  title = 'Plano de Ação Operacional (5W2H)',
-  subtitle = 'Ações corretivas, preventivas e de melhoria contínua',
+  title = 'Chamados de Manutenção & Planos de Ação',
+  subtitle = 'Chamados por área demandante (Compras, Logística, Manutenção) e ações 5W2H',
   allowFilterLoja = false,
+  selectedAreaDemandante,
 }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('todos')
+  const [areaFilter, setAreaFilter] = useState<string>(selectedAreaDemandante || 'todas')
   const [localLojaFilter, setLocalLojaFilter] = useState<string>(selectedLojaId || 'todas')
 
   // Filtros aplicados
@@ -62,6 +65,11 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
       // Filtro de Loja
       if (allowFilterLoja && localLojaFilter !== 'todas' && p.loja !== localLojaFilter) {
         return false
+      }
+      // Filtro de Área Demandante
+      if (areaFilter !== 'todas') {
+        const pArea = p.area_demandante || 'Operações'
+        if (pArea !== areaFilter) return false
       }
       // Filtro de Status
       if (statusFilter === 'abertas') {
@@ -76,16 +84,18 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
       if (searchTerm) {
         const q = searchTerm.toLowerCase()
         const matchDesc = p.descricao.toLowerCase().includes(q)
+        const matchArea = p.area_demandante?.toLowerCase().includes(q)
         const matchResp = p.responsavel?.toLowerCase().includes(q)
         const matchObs = p.observacoes?.toLowerCase().includes(q)
         const matchLoja = p.expand?.loja?.nome?.toLowerCase().includes(q)
         const matchRotina = p.expand?.rotina?.nome?.toLowerCase().includes(q)
-        if (!matchDesc && !matchResp && !matchObs && !matchLoja && !matchRotina) return false
+        if (!matchDesc && !matchArea && !matchResp && !matchObs && !matchLoja && !matchRotina)
+          return false
       }
 
       return true
     })
-  }, [planos, allowFilterLoja, localLojaFilter, statusFilter, searchTerm])
+  }, [planos, allowFilterLoja, localLojaFilter, areaFilter, statusFilter, searchTerm])
 
   // KPIs
   const kpis = useMemo(() => {
@@ -234,6 +244,24 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
           )}
 
           <select
+            value={areaFilter}
+            onChange={(e) => setAreaFilter(e.target.value)}
+            className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+            title="Filtrar por Área Demandante"
+          >
+            <option value="todas">Todas as Áreas</option>
+            <option value="Compras">Compras</option>
+            <option value="Abastecimento">Abastecimento</option>
+            <option value="RH">RH</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Logística">Logística</option>
+            <option value="Financeiro">Financeiro</option>
+            <option value="Operações">Operações</option>
+            <option value="Prevenção de Perdas">Prevenção de Perdas</option>
+            <option value="Manutenção">Manutenção</option>
+          </select>
+
+          <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
@@ -246,11 +274,13 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
 
           {(searchTerm ||
             statusFilter !== 'todos' ||
+            areaFilter !== 'todas' ||
             (allowFilterLoja && localLojaFilter !== 'todas')) && (
             <button
               onClick={() => {
                 setSearchTerm('')
                 setStatusFilter('todos')
+                setAreaFilter('todas')
                 setLocalLojaFilter('todas')
               }}
               className="text-xs text-[#2563EB] hover:underline whitespace-nowrap"
@@ -294,8 +324,16 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
                         isDone ? 'line-through text-[#6B7280]' : 'text-[#1F2937]'
                       }`}
                     >
+                      {plano.area_demandante ? `[${plano.area_demandante}] ` : ''}
                       {plano.descricao}
                     </span>
+
+                    {/* Área Demandante Badge */}
+                    {plano.area_demandante && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-50 text-[#2563EB] border border-blue-200">
+                        {plano.area_demandante}
+                      </span>
+                    )}
 
                     {/* Prioridade */}
                     <span

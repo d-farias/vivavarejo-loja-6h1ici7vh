@@ -36,54 +36,162 @@ interface SegmentOption {
   description: string
 }
 
+interface ExemploRotina {
+  titulo: string
+  descricao: string
+}
+
+const EXEMPLOS_ROTINAS_POR_SEGMENTO: Record<string, ExemploRotina[]> = {
+  Açougue: [
+    {
+      titulo: 'Temperatura de câmara fria e balcão',
+      descricao: 'Aferição matinal e vespertina das câmaras e balcões com registro de conformidade',
+    },
+    {
+      titulo: 'Afiação/higienização de serras e moedores',
+      descricao: 'Desmonte, sanitização química e conferência de segurança e afiação das lâminas',
+    },
+    {
+      titulo: 'FIFO e maturação a vácuo',
+      descricao:
+        'Conferência de primeiro que entra, primeiro que sai e integridade das embalagens a vácuo',
+    },
+  ],
+  Farmácia: [
+    {
+      titulo: 'Registro de temperatura da geladeira de medicamentos',
+      descricao: 'Controle contínuo de termolábeis entre +2°C e +8°C com apontamento obrigatório',
+    },
+    {
+      titulo: 'Auditoria de validade com alerta 90 dias',
+      descricao: 'Varredura preventiva de lotes a vencer para evitar perdas e recolhimento prévio',
+    },
+    {
+      titulo: 'Contagem de psicotrópicos SNGPC',
+      descricao:
+        'Conferência diária do armário restrito com conferência física versus livro/sistema',
+    },
+  ],
+  'Padaria/Confeitaria': [
+    {
+      titulo: 'Higienização de fornos e masseiras',
+      descricao: 'Checklist rigoroso de limpeza pós-forneio e esterilização dos tachos',
+    },
+    {
+      titulo: 'Controle de fermentação e validade de fatiados',
+      descricao:
+        'Acompanhamento do tempo de câmara de fermentação e etiquetagem padrão de fatiados',
+    },
+  ],
+  'Moda/Confecção': [
+    {
+      titulo: 'Vitrine e reposição por grade/tamanho',
+      descricao:
+        'Conferência do padrão visual de manequins e reposição ágil de numerações faltantes',
+    },
+    {
+      titulo: 'Conferência de antifurto em peças de alto valor',
+      descricao: 'Inspeção do travamento de sensores magnéticos em casacos, jeans e peças nobres',
+    },
+  ],
+  'Pet Shop': [
+    {
+      titulo: 'Desinfecção do setor de banho e tosa',
+      descricao: 'Higienização e esterilização de lâminas, baias e toalhas entre atendimentos',
+    },
+    {
+      titulo: 'Auditoria de rações a granel',
+      descricao: 'Controle de vedação, umidade, data de lote e rodízio FIFO nas caixas de granel',
+    },
+  ],
+  'Restaurante/Alimentação': [
+    {
+      titulo: 'Etiquetagem e validade de pré-preparados',
+      descricao: 'Identificação visual obrigatória com data de manipulação e validade secundária',
+    },
+    {
+      titulo: 'Temperatura de cocção e banho-maria',
+      descricao: 'Monitoramento térmico da pista quente acima de 60°C para garantia sanitária',
+    },
+  ],
+  'Supermercado/Mercearia': [
+    {
+      titulo: 'Ruptura na abertura',
+      descricao:
+        'Varredura nos corredores principais antes de abrir as portas para reposição de gôndola',
+    },
+    {
+      titulo: 'Validade de laticínios e frios',
+      descricao: 'Auditoria de lotes próximos ao vencimento e aplicação do rodízio preventivo',
+    },
+  ],
+}
+
+const EXEMPLO_GENERICO_LOJA: ExemploRotina[] = [
+  {
+    titulo: 'Checklist de abertura e fechamento de caixa',
+    descricao: 'Conferência de fundo de troco, suprimentos e batimento financeiro de encerramento',
+  },
+  {
+    titulo: 'Auditoria de precificação e exposição de loja',
+    descricao:
+      'Conferência entre etiqueta de gôndola e leitor de código de barras para evitar atrito no caixa',
+  },
+  {
+    titulo: 'Prevenção de quebras e controle de estoque',
+    descricao:
+      'Contagem rotativa dos itens de maior giro e verificação de itens danificados ou avariados',
+  },
+]
+
 const SEGMENT_OPTIONS: SegmentOption[] = [
   {
-    id: 'Moda e Vestuário',
-    label: 'Moda e Vestuário',
+    id: 'Supermercado/Mercearia',
+    label: 'Supermercado/Mercearia',
+    icon: UtensilsCrossed,
+    description: 'Mercados, mercearias e minimercados',
+  },
+  {
+    id: 'Açougue',
+    label: 'Açougue / Carnes',
+    icon: UtensilsCrossed,
+    description: 'Casas de carnes, boutiques de cortes e peixarias',
+  },
+  {
+    id: 'Padaria/Confeitaria',
+    label: 'Padaria / Confeitaria',
+    icon: Sparkles,
+    description: 'Panificação, confeitarias, bistrôs e empórios',
+  },
+  {
+    id: 'Farmácia',
+    label: 'Farmácia / Drogaria',
+    icon: Pill,
+    description: 'Drogarias, farmácias e dermocosméticos',
+  },
+  {
+    id: 'Moda/Confecção',
+    label: 'Moda / Confecção',
     icon: ShoppingBag,
     description: 'Lojas de roupas, calçados e acessórios',
   },
   {
-    id: 'Supermercado/Food',
-    label: 'Supermercado/Food',
-    icon: UtensilsCrossed,
-    description: 'Mercados, empórios, hortifrútis e padarias',
-  },
-  {
-    id: 'Farmácia',
-    label: 'Farmácia',
-    icon: Pill,
-    description: 'Drogarias, farmácias e cosméticos de balcão',
-  },
-  {
-    id: 'Eletrônicos',
-    label: 'Eletrônicos',
-    icon: Tv,
-    description: 'Celulares, informática, games e eletrodomésticos',
-  },
-  {
-    id: 'Construção/Casa',
-    label: 'Construção/Casa',
-    icon: Hammer,
-    description: 'Materiais de construção, tintas, utilidades e decoração',
-  },
-  {
-    id: 'Cosméticos',
-    label: 'Cosméticos',
-    icon: Sparkles,
-    description: 'Perfumaria, beleza, estética e franquias de maquiagem',
-  },
-  {
-    id: 'Pet',
+    id: 'Pet Shop',
     label: 'Pet Shop / Veterinária',
     icon: Dog,
-    description: 'Pet shops, clínicas, rações e acessórios',
+    description: 'Pet shops, clínicas, rações e banho & tosa',
+  },
+  {
+    id: 'Restaurante/Alimentação',
+    label: 'Restaurante / Alimentação',
+    icon: UtensilsCrossed,
+    description: 'Restaurantes, lanchonetes e alimentação fora do lar',
   },
   {
     id: 'Outro',
-    label: 'Outro Varejo',
+    label: 'Outro Segmento',
     icon: Store,
-    description: 'Óticas, joalherias, livrarias, automotivo ou outros',
+    description: 'Materiais de construção, óticas, eletrônicos ou outros',
   },
 ]
 
@@ -658,6 +766,42 @@ export default function BemVindo() {
                         placeholder="Ex.: Ótica, Joalheria, Papelaria, Suplementos..."
                         className="w-full px-3.5 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-md outline-none focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
                       />
+                    </div>
+                  )}
+
+                  {/* Modelos do segmento escolhido */}
+                  {segmento && (
+                    <div className="mt-3.5 p-3.5 rounded-lg bg-blue-50/50 border border-blue-200/80 animate-in fade-in duration-200">
+                      <div className="flex items-center justify-between mb-2.5">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-[#2563EB]" />
+                          <span className="text-xs font-bold text-[#1F2937]">
+                            Exemplos de rotinas de{' '}
+                            {SEGMENT_OPTIONS.find((s) => s.id === segmento)?.label || segmento}:
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-semibold text-[#2563EB] bg-white px-2 py-0.5 rounded border border-blue-100">
+                          Modelo Operacional
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        {(EXEMPLOS_ROTINAS_POR_SEGMENTO[segmento] || EXEMPLO_GENERICO_LOJA).map(
+                          (ex, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-white p-2.5 rounded-md border border-[#E5E7EB] shadow-2xs"
+                            >
+                              <div className="text-xs font-bold text-[#1F2937] leading-snug">
+                                {ex.titulo}
+                              </div>
+                              <div className="text-[11px] text-[#4B5563] mt-1 leading-normal">
+                                {ex.descricao}
+                              </div>
+                            </div>
+                          ),
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
