@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog'
 import { ShieldAlert, ShieldCheck, Check, RotateCcw } from 'lucide-react'
 import type { TarefaValidade } from '@/types'
+import { normalizarNomeCanonico } from '@/lib/cargos'
 import { tarefasValidadeService } from '@/services/tarefasValidade'
 
 interface ValidarValidadeModalProps {
@@ -67,7 +68,10 @@ export function ValidarValidadeModal({
         <DialogHeader>
           <DialogTitle className="text-base font-bold flex items-center gap-2 text-[#1F2937]">
             <ShieldCheck className="w-5 h-5 text-[#2563EB]" />
-            <span>Validação de Tarefa — Líder Prevenção</span>
+            <span>
+              Validação de Tarefa —{' '}
+              {normalizarNomeCanonico(tarefa.validador_funcao_nome || 'Prevenção de Perdas')}
+            </span>
           </DialogTitle>
         </DialogHeader>
 

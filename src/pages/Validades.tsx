@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { useStore } from '@/context/StoreContext'
 import { useAuth } from '@/context/AuthContext'
+import { normalizarNomeCanonico, getChaveCanonico } from '@/lib/cargos'
 import { StoreSelector } from '@/components/StoreSelector'
 import { ImportarValidadeModal } from '@/components/ImportarValidadeModal'
 import { BotaoAvisoWhatsApp } from '@/components/BotaoAvisoWhatsApp'
@@ -151,10 +152,15 @@ export default function ValidadesPage() {
     return tarefasDoDia.filter((t) => {
       if (searchTerm.trim()) {
         const q = searchTerm.toLowerCase()
-        const matchSetor = t.setor_categoria.toLowerCase().includes(q)
+        const setorNorm = normalizarNomeCanonico(t.setor_categoria).toLowerCase()
+        const matchSetor = t.setor_categoria.toLowerCase().includes(q) || setorNorm.includes(q)
         const matchDesc = t.descricao?.toLowerCase().includes(q) || false
-        const matchExec = t.executor_nome?.toLowerCase().includes(q) || false
-        const matchVal = t.validador_funcao_nome?.toLowerCase().includes(q) || false
+        const execNorm = normalizarNomeCanonico(t.executor_nome).toLowerCase()
+        const matchExec =
+          t.executor_nome?.toLowerCase().includes(q) || execNorm.includes(q) || false
+        const valNorm = normalizarNomeCanonico(t.validador_funcao_nome).toLowerCase()
+        const matchVal =
+          t.validador_funcao_nome?.toLowerCase().includes(q) || valNorm.includes(q) || false
         if (!matchSetor && !matchDesc && !matchExec && !matchVal) return false
       }
 
@@ -163,7 +169,9 @@ export default function ValidadesPage() {
       }
 
       if (setorFilter !== 'todos') {
-        if (t.setor_categoria !== setorFilter) return false
+        const chaveFiltro = getChaveCanonico(setorFilter)
+        const chaveSetor = getChaveCanonico(t.setor_categoria)
+        if (chaveFiltro !== chaveSetor && t.setor_categoria !== setorFilter) return false
       }
 
       if (semanaFilter !== 'todas') {
@@ -174,13 +182,19 @@ export default function ValidadesPage() {
     })
   }, [tarefasDoDia, searchTerm, statusFilter, setorFilter, semanaFilter])
 
-  // Lista de setores disponíveis para o filtro
+  // Lista de setores disponíveis para o filtro (agrupada pela chave canônica unificada)
   const setoresDisponiveis = useMemo(() => {
-    const set = new Set<string>()
+    const map = new Map<string, string>()
     for (const t of tarefasDoDia) {
-      if (t.setor_categoria) set.add(t.setor_categoria)
+      if (t.setor_categoria) {
+        const canonico = normalizarNomeCanonico(t.setor_categoria)
+        const chave = getChaveCanonico(canonico) || getChaveCanonico(t.setor_categoria)
+        if (!map.has(chave)) {
+          map.set(chave, canonico)
+        }
+      }
     }
-    return Array.from(set).sort()
+    return Array.from(map.values()).sort((a, b) => a.localeCompare(b))
   }, [tarefasDoDia])
 
   // Cálculos de KPI do dia
@@ -627,13 +641,18 @@ export default function ValidadesPage() {
                     <div className="flex items-center gap-3 text-xs text-[#6B7280] flex-wrap pt-0.5">
                       <span>
                         Validador:{' '}
-                        <strong>{tarefa.validador_funcao_nome || 'Líder Prevenção'}</strong>
+                        <strong>
+                          {normalizarNomeCanonico(
+                            tarefa.validador_funcao_nome || 'Prevenção de Perdas',
+                          )}
+                        </strong>
                       </span>
                       {tarefa.executor_nome && (
                         <>
                           <span>•</span>
                           <span>
-                            Responsável direto: <strong>{tarefa.executor_nome}</strong>
+                            Responsável direto:{' '}
+                            <strong>{normalizarNomeCanonico(tarefa.executor_nome)}</strong>
                           </span>
                         </>
                       )}

@@ -3,6 +3,7 @@ import { useAuth } from '@/context/AuthContext'
 import { Navigate } from 'react-router-dom'
 import { clientesService } from '@/services/clientes'
 import { lojasService } from '@/services/lojas'
+import { normalizarNomeCanonico, formatarCargoOuResponsavel } from '@/lib/cargos'
 import { funcoesService } from '@/services/funcoes'
 import { funcionariosService, usersService } from '@/services/funcionarios'
 import { modelosRotinasService } from '@/services/modelosRotinas'
@@ -1827,7 +1828,16 @@ export default function Admin() {
                     <tbody className="divide-y divide-[#E5E7EB]">
                       {filteredFuncoes.map((fn) => (
                         <tr key={fn.id} className="hover:bg-gray-50/80 transition-colors">
-                          <td className="p-3.5 font-semibold text-[#1F2937]">{fn.nome}</td>
+                          <td className="p-3.5 font-semibold text-[#1F2937]">
+                            <div className="flex items-center gap-2">
+                              <span>{normalizarNomeCanonico(fn.nome)}</span>
+                              {normalizarNomeCanonico(fn.nome) !== fn.nome && (
+                                <span className="text-[10px] text-gray-400 font-normal">
+                                  ({fn.nome})
+                                </span>
+                              )}
+                            </div>
+                          </td>
                           <td className="p-3.5 text-[#4B5563]">
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-100 text-[11px] font-medium text-[#374151]">
                               <Store className="w-3 h-3 text-[#6B7280]" />
@@ -1837,7 +1847,9 @@ export default function Admin() {
                           <td className="p-3.5 text-[#4B5563]">
                             {fn.expand?.chefe_imediato_funcao ? (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 text-[11px] font-medium text-blue-700 border border-blue-200">
-                                <span>{fn.expand.chefe_imediato_funcao.nome}</span>
+                                <span>
+                                  {normalizarNomeCanonico(fn.expand.chefe_imediato_funcao.nome)}
+                                </span>
                               </span>
                             ) : (
                               <span className="text-xs text-gray-400 italic">Não definido</span>
@@ -1924,7 +1936,7 @@ export default function Admin() {
                       <option value="todas">Todas as Funções</option>
                       {funcoes.map((fn) => (
                         <option key={fn.id} value={fn.id}>
-                          {fn.nome}
+                          {normalizarNomeCanonico(fn.nome)}
                         </option>
                       ))}
                     </select>
@@ -1993,7 +2005,11 @@ export default function Admin() {
                           <td className="p-3.5 text-[#374151]">
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-100 text-[11px] font-medium">
                               <Briefcase className="w-3 h-3 text-[#6B7280]" />
-                              <span>{fc.expand?.funcao?.nome || 'Função não atribuída'}</span>
+                              <span>
+                                {fc.expand?.funcao?.nome
+                                  ? normalizarNomeCanonico(fc.expand.funcao.nome)
+                                  : 'Função não atribuída'}
+                              </span>
                             </span>
                           </td>
                           <td className="p-3.5 text-[#4B5563]">
@@ -2367,7 +2383,9 @@ export default function Admin() {
                                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-100 text-[#1F2937] font-semibold text-[11px]">
                                         <Briefcase className="w-3 h-3 text-[#6B7280]" />
                                         <span>
-                                          {f.expand?.funcao?.nome || 'Função não definida'}
+                                          {f.expand?.funcao?.nome
+                                            ? normalizarNomeCanonico(f.expand.funcao.nome)
+                                            : 'Função não definida'}
                                         </span>
                                       </span>
                                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 text-[#2563EB] text-[11px]">
@@ -2873,7 +2891,7 @@ export default function Admin() {
                     )
                     .map((f) => (
                       <option key={f.id} value={f.id}>
-                        {f.nome}
+                        {normalizarNomeCanonico(f.nome)}
                       </option>
                     ))}
                 </select>
@@ -2970,7 +2988,7 @@ export default function Admin() {
                     .filter((f) => !formLojaId || f.loja === formLojaId)
                     .map((fn) => (
                       <option key={fn.id} value={fn.id}>
-                        {fn.nome}
+                        {normalizarNomeCanonico(fn.nome)}
                       </option>
                     ))}
                 </select>

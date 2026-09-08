@@ -17,6 +17,7 @@ import {
   Layers,
 } from 'lucide-react'
 import type { PlanoAcao, Loja, Rotina, StatusPlanoAcao } from '@/types'
+import { normalizarNomeCanonico, getChaveCanonico } from '@/lib/cargos'
 
 interface PlanosAcaoCardProps {
   planos: PlanoAcao[]
@@ -69,7 +70,9 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
       // Filtro de Área Demandante
       if (areaFilter !== 'todas') {
         const pArea = p.area_demandante || 'Operações'
-        if (pArea !== areaFilter) return false
+        const chaveFiltro = getChaveCanonico(areaFilter)
+        const chaveArea = getChaveCanonico(pArea)
+        if (chaveFiltro !== chaveArea && pArea !== areaFilter) return false
       }
       // Filtro de Status
       if (statusFilter === 'abertas') {
@@ -84,8 +87,10 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
       if (searchTerm) {
         const q = searchTerm.toLowerCase()
         const matchDesc = p.descricao.toLowerCase().includes(q)
-        const matchArea = p.area_demandante?.toLowerCase().includes(q)
-        const matchResp = p.responsavel?.toLowerCase().includes(q)
+        const areaNorm = normalizarNomeCanonico(p.area_demandante).toLowerCase()
+        const respNorm = normalizarNomeCanonico(p.responsavel).toLowerCase()
+        const matchArea = p.area_demandante?.toLowerCase().includes(q) || areaNorm.includes(q)
+        const matchResp = p.responsavel?.toLowerCase().includes(q) || respNorm.includes(q)
         const matchObs = p.observacoes?.toLowerCase().includes(q)
         const matchLoja = p.expand?.loja?.nome?.toLowerCase().includes(q)
         const matchRotina = p.expand?.rotina?.nome?.toLowerCase().includes(q)
@@ -331,7 +336,7 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
                     {/* Área Demandante Badge */}
                     {plano.area_demandante && (
                       <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-50 text-[#2563EB] border border-blue-200">
-                        {plano.area_demandante}
+                        {normalizarNomeCanonico(plano.area_demandante)}
                       </span>
                     )}
 
@@ -383,7 +388,7 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
                     {plano.responsavel && (
                       <span className="flex items-center gap-1">
                         <User className="w-3.5 h-3.5 text-[#9CA3AF]" />
-                        <span>{plano.responsavel}</span>
+                        <span>{normalizarNomeCanonico(plano.responsavel)}</span>
                       </span>
                     )}
 

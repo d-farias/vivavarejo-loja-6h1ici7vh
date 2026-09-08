@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog'
 import { CalendarCheck, Store, Phone, Briefcase } from 'lucide-react'
 import type { TarefaValidade, Loja, Funcao, Funcionario } from '@/types'
+import { normalizarNomeCanonico } from '@/lib/cargos'
 import { formatPhoneBR } from '@/lib/phone-utils'
 import { funcoesService } from '@/services/funcoes'
 import { funcionariosService } from '@/services/funcionarios'
@@ -321,7 +322,7 @@ export function TarefaValidadeFormModal({
                 <option value="">Selecione uma função para autopreenchimento...</option>
                 {funcoesLoja.map((f) => (
                   <option key={f.id} value={f.id}>
-                    {f.nome}
+                    {normalizarNomeCanonico(f.nome)}
                   </option>
                 ))}
               </select>

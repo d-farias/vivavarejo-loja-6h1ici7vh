@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog'
 import { CheckCircle2, Camera, Upload, ShieldCheck, X } from 'lucide-react'
 import type { TarefaValidade } from '@/types'
+import { normalizarNomeCanonico } from '@/lib/cargos'
 
 interface ConcluirValidadeModalProps {
   isOpen: boolean
@@ -93,7 +94,10 @@ export function ConcluirValidadeModal({
                 {tarefa.horario_fim ? `– ${tarefa.horario_fim}` : ''}
               </span>
               <span>•</span>
-              <span>Validador: {tarefa.validador_funcao_nome || 'Líder Prevenção'}</span>
+              <span>
+                Validador:{' '}
+                {normalizarNomeCanonico(tarefa.validador_funcao_nome || 'Prevenção de Perdas')}
+              </span>
             </div>
           </div>
 
@@ -167,8 +171,10 @@ export function ConcluirValidadeModal({
             <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5" />
             <span>
               Ao concluir, a tarefa será encaminhada para validação de{' '}
-              <strong>{tarefa.validador_funcao_nome || 'Líder Prevenção'}</strong> para conferência
-              da foto e observações.
+              <strong>
+                {normalizarNomeCanonico(tarefa.validador_funcao_nome || 'Prevenção de Perdas')}
+              </strong>{' '}
+              para conferência da foto e observações.
             </span>
           </div>
 

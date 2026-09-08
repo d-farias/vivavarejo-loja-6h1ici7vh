@@ -533,50 +533,6 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
     return result.sort((a, b) => b.percentualSemana - a.percentualSemana)
   }, [rotinasFiltradas, execucoesFiltradas])
 
-    const result: AreaPerformance[] = []
-    map.forEach((rots, area) => {
-      const rotIds = new Set(rots.map((r) => r.id))
-      const totalEsperadoSemana = rots.length * 7
-
-      // Execuções válidas da semana para essa área (não devolvidas)
-      const execsArea = execucoesFiltradas.filter(
-        (e) => rotIds.has(e.rotina) && e.concluida && e.status_validacao !== 'devolvida',
-      )
-      const conclusoesSemana = execsArea.length
-      const percentualSemana =
-        totalEsperadoSemana > 0 ? Math.round((conclusoesSemana / totalEsperadoSemana) * 100) : 0
-
-      // Hoje
-      const execsHoje = execsArea.filter((e) => {
-        const eDate = e.data_execucao ? e.data_execucao.substring(0, 10) : ''
-        return eDate === todayStr
-      })
-      const conclusoesHoje = new Set(execsHoje.map((e) => e.rotina)).size
-      const totalHoje = rots.length
-      const percentualHoje = totalHoje > 0 ? Math.round((conclusoesHoje / totalHoje) * 100) : 0
-
-      const atrasadasHoje = rots.filter(
-        (r) => !concluidasHojeIds.has(r.id) && isPastDue(r.horario_limite),
-      ).length
-
-      result.push({
-        area,
-        totalRotinas: rots.length,
-        totalEsperadoSemana,
-        conclusoesSemana,
-        percentualSemana: Math.min(100, percentualSemana),
-        conclusoesHoje,
-        totalHoje,
-        percentualHoje: Math.min(100, percentualHoje),
-        atrasadasHoje,
-      })
-    })
-
-    return result.sort((a, b) => a.percentualSemana - b.percentualSemana)
-  }, [rotinasFiltradas, execucoesFiltradas, todayStr, concluidasHojeIds])
-
-
-
   // Ranking de Lojas (quando há lojas cadastradas)
   const rankingLojas: LojaRanking[] = useMemo(() => {
     return lojasFiltradasPorCliente

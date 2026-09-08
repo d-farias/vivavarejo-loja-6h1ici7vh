@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useStore } from '@/context/StoreContext'
+import { normalizarNomeCanonico, getChaveCanonico } from '@/lib/cargos'
 import { perdasService } from '@/services/perdas'
 import { inventariosService } from '@/services/inventarios'
 import { tarefasValidadeService } from '@/services/tarefasValidade'
@@ -125,8 +126,12 @@ export default function PerdasPage() {
       if (dataCorte && p.data && p.data < dataCorte) {
         return false
       }
-      if (filtroSetor !== 'todos' && p.setor_categoria !== filtroSetor) {
-        return false
+      if (filtroSetor !== 'todos') {
+        const chaveFiltro = getChaveCanonico(filtroSetor)
+        const chaveSetor = getChaveCanonico(p.setor_categoria)
+        if (chaveFiltro !== chaveSetor && p.setor_categoria !== filtroSetor) {
+          return false
+        }
       }
       if (filtroMotivo !== 'todos' && p.motivo !== filtroMotivo) {
         return false
@@ -134,9 +139,10 @@ export default function PerdasPage() {
       if (busca.trim()) {
         const b = busca.toLowerCase()
         const setor = (p.setor_categoria || '').toLowerCase()
+        const setorNorm = normalizarNomeCanonico(p.setor_categoria).toLowerCase()
         const item = (p.item_descricao || '').toLowerCase()
         const obs = (p.observacao || '').toLowerCase()
-        if (!setor.includes(b) && !item.includes(b) && !obs.includes(b)) {
+        if (!setor.includes(b) && !setorNorm.includes(b) && !item.includes(b) && !obs.includes(b)) {
           return false
         }
       }
@@ -153,8 +159,12 @@ export default function PerdasPage() {
       if (dataCorte && inv.data && inv.data < dataCorte) {
         return false
       }
-      if (filtroSetor !== 'todos' && inv.setor_categoria !== filtroSetor) {
-        return false
+      if (filtroSetor !== 'todos') {
+        const chaveFiltro = getChaveCanonico(filtroSetor)
+        const chaveSetor = getChaveCanonico(inv.setor_categoria)
+        if (chaveFiltro !== chaveSetor && inv.setor_categoria !== filtroSetor) {
+          return false
+        }
       }
       return true
     })
@@ -166,8 +176,12 @@ export default function PerdasPage() {
       if (filtroLoja !== 'todas' && t.loja && t.loja !== filtroLoja) {
         return false
       }
-      if (filtroSetor !== 'todos' && t.setor_categoria !== filtroSetor) {
-        return false
+      if (filtroSetor !== 'todos') {
+        const chaveFiltro = getChaveCanonico(filtroSetor)
+        const chaveSetor = getChaveCanonico(t.setor_categoria)
+        if (chaveFiltro !== chaveSetor && t.setor_categoria !== filtroSetor) {
+          return false
+        }
       }
       return true
     })
@@ -182,25 +196,30 @@ export default function PerdasPage() {
     return perdasFiltradas.reduce((acc, p) => acc + (Number(p.valor_estimado) || 0), 0)
   }, [perdasFiltradas])
 
-  // 2. Setores com soma de perdas para achar o Top Setor Crítico
+  // 2. Setores com soma de perdas para achar o Top Setor Crítico (agrupados por padrão canônico)
   const perdasPorSetor = useMemo(() => {
-    const map = new Map<string, { totalValor: number; totalQtd: number; count: number }>()
+    const map = new Map<
+      string,
+      { setor: string; totalValor: number; totalQtd: number; count: number }
+    >()
     perdasFiltradas.forEach((p) => {
-      const s = p.setor_categoria || 'Outro'
-      const cur = map.get(s) || { totalValor: 0, totalQtd: 0, count: 0 }
+      const raw = p.setor_categoria || 'Outro'
+      const s = normalizarNomeCanonico(raw) || 'Outro'
+      const chave = getChaveCanonico(s) || 'outro'
+      const cur = map.get(chave) || { setor: s, totalValor: 0, totalQtd: 0, count: 0 }
       cur.totalValor += Number(p.valor_estimado) || 0
       cur.totalQtd += Number(p.quantidade) || 0
       cur.count += 1
-      map.set(s, cur)
+      map.set(chave, cur)
     })
     return map
   }, [perdasFiltradas])
 
   const topSetorCritico = useMemo(() => {
     let top = { setor: 'Nenhum', valor: 0 }
-    perdasPorSetor.forEach((val, setor) => {
+    perdasPorSetor.forEach((val) => {
       if (val.totalValor > top.valor) {
-        top = { setor, valor: val.totalValor }
+        top = { setor: val.setor, valor: val.totalValor }
       }
     })
     return top
@@ -263,10 +282,12 @@ export default function PerdasPage() {
       }
     >()
 
-    // 1. Mapear setores com tarefas de validade pendentes
+    // 1. Mapear setores com tarefas de validade pendentes (unificado pelo padrão canônico)
     tarefasValidadeNaoAbertas.forEach((t) => {
-      const s = t.setor_categoria || 'Geral'
-      const cur = map.get(s) || {
+      const raw = t.setor_categoria || 'Geral'
+      const s = normalizarNomeCanonico(raw) || 'Geral'
+      const chave = getChaveCanonico(s) || 'geral'
+      const cur = map.get(chave) || {
         setor: s,
         tarefasPendentesCount: 0,
         tarefasExemplos: [],
@@ -278,13 +299,15 @@ export default function PerdasPage() {
       if (cur.tarefasExemplos.length < 3) {
         cur.tarefasExemplos.push(t)
       }
-      map.set(s, cur)
+      map.set(chave, cur)
     })
 
-    // 2. Mapear setores que têm perdas registradas
+    // 2. Mapear setores que têm perdas registradas (agrupando pela mesma chave canônica)
     perdasFiltradas.forEach((p) => {
-      const s = p.setor_categoria || 'Outro'
-      const cur = map.get(s) || {
+      const raw = p.setor_categoria || 'Outro'
+      const s = normalizarNomeCanonico(raw) || 'Outro'
+      const chave = getChaveCanonico(s) || 'outro'
+      const cur = map.get(chave) || {
         setor: s,
         tarefasPendentesCount: 0,
         tarefasExemplos: [],
@@ -297,13 +320,13 @@ export default function PerdasPage() {
       if (p.item_descricao && !cur.itensAtingidos.includes(p.item_descricao)) {
         cur.itensAtingidos.push(p.item_descricao)
       }
-      map.set(s, cur)
+      map.set(chave, cur)
     })
 
     // 3. Vincular último inventário do setor
     inventarios.forEach((inv) => {
-      const s = inv.setor_categoria
-      const cur = map.get(s)
+      const chave = getChaveCanonico(inv.setor_categoria)
+      const cur = map.get(chave)
       if (cur) {
         if (!cur.ultimoInventario || inv.data > cur.ultimoInventario.data) {
           cur.ultimoInventario = inv
@@ -867,7 +890,9 @@ export default function PerdasPage() {
                         {p.data.split('-').reverse().join('/')}
                       </td>
                       <td className="p-3 text-[#4B5563] font-medium">{lojaNome}</td>
-                      <td className="p-3 text-[#1F2937] font-semibold">{p.setor_categoria}</td>
+                      <td className="p-3 text-[#1F2937] font-semibold">
+                        {normalizarNomeCanonico(p.setor_categoria)}
+                      </td>
                       <td className="p-3">
                         <span
                           className={`inline-block px-2 py-0.5 rounded text-[11px] font-semibold uppercase ${
@@ -980,7 +1005,9 @@ export default function PerdasPage() {
                     <td className="p-3 text-[#4B5563]">
                       {inv.expand?.loja?.nome || 'Loja Principal'}
                     </td>
-                    <td className="p-3 font-semibold text-[#1F2937]">{inv.setor_categoria}</td>
+                    <td className="p-3 font-semibold text-[#1F2937]">
+                      {normalizarNomeCanonico(inv.setor_categoria)}
+                    </td>
                     <td className="p-3 capitalize text-[#4B5563]">
                       {inv.tipo === 'rotativo' ? 'Rotativo (Setor)' : 'Geral'}
                     </td>
@@ -995,7 +1022,9 @@ export default function PerdasPage() {
                         {inv.acuracidade_percentual ?? 100}%
                       </span>
                     </td>
-                    <td className="p-3 text-[#6B7280]">{inv.responsavel_nome || '—'}</td>
+                    <td className="p-3 text-[#6B7280]">
+                      {normalizarNomeCanonico(inv.responsavel_nome) || '—'}
+                    </td>
                   </tr>
                 ))}
               </tbody>
