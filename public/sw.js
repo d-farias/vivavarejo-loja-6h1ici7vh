@@ -1,18 +1,17 @@
 // Service Worker para VivaVarejo PWA
-// Versão do app: 0.0.66
+// Versão do app: 0.0.70
 // Estratégia de cache:
-// 1. Navegação (HTML / App Shell): Network-first SEMPRE com timeout e fallback para cache apenas se offline.
+// 1. Navegação (HTML / App Shell): Network-first SEMPRE com timeout rápido e fallback para cache apenas se offline.
 //    Isso garante que celulares com o app instalado recebam imediatamente a nova versão ao abrir ou recarregar com internet.
-// 2. Assets estáticos versionados pelo Vite (assets/*.js, assets/*.css): Cache-first / stale-while-revalidate com purge completo na ativação de nova versão.
+// 2. Assets estáticos versionados pelo Vite (assets/*.js, assets/*.css): Network-first com fallback para cache.
 // 3. NUNCA interceptar nem cachear chamadas de API do PocketBase (/api/) ou serviços externos.
-// 4. Ativação imediata: self.skipWaiting() e clients.claim(), enviando mensagem de update aos clientes abertos.
+// 4. Ativação imediata: self.skipWaiting() e clients.claim(), enviando mensagem de update aos clientes abertos e expurgando caches antigos.
 
-const APP_VERSION = '0.0.66'
+const APP_VERSION = '0.0.70'
 const CACHE_NAME = `vivavarejo-shell-v${APP_VERSION}`
 
 const PRECACHE_ASSETS = [
   '/',
-  '/index.html',
   '/manifest.webmanifest',
   '/icon-192.svg',
   '/icon-512.svg',
@@ -32,7 +31,7 @@ self.addEventListener('install', (event) => {
   )
 })
 
-// Ativação: apaga TODOS os caches antigos (incluindo vivavarejo-shell-v2 e versões legadas) e assume controle imediato
+// Ativação: apaga TODOS os caches antigos (incluindo vivavarejo-shell-v2, v0.0.66 e versões legadas) e assume controle imediato
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
@@ -89,7 +88,9 @@ self.addEventListener('fetch', (event) => {
   }
 
   // 3. Estratégia Network-first estrita para navegação HTML (document / App Shell)
-  // Garante que o celular SEMPRE pegue o HTML mais novo com as tags corretas de scripts ao estar online
+  // Garante que o celular SEMPRE busque o HTML mais novo do servidor quando online.
+  // Se a rede responder com sucesso (200), atualiza o cache e entrega o HTML fresco.
+  // Apenas em falha total de rede/offline recorre ao cache local.
   if (
     req.mode === 'navigate' ||
     req.destination === 'document' ||
@@ -103,7 +104,6 @@ self.addEventListener('fetch', (event) => {
             const copy = networkRes.clone()
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(req, copy)
-              cache.put('/index.html', copy.clone())
             })
           }
           return networkRes
@@ -111,8 +111,8 @@ self.addEventListener('fetch', (event) => {
         .catch(async () => {
           // Fallback offline: responde com o HTML armazenado em cache
           const cache = await caches.open(CACHE_NAME)
-          const cachedIndex = await cache.match('/index.html')
-          return cachedIndex || (await cache.match('/'))
+          const cachedIndex = await cache.match(req)
+          return cachedIndex || (await cache.match('/')) || new Response('Offline', { status: 503 })
         }),
     )
     return
@@ -120,8 +120,8 @@ self.addEventListener('fetch', (event) => {
 
   // 4. Recursos estáticos locais da mesma origem (JS, CSS, SVGs, fontes, imagens)
   if (url.origin === self.location.origin) {
-    // Para bundles Vite com hash no nome (/assets/*-[hash].js ou .css),
-    // podemos usar stale-while-revalidate ou network-first para garantir frescor
+    // Bundles do Vite têm hash no nome. Buscar primeiro na rede garante que novos bundles sejam baixados
+    // e o cache só atue como fallback ou aceleração offline.
     event.respondWith(
       fetch(req)
         .then((networkRes) => {
@@ -135,11 +135,6 @@ self.addEventListener('fetch', (event) => {
           // Se offline ou rede falhou, tenta o cache
           const cached = await caches.match(req)
           if (cached) return cached
-          // Se for rota de cliente em fallback, retorna o index.html
-          if (req.destination === 'document') {
-            const cache = await caches.open(CACHE_NAME)
-            return cache.match('/index.html')
-          }
           return new Response('Offline', { status: 503, statusText: 'Offline' })
         }),
     )

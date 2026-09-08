@@ -30,7 +30,7 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 
   window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register('/sw.js')
+      .register('/sw.js', { updateViaCache: 'none' })
       .then((reg) => {
         console.log('[VivaVarejo PWA] Service worker registrado:', reg.scope)
 
@@ -49,9 +49,11 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
           const newWorker = reg.installing
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // Nova versão instalada e pronta: manda pular espera
-                newWorker.postMessage({ type: 'SKIP_WAITING' })
+              if (newWorker.state === 'installed') {
+                if (navigator.serviceWorker.controller) {
+                  // Nova versão instalada e pronta: manda pular espera
+                  newWorker.postMessage({ type: 'SKIP_WAITING' })
+                }
               }
             })
           }
