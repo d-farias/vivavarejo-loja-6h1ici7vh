@@ -920,7 +920,7 @@ export default function Admin() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
         <div>
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-[#2563EB]" />
@@ -997,7 +997,7 @@ export default function Admin() {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="border-b border-[#E5E7EB] flex items-center gap-2 overflow-x-auto">
+      <div className="border-b border-[#E5E7EB] flex items-center gap-2 overflow-x-auto print:hidden">
         {/* Nova primeira aba: Painel Gerencial */}
         <button
           onClick={() => {

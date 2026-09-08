@@ -42,125 +42,92 @@ interface ComparativoItem {
 
 interface SolucaoPilar {
   id: string
+  numero: number
   titulo: string
   subtitulo: string
   icone: React.ComponentType<{ className?: string }>
   beneficioPrincipal: string
-  pontosChave: string[]
+  itensDetalhados: {
+    titulo: string
+    descricao: string
+  }[]
+  diferencialExclusivo: string
   dicaVendaInterna?: string
 }
 
 const COMPARATIVO_ITEMS: ComparativoItem[] = [
   {
-    criterio: 'Posicionamento: Camada de Execução Operacional',
-    subtexto: 'Transforma dados do ERP/BI em prioridades, rotinas e cobrança ativa em loja',
+    criterio: 'Motor de Execução Operacional vs Checklist Passivo',
+    subtexto: 'Conecta dados da retaguarda aos cortes horários de loja',
     vivavarejo: {
       status: true,
       detalhe:
-        'A ponte entre informação e execução: importa planilhas/CSV de qualquer ERP e cria rotinas com responsável, horário e cobrança imediata.',
+        'Converte metas e indicadores em rotinas com dono, horário de corte e conferência em piso de loja.',
       notaInterna:
-        'Argumento central: o lojista já tem ERP que diz "o que aconteceu ontem"; o VivaVarejo diz "o que precisa ser feito nos próximos 15 minutos".',
+        'O ERP informa o passado; o VivaVarejo dita o que fazer nos próximos 15 minutos.',
     },
     tradicionais: {
       status: false,
-      detalhe:
-        'Apenas formulários e checklists isolados que não conectam indicadores de retaguarda à rotina de quem está no chão.',
-      notaInterna: 'Concorrentes vendem auditoria estática sem ritmo diário de corte de loja.',
+      detalhe: 'Formulários estáticos e auditorias esporádicas sem ritmo diário de corte de loja.',
+      notaInterna: 'Concorrentes vendem auditoria de formulário sem ritmo de piso.',
     },
   },
   {
-    criterio: 'Prevenção de Perdas em Todo o Varejo (Não Apenas Supermercados)',
-    subtexto:
-      'Quebras, vencimentos, inventário rotativo e criticidade por setor para qualquer segmento',
+    criterio: 'Prevenção de Perdas Multissetorial com Rodízio',
+    subtexto: 'Quebras por motivo e valor + rodízio de 4 semanas de validade',
     vivavarejo: {
       status: true,
       detalhe:
-        'Gestão de quebras por motivo e valor estimado, inventários rotativos setorizados e acuracidade em tempo real para supermercados, farmácias, moda, açougues, pet shops e restaurantes.',
+        'Apontamento financeiro de perdas por motivo e rodízio de validade em 4 semanas para qualquer segmento.',
       notaInterna:
-        'Enfatize: não somos apenas alimentício. Em moda evita perdas de ponta de estoque e avarias; em farmácia atende controle estrito de lotes; em pet shop reduz vencimento de rações.',
+        'Em moda evita perda de ponta de estoque; em farmácia atende controle de lotes; em pet shop reduz perdas de ração.',
     },
     tradicionais: {
       status: 'parcial',
-      detalhe:
-        'Foco restrito a checklists genéricos de loja ou módulos pesados de auditoria externa sem rotina preventiva diária.',
+      detalhe: 'Foco restrito a checklists genéricos ou apuração contábil tardia de perdas.',
       notaInterna:
-        'Geralmente tratam perdas apenas no fechamento contábil do mês, quando o prejuízo já ocorreu.',
+        'Geralmente tratam quebra apenas no fechamento do mês, quando o prejuízo já ocorreu.',
     },
   },
   {
-    criterio: 'Validade × Calendário Nativa com Rodízio de 4 Semanas & Workflow',
-    subtexto: 'Cronograma distribuído, pré-alerta e validação com status e devolução formal',
+    criterio: 'Gestão Nativa de Promotores e Fornecedores',
+    subtexto: 'Agenda de visitas, tarefas em gôndola e controle de presença',
     vivavarejo: {
       status: true,
       detalhe:
-        'Rodízio mensal automático (semanas 1 a 4), pré-alertas sonoros/WhatsApp, workflow completo: Pendente → Aguardando Validação → Aprovada ou Devolvida com motivo.',
+        'Controle completo de promotores integrado à rotina da loja sem cobrança de ferramenta de trade à parte.',
       notaInterna:
-        'Diferencial exclusivo: o gerente não precisa auditar 100% dos itens todo dia; o sistema fatia a loja em 4 semanas e avisa se a auditoria foi aprovada ou devolvida.',
+        'Módulos de trade na concorrência custam de R$ 300 a R$ 800 extras/mês por loja.',
     },
     tradicionais: {
       status: false,
       detalhe:
-        'Inexistente no formato de calendário rotativo de 4 semanas. Apenas listas estáticas com prazos manuais.',
-      notaInterna:
-        'Sistemas genéricos exigem recadastramento manual recorrente sem rodízio inteligente.',
+        'Exige contratação de módulo terceirizado de trade marketing ou formulários manuais de portaria.',
     },
   },
   {
-    criterio: 'Chamados Instantâneos Integrando Áreas da Empresa ao Motor de Prioridade',
-    subtexto:
-      'Compras, Abastecimento, RH, Marketing, Logística, Financeiro, Manutenção e Prevenção',
+    criterio: 'Chamados Corporativos no Motor de Prioridade',
+    subtexto: 'Demandas de áreas internas com criticidade e alerta escalonado',
     vivavarejo: {
       status: true,
       detalhe:
-        'Demandas das áreas corporativas (ex.: "Caminhão atrasado", "Manutenção de câmara", "Troca de cartazete") entram automaticamente no Motor de Prioridade da Agenda da loja com alerta WhatsApp.',
+        'Compras, Abastecimento, Logística e Manutenção entram na Agenda da loja por criticidade com alerta WhatsApp.',
       notaInterna:
-        'Elimina o grupo de WhatsApp bagunçado onde pedidos se perdem: toda área abre chamado rápido com prazo, prioridade (Baixa, Média, Alta) e responsável direto.',
+        'Substitui grupos caóticos de WhatsApp onde pedidos se perdem sem prazo e responsável.',
     },
     tradicionais: {
       status: false,
       detalhe:
-        'Sistemas de checklist desconectados de helpdesks corporativos, forçando equipes a usarem 3 softwares diferentes.',
+        'Helpdesks corporativos e sistemas de checklist isolados forçando a equipe a abrir 3 sistemas.',
     },
   },
   {
-    criterio: 'Controle Completo de Promotores & Fornecedores Incluso',
-    subtexto: 'Agenda de visitas em loja, tarefas do promotor e acompanhamento de acordos',
+    criterio: 'Workflow Gerencial com 4 Status e Devolução Formal',
+    subtexto: 'Atrasada, Aguardando Validação, Devolvida e Aprovada',
     vivavarejo: {
       status: true,
       detalhe:
-        'Cadastro de marcas e fornecedores, promotores vinculados, agenda semanal de visitas em loja, checklist de tarefas do promotor e conferência de execução sem custo adicional.',
-      notaInterna:
-        'Módulos de trade marketing na concorrência custam de R$ 300 a R$ 800 extras/mês por loja. No VivaVarejo é parte nativa da plataforma.',
-    },
-    tradicionais: {
-      status: false,
-      detalhe:
-        'Cobrado como módulo à parte de Trade Marketing ou exige aplicativo externo secundário.',
-    },
-  },
-  {
-    criterio: 'Escalonamento Hierárquico no WhatsApp por Nível de Cargo',
-    subtexto: 'Cadeia de alertas quando a rotina atrasa ou sai da conformidade',
-    vivavarejo: {
-      status: true,
-      detalhe:
-        'Cadeia escalonada: Executor direto → Chefe imediato / Encarregado → Gerente de Operações (GO) → Diretor Regional com mensagens contextualizadas com 1 toque.',
-      notaInterna:
-        'Dica de fechamento: equipe operacional não abre e-mail corporativo. O WhatsApp garante índice de leitura acima de 98% e resposta em minutos.',
-    },
-    tradicionais: {
-      status: false,
-      detalhe:
-        'Apenas notificações frias por e-mail ou push genérico ignorados pelo operador de piso.',
-    },
-  },
-  {
-    criterio: 'Workflow Operacional com Sinalização Clara de Pendências',
-    subtexto: 'Acompanhamento de rotinas e tarefas em tempo real sem ambiguidade',
-    vivavarejo: {
-      status: true,
-      detalhe:
-        'Status visual explícito: Atrasada, Aguardando Validação, Devolvida com apontamento de correção e Aprovada com registro do validador e data/hora.',
+        'Workflow com validação gerencial obrigatória, motivo formal em devoluções e carimbo do auditor.',
     },
     tradicionais: {
       status: 'parcial',
@@ -169,79 +136,68 @@ const COMPARATIVO_ITEMS: ComparativoItem[] = [
     },
   },
   {
-    criterio: 'Planos de Ação 5W2H Gerados em 1 Toque a Partir do Desvio',
-    subtexto: 'O que, quem, quando, onde, por que e como resolver qualquer problema identificado',
+    criterio: 'Cadeia de Escalonamento Hierárquico no WhatsApp',
+    subtexto: 'Cobrança do responsável direto até o Diretor Regional',
     vivavarejo: {
       status: true,
       detalhe:
-        'Qualquer rotina atrasada, avaria ou ruptura vira plano corretivo 5W2H com prazo, responsável e prioridade diretamente na Agenda da loja.',
+        'Alertas contextualizados em 1 toque: Executor → Chefe imediato → Gerente de Operações → Regional.',
       notaInterna:
-        'Mostre no celular: uma inconformidade nunca fica "no ar". Ela vira um compromisso rastreável com cobrança hierárquica.',
+        'Piso de loja não lê e-mail; WhatsApp garante taxa de resposta e resolução imediata.',
+    },
+    tradicionais: {
+      status: false,
+      detalhe: 'Apenas e-mails frios ou push genéricos frequentemente ignorados pelo operador.',
+    },
+  },
+  {
+    criterio: 'Planos de Ação 5W2H Imediatos a Partir do Desvio',
+    subtexto: 'Causa raiz, responsável, prazo e acompanhamento na Agenda',
+    vivavarejo: {
+      status: true,
+      detalhe:
+        'Qualquer rotina atrasada ou quebra gera plano corretivo 5W2H em 1 toque diretamente na Agenda.',
+      notaInterna:
+        'Uma inconformidade nunca morre na planilha: vira compromisso rastreável com cobrança.',
     },
     tradicionais: {
       status: 'parcial',
       detalhe:
-        'Módulos de planos de ação complexos, lentos e burocráticos que líderes de loja abandonam.',
+        'Módulos complexos e burocráticos de planos de ação que a equipe abandona após a implantação.',
     },
   },
   {
-    criterio: 'Auditoria Visual com Fotos & Mídias de Comprovação Instantâneas',
-    subtexto: 'Registro fotográfico com horário, zoom e visualizador rápido na web e mobile',
+    criterio: 'Visão Unificada: Painel Executivo e Relatório Loja a Loja',
+    subtexto: 'Hoje, semana e mês, ranking de conformidade e exportação CSV',
     vivavarejo: {
       status: true,
       detalhe:
-        'Fotos obrigatórias ou opcionais capturadas na câmera do celular com carimbo de tempo, visualizador em modal e histórico por item.',
-    },
-    tradicionais: {
-      status: true,
-      detalhe: 'Permite foto, mas fluxos pesados e upload lento atrasam o ritmo de piso de loja.',
-    },
-  },
-  {
-    criterio: 'Visão Única: Dashboard Executivo + Relatório Loja a Loja Consolidado',
-    subtexto: 'Acompanhamento comparativo em tela única por Hoje / Semana / Mês com exportação CSV',
-    vivavarejo: {
-      status: true,
-      detalhe:
-        'Visão unificada: % de conclusão, % de aprovação, ranking comparativo entre lojas da rede, deltas de evolução e exportação consolidada em CSV com 1 clique.',
+        'Comparativo entre filiais da rede, % de conclusão e aprovação, ranking e exportação CSV consolidada.',
       notaInterna:
-        'Diretoria adora: em 10 segundos o Diretor Geral sabe qual loja está no topo e qual encarregado está com rotinas atrasadas.',
+        'Em 10 segundos o Diretor Geral sabe qual loja lidera e qual filial necessita de suporte urgente.',
     },
     tradicionais: {
       status: 'parcial',
       detalhe:
-        'Dashboards pesados e fragmentados em relatórios isolados com filtros lentos que exigem treinamento.',
+        'Relatórios fragmentados que exigem manipulação prévia de planilhas para gerar visão de rede.',
     },
   },
   {
-    criterio: 'Modelos Especializados por Segmento do Varejo & Importação Rápida',
-    subtexto: 'Implantação no mesmo dia com catálogo pronto e inteligência de rotinas',
+    criterio: 'Implantação no Mesmo Dia com Modelos de Varejo e PWA Leve',
+    subtexto: 'Biblioteca de rotinas prontas por segmento e app sem loja',
     vivavarejo: {
       status: true,
       detalhe:
-        'Biblioteca de modelos operacionais para Supermercados, Farmácias, Lojas de Moda, Açougues, Pet Shops e Restaurantes. Aplicação com 1 clique ou importação CSV/ERP.',
+        'Modelos prontos por segmento + importação Excel/CSV do ERP + PWA leve instalável no iPhone e Android.',
       notaInterna:
-        'Quebra a objeção clássica de falta de tempo: a loja não começa do zero, ela aplica o modelo do setor dela e sai rodando.',
+        'Quebra objeção de tempo: a loja não começa do zero e opera no mesmo dia sem consultoria cara.',
     },
     tradicionais: {
       status: false,
       detalhe:
-        'Consultorias caras e demoradas de semanas apenas para cadastrar perguntas e formulários.',
-      notaInterna: 'Concorrentes costumam cobrar taxa de implantação de R$ 2.000 a R$ 5.000.',
-    },
-  },
-  {
-    criterio: 'PWA Nativo Instalável no Celular Sem Loja de Aplicativos',
-    subtexto: 'Acesso rápido para toda a equipe, leve, atualizações transparentes',
-    vivavarejo: {
-      status: true,
-      detalhe:
-        'Instalação em 1 toque no iPhone (iOS) e Android sem necessidade de baixar centenas de megas em lojas, com navegação rápida pensada para operação no piso.',
-    },
-    tradicionais: {
-      status: 'parcial',
-      detalhe:
-        'Aplicativos pesados que travam celulares mais simples dos operadores ou sites não responsivos.',
+        'Semanas de parametrização consultiva e aplicativos pesados que travam celulares simples.',
+      notaInterna:
+        'Concorrentes costumam cobrar taxa pesada de implantação de R$ 2.000 a R$ 5.000.',
     },
   },
 ]
@@ -249,103 +205,220 @@ const COMPARATIVO_ITEMS: ComparativoItem[] = [
 const SOLUCOES_PLATAFORMA: SolucaoPilar[] = [
   {
     id: 'perdas',
-    titulo: '1. Prevenção de Perdas em Todo o Varejo',
-    subtitulo: 'Controle de quebras, validades, inventário rotativo e criticidade por setor',
+    numero: 1,
+    titulo: 'Perdas em TODO o Varejo (Não Só Supermercado)',
+    subtitulo: 'Quebras detalhadas, inventários rotativos e rodízio de 4 semanas de validade',
     icone: ShieldAlert,
     beneficioPrincipal:
-      'Solução universal para qualquer segmento varejista: supermercados, hortifrutis, farmácias, confecção/moda, açougues, pet shops e restaurantes.',
-    pontosChave: [
-      'Apontamento de perdas com motivo (vencimento, avaria, roubo, erro de pedido), item, setor, quantidade e valor financeiro estimado.',
-      'Validade × Calendário em rodízio inteligente de 4 semanas, distribuindo o esforço da equipe sem sobrecarregar nenhum dia.',
-      'Inventários setorizados (rotativos ou gerais) com cálculo automático de acuracidade percentual e divergências.',
-      'Registro fotográfico imediato das quebras e inconformidades como prova e rastreabilidade da loja.',
+      'Solução universal que atende supermercado, farmácia, moda, açougue, pet shop e restaurante com disciplina preventiva diária.',
+    itensDetalhados: [
+      {
+        titulo: 'Quebras por Motivo, Setor, Quantidade e Valor',
+        descricao:
+          'Apontamento no momento da ocorrência categorizado por vencimento, avaria, furto/roubo interno/externo ou erro de pedido, calculando impacto financeiro real.',
+      },
+      {
+        titulo: 'Inventários Rotativos Setorizados',
+        descricao:
+          'Auditorias contínuas por seção (açougue, perfumaria, confecção, frios) com apuração automática de acuracidade de estoque e divergências antes do fechamento do mês.',
+      },
+      {
+        titulo: 'Validade × Calendário em Rodízio de 4 Semanas',
+        descricao:
+          'Cronograma mensal inteligente que distribui as seções nas semanas 1 a 4, garantindo cobertura total da loja sem sobrecarregar nenhum turno.',
+      },
+      {
+        titulo: 'Aplicabilidade Multissetorial Comprovada',
+        descricao:
+          'Em farmácias assegura controle de lotes e retenção regulatória; em moda evita avarias e peças órfãs; em pet shops monitora sacarias e rações; em restaurantes audita câmaras frias.',
+      },
     ],
+    diferencialExclusivo:
+      'Diferencial exclusivo: transforma a prevenção de perdas em rotina diária no piso, em vez de um susto contábil descoberto semanas depois.',
     dicaVendaInterna:
-      'Lembre o cliente: em supermercados a perda atinge de 1% a 3% do faturamento; em farmácias, itens vencidos causam multas sanitárias graves; em pet e moda, avarias e desvios de estoque corroem a margem líquida.',
+      'Enfatize o argumento financeiro: perdas no varejo drenam de 1,5% a 3% do faturamento bruto. Uma redução de 20% nas quebras paga a plataforma imediatamente.',
   },
   {
     id: 'promotores',
-    titulo: '2. Controle de Promotores & Fornecedores',
-    subtitulo: 'Gestão da presença externa, tarefas em gôndola e cumprimento de acordos',
+    numero: 2,
+    titulo: 'Controle de Promotores e Fornecedores',
+    subtitulo: 'Agenda de visitas em loja, tarefas do promotor e acompanhamento de acordos',
     icone: Users,
     beneficioPrincipal:
-      'Visibilidade total sobre quem entra na sua loja, com tarefas claras e garantia do padrão combinado com fornecedores.',
-    pontosChave: [
-      'Agenda de visitas em loja com data, horário previsto, status (agendada, realizada, atrasada) e promotor responsável.',
-      'Checklist de rotinas do promotor: reposição, precificação, conferência de gôndola e aplicação de materiais promocionais.',
-      'Acompanhamento de demandas de fornecedores com histórico das visitas concluídas e observações registradas.',
-      'Módulo 100% nativo da plataforma, sem necessidade de contratar ferramentas caras de trade marketing à parte.',
+      'Controle nativo de presença externa, execução de gôndola e cumprimento de acordos comerciais sem custo de ferramentas adicionais.',
+    itensDetalhados: [
+      {
+        titulo: 'Agenda de Visitas em Loja',
+        descricao:
+          'Programação semanal e diária da escala de promotores com marca de fornecedor, data, horário previsto, status (agendada, realizada, atrasada) e promotor responsável.',
+      },
+      {
+        titulo: 'Tarefas de Piso do Promotor',
+        descricao:
+          'Checklists direcionados por visita: reposição de mercadoria, conferência de precificação na ponta de gôndola, aplicação de material de merchandising e verificação de frentes.',
+      },
+      {
+        titulo: 'Conferência de Acordos Comerciais',
+        descricao:
+          'Registro de conformidade e ocorrências para confrontar entregas de trade, bonificações acordadas e cumprimento das cotas de espaço em gôndola.',
+      },
+      {
+        titulo: 'Solução Nativa sem Custo Adicional',
+        descricao:
+          'Módulo 100% incorporado à plataforma VivaVarejo, eliminando a contratação de ferramentas extras de trade marketing que costumam encarecer o custo mensal por loja.',
+      },
     ],
+    diferencialExclusivo:
+      'Diferencial exclusivo: a loja passa a comprovar se o fornecedor parceiro realmente prestou o serviço combinado em gôndola com histórico auditável.',
     dicaVendaInterna:
-      'Geralmente o varejista não sabe se o promotor do fornecedor foi à loja ou quanto tempo ficou. Com o VivaVarejo, a presença vira indicador de conformidade do acordo comercial.',
+      'Quase todo supermercadista ou lojista reclama que o promotor "finge que vai e ninguém confere". O VivaVarejo dá a ele evidência fotográfica e controle pontual da visita.',
   },
   {
     id: 'integracao_areas',
-    titulo: '3. Integração Fácil com Áreas da Empresa & Chamados Instantâneos',
-    subtitulo:
-      'Compras, Abastecimento, RH, Marketing, Logística, Financeiro e Manutenção conectados',
+    numero: 3,
+    titulo: 'Integração com Áreas da Empresa',
+    subtitulo: 'Chamados instantâneos de retaguarda conectados ao Motor de Prioridade com WhatsApp',
     icone: Layers,
     beneficioPrincipal:
-      'Fim da bagunça de grupos de WhatsApp: toda área demandante abre chamados rápidos que entram direto na fila de execução da loja.',
-    pontosChave: [
-      'Chamados instantâneos por área demandante: Compras, Abastecimento, RH, Marketing, Logística (ex.: "Caminhão atrasado"), Financeiro, Operações, Prevenção de Perdas e Manutenção.',
-      'Integração nativa com o Motor de Prioridade da Agenda da loja, ordenando tarefas por criticidade e horário de corte.',
-      'Alerta imediato e escalonado via WhatsApp com mensagem formatada para o encarregado e gestor.',
-      'Prazos e níveis de prioridade (Baixa, Média, Alta) com acompanhamento em tempo real até o fechamento.',
+      'Centraliza demandas corporativas diretamente na fila de execução da loja, encerrando o caos de solicitações perdidas em grupos de mensagens.',
+    itensDetalhados: [
+      {
+        titulo: 'Chamados Instantâneos por Área Demandante',
+        descricao:
+          'Canais diretos para Compras, Abastecimento, RH, Marketing, Logística, Financeiro, Operações, Prevenção de Perdas e Manutenção abrirem pedidos à loja.',
+      },
+      {
+        titulo: 'Cenários Críticos em Tempo Real ("Caminhão Atrasado")',
+        descricao:
+          'Avisos urgentes (ex.: "Caminhão atrasado na rodovia", "Troca urgente de cartazete promocional") chegam imediatamente à gerência de loja para replanejar equipes e docas.',
+      },
+      {
+        titulo: 'Motor de Prioridade da Agenda da Loja',
+        descricao:
+          'Os chamados entram automaticamente no fluxo diário da loja ordenados por criticidade (Baixa, Média, Alta) e prazo de corte para não ficarem esquecidos.',
+      },
+      {
+        titulo: 'Alerta com Notificação Formatada via WhatsApp',
+        descricao:
+          'Disparo imediato ao encarregado e gestor responsável com mensagem estruturada, evitando ruídos de comunicação e acelerando a resposta.',
+      },
     ],
+    diferencialExclusivo:
+      'Diferencial exclusivo: substitui a salada de grupos informais de WhatsApp por chamados rastreáveis com dono, criticidade e prazo de atendimento.',
     dicaVendaInterna:
-      'Exemplo real de pitch: quando a Logística avisa "caminhão atrasado", isso vira prioridade na Agenda para reposicionar a equipe de recebimento antes de gerar gargalo na doca.',
+      'Mostre como a Logística sofre ao avisar atraso de frete por e-mail e a doca de recebimento estar vazia ou sem pessoal. Com o VivaVarejo o encarregado é alertado na hora.',
   },
   {
     id: 'erp_execucao',
-    titulo: '4. Da Informação à Execução: A Camada Entre ERP/BI e a Loja',
-    subtitulo: 'Transforma relatórios e planilhas em rotinas, prioridades e ação diária',
+    numero: 4,
+    titulo: 'Da Informação à Execução',
+    subtitulo:
+      'ERP/BI mostra o passado; VivaVarejo transforma planilha em rotina, prioridade e acompanhamento',
     icone: FileSpreadsheet,
     beneficioPrincipal:
-      'O ERP e o BI mostram o que aconteceu no passado; o VivaVarejo garante a execução no presente com ritmo de loja.',
-    pontosChave: [
-      'Importação inteligente de planilhas Excel (.xlsx) e colagem direta de dados CSV exportados do seu ERP ou BI.',
-      'Mapeamento automático de rotina, setor, responsável, horário limite, ferramentas necessárias e tipo de validação.',
-      'Mecanismo de desduplicação inteligente para atualizar operações sem criar rotinas repetidas.',
-      'Capacidade de salvar importações como novos modelos reutilizáveis para rápida replicação entre lojas da rede.',
+      'A ponte definitiva entre relatórios da matriz e a operação no chão de loja: transforma dados estáticos em ação humana imediata.',
+    itensDetalhados: [
+      {
+        titulo: 'Superação do Abismo entre Retaguarda e Loja',
+        descricao:
+          'O ERP e o BI revelam "o que deu errado ontem"; o VivaVarejo assegura o que precisa ser executado exatamente nas próximas horas do turno.',
+      },
+      {
+        titulo: 'Transformação de Indicadores em Rotinas Vivas',
+        descricao:
+          'Cada meta, ruptura apontada ou divergência vira rotina prática atribuída a um cargo, com horário limite, ferramentas necessárias e tipo de conferência.',
+      },
+      {
+        titulo: 'Importação Fácil via Planilhas Excel (.xlsx) e CSV',
+        descricao:
+          'Importador flexível de arquivos Excel e recurso de colagem direta de dados CSV exportados do seu ERP ou BI, com pré-visualização linha a linha.',
+      },
+      {
+        titulo: 'Mecanismo de Desduplicação Inteligente',
+        descricao:
+          'Atualiza horários e responsáveis de rotinas existentes sem duplicar cadastros, preservando o histórico de execuções anteriores da loja.',
+      },
     ],
+    diferencialExclusivo:
+      'Diferencial exclusivo: o lojista não precisa trocar de ERP nem investir em integrações caras; o VivaVarejo importa dados e governa o ritmo de execução.',
     dicaVendaInterna:
-      'O maior gap do varejo é que a diretoria tem dados no ERP, mas a loja não sabe o que priorizar às 09:00 ou 15:00. O VivaVarejo é exatamente o motor que fecha esse abismo.',
+      'Dica central de fechamento: nunca diga que o ERP do cliente é ruim. Diga que o ERP é excelente para guardar o passado, mas o VivaVarejo é quem comanda o piso hoje.',
   },
   {
     id: 'visao_unica',
-    titulo: '5. Visão Única: Relatórios de Gestão + Dashboard Loja a Loja',
-    subtitulo: 'Painel executivo com Hoje, Semana e Mês, ranking comparativo e exportação CSV',
+    numero: 5,
+    titulo: 'Visão Única de Gestão',
+    subtitulo: 'Dashboard executivo + relatórios consolidados loja a loja por Hoje, Semana e Mês',
     icone: BarChart3,
     beneficioPrincipal:
-      'Tudo em uma só tela: saiba instantaneamente quem cumpre o padrão, quem atrasa e qual loja necessita de suporte imediato.',
-    pontosChave: [
-      'Filtros por período pré-configurados: Hoje, Esta Semana e Este Mês com cálculo de deltas percentuais.',
-      'Indicadores-chave consolidados: % de rotinas concluídas, % de validação/aprovação gerencial e taxa de pontualidade.',
-      'Ranking comparativo entre lojas da rede, estimulando a disciplina operacional e identificando gargalos regionais.',
-      'Exportação consolidada em CSV com 1 clique para integração com apresentações de diretoria e auditorias.',
+      'Visão panorâmica em tela única: diretoria, GOs e gerentes enxergam instantaneamente o padrão de conformidade e o ranking da rede.',
+    itensDetalhados: [
+      {
+        titulo: 'Dashboard Executivo com Filtros Temporais',
+        descricao:
+          'Navegação rápida por Hoje, Esta Semana e Este Mês, com indicadores consolidados de volume de rotinas, concluídas, atrasadas e deltas percentuais.',
+      },
+      {
+        titulo: 'Relatório Consolidado Loja a Loja',
+        descricao:
+          'Tabela comparativa lado a lado de todas as unidades da rede, permitindo identificar em segundos qual filial performa acima e qual requer socorro operacional.',
+      },
+      {
+        titulo: 'Indicadores Centrais: % Conclusão, Validação e Pontualidade',
+        descricao:
+          'Taxa percentual de conclusão das tarefas, índice de validação e aprovação gerencial e taxa de rotinas cumpridas rigorosamente no prazo.',
+      },
+      {
+        titulo: 'Ranking da Rede e Exportação Consolidada em CSV',
+        descricao:
+          'Classificação das lojas com base no índice de entrega e botão de exportação em planilha CSV para apresentações de conselho e reuniões de resultado.',
+      },
     ],
+    diferencialExclusivo:
+      'Diferencial exclusivo: o Diretor de Operações sabe exatamente a saúde de 10, 50 ou 100 lojas em 10 segundos, sem ter que telefonar para cada gerente.',
     dicaVendaInterna:
-      'Em reuniões de resultados semanais, o diretor não precisa abrir 10 telas. Basta a tela de Relatório Loja a Loja para ver o mapa completo de execução da rede.',
+      'Em reuniões de resultados semanais, o diretor não precisa abrir 10 telas. O Relatório Loja a Loja dá a foto completa de disciplina da rede inteira.',
   },
   {
     id: 'workflow_e_mais',
-    titulo: '6. E Tem Muito Mais: O Sistema Operacional Completo da Operação',
-    subtitulo: 'Workflow estruturado, planos 5W2H, provas fotográficas, cadeia de WhatsApp e PWA',
+    numero: 6,
+    titulo: '"E Tem Muito Mais": O Sistema Operacional da Loja',
+    subtitulo:
+      '4 status, 5W2H em 1 toque, fotos com zoom, cadeia WhatsApp, modelos por segmento e PWA',
     icone: Workflow,
     beneficioPrincipal:
-      'Cada recurso foi construído pensando nas dores reais da liderança de chão de loja, não como um checklist genérico de prateleira.',
-    pontosChave: [
-      'Workflow com pendências e sinalização nítida: Atrasada, Aguardando Validação, Devolvida com apontamento de correção e Aprovada.',
-      'Planos de ação 5W2H gerados em 1 toque para tratar causa raiz de inconformidades, com responsável e prazo definido.',
-      'Auditoria visual com fotos obrigatórias/opcionais, histórico com carimbo de tempo e zoom de conferência.',
-      'Validade × Calendário com avisos sonoros e lembretes antes do vencimento do horário de corte.',
-      'Hierarquia com cadeia de alertas WhatsApp: Responsável direto → Chefe imediato → Gerente de Operações → Regional.',
-      'Modelos prontos por segmento de varejo (Supermercados, Farmácias, Lojas de Moda, Açougues, Pet Shops, etc.).',
-      'PWA instalável no celular em segundos, leve, rápido e sem complicações de lojas de aplicativos.',
+      'Um ecossistema completo desenhado para os desafios reais do varejo físico, muito além de formulários genéricos de prateleira.',
+    itensDetalhados: [
+      {
+        titulo: '4 Status Operacionais Claros',
+        descricao:
+          'Acompanhamento sem ambiguidade: Atrasada (vermelho), Aguardando Validação (âmbar), Devolvida com motivo de ajuste (laranja) e Aprovada (verde) com auditor e horário.',
+      },
+      {
+        titulo: 'Planos de Ação 5W2H Gerados em 1 Toque',
+        descricao:
+          'Qualquer quebra ou desvio vira plano corretivo estruturado (O que, Quem, Quando, Onde, Por que e Como) para eliminar reincidências diretamente na Agenda.',
+      },
+      {
+        titulo: 'Auditoria Visual com Fotos e Zoom',
+        descricao:
+          'Comprovação fotográfica com carimbo de data e hora, fotos obrigatórias por setor, visualizador ampliado e galeria de conferência para a liderança.',
+      },
+      {
+        titulo: 'Cadeia de Escalonamento no WhatsApp',
+        descricao:
+          'Alerta com mensagens contextualizadas seguindo a hierarquia: Responsável direto → Chefe imediato / Encarregado → Gerente de Operações (GO) → Diretor Regional.',
+      },
+      {
+        titulo: 'Biblioteca de Modelos por Segmento e PWA Leve',
+        descricao:
+          'Modelos prontos para Supermercados, Farmácias, Confecção/Moda, Açougues, Pet Shops e Restaurantes. PWA instalável no iPhone e Android sem lojas de aplicativos.',
+      },
     ],
+    diferencialExclusivo:
+      'Diferencial exclusivo: é um sistema operacional completo para o piso, leve para qualquer smartphone e adotado espontaneamente pelas equipes de loja.',
     dicaVendaInterna:
-      'Argumento forte: "Não somos mais um aplicativo de checklist que seus operadores vão desinstalar semana que vem; somos o sistema operacional da rotina diária da sua loja".',
+      'O fechamento definitivo: "Outros aplicativos vendem formulários chatos. O VivaVarejo entrega ritmo diário, segurança operacional e proteção da margem da sua rede".',
   },
 ]
 
@@ -679,23 +752,23 @@ export function MaterialVendaAba() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-3.5">
             {SOLUCOES_PLATAFORMA.map((solucao) => {
               const Icon = solucao.icone || Sparkles
               return (
                 <div
                   key={solucao.id}
-                  className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 flex flex-col justify-between space-y-3"
+                  className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-4 flex flex-col justify-between space-y-3 print:space-y-2.5 print-break-inside-avoid print:bg-white print:border-gray-300"
                 >
                   <div className="space-y-2.5">
                     {/* Header da Solução */}
                     <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5 border border-[#2563EB]/20">
+                      <div className="w-9 h-9 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5 border border-[#2563EB]/20 print:border-[#2563EB]/40">
                         <Icon className="w-5 h-5" />
                       </div>
                       <div className="min-w-0">
                         <h3 className="text-sm font-bold text-[#1F2937] leading-tight">
-                          {solucao.titulo}
+                          {solucao.numero}. {solucao.titulo}
                         </h3>
                         <p className="text-xs text-[#6B7280] mt-0.5 leading-snug">
                           {solucao.subtitulo}
@@ -704,27 +777,41 @@ export function MaterialVendaAba() {
                     </div>
 
                     {/* Benefício Principal */}
-                    <div className="text-xs font-medium text-[#1F2937] bg-white p-2.5 rounded-lg border border-[#E5E7EB]">
+                    <div className="text-xs font-semibold text-[#1F2937] bg-white print:bg-blue-50/40 p-2.5 rounded-lg border border-[#E5E7EB] print:border-blue-100">
                       {solucao.beneficioPrincipal}
                     </div>
 
-                    {/* Pontos Chave */}
-                    <ul className="space-y-1.5 pt-1">
-                      {solucao.pontosChave.map((ponto, pIdx) => (
-                        <li key={pIdx} className="text-xs text-[#4B5563] flex items-start gap-2">
+                    {/* Itens Detalhados: Título em Negrito + Descrição Embaixo (padrão solicitado) */}
+                    <div className="space-y-2 pt-1">
+                      {solucao.itensDetalhados.map((item, iIdx) => (
+                        <div key={iIdx} className="text-xs flex items-start gap-2">
                           <CheckCircle2 className="w-3.5 h-3.5 text-[#2563EB] shrink-0 mt-0.5" />
-                          <span className="leading-tight">{ponto}</span>
-                        </li>
+                          <div className="min-w-0 flex-1">
+                            <span className="font-bold text-[#1F2937] block leading-snug">
+                              {item.titulo}
+                            </span>
+                            <span className="text-[#4B5563] text-[11px] sm:text-xs block leading-relaxed mt-0.5">
+                              {item.descricao}
+                            </span>
+                          </div>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
+
+                    {/* Destaque de Diferencial Exclusivo */}
+                    <div className="text-[11px] text-[#2563EB] bg-blue-50/70 print:bg-gray-50 p-2 rounded-md border border-blue-100 print:border-gray-200 font-medium leading-snug">
+                      {solucao.diferencialExclusivo}
+                    </div>
                   </div>
 
-                  {/* Dica de Venda Interna (Apenas versão interna) */}
+                  {/* Dica de Venda Interna (Apenas versão interna com selo âmbar) */}
                   {!isCliente && solucao.dicaVendaInterna && (
-                    <div className="pt-2 border-t border-[#E5E7EB]/80">
+                    <div className="pt-2 border-t border-[#E5E7EB]/80 print-break-inside-avoid">
                       <div className="text-[11px] text-amber-900 bg-amber-50 p-2 rounded border border-amber-200 leading-tight">
-                        <span className="font-bold text-amber-950">Dica de Pitch: </span>
-                        {solucao.dicaVendaInterna}
+                        <span className="font-bold text-amber-950 uppercase tracking-wider text-[10px] block mb-0.5">
+                          [Confidencial • Dica de Pitch]:
+                        </span>
+                        <span>{solucao.dicaVendaInterna}</span>
                       </div>
                     </div>
                   )}
@@ -737,7 +824,7 @@ export function MaterialVendaAba() {
         {/* =========================================================================
             TABELA COMPARATIVA EXPANDIDA & ESPECÍFICA
            ========================================================================= */}
-        <div className="space-y-3 pt-2">
+        <div className="space-y-3 pt-2 print-break-inside-avoid">
           <div>
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
               Comparativo Técnico de Mercado
@@ -750,32 +837,35 @@ export function MaterialVendaAba() {
             </p>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-[#E5E7EB]">
+          <div className="overflow-x-auto print:overflow-visible rounded-xl border border-[#E5E7EB] print:border-gray-300">
             <table className="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
-                <tr className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#1F2937]">
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs w-[36%]">
+                <tr className="bg-[#F7F7F5] print:bg-gray-100 border-b border-[#E5E7EB] print:border-gray-300 text-[#1F2937]">
+                  <th className="p-3.5 print:p-2.5 font-bold uppercase tracking-wider text-xs w-[36%]">
                     Diferencial / Capacidade Operacional
                   </th>
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs bg-blue-50/80 text-[#2563EB] border-x border-[#E5E7EB] w-[34%]">
+                  <th className="p-3.5 print:p-2.5 font-bold uppercase tracking-wider text-xs bg-blue-50/80 print:bg-blue-100/70 text-[#2563EB] border-x border-[#E5E7EB] print:border-gray-300 w-[34%]">
                     <div className="flex items-center gap-1.5">
                       <div className="w-2.5 h-2.5 rounded-full bg-[#2563EB]" />
                       <span>VivaVarejo</span>
                     </div>
                   </th>
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs text-[#6B7280] w-[30%]">
+                  <th className="p-3.5 print:p-2.5 font-bold uppercase tracking-wider text-xs text-[#6B7280] w-[30%]">
                     Sistemas Tradicionais
                     <span className="block text-[10px] font-normal lowercase tracking-normal text-[#9CA3AF]">
-                      (Checklists Genéricos de Mercado)
+                      (Checklists Genéricos)
                     </span>
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E5E7EB]">
+              <tbody className="divide-y divide-[#E5E7EB] print:divide-gray-300">
                 {COMPARATIVO_ITEMS.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50/60 transition-colors">
+                  <tr
+                    key={idx}
+                    className="hover:bg-gray-50/60 print-break-inside-avoid transition-colors"
+                  >
                     {/* Critério */}
-                    <td className="p-3.5 align-top">
+                    <td className="p-3.5 print:p-2.5 align-top">
                       <div className="font-bold text-[#1F2937] leading-tight">{item.criterio}</div>
                       <div className="text-[11px] text-[#6B7280] mt-0.5 leading-tight">
                         {item.subtexto}
@@ -783,9 +873,9 @@ export function MaterialVendaAba() {
                     </td>
 
                     {/* VivaVarejo */}
-                    <td className="p-3.5 bg-blue-50/30 border-x border-[#E5E7EB] align-top">
+                    <td className="p-3.5 print:p-2.5 bg-blue-50/30 print:bg-blue-50/20 border-x border-[#E5E7EB] print:border-gray-300 align-top">
                       <div className="flex items-start gap-2">
-                        <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                        <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 print:bg-emerald-50">
                           <Check className="w-3.5 h-3.5 stroke-[3]" />
                         </div>
                         <div className="space-y-1">
@@ -794,9 +884,11 @@ export function MaterialVendaAba() {
                           </div>
                           {/* Nota Interna da Equipe (oculta na versão cliente) */}
                           {!isCliente && item.vivavarejo.notaInterna && (
-                            <div className="text-[11px] font-normal text-blue-900 bg-blue-100/70 p-1.5 rounded border border-blue-200 mt-1 leading-tight">
-                              <span className="font-bold">Dica de Pitch: </span>
-                              {item.vivavarejo.notaInterna}
+                            <div className="text-[11px] font-normal text-amber-900 bg-amber-50 p-1.5 rounded border border-amber-200 mt-1 leading-tight print:bg-amber-50">
+                              <span className="font-bold text-amber-950 uppercase text-[10px]">
+                                [Confidencial • Pitch]:{' '}
+                              </span>
+                              <span>{item.vivavarejo.notaInterna}</span>
                             </div>
                           )}
                         </div>
@@ -804,7 +896,7 @@ export function MaterialVendaAba() {
                     </td>
 
                     {/* Sistemas Tradicionais */}
-                    <td className="p-3.5 align-top text-[#4B5563]">
+                    <td className="p-3.5 print:p-2.5 align-top text-[#4B5563]">
                       <div className="flex items-start gap-2">
                         {item.tradicionais.status === true ? (
                           <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
@@ -825,9 +917,11 @@ export function MaterialVendaAba() {
                           </div>
                           {/* Nota Interna da Equipe (oculta na versão cliente) */}
                           {!isCliente && item.tradicionais.notaInterna && (
-                            <div className="text-[11px] font-normal text-amber-900 bg-amber-100/70 p-1.5 rounded border border-amber-200 mt-1 leading-tight">
-                              <span className="font-bold">Inteligência: </span>
-                              {item.tradicionais.notaInterna}
+                            <div className="text-[11px] font-normal text-amber-900 bg-amber-50 p-1.5 rounded border border-amber-200 mt-1 leading-tight print:bg-amber-50">
+                              <span className="font-bold text-amber-950 uppercase text-[10px]">
+                                [Confidencial • Intel]:{' '}
+                              </span>
+                              <span>{item.tradicionais.notaInterna}</span>
                             </div>
                           )}
                         </div>
@@ -843,7 +937,7 @@ export function MaterialVendaAba() {
         {/* =========================================================================
             PILARES ESTRATÉGICOS (Por que o VivaVarejo?)
            ========================================================================= */}
-        <div className="space-y-4 pt-4 border-t border-[#E5E7EB] page-break-inside-avoid">
+        <div className="space-y-4 pt-4 border-t border-[#E5E7EB] print-break-inside-avoid">
           <div>
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
               Pilares Estratégicos
@@ -856,9 +950,9 @@ export function MaterialVendaAba() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 print:grid-cols-3 print:gap-3">
             {/* Argumento 1 */}
-            <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 space-y-2.5">
+            <div className="bg-[#F7F7F5] print:bg-white border border-[#E5E7EB] print:border-gray-300 rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid">
               <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm">
                 1
               </div>
@@ -866,15 +960,13 @@ export function MaterialVendaAba() {
                 Foco 100% no Varejo Real de Loja
               </h4>
               <p className="text-xs text-[#4B5563] leading-relaxed">
-                Não somos um formulário genérico para auditorias aleatórias. Toda tela e rotina foi
-                pensada para a dinâmica do comércio físico: horários de corte, prevenção de perdas
-                em qualquer segmento (supermercados, farmácias, moda, açougues, pet shops,
-                restaurantes), promotores e conferência em 2 toques.
+                Construído para o varejo físico real: cortes horários de piso, prevenção de perdas
+                multissetorial, conferência ágil e interface simples para qualquer smartphone.
               </p>
             </div>
 
             {/* Argumento 2 */}
-            <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 space-y-2.5">
+            <div className="bg-[#F7F7F5] print:bg-white border border-[#E5E7EB] print:border-gray-300 rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid">
               <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm">
                 2
               </div>
@@ -882,15 +974,13 @@ export function MaterialVendaAba() {
                 Implantação no Mesmo Dia com Modelos
               </h4>
               <p className="text-xs text-[#4B5563] leading-relaxed">
-                Esqueça semanas de parametrização e contratos de consultoria caros apenas para
-                iniciar. Com a biblioteca de Modelos de Rotinas por segmento e a importação de
-                planilhas do ERP, a loja entra em operação em minutos e a equipe já executa pelo
-                celular no mesmo dia.
+                Zero tempo perdido: biblioteca de rotinas prontas por segmento e importação
+                facilitada de dados do ERP permitem que a equipe execute as rotinas no mesmo dia.
               </p>
             </div>
 
             {/* Argumento 3 */}
-            <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 space-y-2.5">
+            <div className="bg-[#F7F7F5] print:bg-white border border-[#E5E7EB] print:border-gray-300 rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid">
               <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm">
                 3
               </div>
@@ -898,17 +988,15 @@ export function MaterialVendaAba() {
                 Parceiro de Resultados & Execução
               </h4>
               <p className="text-xs text-[#4B5563] leading-relaxed">
-                Não entregamos apenas software: acompanhamos os índices de execução com apoio do
-                consultor especialista. A cadeia de cobrança no WhatsApp garante que nada caia no
-                esquecimento, blindando a margem do lojista contra perdas, rupturas e quebras de
-                padrão.
+                Acompanhamento com especialista, workflow com validação formal e cadeia WhatsApp
+                para blindar margens contra quebras, rupturas e desvios de processo.
               </p>
             </div>
           </div>
         </div>
 
         {/* Rodapé da Apresentação */}
-        <div className="pt-6 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#6B7280]">
+        <div className="pt-6 border-t border-[#E5E7EB] print:pt-4 print:border-gray-300 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#6B7280] print-break-inside-avoid">
           <div className="flex items-center gap-2">
             <span className="font-bold text-[#1F2937]">VivaVarejo</span>
             <span>— Excelência em Operação de Varejo & Prevenção de Perdas</span>
