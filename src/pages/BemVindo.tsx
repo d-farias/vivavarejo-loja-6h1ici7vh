@@ -284,6 +284,7 @@ export default function BemVindo() {
 
             {/* Links rápidos dos 4 pilares sob o Hero - Padrão solicitado: título forte em negrito + descrição curta */}
             <div className="pt-6 border-t border-[#E5E7EB] text-left">
+              {' '}
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280]">
                   Pilares de Gestão da Plataforma:
@@ -386,8 +387,34 @@ export default function BemVindo() {
             </div>
           </div>
         </section>
+        {/* Nova Seção: O Desafio do Varejo (Inovação VivaVarejo — Da Informação à Execução) */}
+        <section className="py-10 sm:py-14 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]">
+          <div className="max-w-4xl mx-auto space-y-4 text-center">
+            <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#2563EB]">
+              O Desafio do Varejo
+            </div>
 
-        {/* Seção "O que você ganha no dia a dia" (6 itens com ✓ com ênfase na solução) */}
+            <div className="space-y-3">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1F2937] tracking-tight">
+                O desafio do varejo não é falta de informação. É falta de execução.
+              </h2>
+              <p className="text-sm sm:text-base text-[#4B5563] max-w-3xl mx-auto leading-relaxed">
+                ERP registra. BI mostra. WhatsApp distribui. E o gerente fica no meio, juntando tudo
+                em vez de estar no chão de loja. O VivaVarejo é a camada que falta: transforma
+                informação em prioridade, ação, responsável e prazo — e acompanha a execução até o
+                problema estar resolvido.
+              </p>
+            </div>
+
+            <div className="pt-2">
+              <div className="inline-block px-4 py-2 rounded-lg bg-[#F7F7F5] border border-[#E5E7EB] text-xs sm:text-sm font-bold text-[#1F2937]">
+                <span className="text-[#2563EB]">Da informação à execução.</span> Menos relatório.
+                Mais execução.
+              </div>
+            </div>
+          </div>
+        </section>
+        {/* Seção "O que você ganha no dia a dia" (6 itens com ✓ com ênfase na solução) */}{' '}
         <section className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5] border-b border-[#E5E7EB]">
           <div className="max-w-5xl mx-auto space-y-8">
             <div className="text-center space-y-3">
@@ -483,7 +510,6 @@ export default function BemVindo() {
             </div>
           </div>
         </section>
-
         {/* Seção Frase de Impacto */}
         <section className="py-12 sm:py-16 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]">
           <div className="max-w-4xl mx-auto">
@@ -532,7 +558,6 @@ export default function BemVindo() {
             </div>
           </div>
         </section>
-
         {/* Seção Pilares Competitivos do Produto: Dashboard, Workflow, Fotos e 5W2H */}
         <section
           id="pilares-produto"
@@ -749,7 +774,6 @@ export default function BemVindo() {
             </div>
           </div>
         </section>
-
         {/* Seção: As Três Camadas do VivaVarejo */}
         <section className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5] border-b border-[#E5E7EB]">
           <div className="max-w-4xl mx-auto space-y-8">
@@ -849,7 +873,6 @@ export default function BemVindo() {
             </div>
           </div>
         </section>
-
         {/* Bloco "Opção de interesse" / Funil PF/CNPJ */}
         <section id="opcao-interesse" className="py-12 sm:py-16 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto">

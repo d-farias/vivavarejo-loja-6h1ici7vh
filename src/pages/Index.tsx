@@ -794,6 +794,31 @@ export default function Index() {
         </div>
       )}
 
+      {/* Mentalidade de Integração: Da informação à execução */}
+      <div className="bg-white border border-[#E5E7EB] rounded-lg p-3.5 sm:p-4 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-l-4 border-l-[#2563EB]">
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] uppercase tracking-wider font-bold text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded">
+              Da informação à execução
+            </span>
+            <span className="text-xs font-semibold text-[#1F2937]">
+              O diferencial do VivaVarejo
+            </span>
+          </div>
+          <p className="text-xs text-[#4B5563] leading-relaxed max-w-4xl">
+            O VivaVarejo é a camada entre a informação (ERP/BI) e a execução na loja — transforma
+            indicadores e planilhas em prioridade, ação, responsável e acompanhamento em tempo real.
+          </p>
+        </div>
+        <Link
+          to="/agenda"
+          className="shrink-0 text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] inline-flex items-center gap-1 hover:underline self-end sm:self-center"
+        >
+          <span>Ver prioridades de hoje</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
+
       {/* (b) LISTA "ROTINAS DE HOJE" COM DESTAQUE DAS ATRASADAS NO TOPO E ORDENADAS POR HORÁRIO */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">

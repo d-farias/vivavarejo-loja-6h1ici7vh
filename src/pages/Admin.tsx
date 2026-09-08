@@ -937,6 +937,15 @@ export default function Admin() {
             </div>
           </div>
 
+          {/* Destaque discreto: Da informação à execução */}
+          <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 bg-blue-50/70 border border-blue-200/60 rounded-lg text-xs text-[#1F2937] max-w-lg">
+            <span className="font-bold text-[#2563EB] shrink-0">Da informação à execução:</span>
+            <span className="text-[#4B5563] text-[11px] leading-tight">
+              O VivaVarejo conecta dados de ERP e BI à ponta — transformando indicadores em rotinas
+              com dono, prazo e checagem real.
+            </span>
+          </div>
+
           <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
             <button
               onClick={() => setContatosAtendimentoModalOpen(true)}

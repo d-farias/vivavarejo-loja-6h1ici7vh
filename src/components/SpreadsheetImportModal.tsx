@@ -38,6 +38,8 @@ export function SpreadsheetImportModal({
   const [parseError, setParseError] = useState<string | null>(null)
   const [parsedData, setParsedData] = useState<ParsedSheetRoutine[]>([])
   const [detectedHeaders, setDetectedHeaders] = useState<string[]>([])
+  const [importTab, setImportTab] = useState<'file' | 'paste'>('file')
+  const [pastedText, setPastedText] = useState('')
   const [importMode, setImportMode] = useState<'append' | 'replace'>('append')
   const [deduplicateOnImport, setDeduplicateOnImport] = useState(true)
   const [progressMsg, setProgressMsg] = useState('')
@@ -189,8 +191,43 @@ export function SpreadsheetImportModal({
     }
   }
 
+  const handleProcessPastedText = async () => {
+    if (!pastedText.trim()) {
+      setParseError('Cole o texto da tabela ou CSV antes de processar.')
+      return
+    }
+
+    setParseError(null)
+    setParsing(true)
+    setParsedData([])
+
+    try {
+      const blob = new Blob([pastedText], { type: 'text/csv;charset=utf-8;' })
+      const simulatedFile = new File([blob], 'dados-colados.csv', { type: 'text/csv' })
+      setFile(simulatedFile)
+
+      const result = await parseUploadedSpreadsheet(simulatedFile)
+      if (result.routines.length === 0) {
+        setParseError(
+          'Nenhuma rotina com formato válido foi identificada no texto colado. Certifique-se de que há colunas como Rotina e Responsável.',
+        )
+      } else {
+        setParsedData(result.routines)
+        setDetectedHeaders(result.headers)
+        if (!modeloNome) {
+          setModeloNome('Modelo - Dados Colados')
+        }
+      }
+    } catch (err: any) {
+      setParseError(err?.message || 'Falha ao interpretar texto colado.')
+    } finally {
+      setParsing(false)
+    }
+  }
+
   const handleReset = () => {
     setFile(null)
+    setPastedText('')
     setParsedData([])
     setDetectedHeaders([])
     setParseError(null)
@@ -218,7 +255,7 @@ export function SpreadsheetImportModal({
             <div>
               <h2 className="text-lg font-bold text-[#1F2937]">Importar Planilha de Rotinas</h2>
               <p className="text-xs text-[#6B7280]">
-                Faça upload de arquivo Excel (.xlsx) ou CSV para alimentar o VivaVarejo
+                Exporte do seu ERP/BI e o VivaVarejo transforma em rotinas e prioridades do dia
               </p>
             </div>
           </div>
@@ -234,32 +271,110 @@ export function SpreadsheetImportModal({
 
         {/* Modal Body */}
         <div className="overflow-y-auto p-6 space-y-5">
-          {/* File Picker State */}
+          {/* File Picker or Paste State */}
           {!file ? (
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-[#D1D5DB] hover:border-[#2563EB] rounded-lg p-8 text-center cursor-pointer transition-colors bg-[#F7F7F5]/50 hover:bg-[#3B82F6]/5 group"
-            >
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".xlsx, .xls, .csv"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              <UploadCloud className="w-10 h-10 text-[#9CA3AF] group-hover:text-[#2563EB] mx-auto mb-3 transition-colors" />
-              <p className="text-sm font-semibold text-[#1F2937]">
-                Clique aqui para selecionar a planilha
-              </p>
-              <p className="text-xs text-[#6B7280] mt-1">
-                Suporta planilhas Excel (.xlsx) ou arquivos .csv
-              </p>
-
-              <div className="mt-4 inline-block px-3 py-1.5 rounded bg-white border border-[#E5E7EB] text-[11px] text-[#4B5563]">
-                Mapeamento automático: <strong>Rotina</strong>, <strong>Responsável</strong>,{' '}
-                <strong>Frequência</strong>, <strong>Horário limite</strong>,{' '}
-                <strong>Ferramenta</strong>, <strong>Validação</strong>, <strong>Área</strong>
+            <div className="space-y-4">
+              {/* Abas: Arquivo vs Colar Dados */}
+              <div className="flex border-b border-[#E5E7EB]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImportTab('file')
+                    setParseError(null)
+                  }}
+                  className={`px-4 py-2 text-xs font-semibold border-b-2 transition-colors ${
+                    importTab === 'file'
+                      ? 'border-[#2563EB] text-[#2563EB]'
+                      : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
+                  }`}
+                >
+                  Carregar Arquivo (Excel/CSV)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImportTab('paste')
+                    setParseError(null)
+                  }}
+                  className={`px-4 py-2 text-xs font-semibold border-b-2 transition-colors ${
+                    importTab === 'paste'
+                      ? 'border-[#2563EB] text-[#2563EB]'
+                      : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
+                  }`}
+                >
+                  Colar Dados (CSV / Copiado de Planilha)
+                </button>
               </div>
+
+              {parseError && (
+                <div className="p-3.5 rounded-lg bg-red-50 border border-red-200 text-[#B91C1C] text-xs flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>{parseError}</span>
+                </div>
+              )}
+
+              {importTab === 'file' ? (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-dashed border-[#D1D5DB] hover:border-[#2563EB] rounded-lg p-8 text-center cursor-pointer transition-colors bg-[#F7F7F5]/50 hover:bg-[#3B82F6]/5 group"
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".xlsx, .xls, .csv"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <UploadCloud className="w-10 h-10 text-[#9CA3AF] group-hover:text-[#2563EB] mx-auto mb-3 transition-colors" />
+                  <p className="text-sm font-semibold text-[#1F2937]">
+                    Clique aqui para selecionar a planilha
+                  </p>
+                  <p className="text-xs text-[#6B7280] mt-1">
+                    Suporta planilhas Excel (.xlsx) ou arquivos .csv
+                  </p>
+
+                  <div className="mt-4 inline-block px-3 py-1.5 rounded bg-white border border-[#E5E7EB] text-[11px] text-[#4B5563]">
+                    Mapeamento automático: <strong>Rotina</strong>, <strong>Responsável</strong>,{' '}
+                    <strong>Frequência</strong>, <strong>Horário limite</strong>,{' '}
+                    <strong>Ferramenta</strong>, <strong>Validação</strong>, <strong>Área</strong>
+                  </div>
+
+                  <div className="mt-3 p-2.5 rounded bg-blue-50/70 border border-blue-200/60 text-[11px] text-[#1F2937] max-w-lg mx-auto text-left leading-relaxed">
+                    <span className="font-bold text-[#2563EB]">
+                      A ponte da informação à execução:{' '}
+                    </span>
+                    O VivaVarejo é a camada entre a informação (ERP/BI) e a execução na loja —
+                    transforma indicadores e planilhas em prioridade, ação, responsável e
+                    acompanhamento.
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3 p-4 rounded-lg bg-[#F7F7F5] border border-[#E5E7EB]">
+                  <label className="block text-xs font-semibold text-[#1F2937]">
+                    Cole aqui os dados copiados do Excel/ERP ou conteúdo CSV:
+                  </label>
+                  <textarea
+                    value={pastedText}
+                    onChange={(e) => setPastedText(e.target.value)}
+                    placeholder="Cole aqui (exemplo: Rotina;Responsavel;Horario;Frequencia...)"
+                    rows={8}
+                    className="w-full p-2.5 text-xs font-mono bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+                  />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-[#6B7280]">
+                      Suporta separador ponto e vírgula (;), vírgula (,) ou tabulação.
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleProcessPastedText}
+                      disabled={parsing || !pastedText.trim()}
+                      className="px-4 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors disabled:opacity-50"
+                    >
+                      Processar Dados Colados
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="space-y-4">

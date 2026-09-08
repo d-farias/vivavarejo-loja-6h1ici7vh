@@ -219,7 +219,7 @@ export function ImportarValidadeModal({
                 )}
               </div>
               <p className="text-xs text-[#6B7280]">
-                Reconhecimento automático de layout, divisores semanais, responsáveis e deadline
+                Exporte do seu ERP/BI e o VivaVarejo transforma em rotinas e prioridades do dia
               </p>
             </div>
           </div>
@@ -279,6 +279,12 @@ export function ImportarValidadeModal({
                   • <strong>Deadline Implícito:</strong> Tarefas com &quot;até 15hs&quot; sugerem
                   automaticamente a janela 09:00–15:00 configurável na prévia.
                 </p>
+              </div>
+
+              <div className="mt-4 p-2.5 rounded bg-blue-50/70 border border-blue-200/60 text-[11px] text-[#1F2937] max-w-xl mx-auto text-left leading-relaxed">
+                <span className="font-bold text-[#2563EB]">A ponte da informação à execução: </span>
+                O VivaVarejo transforma as planilhas e relatórios do seu ERP/BI em checagens diárias
+                com setor, horário, responsável e comprovação por foto.
               </div>
             </div>
           ) : (

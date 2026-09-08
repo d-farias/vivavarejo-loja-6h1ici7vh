@@ -4,6 +4,9 @@ import { useStore } from '@/context/StoreContext'
 import { rotinasService, execucoesService, getTodayDateString } from '@/services/rotinas'
 import { visitasPromotorService, rotinasPromotorService } from '@/services/visitasPromotor'
 import { planosAcaoService } from '@/services/planosAcao'
+import { tarefasValidadeService } from '@/services/tarefasValidade'
+import { perdasService } from '@/services/perdas'
+import { ConcluirValidadeModal } from '@/components/ConcluirValidadeModal'
 import { StoreSelector } from '@/components/StoreSelector'
 import { ReadequarTarefaModal } from '@/components/ReadequarTarefaModal'
 import { ConcluirRotinaModal } from '@/components/ConcluirRotinaModal'
@@ -20,6 +23,8 @@ import type {
   VisitaPromotor,
   RotinaPromotor,
   PlanoAcao,
+  TarefaValidade,
+  Perda,
   StatusValidacaoRotina,
 } from '@/types'
 import {
@@ -59,6 +64,8 @@ export default function AgendaPage() {
   const [visitas, setVisitas] = useState<VisitaPromotor[]>([])
   const [rotinasPromotores, setRotinasPromotores] = useState<RotinaPromotor[]>([])
   const [planosAcao, setPlanosAcao] = useState<PlanoAcao[]>([])
+  const [tarefasValidade, setTarefasValidade] = useState<TarefaValidade[]>([])
+  const [perdasLoja, setPerdasLoja] = useState<Perda[]>([])
   const [loading, setLoading] = useState<boolean>(true)
 
   // Filtros locais
@@ -75,6 +82,7 @@ export default function AgendaPage() {
 
   const [concluirModalRotina, setConcluirModalRotina] = useState<Rotina | null>(null)
   const [concluirVisitaModal, setConcluirVisitaModal] = useState<VisitaPromotor | null>(null)
+  const [concluirValidadeModal, setConcluirValidadeModal] = useState<TarefaValidade | null>(null)
   const [planoAcaoModal, setPlanoAcaoModal] = useState<{ open: boolean; rotina?: Rotina | null }>({
     open: false,
     rotina: null,
@@ -88,7 +96,7 @@ export default function AgendaPage() {
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
-      const [r, e, v, rp, p] = await Promise.all([
+      const [r, e, v, rp, p, tv, pd] = await Promise.all([
         rotinasService.getAll(lojaSelecionadaId),
         execucoesService.getExecutionsByDate(currentDateStr).catch(() => [] as ExecucaoRotina[]),
         visitasPromotorService
@@ -98,6 +106,8 @@ export default function AgendaPage() {
           .getAll(lojaSelecionadaId || undefined)
           .catch(() => [] as RotinaPromotor[]),
         planosAcaoService.getAll(lojaSelecionadaId).catch(() => [] as PlanoAcao[]),
+        tarefasValidadeService.getAll(lojaSelecionadaId).catch(() => [] as TarefaValidade[]),
+        perdasService.getAll(lojaSelecionadaId).catch(() => [] as Perda[]),
       ])
 
       setRotinas(r)
@@ -105,6 +115,8 @@ export default function AgendaPage() {
       setVisitas(v)
       setRotinasPromotores(rp)
       setPlanosAcao(p)
+      setTarefasValidade(tv)
+      setPerdasLoja(pd)
     } catch (err) {
       console.error('Erro ao carregar agenda:', err)
     } finally {
@@ -118,6 +130,55 @@ export default function AgendaPage() {
 
   // Navegação de dias
   const isToday = currentDateStr === getTodayDateString()
+
+  // Dia da semana e semana do mês da data selecionada para filtrar tarefas de validade
+  const { diaDaSemana, semanaDoMes } = useMemo(() => {
+    const parts = currentDateStr.split('-').map(Number)
+    const dateObj = new Date(parts[0], parts[1] - 1, parts[2])
+    const diasSemanaNomes = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado']
+    const semMes = Math.min(Math.ceil(parts[2] / 7), 4)
+    return {
+      diaDaSemana: diasSemanaNomes[dateObj.getDay()],
+      semanaDoMes: semMes,
+    }
+  }, [currentDateStr])
+
+  // Tarefas de Validade que se aplicam à data selecionada
+  const tarefasValidadeDoDia = useMemo(() => {
+    return tarefasValidade.filter((t) => {
+      if (t.semana_mes && t.semana_mes > 0) {
+        if (t.semana_mes !== semanaDoMes) return false
+      }
+      const dataEsp = (t.data_especifica || '').substring(0, 10)
+      const rec = (t.recorrencia || '').toLowerCase().trim()
+
+      if (dataEsp) return dataEsp === currentDateStr
+      if (rec) {
+        if (rec === 'diaria' || rec === 'diária' || rec === 'todos os dias') return true
+        if (rec.includes(diaDaSemana) || (diaDaSemana === 'terça' && rec.includes('terca')))
+          return true
+        if (diaDaSemana === 'sábado' && rec.includes('sabado')) return true
+        if (diaDaSemana === 'domingo' && rec.includes('domingo')) return true
+        return false
+      }
+      return true
+    })
+  }, [tarefasValidade, currentDateStr, diaDaSemana, semanaDoMes])
+
+  // Setores críticos com perdas registradas na loja (usar dados do módulo Perdas & Inventário)
+  const setoresComPerdas = useMemo(() => {
+    const set = new Set<string>()
+    for (const p of perdasLoja) {
+      if (p.setor_categoria) {
+        set.add(p.setor_categoria.trim().toLowerCase())
+      }
+    }
+    return set
+  }, [perdasLoja])
+
+  // Minutos atuais para avaliar prazo vencido ou dentro da próxima hora
+  const now = new Date()
+  const currentMinutes = now.getHours() * 60 + now.getMinutes()
 
   const handleMudarDia = (offsetDays: number) => {
     const parts = currentDateStr.split('-').map(Number)
@@ -309,14 +370,297 @@ export default function AgendaPage() {
     })
   }, [visitas, currentDateStr])
 
-  // Planos de ação com prazo na data
+  // Planos de ação com prazo na data ou atrasados
   const planosDoDia = useMemo(() => {
     return planosAcao.filter((p) => {
       if (!p.prazo) return false
       const pPrazo = p.prazo.substring(0, 10)
-      return pPrazo === currentDateStr
+      return pPrazo === currentDateStr || (pPrazo <= currentDateStr && p.status !== 'concluida')
     })
   }, [planosAcao, currentDateStr])
+
+  // =========================================================================
+  // MOTOR DE PRIORIDADE: Itens Abertos Críticos do Dia ("Precisam de atenção agora")
+  // =========================================================================
+  interface ItemCritico {
+    id: string
+    tipo: 'rotina' | 'validade' | 'plano' | 'visita'
+    titulo: string
+    setor: string
+    responsavel: string
+    prazo: string
+    statusBadge: 'Atrasada' | 'Aguardando Validação' | 'Devolvida' | 'No prazo'
+    statusVariant: 'atrasada' | 'aguardando' | 'devolvida' | 'no_prazo'
+    score: number
+    motivos: string[]
+    // Referências para ações rápidas reutilizando fluxos existentes
+    rotinaRef?: Rotina
+    validadeRef?: TarefaValidade
+    planoRef?: PlanoAcao
+    visitaRef?: VisitaPromotor
+  }
+
+  const itensCriticos = useMemo(() => {
+    const list: ItemCritico[] = []
+
+    // 1. ROTINAS ABERTAS DO DIA
+    for (const item of itensAgenda) {
+      if (item.concluida) continue // Concluídas somem de ambos
+
+      let score = 0
+      const motivos: string[] = []
+
+      // Status Devolvida (retrabalho urgente)
+      if (item.devolvida) {
+        score += 80
+        motivos.push('Devolvida pelo regional')
+      }
+
+      // Prazo vencido vs dentro da próxima hora
+      if (item.isAtrasada) {
+        score += 100
+        if (item.minutosHorario !== null) {
+          const diffAtraso = currentMinutes - item.minutosHorario
+          if (diffAtraso > 0) {
+            score += Math.min(diffAtraso, 120) // peso maior quanto mais atrasado
+          }
+        }
+        motivos.push('Prazo vencido')
+      } else if (item.minutosHorario !== null && isToday) {
+        const diff = item.minutosHorario - currentMinutes
+        if (diff >= 0 && diff <= 60) {
+          score += 40
+          motivos.push('Vence na próxima hora')
+        }
+      }
+
+      // Prioridade alta do dia (P1)
+      if (item.prioridade === 1) {
+        score += 35
+        motivos.push('Prioridade alta')
+      } else if (item.prioridade === 2) {
+        score += 10
+      }
+
+      // Setor crítico com perdas registradas
+      if (item.area && setoresComPerdas.has(item.area.trim().toLowerCase())) {
+        score += 30
+        motivos.push('Setor com histórico de perdas')
+      }
+
+      // Aguardando validação
+      if (item.aguardandoValidacao) {
+        score += 25
+        motivos.push('Aguardando validação')
+      }
+
+      // Só qualifica se tiver alguma criticidade (score >= 25)
+      if (score >= 25) {
+        let badge: ItemCritico['statusBadge'] = 'No prazo'
+        let variant: ItemCritico['statusVariant'] = 'no_prazo'
+
+        if (item.devolvida) {
+          badge = 'Devolvida'
+          variant = 'devolvida'
+        } else if (item.aguardandoValidacao) {
+          badge = 'Aguardando Validação'
+          variant = 'aguardando'
+        } else if (item.isAtrasada) {
+          badge = 'Atrasada'
+          variant = 'atrasada'
+        }
+
+        list.push({
+          id: item.rotina.id,
+          tipo: 'rotina',
+          titulo: item.rotina.nome,
+          setor: item.area,
+          responsavel: item.rotina.responsavel || 'Equipe',
+          prazo: item.horarioEfetivo ? `Limite: ${item.horarioEfetivo}` : 'Integral',
+          statusBadge: badge,
+          statusVariant: variant,
+          score,
+          motivos,
+          rotinaRef: item.rotina,
+        })
+      }
+    }
+
+    // 2. TAREFAS DE VALIDADE × CALENDÁRIO ABERTAS DO DIA
+    for (const tv of tarefasValidadeDoDia) {
+      const st = tv.status || 'pendente'
+      if (st === 'aprovada') continue // Concluídas somem
+
+      let score = 0
+      const motivos: string[] = []
+      const minInicio = parseHorarioLimiteToMinutes(tv.horario_inicio)
+      const minFim = parseHorarioLimiteToMinutes(tv.horario_fim || '15:00')
+      const isAtrasadaValidade =
+        isToday && st === 'pendente' && minInicio !== null && currentMinutes > minInicio
+
+      if (st === 'devolvida') {
+        score += 85
+        motivos.push('Devolvida para ajuste')
+      }
+
+      if (isAtrasadaValidade) {
+        score += 95
+        if (minInicio !== null) {
+          const diff = currentMinutes - minInicio
+          if (diff > 0) score += Math.min(diff, 100)
+        }
+        motivos.push('Não aberta no horário')
+      } else if (minInicio !== null && isToday) {
+        const diff = minInicio - currentMinutes
+        if (diff >= 0 && diff <= 60) {
+          score += 45
+          motivos.push('Abertura na próxima hora')
+        }
+      }
+
+      // Se passou do horário final e continua pendente/em andamento
+      if (minFim !== null && isToday && currentMinutes > minFim && st !== 'aguardando_validacao') {
+        score += 50
+        motivos.push('Prazo final ultrapassado')
+      }
+
+      if (st === 'aguardando_validacao') {
+        score += 30
+        motivos.push('Aguardando Líder Prevenção')
+      }
+
+      // Setor crítico com perdas
+      if (tv.setor_categoria && setoresComPerdas.has(tv.setor_categoria.trim().toLowerCase())) {
+        score += 35
+        motivos.push('Setor crítico com perdas')
+      }
+
+      if (score >= 25) {
+        let badge: ItemCritico['statusBadge'] = 'No prazo'
+        let variant: ItemCritico['statusVariant'] = 'no_prazo'
+
+        if (st === 'devolvida') {
+          badge = 'Devolvida'
+          variant = 'devolvida'
+        } else if (st === 'aguardando_validacao') {
+          badge = 'Aguardando Validação'
+          variant = 'aguardando'
+        } else if (isAtrasadaValidade) {
+          badge = 'Atrasada'
+          variant = 'atrasada'
+        }
+
+        list.push({
+          id: tv.id,
+          tipo: 'validade',
+          titulo: `Validade: ${tv.setor_categoria}`,
+          setor: tv.setor_categoria,
+          responsavel: tv.executor_nome || tv.validador_funcao_nome || 'Líder Prevenção',
+          prazo: `${tv.horario_inicio}${tv.horario_fim ? ` – ${tv.horario_fim}` : ''}`,
+          statusBadge: badge,
+          statusVariant: variant,
+          score,
+          motivos,
+          validadeRef: tv,
+        })
+      }
+    }
+
+    // 3. PLANOS DE AÇÃO 5W2H ABERTOS
+    for (const plano of planosDoDia) {
+      if (plano.status === 'concluida') continue // Concluídos somem
+
+      let score = 0
+      const motivos: string[] = []
+      const atrasado = isPlanoAtrasado(plano)
+
+      if (atrasado) {
+        score += 110 // Plano 5W2H atrasado é desvio não corrigido
+        motivos.push('Plano de ação 5W2H atrasado')
+      } else {
+        score += 35
+        motivos.push('Prazo repactuado para hoje')
+      }
+
+      if (plano.prioridade === 'alta') {
+        score += 30
+        motivos.push('Prioridade alta')
+      }
+
+      const pPrazo = plano.prazo ? plano.prazo.substring(0, 10) : ''
+      list.push({
+        id: plano.id,
+        tipo: 'plano',
+        titulo: `Ação 5W2H: ${plano.descricao}`,
+        setor: plano.expand?.rotina?.area || 'Operação Loja',
+        responsavel: plano.responsavel || 'Responsável',
+        prazo: pPrazo ? `Prazo: ${pPrazo.split('-').reverse().slice(0, 2).join('/')}` : 'Sem prazo',
+        statusBadge: atrasado ? 'Atrasada' : 'No prazo',
+        statusVariant: atrasado ? 'atrasada' : 'no_prazo',
+        score,
+        motivos,
+        planoRef: plano,
+      })
+    }
+
+    // 4. VISITAS DE PROMOTORES DO DIA
+    for (const v of visitasDoDia) {
+      if (v.status === 'realizada') continue
+
+      const atrasada = isVisitaAtrasada(v)
+      let score = 0
+      const motivos: string[] = []
+
+      if (atrasada) {
+        score += 75
+        motivos.push('Visita de promotor atrasada')
+      } else if (v.hora_prevista && isToday) {
+        const minVis = parseHorarioLimiteToMinutes(v.hora_prevista)
+        if (minVis !== null && minVis - currentMinutes <= 60 && minVis >= currentMinutes) {
+          score += 30
+          motivos.push('Atendimento na próxima hora')
+        }
+      }
+
+      if (score >= 25) {
+        const promotorNome = v.expand?.promotor?.nome || 'Promotor'
+        const fornNome = v.expand?.promotor?.expand?.fornecedor?.nome
+        list.push({
+          id: v.id,
+          tipo: 'visita',
+          titulo: `Atendimento: ${promotorNome}${fornNome ? ` (${fornNome})` : ''}`,
+          setor: 'Promotores & Fornecedores',
+          responsavel: promotorNome,
+          prazo: v.hora_prevista ? `Previsto: ${v.hora_prevista}` : 'Hoje',
+          statusBadge: atrasada ? 'Atrasada' : 'No prazo',
+          statusVariant: atrasada ? 'atrasada' : 'no_prazo',
+          score,
+          motivos,
+          visitaRef: v,
+        })
+      }
+    }
+
+    // Ordenar pelos mais críticos (score decrescente) e retornar os 5 mais críticos
+    return list.sort((a, b) => b.score - a.score).slice(0, 5)
+  }, [
+    itensAgenda,
+    tarefasValidadeDoDia,
+    planosDoDia,
+    visitasDoDia,
+    setoresComPerdas,
+    currentMinutes,
+    isToday,
+  ])
+
+  // Total de itens abertos do dia para saber se a lista do dia está 100% concluída
+  const totalItensAbertosNoDia = useMemo(() => {
+    const rotinasAbertas = itensAgenda.filter((i) => !i.concluida).length
+    const validadesAbertas = tarefasValidadeDoDia.filter((t) => t.status !== 'aprovada').length
+    const planosAbertos = planosDoDia.filter((p) => p.status !== 'concluida').length
+    const visitasAbertas = visitasDoDia.filter((v) => v.status !== 'realizada').length
+    return rotinasAbertas + validadesAbertas + planosAbertos + visitasAbertas
+  }, [itensAgenda, tarefasValidadeDoDia, planosDoDia, visitasDoDia])
 
   // Contadores KPIs do dia
   const statsDia = useMemo(() => {
@@ -583,6 +927,207 @@ export default function AgendaPage() {
           </span>
         </div>
       </div>
+
+      {/* MOTOR DE PRIORIDADE: "Precisam de atenção agora" (topo da Agenda antes da lista do dia) */}
+      {totalItensAbertosNoDia > 0 && (
+        <div className="bg-white border-2 border-[#2563EB]/40 rounded-xl shadow-xs overflow-hidden">
+          {/* Header do Motor de Prioridade */}
+          <div className="p-3.5 sm:p-4 bg-gradient-to-r from-blue-50/70 via-white to-blue-50/40 border-b border-[#E5E7EB] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center shrink-0 shadow-xs">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm sm:text-base font-bold text-[#1F2937]">
+                    Precisam de atenção agora
+                  </h2>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#2563EB] text-white">
+                    Motor de Prioridade
+                  </span>
+                </div>
+                <p className="text-xs text-[#6B7280]">
+                  Itens mais críticos do dia da loja (rotinas, validades, planos 5W2H e visitas)
+                  ordenados por urgência e impacto.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <span className="text-xs text-[#6B7280]">
+                {itensCriticos.length > 0
+                  ? `Mostrando ${itensCriticos.length} mais críticos`
+                  : 'Fila sob controle'}
+              </span>
+            </div>
+          </div>
+
+          {/* Conteúdo: Lista dos 5 mais críticos ou mensagem positiva curta */}
+          {itensCriticos.length === 0 ? (
+            <div className="p-5 text-center bg-[#F7F7F5]/50 flex items-center justify-center gap-2 text-xs text-[#374151]">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span className="font-semibold">Nada crítico agora. Boa gestão!</span>
+              <span className="text-[#6B7280]">
+                — Todas as pendências imediatas estão encaminhadas ou dentro do prazo.
+              </span>
+            </div>
+          ) : (
+            <div className="divide-y divide-[#E5E7EB]">
+              {itensCriticos.map((item, idx) => (
+                <div
+                  key={`${item.tipo}-${item.id}`}
+                  className={`p-3 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3 transition-colors ${
+                    item.statusVariant === 'atrasada'
+                      ? 'bg-red-50/30 border-l-4 border-l-[#B91C1C]'
+                      : item.statusVariant === 'devolvida'
+                        ? 'bg-amber-50/30 border-l-4 border-l-amber-500'
+                        : item.statusVariant === 'aguardando'
+                          ? 'bg-blue-50/20 border-l-4 border-l-[#2563EB]'
+                          : 'bg-white hover:bg-gray-50/60 border-l-4 border-l-blue-300'
+                  }`}
+                >
+                  {/* Informações do Item Crítico */}
+                  <div className="space-y-1.5 flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[10px] font-mono font-bold w-5 h-5 rounded-full bg-gray-100 text-[#4B5563] flex items-center justify-center shrink-0">
+                        {idx + 1}
+                      </span>
+
+                      <span className="font-bold text-xs sm:text-sm text-[#1F2937]">
+                        {item.titulo}
+                      </span>
+
+                      {/* Badge de Status Padrão */}
+                      {item.statusBadge === 'Atrasada' && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-[#B91C1C] border border-red-200">
+                          <AlertTriangle className="w-3 h-3" />
+                          Atrasada
+                        </span>
+                      )}
+                      {item.statusBadge === 'Devolvida' && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                          <RotateCcw className="w-3 h-3" />
+                          Devolvida
+                        </span>
+                      )}
+                      {item.statusBadge === 'Aguardando Validação' && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-[#2563EB] border border-blue-200">
+                          <Clock className="w-3 h-3" />
+                          Aguardando Validação
+                        </span>
+                      )}
+                      {item.statusBadge === 'No prazo' && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-[#4B5563]">
+                          <Clock className="w-3 h-3" />
+                          No prazo
+                        </span>
+                      )}
+
+                      {/* Motivos da Criticidade / Pontuação */}
+                      {item.motivos.slice(0, 2).map((motivo, mIdx) => (
+                        <span
+                          key={mIdx}
+                          className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-white border border-[#E5E7EB] text-[#4B5563]"
+                        >
+                          {motivo}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-3 text-xs text-[#6B7280] flex-wrap">
+                      <span className="font-medium text-[#1F2937] flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-[#2563EB]" />
+                        <span>{item.prazo}</span>
+                      </span>
+
+                      <span className="px-1.5 py-0.2 rounded bg-gray-100 text-[11px] font-medium text-[#4B5563]">
+                        {item.setor}
+                      </span>
+
+                      <span className="flex items-center gap-1">
+                        <User className="w-3 h-3 text-[#9CA3AF]" />
+                        <span>{item.responsavel}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Ação rápida para resolver/concluir (reusando ações já existentes — não duplica fluxo) */}
+                  <div className="flex items-center gap-2 shrink-0 self-end lg:self-center">
+                    {/* Caso 1: Rotina */}
+                    {item.tipo === 'rotina' && item.rotinaRef && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleConclusao(item.rotinaRef!.id)}
+                          disabled={submittingId === item.rotinaRef.id}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs"
+                          title="Concluir rotina em 1 toque"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Concluir</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConcluirModalRotina(item.rotinaRef!)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-white border border-[#2563EB] text-[#2563EB] hover:bg-blue-50 text-xs font-semibold transition-colors"
+                          title="Concluir anexando foto"
+                        >
+                          <Camera className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">Com foto</span>
+                        </button>
+                      </>
+                    )}
+
+                    {/* Caso 2: Validade */}
+                    {item.tipo === 'validade' && item.validadeRef && (
+                      <button
+                        type="button"
+                        onClick={() => setConcluirValidadeModal(item.validadeRef!)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold shadow-xs"
+                        title="Concluir auditoria com foto"
+                      >
+                        <Camera className="w-3.5 h-3.5" />
+                        <span>Concluir Auditoria</span>
+                      </button>
+                    )}
+
+                    {/* Caso 3: Plano 5W2H */}
+                    {item.tipo === 'plano' && item.planoRef && (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await planosAcaoService.update(item.planoRef!.id, {
+                            status: 'concluida',
+                          })
+                          loadData()
+                        }}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs"
+                        title="Marcar plano 5W2H como concluído"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Concluir Ação</span>
+                      </button>
+                    )}
+
+                    {/* Caso 4: Visita de Promotor */}
+                    {item.tipo === 'visita' && item.visitaRef && (
+                      <button
+                        type="button"
+                        onClick={() => setConcluirVisitaModal(item.visitaRef!)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold shadow-xs"
+                        title="Registrar atendimento do promotor"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Concluir Atendimento</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Alerta de Devolvidas pelo Regional (Retrabalho imediato) */}
       {statsDia.devolvidas > 0 && (
@@ -1109,6 +1654,25 @@ export default function AgendaPage() {
               fotoFile,
             )
             setConcluirModalRotina(null)
+            loadData()
+          }}
+        />
+      )}
+
+      {/* Modal Concluir Validade */}
+      {concluirValidadeModal && user && (
+        <ConcluirValidadeModal
+          isOpen={Boolean(concluirValidadeModal)}
+          onClose={() => setConcluirValidadeModal(null)}
+          tarefa={concluirValidadeModal}
+          onConfirm={async (params) => {
+            if (!concluirValidadeModal || !user) return
+            await tarefasValidadeService.concluirComProva(concluirValidadeModal.id, {
+              userId: user.id,
+              observacao: params.observacao,
+              fotoFile: params.fotoFile,
+            })
+            setConcluirValidadeModal(null)
             loadData()
           }}
         />
