@@ -130,7 +130,8 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
     if (onSelectModelo) {
       onSelectModelo(modelo)
     }
-    setDetalhesModelo(modelo)
+    // Não abrimos modal bloqueante de detalhes ao clicar no botão "Visualizar Rotinas",
+    // para que o usuário veja imediatamente a lista operacional de rotinas do modelo abaixo na página
   }
 
   return (
@@ -307,7 +308,11 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
                         </span>
                       </div>
 
-                      <h3 className="text-sm font-bold text-[#1F2937] leading-snug group-hover:text-[#2563EB] transition-colors">
+                      <h3
+                        onClick={() => handleVisualizarRotinas(modelo)}
+                        className="text-sm font-bold text-[#1F2937] leading-snug group-hover:text-[#2563EB] transition-colors cursor-pointer"
+                        title="Selecionar e visualizar rotinas deste modelo"
+                      >
                         {modelo.nome}
                       </h3>
 

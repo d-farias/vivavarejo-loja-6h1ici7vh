@@ -14,7 +14,8 @@ import { BotaoAvisoWhatsApp } from '@/components/BotaoAvisoWhatsApp'
 import { ModelosSegmentoVitrine } from '@/components/ModelosSegmentoVitrine'
 import { clientesService } from '@/services/clientes'
 import { funcoesService } from '@/services/funcoes'
-import type { Cliente, Funcao, ModeloComContagem } from '@/types'
+import { modelosRotinasService } from '@/services/modelosRotinas'
+import type { Cliente, Funcao, ModeloComContagem, ModeloRotinaItem } from '@/types'
 import {
   Search,
   Filter,
@@ -172,22 +173,141 @@ export default function Rotinas() {
     return map
   }, [execucoes])
 
-  // Extract unique areas from loaded routines
+  // Se houver um modelo comercial selecionado na biblioteca, sincronizamos dinamicamente a listagem de rotinas
+  // com as rotinas daquele modelo específico (seja ele Supermercado, Moda, Farmácia, Pet, Eletrônicos etc.)
+  // e se o modelo foi aplicado na loja ou ainda está como preview, mantemos a visualização e operação imediata.
+  const [rotinasModelo, setRotinasModelo] = useState<Rotina[]>([])
+  const [loadingModeloRotinas, setLoadingModeloRotinas] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (!modeloSelecionado) {
+      setRotinasModelo([])
+      return
+    }
+
+    let isMounted = true
+    setLoadingModeloRotinas(true)
+
+    const carregarRotinasDoModelo = async () => {
+      try {
+        // 1. Carrega os itens cadastrados no modelo
+        const itensModelo = await modelosRotinasService.getItens(modeloSelecionado.id)
+        if (!isMounted) return
+
+        // 2. Mapeia para Rotina para que a interface exiba imediatamente as rotinas do novo modelo
+        // Se a loja tiver rotinas cadastradas/aplicadas correspondentes, reconciliamos os IDs e execuções
+        const rotinasMapeadas: Rotina[] = itensModelo.map((item, index) => {
+          // Busca se já existe uma rotina na loja com mesmo nome e horário para preservar ID real da loja
+          const correspondente = rotinas.find(
+            (r) =>
+              r.nome.trim().toLowerCase() === item.nome.trim().toLowerCase() ||
+              (item.horario_limite &&
+                r.horario_limite?.trim() === item.horario_limite.trim() &&
+                r.nome.toLowerCase().includes(item.nome.toLowerCase().slice(0, 15))),
+          )
+
+          if (correspondente) {
+            return correspondente
+          }
+
+          // Caso ainda não tenha sido aplicada no banco como rotina individual da loja, gera objeto de exibição completo
+          const pseudoId = `mod-${modeloSelecionado.id}-${item.id || index}`
+          return {
+            id: pseudoId,
+            collectionId: 'rotinas',
+            collectionName: 'rotinas',
+            created: item.created || new Date().toISOString(),
+            updated: item.updated || new Date().toISOString(),
+            nome: item.nome,
+            responsavel: item.responsavel || item.funcao_nome || 'Operação',
+            frequencia: item.frequencia || 'Diária',
+            horario_limite: item.horario_limite || '',
+            ferramenta: item.ferramenta || '',
+            validacao: item.validacao || '',
+            area: item.area || '',
+            observacoes: item.observacoes || '',
+            status: 'Ativa',
+            loja: lojaSelecionadaId && lojaSelecionadaId !== 'todas' ? lojaSelecionadaId : '',
+          } as Rotina
+        })
+
+        if (isMounted) {
+          setRotinasModelo(rotinasMapeadas)
+        }
+      } catch (err) {
+        console.error('Erro ao carregar rotinas do modelo selecionado:', err)
+      } finally {
+        if (isMounted) {
+          setLoadingModeloRotinas(false)
+        }
+      }
+    }
+
+    carregarRotinasDoModelo()
+
+    return () => {
+      isMounted = false
+    }
+  }, [modeloSelecionado, rotinas, lojaSelecionadaId])
+
+  // Rotinas base para a listagem: quando há um modelo selecionado, exibe as rotinas desse modelo;
+  // se não houver modelo (neutro), usa a listagem padrão da loja.
+  const rotinasExibicao = useMemo(() => {
+    if (!modeloSelecionado) return rotinas
+    return rotinasModelo
+  }, [modeloSelecionado, rotinasModelo, rotinas])
+
+  // Extract unique areas from currently displayed routines (adapta-se ao modelo escolhido)
   const availableAreas = useMemo(() => {
     const areas = new Set<string>()
-    rotinas.forEach((r) => {
+    rotinasExibicao.forEach((r) => {
       if (r.area && r.area.trim()) areas.add(r.area.trim())
       else if (r.responsavel && r.responsavel.trim()) areas.add(r.responsavel.trim())
     })
     return Array.from(areas).sort()
-  }, [rotinas])
+  }, [rotinasExibicao])
 
   const frequencyFilters = ['Todas', 'Diária', 'Semanal', 'Conforme demanda']
 
   const handleToggle = async (rotinaId: string) => {
     if (!user || submittingId === rotinaId) return
 
-    const existingExec = execucoes.find((e) => e.rotina === rotinaId && e.usuario === user.id)
+    // Se for uma rotina que veio dinamicamente do modelo (pseudo-id mod-...) e ainda não foi persistida como registro da loja,
+    // criamos a rotina na loja automaticamente para permitir o checklist e execução transparente
+    let targetRotinaId = rotinaId
+    if (rotinaId.startsWith('mod-')) {
+      const rotinaObj = rotinasExibicao.find((r) => r.id === rotinaId)
+      if (rotinaObj) {
+        try {
+          const criada = await rotinasService.create({
+            nome: rotinaObj.nome,
+            responsavel: rotinaObj.responsavel,
+            frequencia: rotinaObj.frequencia,
+            horario_limite: rotinaObj.horario_limite,
+            ferramenta: rotinaObj.ferramenta,
+            validacao: rotinaObj.validacao,
+            area: rotinaObj.area,
+            observacoes: rotinaObj.observacoes,
+            status: 'Ativa',
+            loja:
+              lojaSelecionadaId && lojaSelecionadaId !== 'todas' ? lojaSelecionadaId : undefined,
+          })
+          targetRotinaId = criada.id
+          setRotinas((prev) => [criada, ...prev])
+          // Atualiza o item nas rotinas do modelo
+          setRotinasModelo((prev) => prev.map((r) => (r.id === rotinaId ? criada : r)))
+          if (selectedRotina?.id === rotinaId) {
+            setSelectedRotina(criada)
+          }
+        } catch (err) {
+          console.warn('Não foi possível persistir rotina do modelo antes da execução:', err)
+        }
+      }
+    }
+
+    const existingExec = execucoes.find(
+      (e) => (e.rotina === targetRotinaId || e.rotina === rotinaId) && e.usuario === user.id,
+    )
     const isCurrentlyDone = !!existingExec?.concluida
     const nextState = !isCurrentlyDone
 
@@ -205,20 +325,22 @@ export default function Rotinas() {
     }
 
     setExecucoes((prev) => {
-      const idx = prev.findIndex((e) => e.rotina === rotinaId && e.usuario === user.id)
+      const idx = prev.findIndex(
+        (e) => (e.rotina === targetRotinaId || e.rotina === rotinaId) && e.usuario === user.id,
+      )
       if (idx >= 0) {
         const copy = [...prev]
-        copy[idx] = { ...copy[idx], concluida: nextState }
+        copy[idx] = { ...copy[idx], concluida: nextState, rotina: targetRotinaId }
         return copy
       }
-      return [...prev, optimisticRecord]
+      return [...prev, { ...optimisticRecord, rotina: targetRotinaId }]
     })
 
     setSubmittingId(rotinaId)
 
     try {
       const saved = await execucoesService.toggleExecution(
-        rotinaId,
+        targetRotinaId,
         user.id,
         isCurrentlyDone,
         existingExec?.id,
@@ -257,8 +379,11 @@ export default function Rotinas() {
   // Handle Delete
   const handleDeleteRoutine = async (id: string) => {
     try {
-      await rotinasService.delete(id)
+      if (!id.startsWith('mod-')) {
+        await rotinasService.delete(id)
+      }
       setRotinas((prev) => prev.filter((r) => r.id !== id))
+      setRotinasModelo((prev) => prev.filter((r) => r.id !== id))
       if (selectedRotina?.id === id) {
         setSelectedRotina(null)
       }
@@ -275,10 +400,10 @@ export default function Rotinas() {
     setIsFormModalOpen(true)
   }
 
-  // Filtered routines (com deduplicação defensiva por id)
+  // Filtered routines (com deduplicação defensiva por id) baseadas nas rotinas de exibição ativas
   const filteredRotinas = useMemo(() => {
     const seenIds = new Set<string>()
-    return rotinas.filter((r) => {
+    return rotinasExibicao.filter((r) => {
       if (seenIds.has(r.id)) return false
       seenIds.add(r.id)
       // Search
@@ -319,7 +444,7 @@ export default function Rotinas() {
 
       return true
     })
-  }, [rotinas, searchTerm, selectedFreq, selectedArea])
+  }, [rotinasExibicao, searchTerm, selectedFreq, selectedArea])
 
   const clearFilters = () => {
     setSearchTerm('')
@@ -426,9 +551,54 @@ export default function Rotinas() {
         userPerfil={perfil}
         lojas={lojas}
         clientes={clientes}
-        onRotinasAtualizadas={loadData}
+        onRotinasAtualizadas={async () => {
+          await loadData()
+          // Recarrega os itens do modelo ativo para atualizar com os IDs reais aplicados na loja
+          if (modeloSelecionado) {
+            try {
+              const itens = await modelosRotinasService.getItens(modeloSelecionado.id)
+              const rotinasMapeadas: Rotina[] = itens.map((item, index) => {
+                const correspondente = rotinas.find(
+                  (r) =>
+                    r.nome.trim().toLowerCase() === item.nome.trim().toLowerCase() ||
+                    (item.horario_limite &&
+                      r.horario_limite?.trim() === item.horario_limite.trim() &&
+                      r.nome.toLowerCase().includes(item.nome.toLowerCase().slice(0, 15))),
+                )
+                if (correspondente) return correspondente
+                return {
+                  id: `mod-${modeloSelecionado.id}-${item.id || index}`,
+                  collectionId: 'rotinas',
+                  collectionName: 'rotinas',
+                  created: item.created || new Date().toISOString(),
+                  updated: item.updated || new Date().toISOString(),
+                  nome: item.nome,
+                  responsavel: item.responsavel || item.funcao_nome || 'Operação',
+                  frequencia: item.frequencia || 'Diária',
+                  horario_limite: item.horario_limite || '',
+                  ferramenta: item.ferramenta || '',
+                  validacao: item.validacao || '',
+                  area: item.area || '',
+                  observacoes: item.observacoes || '',
+                  status: 'Ativa',
+                  loja: lojaSelecionadaId && lojaSelecionadaId !== 'todas' ? lojaSelecionadaId : '',
+                } as Rotina
+              })
+              setRotinasModelo(rotinasMapeadas)
+            } catch {
+              // noop
+            }
+          }
+        }}
         onSelectModelo={(mod) => {
           setModeloSelecionado(mod)
+          // Rola suavemente até o catálogo de rotinas caso o usuário esteja em celular
+          setTimeout(() => {
+            const el = document.getElementById('catalogo-rotinas-container')
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }
+          }, 100)
         }}
         selectedModeloId={modeloSelecionado?.id || null}
       />
@@ -509,7 +679,7 @@ export default function Rotinas() {
                       <span className="text-[10px] opacity-75">
                         (
                         {
-                          rotinas.filter(
+                          rotinasExibicao.filter(
                             (r) =>
                               (r.area && r.area.trim() === area) ||
                               (!r.area && r.responsavel && r.responsavel.trim() === area),
@@ -583,7 +753,7 @@ export default function Rotinas() {
           </p>
         </div>
       ) : (
-        <>
+        <div id="catalogo-rotinas-container" className="space-y-6">
           {/* Barra indicadora do modelo atualmente ativo com opção de trocar */}
           <div className="bg-blue-50/70 border border-blue-200/80 rounded-lg p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div className="flex items-center gap-2.5 min-w-0">
@@ -648,7 +818,11 @@ export default function Rotinas() {
               </div>
 
               <span className="text-xs text-[#6B7280]">
-                Exibindo <strong>{filteredRotinas.length}</strong> de {rotinas.length} rotinas
+                Exibindo <strong>{filteredRotinas.length}</strong> de {rotinasExibicao.length}{' '}
+                rotinas
+                {loadingModeloRotinas && (
+                  <span className="ml-1 text-[#2563EB] animate-pulse">(atualizando modelo...)</span>
+                )}
               </span>
             </div>
 
@@ -920,7 +1094,7 @@ export default function Rotinas() {
               })}
             </div>
           )}
-        </>
+        </div>
       )}
 
       {/* Routine Detail Modal */}
