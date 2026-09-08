@@ -434,8 +434,11 @@ export function MaterialVendaAba() {
   const handlePrint = () => {
     try {
       setImprimindo(true)
+      const originalTitle = document.title
+      document.title = 'VivaVarejo'
       setTimeout(() => {
         window.print()
+        document.title = originalTitle
         setImprimindo(false)
       }, 100)
     } catch (err) {

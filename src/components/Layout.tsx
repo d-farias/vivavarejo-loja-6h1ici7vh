@@ -119,9 +119,6 @@ export default function Layout() {
                 <span className="text-sm font-bold tracking-wider uppercase text-[#1F2937] leading-tight">
                   VivaVarejo
                 </span>
-                <span className="text-[10px] text-[#6B7280] leading-none tracking-normal">
-                  Varejo Operacional
-                </span>
               </div>
             </NavLink>
           </div>

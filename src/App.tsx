@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -19,8 +20,22 @@ import NotFound from './pages/NotFound'
 import Validades from './pages/Validades'
 import Perdas from './pages/Perdas'
 
+const DocumentTitleSync = () => {
+  const location = useLocation()
+
+  useEffect(() => {
+    // Garante que a aba do navegador exiba estritamente "VivaVarejo" sem "Skip" em todas as rotas
+    if (document.title !== 'VivaVarejo') {
+      document.title = 'VivaVarejo'
+    }
+  }, [location.pathname])
+
+  return null
+}
+
 const App = () => (
   <BrowserRouter>
+    <DocumentTitleSync />
     <AuthProvider>
       <StoreProvider>
         <TooltipProvider>
