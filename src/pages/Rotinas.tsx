@@ -248,48 +248,253 @@ export default function Rotinas() {
   // Define se a loja já possui conciliação ativa para o modelo selecionado
   const isConciliado = rotinasConciliadas.length > 0
 
+  // Normalização canônica de nomes de cargos e departamentos para deduplicação
+  const normalizarNomeCanonico = useCallback((raw: string): string => {
+    if (!raw) return ''
+    const s = raw.trim()
+    if (!s) return ''
+
+    // Normalização: lowercase, remover acentos (NFD) e pontuações/separadores substituídos por espaços
+    const norm = s
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+
+    if (!norm) return s
+
+    // 1. "Gerente de Loja": gerente, gerência, gerente geral, gerente de loja, gerente de operações, gerente operacional, "gerente/go", "go", prefixo "gerente..."
+    if (
+      norm === 'go' ||
+      norm === 'gerente' ||
+      norm === 'gerencia' ||
+      norm === 'gerente geral' ||
+      norm === 'gerente de loja' ||
+      norm === 'gerente de operacoes' ||
+      norm === 'gerente operacional' ||
+      norm === 'gerente go' ||
+      norm.startsWith('gerente')
+    ) {
+      return 'Gerente de Loja'
+    }
+
+    // 2. "Prevenção de Perdas": prevenção, prevenção de perdas, "prevencao/go", fiscal de prevenção, preventista, "app", "fiscal app", agente de prevenção, "gp", "lp"
+    if (
+      norm === 'app' ||
+      norm === 'fiscal app' ||
+      norm === 'prevencao' ||
+      norm === 'prevencao de perdas' ||
+      norm === 'prevencao perdas' ||
+      norm === 'prevencao go' ||
+      norm === 'fiscal de prevencao' ||
+      norm === 'fiscal prevencao' ||
+      norm === 'preventista' ||
+      norm === 'agente de prevencao' ||
+      norm === 'agente prevencao' ||
+      norm === 'gp' ||
+      norm === 'lp'
+    ) {
+      return 'Prevenção de Perdas'
+    }
+
+    // 3. "Encarregado de Loja": encarregado(s), "encarregados/go", "enc/gerente/prev.", líder de seção/setor, chefe de seção
+    if (
+      norm === 'encarregado' ||
+      norm === 'encarregados' ||
+      norm === 'encarregados go' ||
+      norm === 'encarregado go' ||
+      norm === 'enc gerente prev' ||
+      norm === 'enc gerente' ||
+      norm === 'enc' ||
+      norm === 'lider de secao' ||
+      norm === 'lider de setor' ||
+      norm === 'lider secao' ||
+      norm === 'lider setor' ||
+      norm === 'chefe de secao' ||
+      norm === 'chefe secao'
+    ) {
+      return 'Encarregado de Loja'
+    }
+
+    // 4. "Analista de Estoque / Auditoria": analista, analista de estoque, auditoria, auditor, "g. est/gerente"
+    if (
+      norm === 'analista' ||
+      norm === 'analista de estoque' ||
+      norm === 'analista estoque' ||
+      norm === 'auditoria' ||
+      norm === 'auditor' ||
+      norm === 'g est gerente' ||
+      norm === 'gest gerente' ||
+      norm === 'g est'
+    ) {
+      return 'Analista de Estoque / Auditoria'
+    }
+
+    // 5. "Cartazista": cartazista, comunicação visual
+    if (norm === 'cartazista' || norm === 'comunicacao visual') {
+      return 'Cartazista'
+    }
+
+    // 6. "Conferente": conferente, recebimento, conferência de cargas
+    if (
+      norm === 'conferente' ||
+      norm === 'recebimento' ||
+      norm === 'conferencia de cargas' ||
+      norm === 'conferencia cargas' ||
+      norm === 'conferencia'
+    ) {
+      return 'Conferente'
+    }
+
+    // 7. "Operador de Caixa": operador de caixa, caixa, fiscal de caixa, atendente
+    if (
+      norm === 'operador de caixa' ||
+      norm === 'operadora de caixa' ||
+      norm === 'caixa' ||
+      norm === 'fiscal de caixa' ||
+      norm === 'fiscal caixa' ||
+      norm === 'atendente'
+    ) {
+      return 'Operador de Caixa'
+    }
+
+    // 8. "Repositor": repositor, reposição, auxiliar de reposição
+    if (
+      norm === 'repositor' ||
+      norm === 'reposicao' ||
+      norm === 'auxiliar de reposicao' ||
+      norm === 'auxiliar reposicao'
+    ) {
+      return 'Repositor'
+    }
+
+    // Fallback: qualquer outro cargo/departamento retorna como está
+    return s
+  }, [])
+
+  // Helper para obter a chave canônica (minúscula) de comparação
+  const getChaveCanonico = useCallback(
+    (raw: string): string => {
+      const canonico = normalizarNomeCanonico(raw)
+      return canonico
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+    },
+    [normalizarNomeCanonico],
+  )
+
   // 1. Departamentos / Áreas: derivados APENAS de rotinas efetivamente conciliadas COM A LOJA
   // Se não houver rotinas conciliadas para este modelo, permanece 100% EM BRANCO (Array vazio).
+  // Deduplica usando os nomes canônicos
   const availableAreas = useMemo(() => {
     if (!modeloSelecionado || !isConciliado) return []
-    const areas = new Set<string>()
+    const areasMap = new Map<string, string>()
     rotinasConciliadas.forEach((r) => {
-      if (r.area && r.area.trim()) areas.add(r.area.trim())
-      else if (r.responsavel && r.responsavel.trim()) areas.add(r.responsavel.trim())
+      const raw = (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim()) || ''
+      if (!raw) return
+      const canonico = normalizarNomeCanonico(raw)
+      const chave = getChaveCanonico(canonico)
+      if (!areasMap.has(chave)) {
+        areasMap.set(chave, canonico)
+      }
     })
-    return Array.from(areas).sort()
-  }, [modeloSelecionado, isConciliado, rotinasConciliadas])
+    return Array.from(areasMap.values()).sort((a, b) => a.localeCompare(b))
+  }, [
+    modeloSelecionado,
+    isConciliado,
+    rotinasConciliadas,
+    normalizarNomeCanonico,
+    getChaveCanonico,
+  ])
 
   // 2. Funções / Cargos: derivados APENAS de rotinas efetivamente conciliadas COM A LOJA
   // Se a loja ainda não conciliou rotinas daquele modelo, a seção fica em branco.
+  // Agrupa variantes pelo nome canônico, somando rotinas associadas e unificando contatos sem descartar dados.
   const funcoesExibicao = useMemo(() => {
     if (!modeloSelecionado || !isConciliado) return []
 
-    const funcoesMap = new Map<string, Funcao>()
+    // Estrutura para cada cargo canônico agregado
+    interface FuncaoAgregada extends Funcao {
+      totalRotinas: number
+    }
+
+    const funcoesMap = new Map<string, FuncaoAgregada>()
 
     rotinasConciliadas.forEach((r) => {
       const nomeResp = (r.responsavel || '').trim()
       if (!nomeResp) return
 
-      const chave = nomeResp.toLowerCase()
+      const nomeCanonico = normalizarNomeCanonico(nomeResp)
+      const chave = getChaveCanonico(nomeCanonico)
+
       if (!funcoesMap.has(chave)) {
-        const existente = funcoesLoja.find((f) => f.nome.trim().toLowerCase() === chave)
+        // Busca cadastro de função da loja que case com a chave canônica ou o nome original
+        const existente = funcoesLoja.find((f) => {
+          const cF = getChaveCanonico(f.nome)
+          return cF === chave || f.nome.trim().toLowerCase() === nomeResp.toLowerCase()
+        })
+
+        const telefoneInicial =
+          existente?.telefone?.trim() ||
+          r.telefone_responsavel?.trim() ||
+          r.expand?.funcao?.telefone?.trim() ||
+          ''
+
+        const chefeInicial =
+          existente?.chefe_imediato_funcao?.trim() ||
+          r.telefone_chefe?.trim() ||
+          r.expand?.funcao?.chefe_imediato_funcao?.trim() ||
+          ''
+
         funcoesMap.set(chave, {
           id: existente?.id || `func-conc-${chave}`,
           collectionId: 'funcoes',
           collectionName: 'funcoes',
           created: existente?.created || new Date().toISOString(),
           updated: existente?.updated || new Date().toISOString(),
-          nome: existente?.nome || nomeResp,
-          telefone: existente?.telefone || '',
-          chefe_imediato_funcao: existente?.chefe_imediato_funcao || '',
+          nome: existente?.nome ? normalizarNomeCanonico(existente.nome) : nomeCanonico,
+          telefone: telefoneInicial,
+          chefe_imediato_funcao: chefeInicial,
           loja: lojaSelecionadaId && lojaSelecionadaId !== 'todas' ? lojaSelecionadaId : '',
-        } as Funcao)
+          totalRotinas: 1,
+        })
+      } else {
+        const atual = funcoesMap.get(chave)!
+        atual.totalRotinas += 1
+
+        // Preenche telefone e chefe imediato caso ainda estejam vazios, priorizando cadastro da loja e depois rotina
+        if (!atual.telefone) {
+          const telRotina = r.telefone_responsavel?.trim() || r.expand?.funcao?.telefone?.trim()
+          if (telRotina) {
+            atual.telefone = telRotina
+          }
+        }
+        if (!atual.chefe_imediato_funcao) {
+          const chefeRotina =
+            r.telefone_chefe?.trim() || r.expand?.funcao?.chefe_imediato_funcao?.trim()
+          if (chefeRotina) {
+            atual.chefe_imediato_funcao = chefeRotina
+          }
+        }
       }
     })
 
     return Array.from(funcoesMap.values()).sort((a, b) => a.nome.localeCompare(b.nome))
-  }, [modeloSelecionado, isConciliado, rotinasConciliadas, funcoesLoja, lojaSelecionadaId])
+  }, [
+    modeloSelecionado,
+    isConciliado,
+    rotinasConciliadas,
+    funcoesLoja,
+    lojaSelecionadaId,
+    normalizarNomeCanonico,
+    getChaveCanonico,
+  ])
 
   // Rotinas para exibição na lista operacional:
   // São exclusivamente as rotinas conciliadas da loja. Se não houver conciliação, lista fica vazia.
@@ -438,8 +643,16 @@ export default function Rotinas() {
 
       // Area filter
       if (selectedArea !== 'Todas') {
-        const routineArea = (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim())
-        if (routineArea !== selectedArea) {
+        const rawRoutineArea =
+          (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim()) || ''
+        const canonicoRoutineArea = normalizarNomeCanonico(rawRoutineArea)
+        const chaveRoutine = getChaveCanonico(canonicoRoutineArea)
+        const chaveSelected = getChaveCanonico(selectedArea)
+        if (
+          chaveRoutine !== chaveSelected &&
+          canonicoRoutineArea !== selectedArea &&
+          rawRoutineArea !== selectedArea
+        ) {
           return false
         }
       }
@@ -680,11 +893,18 @@ export default function Rotinas() {
                       <span className="text-[10px] opacity-75">
                         (
                         {
-                          rotinasExibicao.filter(
-                            (r) =>
-                              (r.area && r.area.trim() === area) ||
-                              (!r.area && r.responsavel && r.responsavel.trim() === area),
-                          ).length
+                          rotinasExibicao.filter((r) => {
+                            const raw =
+                              (r.area && r.area.trim()) ||
+                              (r.responsavel && r.responsavel.trim()) ||
+                              ''
+                            const canon = normalizarNomeCanonico(raw)
+                            return (
+                              getChaveCanonico(canon) === getChaveCanonico(area) ||
+                              canon === area ||
+                              raw === area
+                            )
+                          }).length
                         }
                         )
                       </span>
@@ -719,9 +939,20 @@ export default function Rotinas() {
                       className="p-2 bg-white border border-[#E5E7EB] rounded-md text-xs flex items-center justify-between gap-2 shadow-2xs"
                     >
                       <div className="min-w-0">
-                        <span className="font-semibold text-[#1F2937] block truncate">
-                          {f.nome}
-                        </span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-semibold text-[#1F2937] block truncate">
+                            {f.nome}
+                          </span>
+                          {(f as unknown as { totalRotinas?: number }).totalRotinas !==
+                            undefined && (
+                            <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded-full bg-blue-50 text-[#2563EB] border border-blue-100 shrink-0">
+                              {(f as unknown as { totalRotinas?: number }).totalRotinas}{' '}
+                              {(f as unknown as { totalRotinas?: number }).totalRotinas === 1
+                                ? 'rotina'
+                                : 'rotinas'}
+                            </span>
+                          )}
+                        </div>
                         {f.telefone ? (
                           <span className="text-[11px] text-[#6B7280] font-mono block truncate">
                             WhatsApp: {f.telefone}
@@ -733,7 +964,10 @@ export default function Rotinas() {
                         )}
                       </div>
                       {f.chefe_imediato_funcao && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-[#2563EB] border border-blue-100 shrink-0">
+                        <span
+                          className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-[#2563EB] border border-blue-100 shrink-0"
+                          title={`Chefe imediato: ${f.chefe_imediato_funcao}`}
+                        >
                           Subordinado
                         </span>
                       )}
