@@ -24,6 +24,7 @@ import {
 import pb from '../lib/pocketbase/client'
 import { Cliente, Loja, Rotina, ExecucaoRotina, PlanoAcao } from '../types'
 import { isPastDue, getHorarioStatus } from '../lib/time-utils'
+import { normalizarNomeCanonico, getChaveCanonico } from '../lib/cargos'
 import { getTodayDateString } from '../services/rotinas'
 import { clientesService } from '../services/clientes'
 import { lojasService } from '../services/lojas'
@@ -446,14 +447,91 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
     return dias
   }, [rotinasFiltradas, execucoesFiltradas])
 
-  // Relatório por área
+  // Relatório por área (com agrupamento e chave canônica unificada)
   const relatorioAreas: AreaPerformance[] = useMemo(() => {
-    const map = new Map<string, Rotina[]>()
+    const map = new Map<string, { nome: string; rots: Rotina[] }>()
     rotinasFiltradas.forEach((r) => {
-      const a = (r.area || 'Geral').trim()
-      if (!map.has(a)) map.set(a, [])
-      map.get(a)!.push(r)
+      const raw = (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim()) || 'Geral'
+      const canonico = normalizarNomeCanonico(raw) || 'Geral'
+      const chave = getChaveCanonico(canonico) || 'geral'
+      if (!map.has(chave)) map.set(chave, { nome: canonico, rots: [] })
+      map.get(chave)!.rots.push(r)
     })
+
+    const result: AreaPerformance[] = []
+    map.forEach(({ nome: area, rots }) => {
+      const rotIds = new Set(rots.map((r) => r.id))
+      const totalEsperadoSemana = rots.length * 7
+
+      // Execuções válidas da semana para essa área (não devolvidas)
+      const execsArea = execucoesFiltradas.filter(
+        (e) => rotIds.has(e.rotina) && e.concluida && e.status_validacao !== 'devolvida',
+      )
+      const conclusoesSemana = execsArea.length
+      const percentualSemana =
+        totalEsperadoSemana > 0 ? Math.round((conclusoesSemana / totalEsperadoSemana) * 100) : 0
+
+      // Hoje
+      const execsHoje = execsArea.filter((e) => {
+        const eDate = e.data_execucao ? e.data_execucao.substring(0, 10) : ''
+        return eDate === todayStr
+      })
+      const conclusoesHoje = new Set(execsHoje.map((e) => e.rotina)).size
+      const totalHoje = rots.length
+      const percentualHoje = totalHoje > 0 ? Math.round((conclusoesHoje / totalHoje) * 100) : 0
+
+      const atrasadasHoje = rots.filter(
+        (r) => !concluidasHojeIds.has(r.id) && isPastDue(r.horario_limite),
+      ).length
+
+      result.push({
+        area,
+        totalRotinas: rots.length,
+        totalEsperadoSemana,
+        conclusoesSemana,
+        percentualSemana: Math.min(100, percentualSemana),
+        conclusoesHoje,
+        totalHoje,
+        percentualHoje: Math.min(100, percentualHoje),
+        atrasadasHoje,
+      })
+    })
+
+    return result.sort((a, b) => a.percentualSemana - b.percentualSemana)
+  }, [rotinasFiltradas, execucoesFiltradas, todayStr, concluidasHojeIds])
+
+  // Relatório por líder / responsável (unificado por cargo/responsável canônico)
+  const relatorioLideres: LiderPerformance[] = useMemo(() => {
+    const map = new Map<string, { nome: string; rots: Rotina[] }>()
+    rotinasFiltradas.forEach((r) => {
+      const raw = (r.responsavel || 'Não atribuído').trim()
+      const canonico = normalizarNomeCanonico(raw) || 'Não atribuído'
+      const chave = getChaveCanonico(canonico) || 'nao-atribuido'
+      if (!map.has(chave)) map.set(chave, { nome: canonico, rots: [] })
+      map.get(chave)!.rots.push(r)
+    })
+
+    const result: LiderPerformance[] = []
+    map.forEach(({ nome: responsavel, rots }) => {
+      const rotIds = new Set(rots.map((r) => r.id))
+      const totalEsperadoSemana = rots.length * 7
+      const conclusoesSemana = execucoesFiltradas.filter(
+        (e) => rotIds.has(e.rotina) && e.concluida && e.status_validacao !== 'devolvida',
+      ).length
+      const percentualSemana =
+        totalEsperadoSemana > 0 ? Math.round((conclusoesSemana / totalEsperadoSemana) * 100) : 0
+
+      result.push({
+        responsavel,
+        totalRotinas: rots.length,
+        totalEsperadoSemana,
+        conclusoesSemana,
+        percentualSemana: Math.min(100, percentualSemana),
+      })
+    })
+
+    return result.sort((a, b) => b.percentualSemana - a.percentualSemana)
+  }, [rotinasFiltradas, execucoesFiltradas])
 
     const result: AreaPerformance[] = []
     map.forEach((rots, area) => {
@@ -497,36 +575,7 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
     return result.sort((a, b) => a.percentualSemana - b.percentualSemana)
   }, [rotinasFiltradas, execucoesFiltradas, todayStr, concluidasHojeIds])
 
-  // Relatório por líder / responsável
-  const relatorioLideres: LiderPerformance[] = useMemo(() => {
-    const map = new Map<string, Rotina[]>()
-    rotinasFiltradas.forEach((r) => {
-      const resp = (r.responsavel || 'Não atribuído').trim()
-      if (!map.has(resp)) map.set(resp, [])
-      map.get(resp)!.push(r)
-    })
 
-    const result: LiderPerformance[] = []
-    map.forEach((rots, responsavel) => {
-      const rotIds = new Set(rots.map((r) => r.id))
-      const totalEsperadoSemana = rots.length * 7
-      const conclusoesSemana = execucoesFiltradas.filter(
-        (e) => rotIds.has(e.rotina) && e.concluida && e.status_validacao !== 'devolvida',
-      ).length
-      const percentualSemana =
-        totalEsperadoSemana > 0 ? Math.round((conclusoesSemana / totalEsperadoSemana) * 100) : 0
-
-      result.push({
-        responsavel,
-        totalRotinas: rots.length,
-        totalEsperadoSemana,
-        conclusoesSemana,
-        percentualSemana: Math.min(100, percentualSemana),
-      })
-    })
-
-    return result.sort((a, b) => b.percentualSemana - a.percentualSemana)
-  }, [rotinasFiltradas, execucoesFiltradas])
 
   // Ranking de Lojas (quando há lojas cadastradas)
   const rankingLojas: LojaRanking[] = useMemo(() => {
@@ -589,7 +638,7 @@ export const PainelGerencial: React.FC<PainelGerencialProps> = ({
         id: `atraso-${r.id}`,
         tipo: 'atraso_hoje',
         titulo: `Rotina Atrasada Hoje: ${r.nome}`,
-        descricao: `Responsável: ${r.responsavel} • Área: ${r.area || 'Geral'}`,
+        descricao: `Responsável: ${normalizarNomeCanonico(r.responsavel)} • Área: ${normalizarNomeCanonico(r.area || r.responsavel) || 'Geral'}`,
         dadoConcreto: `Limite era ${status.displayLabel} (ultrapassado)`,
         severidade: 'alta',
       })

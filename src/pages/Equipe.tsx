@@ -18,6 +18,7 @@ import {
   Phone,
 } from 'lucide-react'
 import { formatPhoneBR } from '@/lib/phone-utils'
+import { normalizarNomeCanonico, getChaveCanonico } from '@/lib/cargos'
 import { Link } from 'react-router-dom'
 
 export default function Equipe() {
@@ -51,19 +52,23 @@ export default function Equipe() {
     loadData()
   }, [loadData])
 
-  // Group routines by Area (or responsavel fallback)
+  // Group routines by Area (or responsavel fallback) using unified canonical names
   const groupedData = useMemo(() => {
-    const map = new Map<string, Rotina[]>()
+    const map = new Map<string, { area: string; items: Rotina[] }>()
 
     rotinas.forEach((rotina) => {
-      const areaKey = rotina.area || rotina.responsavel || 'Geral'
-      const existing = map.get(areaKey) || []
-      existing.push(rotina)
-      map.set(areaKey, existing)
+      const raw = rotina.area || rotina.responsavel || 'Geral'
+      const canonico = normalizarNomeCanonico(raw) || 'Geral'
+      const chave = getChaveCanonico(canonico) || 'geral'
+
+      if (!map.has(chave)) {
+        map.set(chave, { area: canonico, items: [] })
+      }
+      map.get(chave)!.items.push(rotina)
     })
 
-    return Array.from(map.entries())
-      .map(([area, items]) => ({
+    return Array.from(map.values())
+      .map(({ area, items }) => ({
         area,
         items,
         count: items.length,
@@ -141,12 +146,14 @@ export default function Equipe() {
                 <div className="min-w-0">
                   <div className="font-bold text-sm text-[#1F2937]">{fc.nome}</div>
                   <div className="text-xs text-[#2563EB] font-medium mt-0.5">
-                    {fc.expand?.funcao?.nome || 'Função operacional'}
+                    {normalizarNomeCanonico(fc.expand?.funcao?.nome) || 'Função operacional'}
                   </div>
                   {fc.expand?.funcao?.chefe_imediato_funcao && (
                     <div className="text-xs text-[#6B7280] mt-0.5">
                       Chefe imediato:{' '}
-                      {fc.expand.funcao.expand?.chefe_imediato_funcao?.nome || 'Definido na função'}
+                      {normalizarNomeCanonico(
+                        fc.expand.funcao.expand?.chefe_imediato_funcao?.nome,
+                      ) || 'Definido na função'}
                     </div>
                   )}
                   {fc.expand?.loja && (
@@ -255,7 +262,7 @@ export default function Equipe() {
                     {routine.validacao && (
                       <span className="flex items-center gap-1 text-[11px] text-[#4B5563]">
                         <ShieldCheck className="w-3.5 h-3.5 text-[#9CA3AF]" />
-                        <span>Validação: {routine.validacao}</span>
+                        <span>Validação: {normalizarNomeCanonico(routine.validacao)}</span>
                       </span>
                     )}
                   </div>

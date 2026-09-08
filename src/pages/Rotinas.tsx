@@ -15,6 +15,7 @@ import { ModelosSegmentoVitrine } from '@/components/ModelosSegmentoVitrine'
 import { clientesService } from '@/services/clientes'
 import { funcoesService } from '@/services/funcoes'
 import { modelosRotinasService } from '@/services/modelosRotinas'
+import { normalizarNomeCanonico, getChaveCanonico } from '@/lib/cargos'
 import type { Cliente, Funcao, ModeloComContagem, ModeloRotinaItem } from '@/types'
 import {
   Search,
@@ -248,146 +249,7 @@ export default function Rotinas() {
   // Define se a loja já possui conciliação ativa para o modelo selecionado
   const isConciliado = rotinasConciliadas.length > 0
 
-  // Normalização canônica de nomes de cargos e departamentos para deduplicação
-  const normalizarNomeCanonico = useCallback((raw: string): string => {
-    if (!raw) return ''
-    const s = raw.trim()
-    if (!s) return ''
-
-    // Normalização: lowercase, remover acentos (NFD) e pontuações/separadores substituídos por espaços
-    const norm = s
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-
-    if (!norm) return s
-
-    // 1. "Gerente de Loja": gerente, gerência, gerente geral, gerente de loja, gerente de operações, gerente operacional, "gerente/go", "go", prefixo "gerente..."
-    if (
-      norm === 'go' ||
-      norm === 'gerente' ||
-      norm === 'gerencia' ||
-      norm === 'gerente geral' ||
-      norm === 'gerente de loja' ||
-      norm === 'gerente de operacoes' ||
-      norm === 'gerente operacional' ||
-      norm === 'gerente go' ||
-      norm.startsWith('gerente')
-    ) {
-      return 'Gerente de Loja'
-    }
-
-    // 2. "Prevenção de Perdas": prevenção, prevenção de perdas, "prevencao/go", fiscal de prevenção, preventista, "app", "fiscal app", agente de prevenção, "gp", "lp"
-    if (
-      norm === 'app' ||
-      norm === 'fiscal app' ||
-      norm === 'prevencao' ||
-      norm === 'prevencao de perdas' ||
-      norm === 'prevencao perdas' ||
-      norm === 'prevencao go' ||
-      norm === 'fiscal de prevencao' ||
-      norm === 'fiscal prevencao' ||
-      norm === 'preventista' ||
-      norm === 'agente de prevencao' ||
-      norm === 'agente prevencao' ||
-      norm === 'gp' ||
-      norm === 'lp'
-    ) {
-      return 'Prevenção de Perdas'
-    }
-
-    // 3. "Encarregado de Loja": encarregado(s), "encarregados/go", "enc/gerente/prev.", líder de seção/setor, chefe de seção
-    if (
-      norm === 'encarregado' ||
-      norm === 'encarregados' ||
-      norm === 'encarregados go' ||
-      norm === 'encarregado go' ||
-      norm === 'enc gerente prev' ||
-      norm === 'enc gerente' ||
-      norm === 'enc' ||
-      norm === 'lider de secao' ||
-      norm === 'lider de setor' ||
-      norm === 'lider secao' ||
-      norm === 'lider setor' ||
-      norm === 'chefe de secao' ||
-      norm === 'chefe secao'
-    ) {
-      return 'Encarregado de Loja'
-    }
-
-    // 4. "Analista de Estoque / Auditoria": analista, analista de estoque, auditoria, auditor, "g. est/gerente"
-    if (
-      norm === 'analista' ||
-      norm === 'analista de estoque' ||
-      norm === 'analista estoque' ||
-      norm === 'auditoria' ||
-      norm === 'auditor' ||
-      norm === 'g est gerente' ||
-      norm === 'gest gerente' ||
-      norm === 'g est'
-    ) {
-      return 'Analista de Estoque / Auditoria'
-    }
-
-    // 5. "Cartazista": cartazista, comunicação visual
-    if (norm === 'cartazista' || norm === 'comunicacao visual') {
-      return 'Cartazista'
-    }
-
-    // 6. "Conferente": conferente, recebimento, conferência de cargas
-    if (
-      norm === 'conferente' ||
-      norm === 'recebimento' ||
-      norm === 'conferencia de cargas' ||
-      norm === 'conferencia cargas' ||
-      norm === 'conferencia'
-    ) {
-      return 'Conferente'
-    }
-
-    // 7. "Operador de Caixa": operador de caixa, caixa, fiscal de caixa, atendente
-    if (
-      norm === 'operador de caixa' ||
-      norm === 'operadora de caixa' ||
-      norm === 'caixa' ||
-      norm === 'fiscal de caixa' ||
-      norm === 'fiscal caixa' ||
-      norm === 'atendente'
-    ) {
-      return 'Operador de Caixa'
-    }
-
-    // 8. "Repositor": repositor, reposição, auxiliar de reposição
-    if (
-      norm === 'repositor' ||
-      norm === 'reposicao' ||
-      norm === 'auxiliar de reposicao' ||
-      norm === 'auxiliar reposicao'
-    ) {
-      return 'Repositor'
-    }
-
-    // Fallback: qualquer outro cargo/departamento retorna como está
-    return s
-  }, [])
-
-  // Helper para obter a chave canônica (minúscula) de comparação
-  const getChaveCanonico = useCallback(
-    (raw: string): string => {
-      const canonico = normalizarNomeCanonico(raw)
-      return canonico
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim()
-    },
-    [normalizarNomeCanonico],
-  )
+  // Importados de @/lib/cargos para manter o padrão unificado em todas as telas
 
   // 1. Departamentos / Áreas: derivados APENAS de rotinas efetivamente conciliadas COM A LOJA
   // Se não houver rotinas conciliadas para este modelo, permanece 100% EM BRANCO (Array vazio).
@@ -405,13 +267,7 @@ export default function Rotinas() {
       }
     })
     return Array.from(areasMap.values()).sort((a, b) => a.localeCompare(b))
-  }, [
-    modeloSelecionado,
-    isConciliado,
-    rotinasConciliadas,
-    normalizarNomeCanonico,
-    getChaveCanonico,
-  ])
+  }, [modeloSelecionado, isConciliado, rotinasConciliadas])
 
   // 2. Funções / Cargos: derivados APENAS de rotinas efetivamente conciliadas COM A LOJA
   // Se a loja ainda não conciliou rotinas daquele modelo, a seção fica em branco.
@@ -486,15 +342,7 @@ export default function Rotinas() {
     })
 
     return Array.from(funcoesMap.values()).sort((a, b) => a.nome.localeCompare(b.nome))
-  }, [
-    modeloSelecionado,
-    isConciliado,
-    rotinasConciliadas,
-    funcoesLoja,
-    lojaSelecionadaId,
-    normalizarNomeCanonico,
-    getChaveCanonico,
-  ])
+  }, [modeloSelecionado, isConciliado, rotinasConciliadas, funcoesLoja, lojaSelecionadaId])
 
   // Rotinas para exibição na lista operacional:
   // São exclusivamente as rotinas conciliadas da loja. Se não houver conciliação, lista fica vazia.
@@ -1376,7 +1224,7 @@ export default function Rotinas() {
                       <div className="flex items-center gap-1.5 flex-wrap mb-3 text-xs">
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#F7F7F5] border border-[#E5E7EB] text-[#4B5563]">
                           <User className="w-3 h-3 text-[#9CA3AF]" />
-                          <span>{rotina.responsavel}</span>
+                          <span>{normalizarNomeCanonico(rotina.responsavel)}</span>
                         </span>
 
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#F7F7F5] border border-[#E5E7EB] text-[#4B5563]">
@@ -1484,7 +1332,9 @@ export default function Rotinas() {
                   <span className="block text-[11px] font-semibold uppercase tracking-wider text-[#6B7280]">
                     Responsável
                   </span>
-                  <span className="font-medium text-[#1F2937]">{selectedRotina.responsavel}</span>
+                  <span className="font-medium text-[#1F2937]">
+                    {normalizarNomeCanonico(selectedRotina.responsavel)}
+                  </span>
                 </div>
                 <div>
                   <span className="block text-[11px] font-semibold uppercase tracking-wider text-[#6B7280]">

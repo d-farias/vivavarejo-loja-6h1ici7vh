@@ -17,6 +17,7 @@ import { BotaoAvisoWhatsApp } from '@/components/BotaoAvisoWhatsApp'
 import { isPlanoAtrasado } from '@/components/PlanosAcaoCard'
 import { isVisitaAtrasada } from '@/services/visitasPromotor'
 import { parseHorarioLimiteToMinutes, getHorarioStatus } from '@/lib/time-utils'
+import { normalizarNomeCanonico, getChaveCanonico } from '@/lib/cargos'
 import type {
   Rotina,
   ExecucaoRotina,
@@ -236,14 +237,19 @@ export default function AgendaPage() {
     })
   }, [rotinas, currentDateStr])
 
-  // Todas as áreas presentes nas rotinas
+  // Todas as áreas presentes nas rotinas (unificadas pelo padrão canônico)
   const areasDisponiveis = useMemo(() => {
-    const set = new Set<string>()
+    const areasMap = new Map<string, string>()
     rotinas.forEach((r) => {
-      const a = (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim()) || 'Geral'
-      set.add(a)
+      const raw = (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim()) || ''
+      if (!raw) return
+      const canonico = normalizarNomeCanonico(raw)
+      const chave = getChaveCanonico(canonico)
+      if (!areasMap.has(chave)) {
+        areasMap.set(chave, canonico)
+      }
     })
-    return Array.from(set).sort()
+    return Array.from(areasMap.values()).sort((a, b) => a.localeCompare(b))
   }, [rotinas])
 
   // Status de cada rotina do dia
@@ -296,16 +302,27 @@ export default function AgendaPage() {
         minutosHorario,
         prioridade,
         statusFormatado,
-        area: (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim()) || 'Geral',
+        area:
+          normalizarNomeCanonico(
+            (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim()),
+          ) || 'Geral',
       }
     })
   }, [rotinasDoDia, execucoesMap, isToday])
 
   // Filtragem e Ordenação da Agenda
   const itensFiltrados = useMemo(() => {
+    const chaveFiltro = filtroArea !== 'Todas' ? getChaveCanonico(filtroArea) : ''
+
     return itensAgenda
       .filter((item) => {
-        if (filtroArea !== 'Todas' && item.area !== filtroArea) return false
+        if (filtroArea !== 'Todas') {
+          const itemChave = getChaveCanonico(item.area)
+          const respChave = getChaveCanonico(item.rotina.responsavel)
+          if (itemChave !== chaveFiltro && respChave !== chaveFiltro && item.area !== filtroArea) {
+            return false
+          }
+        }
 
         if (filtroStatus === 'concluidas' && !item.concluida) return false
         if (filtroStatus === 'atrasadas' && !item.isAtrasada) return false
@@ -474,8 +491,8 @@ export default function AgendaPage() {
           id: item.rotina.id,
           tipo: 'rotina',
           titulo: item.rotina.nome,
-          setor: item.area,
-          responsavel: item.rotina.responsavel || 'Equipe',
+          setor: normalizarNomeCanonico(item.area),
+          responsavel: normalizarNomeCanonico(item.rotina.responsavel) || 'Equipe',
           prazo: item.horarioEfetivo ? `Limite: ${item.horarioEfetivo}` : 'Integral',
           statusBadge: badge,
           statusVariant: variant,
@@ -554,8 +571,11 @@ export default function AgendaPage() {
           id: tv.id,
           tipo: 'validade',
           titulo: `Validade: ${tv.setor_categoria}`,
-          setor: tv.setor_categoria,
-          responsavel: tv.executor_nome || tv.validador_funcao_nome || 'Líder Prevenção',
+          setor: normalizarNomeCanonico(tv.setor_categoria),
+          responsavel:
+            tv.executor_nome ||
+            normalizarNomeCanonico(tv.validador_funcao_nome) ||
+            'Prevenção de Perdas',
           prazo: `${tv.horario_inicio}${tv.horario_fim ? ` – ${tv.horario_fim}` : ''}`,
           statusBadge: badge,
           statusVariant: variant,
@@ -601,8 +621,8 @@ export default function AgendaPage() {
         id: plano.id,
         tipo: 'plano',
         titulo: `${prefixoTitulo}${plano.descricao}`,
-        setor: setorExibicao,
-        responsavel: plano.responsavel || 'Responsável',
+        setor: normalizarNomeCanonico(setorExibicao),
+        responsavel: normalizarNomeCanonico(plano.responsavel) || 'Responsável',
         prazo: pPrazo ? `Prazo: ${pPrazo.split('-').reverse().slice(0, 2).join('/')}` : 'Sem prazo',
         statusBadge: atrasado ? 'Atrasada' : 'No prazo',
         statusVariant: atrasado ? 'atrasada' : 'no_prazo',
@@ -1584,19 +1604,19 @@ export default function AgendaPage() {
                       )}
 
                       <span className="px-1.5 py-0.5 rounded bg-gray-100 text-[11px] font-medium text-[#4B5563]">
-                        {item.area}
+                        {normalizarNomeCanonico(item.area)}
                       </span>
 
                       {rotina.responsavel && (
                         <span className="flex items-center gap-1">
                           <User className="w-3 h-3 text-[#9CA3AF]" />
-                          <span>{rotina.responsavel}</span>
+                          <span>{normalizarNomeCanonico(rotina.responsavel)}</span>
                         </span>
                       )}
 
                       {rotina.validacao && (
                         <span className="text-[11px] text-[#6B7280]">
-                          Validador: {rotina.validacao}
+                          Validador: {normalizarNomeCanonico(rotina.validacao)}
                         </span>
                       )}
 

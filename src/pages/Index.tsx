@@ -4,6 +4,7 @@ import { useStore } from '@/context/StoreContext'
 import { rotinasService, execucoesService, getTodayDateString } from '@/services/rotinas'
 import type { Rotina, ExecucaoRotina, PlanoAcao, Cliente, PrioridadePlanoAcao } from '@/types'
 import { parseHorarioLimiteToMinutes, getHorarioStatus } from '@/lib/time-utils'
+import { normalizarNomeCanonico, getChaveCanonico } from '@/lib/cargos'
 import { useRealtime } from '@/hooks/use-realtime'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StoreSelector } from '@/components/StoreSelector'
@@ -350,11 +351,14 @@ export default function Index() {
       }
     >()
 
-    // Popular todas as áreas presentes nas rotinas
+    // Popular todas as áreas presentes nas rotinas usando agrupamento canônico
     rotinas.forEach((r) => {
-      const area = (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim()) || 'Geral'
-      const existing = areaMap.get(area) || {
-        setor: area,
+      const raw = (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim()) || 'Geral'
+      const canonico = normalizarNomeCanonico(raw) || 'Geral'
+      const chave = getChaveCanonico(canonico) || 'geral'
+
+      const existing = areaMap.get(chave) || {
+        setor: canonico,
         programadas: 0,
         concluidas: 0,
         aprovadas: 0,
@@ -372,15 +376,18 @@ export default function Index() {
           }
         }
       }
-      areaMap.set(area, existing)
+      areaMap.set(chave, existing)
     })
 
     // Contabilizar execuções válidas
     execucoesPeriodo.forEach((e) => {
       if (!e.concluida || e.status_validacao === 'devolvida') return
       const r = rotinas.find((rot) => rot.id === e.rotina)
-      const area = (r?.area && r.area.trim()) || (r?.responsavel && r.responsavel.trim()) || 'Geral'
-      const existing = areaMap.get(area)
+      const raw = (r?.area && r.area.trim()) || (r?.responsavel && r.responsavel.trim()) || 'Geral'
+      const canonico = normalizarNomeCanonico(raw) || 'Geral'
+      const chave = getChaveCanonico(canonico) || 'geral'
+
+      const existing = areaMap.get(chave)
       if (existing) {
         existing.concluidas++
         if (e.status_validacao === 'aprovada') {
@@ -417,9 +424,9 @@ export default function Index() {
           id: `rotina-${r.id}`,
           tipo: 'Rotina Atrasada',
           titulo: r.nome,
-          setor: r.area || 'Operação Loja',
+          setor: normalizarNomeCanonico(r.area || r.responsavel) || 'Operação Loja',
           horario: status.normalizedHorario || r.horario_limite,
-          responsavel: r.responsavel,
+          responsavel: normalizarNomeCanonico(r.responsavel),
           telefone: r.telefone_responsavel || r.expand?.funcao?.telefone,
           rotinaRef: r,
         }
@@ -434,11 +441,13 @@ export default function Index() {
       )
       .map((p) => ({
         id: `plano-${p.id}`,
-        tipo: p.area_demandante ? `Chamado (${p.area_demandante})` : 'Plano 5W2H',
+        tipo: p.area_demandante
+          ? `Chamado (${normalizarNomeCanonico(p.area_demandante)})`
+          : 'Plano 5W2H',
         titulo: p.descricao,
-        setor: p.area_demandante || p.expand?.rotina?.area || 'Operações',
+        setor: normalizarNomeCanonico(p.area_demandante || p.expand?.rotina?.area) || 'Operações',
         horario: p.prazo ? new Date(p.prazo).toLocaleDateString('pt-BR') : undefined,
-        responsavel: p.responsavel,
+        responsavel: normalizarNomeCanonico(p.responsavel),
         telefone: undefined,
         rotinaRef: null,
       }))
