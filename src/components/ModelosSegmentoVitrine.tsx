@@ -325,6 +325,7 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
                       <button
                         type="button"
                         onClick={() => handleVisualizarRotinas(modelo)}
+                        title="Ver conciliação ou prévia de rotinas deste modelo"
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded transition-colors ${
                           selectedModeloId === modelo.id
                             ? 'bg-[#2563EB] text-white'
@@ -332,7 +333,9 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
                         }`}
                       >
                         <Eye className="w-3.5 h-3.5" />
-                        <span>Visualizar Rotinas</span>
+                        <span>
+                          {selectedModeloId === modelo.id ? 'Modelo Ativo' : 'Visualizar Rotinas'}
+                        </span>
                       </button>
 
                       {podeAplicarDeFato ? (

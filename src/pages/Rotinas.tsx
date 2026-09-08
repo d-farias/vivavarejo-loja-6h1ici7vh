@@ -41,8 +41,8 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
+  Eye,
 } from 'lucide-react'
-
 export default function Rotinas() {
   const { user } = useAuth()
   const { lojaSelecionadaId, lojaSelecionada, lojas } = useStore()
@@ -173,79 +173,29 @@ export default function Rotinas() {
     return map
   }, [execucoes])
 
-  // Se houver um modelo comercial selecionado na biblioteca, sincronizamos dinamicamente a listagem de rotinas
-  // com as rotinas daquele modelo específico (seja ele Supermercado, Moda, Farmácia, Pet, Eletrônicos etc.)
-  // e se o modelo foi aplicado na loja ou ainda está como preview, mantemos a visualização e operação imediata.
-  const [rotinasModelo, setRotinasModelo] = useState<Rotina[]>([])
+  // Rotinas do catálogo do modelo selecionado (itens teóricos da biblioteca)
+  const [itensCatalogoModelo, setItensCatalogoModelo] = useState<ModeloRotinaItem[]>([])
   const [loadingModeloRotinas, setLoadingModeloRotinas] = useState<boolean>(false)
 
-  // Quando modeloSelecionado muda, limpa imediatamente qualquer resquício antigo
-  // para evitar exibição temporária de rotinas do modelo anterior
+  // Quando modeloSelecionado muda, busca os itens do catálogo na coleção modelos_rotinas_itens
   useEffect(() => {
     if (!modeloSelecionado) {
-      setRotinasModelo([])
+      setItensCatalogoModelo([])
       return
     }
 
     let isMounted = true
-    // Reseta imediatamente ao trocar de modelo para não mesclar dados
-    setRotinasModelo([])
+    setItensCatalogoModelo([])
     setLoadingModeloRotinas(true)
 
-    const carregarRotinasDoModelo = async () => {
+    const carregarItensCatalogo = async () => {
       try {
-        // 1. Carrega os itens cadastrados no modelo
-        const itensModelo = await modelosRotinasService.getItens(modeloSelecionado.id)
-        if (!isMounted) return
-
-        // 2. Mapeia para Rotina EXCLUSIVAMENTE a partir dos itens do modelo selecionado
-        // Importante: NÃO fazer match frouxo por nome contra a coleção global de rotinas da loja
-        // porque a loja de teste pode conter rotinas legadas de supermercado que colidiriam de forma errônea.
-        // Se a rotina do modelo já foi aplicada nesta loja específica, reconcilia apenas se for exata para a loja selecionada.
-        const rotinasMapeadas: Rotina[] = itensModelo.map((item, index) => {
-          // Só busca correspondente se pertencer à loja específica selecionada
-          const correspondente =
-            lojaSelecionadaId && lojaSelecionadaId !== 'todas'
-              ? rotinas.find(
-                  (r) =>
-                    r.loja === lojaSelecionadaId &&
-                    r.nome.trim().toLowerCase() === item.nome.trim().toLowerCase() &&
-                    (item.horario_limite
-                      ? r.horario_limite?.trim() === item.horario_limite.trim()
-                      : true),
-                )
-              : undefined
-
-          if (correspondente) {
-            return correspondente
-          }
-
-          // Gera objeto de rotina dinâmico pertencente 100% ao modelo selecionado
-          const pseudoId = `mod-${modeloSelecionado.id}-${item.id || index}`
-          return {
-            id: pseudoId,
-            collectionId: 'rotinas',
-            collectionName: 'rotinas',
-            created: item.created || new Date().toISOString(),
-            updated: item.updated || new Date().toISOString(),
-            nome: item.nome,
-            responsavel: item.responsavel || item.funcao_nome || 'Operação',
-            frequencia: item.frequencia || 'Diária',
-            horario_limite: item.horario_limite || '',
-            ferramenta: item.ferramenta || '',
-            validacao: item.validacao || '',
-            area: item.area || '',
-            observacoes: item.observacoes || '',
-            status: 'Ativa',
-            loja: lojaSelecionadaId && lojaSelecionadaId !== 'todas' ? lojaSelecionadaId : '',
-          } as Rotina
-        })
-
+        const itens = await modelosRotinasService.getItens(modeloSelecionado.id)
         if (isMounted) {
-          setRotinasModelo(rotinasMapeadas)
+          setItensCatalogoModelo(itens)
         }
       } catch (err) {
-        console.error('Erro ao carregar rotinas do modelo selecionado:', err)
+        console.error('Erro ao carregar catálogo do modelo:', err)
       } finally {
         if (isMounted) {
           setLoadingModeloRotinas(false)
@@ -253,51 +203,79 @@ export default function Rotinas() {
       }
     }
 
-    carregarRotinasDoModelo()
+    carregarItensCatalogo()
 
     return () => {
       isMounted = false
     }
-  }, [modeloSelecionado, rotinas, lojaSelecionadaId])
+  }, [modeloSelecionado])
 
-  // Rotinas base para a listagem: quando há um modelo selecionado, exibe as rotinas desse modelo;
-  // se não houver modelo (neutro), não exibe rotinas (estado neutro aguardando escolha na biblioteca).
-  const rotinasExibicao = useMemo(() => {
+  // CONCILIAÇÃO COM A LOJA:
+  // Rotinas EFETIVAMENTE CONCILIADAS com a loja para o modelo selecionado.
+  // Regra de negócio:
+  // - O usuário importou a planilha com as funções no contexto de Supermercado/Food.
+  // - Para Supermercado/Food: as rotinas cadastradas/importadas na loja são as rotinas conciliadas deste modelo.
+  // - Para os demais modelos (Farmácia, Moda, etc.): só há rotinas conciliadas se a loja tiver rotinas cadastradas
+  //   que correspondam explicitamente aos itens desse modelo (ou que foram geradas ao aplicar o modelo na loja).
+  // - NUNCA derivar rotinas da loja a partir do catálogo global do modelo.
+  const rotinasConciliadas = useMemo(() => {
     if (!modeloSelecionado) return []
-    return rotinasModelo
-  }, [modeloSelecionado, rotinasModelo])
 
-  // Extract unique areas/departamentos das rotinas do modelo selecionado (zero vestígio de outros segmentos)
+    // Helper para verificar se o modelo selecionado é Supermercado/Food (ou alimentício padrão)
+    const seg = (modeloSelecionado.segmento || '').toLowerCase()
+    const nome = (modeloSelecionado.nome || '').toLowerCase()
+    const isModeloSupermercado =
+      seg.includes('supermercado') ||
+      seg.includes('food') ||
+      seg.includes('alimentar') ||
+      nome.includes('supermercado') ||
+      nome.includes('food')
+
+    if (isModeloSupermercado) {
+      // No modelo Supermercado/Food, as rotinas operacionais cadastradas na loja (importadas da planilha)
+      // são as rotinas conciliadas de fato.
+      return rotinas
+    }
+
+    // Para outros modelos de negócio: concilia APENAS rotinas que foram efetivamente aplicadas /
+    // pertencentes à loja e que correspondam aos itens deste modelo específico.
+    if (itensCatalogoModelo.length === 0) return []
+
+    const itensNomes = new Set(itensCatalogoModelo.map((it) => it.nome.trim().toLowerCase()))
+    return rotinas.filter((r) => itensNomes.has((r.nome || '').trim().toLowerCase()))
+  }, [modeloSelecionado, rotinas, itensCatalogoModelo])
+
+  // Define se a loja já possui conciliação ativa para o modelo selecionado
+  const isConciliado = rotinasConciliadas.length > 0
+
+  // 1. Departamentos / Áreas: derivados APENAS de rotinas efetivamente conciliadas COM A LOJA
+  // Se não houver rotinas conciliadas para este modelo, permanece 100% EM BRANCO (Array vazio).
   const availableAreas = useMemo(() => {
+    if (!modeloSelecionado || !isConciliado) return []
     const areas = new Set<string>()
-    rotinasExibicao.forEach((r) => {
+    rotinasConciliadas.forEach((r) => {
       if (r.area && r.area.trim()) areas.add(r.area.trim())
       else if (r.responsavel && r.responsavel.trim()) areas.add(r.responsavel.trim())
     })
     return Array.from(areas).sort()
-  }, [rotinasExibicao])
+  }, [modeloSelecionado, isConciliado, rotinasConciliadas])
 
-  // Deriva dinamicamente as funções/cargos correspondentes ao modelo selecionado:
-  // 1) Se um modelo estiver selecionado, extrai os responsáveis/funções presentes nas rotinas desse modelo
-  //    e enriquece com dados existentes em funcoesLoja (como telefone e subordinação) se houver match.
-  // 2) Se nenhum modelo estiver selecionado, não exibe funções legadas de supermercado.
+  // 2. Funções / Cargos: derivados APENAS de rotinas efetivamente conciliadas COM A LOJA
+  // Se a loja ainda não conciliou rotinas daquele modelo, a seção fica em branco.
   const funcoesExibicao = useMemo(() => {
-    if (!modeloSelecionado) return []
+    if (!modeloSelecionado || !isConciliado) return []
 
     const funcoesMap = new Map<string, Funcao>()
 
-    // Para cada rotina do modelo selecionado, extrai o cargo/responsável
-    rotinasExibicao.forEach((r) => {
+    rotinasConciliadas.forEach((r) => {
       const nomeResp = (r.responsavel || '').trim()
       if (!nomeResp) return
 
       const chave = nomeResp.toLowerCase()
       if (!funcoesMap.has(chave)) {
-        // Tenta encontrar cadastro prévio na loja com dados de telefone/chefe
         const existente = funcoesLoja.find((f) => f.nome.trim().toLowerCase() === chave)
-
         funcoesMap.set(chave, {
-          id: existente?.id || `func-mod-${chave}`,
+          id: existente?.id || `func-conc-${chave}`,
           collectionId: 'funcoes',
           collectionName: 'funcoes',
           created: existente?.created || new Date().toISOString(),
@@ -311,49 +289,22 @@ export default function Rotinas() {
     })
 
     return Array.from(funcoesMap.values()).sort((a, b) => a.nome.localeCompare(b.nome))
-  }, [modeloSelecionado, rotinasExibicao, funcoesLoja, lojaSelecionadaId])
+  }, [modeloSelecionado, isConciliado, rotinasConciliadas, funcoesLoja, lojaSelecionadaId])
+
+  // Rotinas para exibição na lista operacional:
+  // São exclusivamente as rotinas conciliadas da loja. Se não houver conciliação, lista fica vazia.
+  const rotinasExibicao = useMemo(() => {
+    if (!modeloSelecionado) return []
+    return rotinasConciliadas
+  }, [modeloSelecionado, rotinasConciliadas])
 
   const frequencyFilters = ['Todas', 'Diária', 'Semanal', 'Conforme demanda']
 
   const handleToggle = async (rotinaId: string) => {
     if (!user || submittingId === rotinaId) return
 
-    // Se for uma rotina que veio dinamicamente do modelo (pseudo-id mod-...) e ainda não foi persistida como registro da loja,
-    // criamos a rotina na loja automaticamente para permitir o checklist e execução transparente
-    let targetRotinaId = rotinaId
-    if (rotinaId.startsWith('mod-')) {
-      const rotinaObj = rotinasExibicao.find((r) => r.id === rotinaId)
-      if (rotinaObj) {
-        try {
-          const criada = await rotinasService.create({
-            nome: rotinaObj.nome,
-            responsavel: rotinaObj.responsavel,
-            frequencia: rotinaObj.frequencia,
-            horario_limite: rotinaObj.horario_limite,
-            ferramenta: rotinaObj.ferramenta,
-            validacao: rotinaObj.validacao,
-            area: rotinaObj.area,
-            observacoes: rotinaObj.observacoes,
-            status: 'Ativa',
-            loja:
-              lojaSelecionadaId && lojaSelecionadaId !== 'todas' ? lojaSelecionadaId : undefined,
-          })
-          targetRotinaId = criada.id
-          setRotinas((prev) => [criada, ...prev])
-          // Atualiza o item nas rotinas do modelo
-          setRotinasModelo((prev) => prev.map((r) => (r.id === rotinaId ? criada : r)))
-          if (selectedRotina?.id === rotinaId) {
-            setSelectedRotina(criada)
-          }
-        } catch (err) {
-          console.warn('Não foi possível persistir rotina do modelo antes da execução:', err)
-        }
-      }
-    }
-
-    const existingExec = execucoes.find(
-      (e) => (e.rotina === targetRotinaId || e.rotina === rotinaId) && e.usuario === user.id,
-    )
+    const targetRotinaId = rotinaId
+    const existingExec = execucoes.find((e) => e.rotina === targetRotinaId && e.usuario === user.id)
     const isCurrentlyDone = !!existingExec?.concluida
     const nextState = !isCurrentlyDone
 
@@ -362,7 +313,7 @@ export default function Rotinas() {
       id: tempId,
       collectionId: 'execucoes_rotinas',
       collectionName: 'execucoes_rotinas',
-      rotina: rotinaId,
+      rotina: targetRotinaId,
       usuario: user.id,
       data_execucao: getTodayDateString(),
       concluida: nextState,
@@ -371,15 +322,13 @@ export default function Rotinas() {
     }
 
     setExecucoes((prev) => {
-      const idx = prev.findIndex(
-        (e) => (e.rotina === targetRotinaId || e.rotina === rotinaId) && e.usuario === user.id,
-      )
+      const idx = prev.findIndex((e) => e.rotina === targetRotinaId && e.usuario === user.id)
       if (idx >= 0) {
         const copy = [...prev]
         copy[idx] = { ...copy[idx], concluida: nextState, rotina: targetRotinaId }
         return copy
       }
-      return [...prev, { ...optimisticRecord, rotina: targetRotinaId }]
+      return [...prev, optimisticRecord]
     })
 
     setSubmittingId(rotinaId)
@@ -429,7 +378,6 @@ export default function Rotinas() {
         await rotinasService.delete(id)
       }
       setRotinas((prev) => prev.filter((r) => r.id !== id))
-      setRotinasModelo((prev) => prev.filter((r) => r.id !== id))
       if (selectedRotina?.id === id) {
         setSelectedRotina(null)
       }
@@ -439,6 +387,14 @@ export default function Rotinas() {
       setDeleteConfirmId(null)
     }
   }
+
+  // Estado para expandir prévia das rotinas do modelo quando loja não estiver conciliada
+  const [previaCatalogoAberto, setPreviaCatalogoAberto] = useState<boolean>(false)
+
+  // Quando modeloSelecionado mudar, fecha a prévia do catálogo
+  useEffect(() => {
+    setPreviaCatalogoAberto(false)
+  }, [modeloSelecionado])
 
   // Open Edit modal from card or detail view
   const handleOpenEdit = (rotina: Rotina) => {
@@ -599,38 +555,10 @@ export default function Rotinas() {
         clientes={clientes}
         onRotinasAtualizadas={async () => {
           await loadData()
-          // Recarrega os itens do modelo ativo para atualizar com os IDs reais aplicados na loja
           if (modeloSelecionado) {
             try {
               const itens = await modelosRotinasService.getItens(modeloSelecionado.id)
-              const rotinasMapeadas: Rotina[] = itens.map((item, index) => {
-                const correspondente = rotinas.find(
-                  (r) =>
-                    r.nome.trim().toLowerCase() === item.nome.trim().toLowerCase() ||
-                    (item.horario_limite &&
-                      r.horario_limite?.trim() === item.horario_limite.trim() &&
-                      r.nome.toLowerCase().includes(item.nome.toLowerCase().slice(0, 15))),
-                )
-                if (correspondente) return correspondente
-                return {
-                  id: `mod-${modeloSelecionado.id}-${item.id || index}`,
-                  collectionId: 'rotinas',
-                  collectionName: 'rotinas',
-                  created: item.created || new Date().toISOString(),
-                  updated: item.updated || new Date().toISOString(),
-                  nome: item.nome,
-                  responsavel: item.responsavel || item.funcao_nome || 'Operação',
-                  frequencia: item.frequencia || 'Diária',
-                  horario_limite: item.horario_limite || '',
-                  ferramenta: item.ferramenta || '',
-                  validacao: item.validacao || '',
-                  area: item.area || '',
-                  observacoes: item.observacoes || '',
-                  status: 'Ativa',
-                  loja: lojaSelecionadaId && lojaSelecionadaId !== 'todas' ? lojaSelecionadaId : '',
-                } as Rotina
-              })
-              setRotinasModelo(rotinasMapeadas)
+              setItensCatalogoModelo(itens)
             } catch {
               // noop
             }
@@ -666,10 +594,16 @@ export default function Rotinas() {
                   Departamentos e Funções
                 </h2>
                 {modeloSelecionado ? (
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-[#2563EB] border border-blue-200">
-                    {availableAreas.length} departamentos • {funcoesExibicao.length} funções (
-                    {modeloSelecionado.nome})
-                  </span>
+                  isConciliado ? (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      {availableAreas.length} departamentos • {funcoesExibicao.length} funções
+                      conciliadas ({modeloSelecionado.nome})
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                      Sem conciliação para {modeloSelecionado.nome} (0 funções)
+                    </span>
+                  )
                 ) : (
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-gray-100 text-[#6B7280]">
                     Aguardando seleção de modelo
@@ -678,7 +612,9 @@ export default function Rotinas() {
               </div>
               <p className="text-[11px] text-[#6B7280] truncate">
                 {modeloSelecionado
-                  ? `Mapeamento departamental e cargos operacionais para o modelo ${modeloSelecionado.nome}.`
+                  ? isConciliado
+                    ? `Departamentos e funções conciliados na loja para o modelo ${modeloSelecionado.nome}.`
+                    : `Nenhuma função conciliada para ${modeloSelecionado.nome}. Importe a planilha ou aplique o modelo para conciliar.`
                   : 'Escolha um modelo na biblioteca acima para visualizar departamentos e funções mapeados.'}
               </p>
             </div>
@@ -710,16 +646,20 @@ export default function Rotinas() {
             {/* Departamentos / Áreas */}
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563] block mb-2">
-                Departamentos / Setores Mapeados ({availableAreas.length})
+                Departamentos / Setores Conciliados ({availableAreas.length})
               </span>
               {!modeloSelecionado ? (
                 <p className="text-xs text-[#9CA3AF] italic">
                   Escolha um modelo na biblioteca acima para visualizar os departamentos mapeados.
                 </p>
               ) : availableAreas.length === 0 ? (
-                <p className="text-xs text-[#9CA3AF] italic">
-                  Nenhum departamento identificado nas rotinas deste modelo.
-                </p>
+                <div className="p-3 bg-amber-50/60 border border-amber-200/70 rounded-md text-xs text-amber-900 space-y-1">
+                  <p className="font-semibold">Nenhum departamento conciliado para este modelo.</p>
+                  <p className="text-[11px] text-amber-800">
+                    Importe a planilha de rotinas ou aplique o modelo na sua loja para conciliar os
+                    departamentos.
+                  </p>
+                </div>
               ) : (
                 <div className="flex items-center gap-1.5 flex-wrap">
                   {availableAreas.map((area) => (
@@ -757,16 +697,20 @@ export default function Rotinas() {
             {/* Funções / Cargos Operacionais */}
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563] block mb-2">
-                Funções e Cargos Mapeados no Modelo ({funcoesExibicao.length})
+                Funções e Cargos Conciliados na Loja ({funcoesExibicao.length})
               </span>
               {!modeloSelecionado ? (
                 <p className="text-xs text-[#9CA3AF] italic">
                   Escolha um modelo na biblioteca para visualizar as funções operacionais.
                 </p>
               ) : funcoesExibicao.length === 0 ? (
-                <p className="text-xs text-[#9CA3AF] italic">
-                  Nenhuma função específica identificada para este modelo.
-                </p>
+                <div className="p-3 bg-amber-50/60 border border-amber-200/70 rounded-md text-xs text-amber-900 space-y-1">
+                  <p className="font-semibold">Nenhuma função conciliada para este modelo.</p>
+                  <p className="text-[11px] text-amber-800">
+                    Importe a planilha ou aplique o modelo na loja para conciliar os cargos
+                    operacionais.
+                  </p>
+                </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                   {funcoesExibicao.map((f) => (
@@ -784,7 +728,7 @@ export default function Rotinas() {
                           </span>
                         ) : (
                           <span className="text-[10px] text-[#9CA3AF] block truncate">
-                            Responsável operacional no modelo
+                            Responsável operacional conciliado
                           </span>
                         )}
                       </div>
@@ -832,16 +776,28 @@ export default function Rotinas() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs font-bold text-[#1F2937] truncate">
-                    Rotinas ativas: {modeloSelecionado.nome}
+                    {isConciliado ? 'Rotinas ativas:' : 'Modelo selecionado:'}{' '}
+                    {modeloSelecionado.nome}
                   </span>
                   {modeloSelecionado.segmento && (
                     <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-100 text-[#2563EB]">
                       {modeloSelecionado.segmento}
                     </span>
                   )}
+                  {isConciliado ? (
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                      Conciliado na loja
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">
+                      Sem conciliação
+                    </span>
+                  )}
                 </div>
                 <p className="text-[11px] text-[#4B5563] truncate">
-                  {filteredRotinas.length} rotinas operacionais disponíveis no catálogo.
+                  {isConciliado
+                    ? `${filteredRotinas.length} rotinas operacionais conciliadas da sua loja.`
+                    : 'Nenhuma rotina conciliada na sua loja para este modelo de negócio.'}
                 </p>
               </div>
             </div>
@@ -960,7 +916,95 @@ export default function Rotinas() {
           </div>
 
           {/* Routine Cards Grid */}
-          {filteredRotinas.length === 0 ? (
+          {rotinasExibicao.length === 0 ? (
+            <div className="p-8 sm:p-10 text-center bg-white border border-dashed border-[#E5E7EB] rounded-xl space-y-3 shadow-xs animate-fade-in">
+              <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 mx-auto flex items-center justify-center">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div className="max-w-md mx-auto space-y-1">
+                <h3 className="text-sm sm:text-base font-bold text-[#1F2937]">
+                  Nenhuma rotina conciliada para {modeloSelecionado.nome}
+                </h3>
+                <p className="text-xs sm:text-sm text-[#6B7280] leading-relaxed">
+                  Esta loja ainda não possui rotinas conciliadas para este modelo de negócio. Os
+                  dados não são derivados por inferência para garantir a realidade operacional da
+                  sua loja.
+                </p>
+              </div>
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2 text-xs">
+                {podeGerenciar && (
+                  <button
+                    onClick={() => setIsImportModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-md shadow-xs transition-colors"
+                  >
+                    <FileSpreadsheet className="w-4 h-4" />
+                    <span>Importar Planilha deste Modelo</span>
+                  </button>
+                )}
+                {itensCatalogoModelo.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setPreviaCatalogoAberto((prev) => !prev)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:bg-gray-50 text-[#374151] font-semibold rounded-md shadow-2xs transition-colors"
+                  >
+                    <Eye className="w-4 h-4 text-[#2563EB]" />
+                    <span>
+                      {previaCatalogoAberto
+                        ? 'Ocultar prévia do modelo'
+                        : `Ver prévia do modelo (${itensCatalogoModelo.length} sugestões)`}
+                    </span>
+                  </button>
+                )}
+              </div>
+
+              {/* Se o usuário abrir a prévia das sugestões do catálogo */}
+              {previaCatalogoAberto && itensCatalogoModelo.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-[#E5E7EB] text-left space-y-3 animate-fade-in">
+                  <div className="flex items-center justify-between gap-2 flex-wrap bg-blue-50/60 p-3 rounded-lg border border-blue-100">
+                    <div>
+                      <span className="text-xs font-bold text-[#1F2937] block">
+                        Prévia do Catálogo: {modeloSelecionado.nome} (Não conciliado na loja)
+                      </span>
+                      <span className="text-[11px] text-[#4B5563]">
+                        Estas rotinas pertencem ao catálogo teórico do VivaVarejo e servem apenas
+                        como referência.
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-100 text-[#2563EB] shrink-0">
+                      Modo Prévia
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {itensCatalogoModelo.map((item, idx) => (
+                      <div
+                        key={item.id || idx}
+                        className="p-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg text-xs space-y-1.5"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="font-semibold text-[#1F2937] leading-snug">
+                            {item.nome}
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-200 text-[#4B5563] shrink-0">
+                            {item.frequencia || 'Diária'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[11px] text-[#6B7280]">
+                          <span>Resp: {item.responsavel || item.funcao_nome || 'Operação'}</span>
+                          {item.horario_limite && <span>• Até {item.horario_limite}</span>}
+                        </div>
+                        {item.area && (
+                          <span className="inline-block text-[10px] px-1.5 py-0.2 rounded bg-blue-50 text-[#2563EB]">
+                            {item.area}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : filteredRotinas.length === 0 ? (
             <div className="p-10 text-center bg-white border border-[#E5E7EB] rounded-lg space-y-3">
               <AlertCircle className="w-8 h-8 text-[#9CA3AF] mx-auto" />
               <p className="text-sm text-[#4B5563] font-medium">
