@@ -18,19 +18,9 @@ import {
   Check,
   Instagram,
   Linkedin,
-  LayoutDashboard,
-  GitBranch,
-  Camera,
-  Target,
-  ArrowUpRight,
-  X,
-  Clock,
-  AlertTriangle,
-  RotateCcw,
 } from 'lucide-react'
 import { TipoPessoaCliente } from '@/types'
 import { useContatosAtendimento } from '@/hooks/use-contatos-atendimento'
-import { useAuth } from '@/context/AuthContext'
 
 /**
  * Endereços de redes sociais do rodapé da landing page.
@@ -100,12 +90,6 @@ const SEGMENT_OPTIONS: SegmentOption[] = [
 export default function BemVindo() {
   const navigate = useNavigate()
   const { contatos } = useContatosAtendimento()
-  const { user } = useAuth()
-
-  // Modal de Detalhes dos Pilares para visitantes (sem credenciais de acesso)
-  const [pilarModal, setPilarModal] = useState<'dashboard' | 'workflow' | 'fotos' | '5w2h' | null>(
-    null,
-  )
 
   // Funil de interesse em 2 passos
   const [tipoPessoa, setTipoPessoa] = useState<TipoPessoaCliente | null>(null)
@@ -139,41 +123,6 @@ export default function BemVindo() {
     }
   }
 
-  const handleScrollToPilares = () => {
-    const el = document.getElementById('pilares-produto')
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
-
-  const handlePilarClick = (tipo: 'dashboard' | 'workflow' | 'fotos' | '5w2h') => {
-    if (user) {
-      // Usuário logado: redireciona direto para o recurso no app
-      if (tipo === 'dashboard') {
-        const isAdmin =
-          user.perfil === 'admin' ||
-          user.perfil === 'adm_rede' ||
-          user.email === 'dfarias53@gmail.com'
-        navigate(isAdmin ? '/admin' : '/')
-      } else if (tipo === 'workflow') {
-        navigate('/agenda')
-      } else if (tipo === 'fotos') {
-        navigate('/rotinas')
-      } else if (tipo === '5w2h') {
-        navigate('/agenda')
-      }
-      return
-    }
-
-    // Usuário visitante (não logado): rola suavemente para o pilar ou abre modal demonstrativo
-    const targetEl = document.getElementById(`pilar-${tipo}`)
-    if (targetEl) {
-      targetEl.scrollIntoView({ behavior: 'smooth' })
-    } else {
-      setPilarModal(tipo)
-    }
-  }
-
   return (
     <div className="min-h-screen bg-[#F7F7F5] text-[#1F2937] flex flex-col font-sans">
       {/* Header sóbrio */}
@@ -188,30 +137,14 @@ export default function BemVindo() {
             </span>
           </Link>
 
-          {/* Links rápidos no cabeçalho */}
-          <nav className="flex items-center gap-1 sm:gap-4 text-xs font-medium">
+          {/* Links no cabeçalho */}
+          <nav className="flex items-center gap-2 sm:gap-4 text-xs font-medium">
             <button
               type="button"
-              onClick={() => handlePilarClick('dashboard')}
-              className="px-2.5 py-1.5 text-[#4B5563] hover:text-[#2563EB] hover:bg-blue-50/60 rounded-md transition-colors hidden sm:inline-flex items-center gap-1.5"
+              onClick={handleScrollToInterest}
+              className="px-2.5 py-1.5 text-[#4B5563] hover:text-[#2563EB] hover:bg-blue-50/60 rounded-md transition-colors"
             >
-              <LayoutDashboard className="w-3.5 h-3.5 text-[#2563EB]" />
-              <span>Dashboard</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handlePilarClick('workflow')}
-              className="px-2.5 py-1.5 text-[#4B5563] hover:text-[#2563EB] hover:bg-blue-50/60 rounded-md transition-colors hidden sm:inline-flex items-center gap-1.5"
-            >
-              <GitBranch className="w-3.5 h-3.5 text-[#2563EB]" />
-              <span>Workflow</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleScrollToPilares}
-              className="px-2.5 py-1.5 text-[#4B5563] hover:text-[#2563EB] hover:bg-blue-50/60 rounded-md transition-colors inline-flex items-center gap-1"
-            >
-              <span>Recursos</span>
+              Tenho interesse
             </button>
             <Link
               to="/login"
@@ -280,110 +213,6 @@ export default function BemVindo() {
                 <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
                 Compatível com celular e desktop
               </span>
-            </div>
-
-            {/* Links rápidos dos 4 pilares sob o Hero - Padrão solicitado: título forte em negrito + descrição curta */}
-            <div className="pt-6 border-t border-[#E5E7EB] text-left">
-              {' '}
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280]">
-                  Pilares de Gestão da Plataforma:
-                </span>
-                <span className="text-[11px] text-[#2563EB] font-medium hidden sm:inline">
-                  Clique para conhecer cada módulo
-                </span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                {/* Link Dashboard */}
-                <button
-                  type="button"
-                  onClick={() => handlePilarClick('dashboard')}
-                  className="p-3.5 rounded-lg border border-[#E5E7EB] bg-[#F7F7F5] hover:bg-white hover:border-[#2563EB] text-left transition-all group shadow-2xs"
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded bg-blue-100 text-[#2563EB] flex items-center justify-center">
-                        <LayoutDashboard className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="text-sm font-bold text-[#1F2937] group-hover:text-[#2563EB] transition-colors">
-                        Dashboard
-                      </span>
-                    </div>
-                    <ArrowUpRight className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#2563EB] transition-colors" />
-                  </div>
-                  <p className="text-xs text-[#6B7280] leading-relaxed">
-                    Relatórios loja a loja em tempo real: execução, aprovação, ranking e evolução
-                    por dia, semana e mês.
-                  </p>
-                </button>
-
-                {/* Link Workflow */}
-                <button
-                  type="button"
-                  onClick={() => handlePilarClick('workflow')}
-                  className="p-3.5 rounded-lg border border-[#E5E7EB] bg-[#F7F7F5] hover:bg-white hover:border-[#2563EB] text-left transition-all group shadow-2xs"
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded bg-blue-100 text-[#2563EB] flex items-center justify-center">
-                        <GitBranch className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="text-sm font-bold text-[#1F2937] group-hover:text-[#2563EB] transition-colors">
-                        Workflow
-                      </span>
-                    </div>
-                    <ArrowUpRight className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#2563EB] transition-colors" />
-                  </div>
-                  <p className="text-xs text-[#6B7280] leading-relaxed">
-                    Pendências visíveis na hora: atrasada, aguardando validação, devolvida ou
-                    aprovada — com alerta por WhatsApp em 1 clique.
-                  </p>
-                </button>
-
-                {/* Link Fotos e Mídias */}
-                <button
-                  type="button"
-                  onClick={() => handlePilarClick('fotos')}
-                  className="p-3.5 rounded-lg border border-[#E5E7EB] bg-[#F7F7F5] hover:bg-white hover:border-[#2563EB] text-left transition-all group shadow-2xs"
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded bg-blue-100 text-[#2563EB] flex items-center justify-center">
-                        <Camera className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="text-sm font-bold text-[#1F2937] group-hover:text-[#2563EB] transition-colors">
-                        Fotos e Mídias
-                      </span>
-                    </div>
-                    <ArrowUpRight className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#2563EB] transition-colors" />
-                  </div>
-                  <p className="text-xs text-[#6B7280] leading-relaxed">
-                    Prova de execução com foto e observação em cada rotina e validade.
-                  </p>
-                </button>
-
-                {/* Link Planos 5W2H */}
-                <button
-                  type="button"
-                  onClick={() => handlePilarClick('5w2h')}
-                  className="p-3.5 rounded-lg border border-[#E5E7EB] bg-[#F7F7F5] hover:bg-white hover:border-[#2563EB] text-left transition-all group shadow-2xs"
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded bg-blue-100 text-[#2563EB] flex items-center justify-center">
-                        <Target className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="text-sm font-bold text-[#1F2937] group-hover:text-[#2563EB] transition-colors">
-                        Planos 5W2H
-                      </span>
-                    </div>
-                    <ArrowUpRight className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#2563EB] transition-colors" />
-                  </div>
-                  <p className="text-xs text-[#6B7280] leading-relaxed">
-                    Ação estruturada para todo desvio: o quê, quem, quando e prioridade.
-                  </p>
-                </button>
-              </div>
             </div>
           </div>
         </section>
@@ -553,222 +382,6 @@ export default function BemVindo() {
                     Acompanhamento
                   </span>
                   <span className="font-semibold text-emerald-700">é gestão</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-        {/* Seção Pilares Competitivos do Produto: Dashboard, Workflow, Fotos e 5W2H */}
-        <section
-          id="pilares-produto"
-          className="py-12 sm:py-16 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]"
-        >
-          <div className="max-w-5xl mx-auto space-y-10">
-            <div className="text-center space-y-3">
-              <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#2563EB]">
-                4 Pilares da Plataforma
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
-                Gestão completa: do chão de loja aos relatórios executivos
-              </h2>
-              <p className="text-sm sm:text-base text-[#6B7280] max-w-2xl mx-auto leading-relaxed">
-                Tudo o que sua equipe precisa para transformar rotinas em resultados mensuráveis.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Pilar 1: Dashboard (Relatórios BI) */}
-              <div
-                id="pilar-dashboard"
-                className="bg-[#F7F7F5] border border-[#E5E7EB] hover:border-[#2563EB] rounded-xl p-6 space-y-4 transition-all shadow-xs"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 text-[#2563EB] flex items-center justify-center">
-                    <LayoutDashboard className="w-5 h-5" />
-                  </div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-blue-100 text-[#2563EB]">
-                    BI e Gestão
-                  </span>
-                </div>
-                <div className="space-y-1.5">
-                  <h3 className="text-base sm:text-lg font-bold text-[#1F2937]">Dashboard</h3>
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                    Relatórios loja a loja em tempo real: execução, aprovação, ranking e evolução
-                    por dia, semana e mês.
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-[#E5E7EB] space-y-2 text-xs text-[#6B7280]">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
-                    <span>Comparativo loja a loja com % de conclusão e aprovação</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
-                    <span>Evolução vs. período anterior e ranking de desempenho</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
-                    <span>Exportação consolidada em planilha CSV com 1 clique</span>
-                  </div>
-                </div>
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={() => handlePilarClick('dashboard')}
-                    className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] inline-flex items-center gap-1 group"
-                  >
-                    <span>
-                      {user ? 'Acessar Dashboard do app' : 'Ver como funciona na prática'}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Pilar 2: Workflow com Pendências */}
-              <div
-                id="pilar-workflow"
-                className="bg-[#F7F7F5] border border-[#E5E7EB] hover:border-[#2563EB] rounded-xl p-6 space-y-4 transition-all shadow-xs"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 text-[#2563EB] flex items-center justify-center">
-                    <GitBranch className="w-5 h-5" />
-                  </div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-blue-100 text-[#2563EB]">
-                    Operação e Status
-                  </span>
-                </div>
-                <div className="space-y-1.5">
-                  <h3 className="text-base sm:text-lg font-bold text-[#1F2937]">Workflow</h3>
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                    Pendências visíveis na hora: atrasada, aguardando validação, devolvida ou
-                    aprovada — com alerta por WhatsApp em 1 clique.
-                  </p>
-                </div>
-                {/* Visual dos badges padronizados */}
-                <div className="pt-3 border-t border-[#E5E7EB] flex flex-wrap gap-1.5">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-[#B91C1C]">
-                    <AlertTriangle className="w-3 h-3" />
-                    ATRASADA
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-[#2563EB]">
-                    <Clock className="w-3 h-3" />
-                    AGUARDANDO VALIDAÇÃO
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">
-                    <RotateCcw className="w-3 h-3" />
-                    DEVOLVIDA
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                    <CheckCircle2 className="w-3 h-3" />
-                    APROVADA
-                  </span>
-                </div>
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={() => handlePilarClick('workflow')}
-                    className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] inline-flex items-center gap-1 group"
-                  >
-                    <span>
-                      {user ? 'Acessar Workflow e Agenda' : 'Ver rotina com badges de status'}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Pilar 3: Fotos e Mídias */}
-              <div
-                id="pilar-fotos"
-                className="bg-[#F7F7F5] border border-[#E5E7EB] hover:border-[#2563EB] rounded-xl p-6 space-y-4 transition-all shadow-xs"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 text-[#2563EB] flex items-center justify-center">
-                    <Camera className="w-5 h-5" />
-                  </div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-blue-100 text-[#2563EB]">
-                    Auditoria Visual
-                  </span>
-                </div>
-                <div className="space-y-1.5">
-                  <h3 className="text-base sm:text-lg font-bold text-[#1F2937]">Fotos e Mídias</h3>
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                    Prova de execução com foto e observação em cada rotina e validade.
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-[#E5E7EB] space-y-2 text-xs text-[#6B7280]">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
-                    <span>Upload direto pelo celular ao concluir a tarefa</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
-                    <span>Visualizador de fotos em alta resolução integrado</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
-                    <span>Comprovação visual para auditoria de loja e validação regional</span>
-                  </div>
-                </div>
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={() => handlePilarClick('fotos')}
-                    className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] inline-flex items-center gap-1 group"
-                  >
-                    <span>
-                      {user ? 'Ver biblioteca com fotos' : 'Conhecer comprovação por foto'}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Pilar 4: Planos 5W2H */}
-              <div
-                id="pilar-5w2h"
-                className="bg-[#F7F7F5] border border-[#E5E7EB] hover:border-[#2563EB] rounded-xl p-6 space-y-4 transition-all shadow-xs"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 text-[#2563EB] flex items-center justify-center">
-                    <Target className="w-5 h-5" />
-                  </div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-blue-100 text-[#2563EB]">
-                    Ação Corretiva
-                  </span>
-                </div>
-                <div className="space-y-1.5">
-                  <h3 className="text-base sm:text-lg font-bold text-[#1F2937]">Planos 5W2H</h3>
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                    Ação estruturada para todo desvio: o quê, quem, quando e prioridade.
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-[#E5E7EB] space-y-2 text-xs text-[#6B7280]">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
-                    <span>Criação em 1 clique a partir de qualquer rotina atrasada</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
-                    <span>Responsável, prazo e prioridade (Alta, Média, Baixa)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
-                    <span>Ciclo de conclusão e reabertura com histórico da loja</span>
-                  </div>
-                </div>
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={() => handlePilarClick('5w2h')}
-                    className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] inline-flex items-center gap-1 group"
-                  >
-                    <span>
-                      {user ? 'Acessar Planos de Ação' : 'Ver como estruturar ações 5W2H'}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                  </button>
                 </div>
               </div>
             </div>
@@ -1093,38 +706,6 @@ export default function BemVindo() {
 
             {/* Links de navegação e acesso rápido */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[#4B5563]">
-              <button
-                type="button"
-                onClick={() => handlePilarClick('dashboard')}
-                className="hover:text-[#2563EB] font-medium transition-colors"
-              >
-                Dashboard
-              </button>
-              <span className="text-gray-300">•</span>
-              <button
-                type="button"
-                onClick={() => handlePilarClick('workflow')}
-                className="hover:text-[#2563EB] font-medium transition-colors"
-              >
-                Workflow
-              </button>
-              <span className="text-gray-300">•</span>
-              <button
-                type="button"
-                onClick={() => handlePilarClick('fotos')}
-                className="hover:text-[#2563EB] font-medium transition-colors"
-              >
-                Fotos e Mídias
-              </button>
-              <span className="text-gray-300">•</span>
-              <button
-                type="button"
-                onClick={() => handlePilarClick('5w2h')}
-                className="hover:text-[#2563EB] font-medium transition-colors"
-              >
-                Planos 5W2H
-              </button>
-              <span className="text-gray-300">•</span>
               <Link to="/login" className="hover:text-[#2563EB] font-medium transition-colors">
                 Já tenho conta
               </Link>
@@ -1212,135 +793,6 @@ export default function BemVindo() {
           </div>
         </div>
       </footer>
-      {/* Modal Demonstrativo de Pilar para visitantes não logados */}
-      {pilarModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
-            onClick={() => setPilarModal(null)}
-          />
-          <div className="relative w-full max-w-lg bg-white rounded-xl shadow-xl border border-[#E5E7EB] p-6 z-10 space-y-5 animate-fade-in-up">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-200 text-[#2563EB] flex items-center justify-center">
-                  {pilarModal === 'dashboard' && <LayoutDashboard className="w-5 h-5" />}
-                  {pilarModal === 'workflow' && <GitBranch className="w-5 h-5" />}
-                  {pilarModal === 'fotos' && <Camera className="w-5 h-5" />}
-                  {pilarModal === '5w2h' && <Target className="w-5 h-5" />}
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-[#1F2937]">
-                    {pilarModal === 'dashboard' && 'Dashboard • Relatórios Loja a Loja'}
-                    {pilarModal === 'workflow' && 'Workflow • Gestão de Pendências'}
-                    {pilarModal === 'fotos' && 'Fotos e Mídias • Auditoria Visual'}
-                    {pilarModal === '5w2h' && 'Planos 5W2H • Ação Corretiva Estruturada'}
-                  </h3>
-                  <span className="text-xs text-[#6B7280]">Recurso funcional do VivaVarejo</span>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setPilarModal(null)}
-                className="p-1 rounded text-[#9CA3AF] hover:text-[#1F2937]"
-                aria-label="Fechar"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="text-xs sm:text-sm text-[#4B5563] space-y-3 leading-relaxed">
-              {pilarModal === 'dashboard' && (
-                <>
-                  <p>
-                    O módulo <strong>Dashboard</strong> reúne a performance diária, semanal e mensal
-                    de cada unidade da rede:
-                  </p>
-                  <ul className="space-y-1.5 pl-4 list-disc text-xs text-[#374151]">
-                    <li>Visão em tempo real das rotinas concluídas e pendentes por loja;</li>
-                    <li>Ranking de eficiência operacional e comparação vs. período anterior;</li>
-                    <li>Exportação consolidada em CSV para relatórios executivos e auditoria.</li>
-                  </ul>
-                </>
-              )}
-
-              {pilarModal === 'workflow' && (
-                <>
-                  <p>
-                    O <strong>Workflow</strong> traz controle total de pendências com badges de
-                    status padronizados:
-                  </p>
-                  <ul className="space-y-1.5 pl-4 list-disc text-xs text-[#374151]">
-                    <li>
-                      <strong>Atrasada:</strong> alerta vermelho imediato com disparo WhatsApp em 1
-                      clique;
-                    </li>
-                    <li>
-                      <strong>Aguardando Validação:</strong> líder confere a execução antes de
-                      aprovar;
-                    </li>
-                    <li>
-                      <strong>Devolvida:</strong> feedback na tarefa para correção imediata pela
-                      equipe;
-                    </li>
-                    <li>
-                      <strong>Aprovada:</strong> rotina auditada e concluída com segurança.
-                    </li>
-                  </ul>
-                </>
-              )}
-
-              {pilarModal === 'fotos' && (
-                <>
-                  <p>
-                    Com <strong>Fotos e Mídias</strong>, cada rotina e conferência de validade pode
-                    exigir comprovação visual:
-                  </p>
-                  <ul className="space-y-1.5 pl-4 list-disc text-xs text-[#374151]">
-                    <li>Foto de prova capturada na hora no celular pelo operador;</li>
-                    <li>Visualizador integrado com zoom e download para conferência;</li>
-                    <li>Elimina o "diz que fez" e eleva o padrão visual de loja.</li>
-                  </ul>
-                </>
-              )}
-
-              {pilarModal === '5w2h' && (
-                <>
-                  <p>
-                    Os <strong>Planos 5W2H</strong> transformam qualquer desvio operacional em plano
-                    de ação prático:
-                  </p>
-                  <ul className="space-y-1.5 pl-4 list-disc text-xs text-[#374151]">
-                    <li>Defina o quê, quem, quando, motivo e prioridade (Alta, Média, Baixa);</li>
-                    <li>Vincule diretamente a uma rotina atrasada da loja;</li>
-                    <li>Acompanhe o status e mantenha histórico de melhoria contínua.</li>
-                  </ul>
-                </>
-              )}
-            </div>
-
-            <div className="pt-3 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-end gap-2.5">
-              <button
-                type="button"
-                onClick={() => setPilarModal(null)}
-                className="w-full sm:w-auto px-4 py-2 border border-[#E5E7EB] hover:bg-gray-100 text-[#4B5563] text-xs font-semibold rounded-md transition-colors"
-              >
-                Fechar
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setPilarModal(null)
-                  handleScrollToInterest()
-                }}
-                className="w-full sm:w-auto px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors inline-flex items-center justify-center gap-1.5"
-              >
-                <span>Quero usar na minha loja</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
