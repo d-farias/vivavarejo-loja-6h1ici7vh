@@ -57,13 +57,13 @@ export const visitasPromotorService = {
     })
   },
 
-  async create(data: Partial<VisitaPromotor>): Promise<VisitaPromotor> {
+  async create(data: Partial<VisitaPromotor> | FormData): Promise<VisitaPromotor> {
     return await pb.collection('visitas_promotor').create<VisitaPromotor>(data, {
       expand: 'promotor,promotor.fornecedor,loja',
     })
   },
 
-  async update(id: string, data: Partial<VisitaPromotor>): Promise<VisitaPromotor> {
+  async update(id: string, data: Partial<VisitaPromotor> | FormData): Promise<VisitaPromotor> {
     return await pb.collection('visitas_promotor').update<VisitaPromotor>(id, data, {
       expand: 'promotor,promotor.fornecedor,loja',
     })
@@ -75,12 +75,33 @@ export const visitasPromotorService = {
 
   async registrarConclusao(
     id: string,
-    params: {
-      conclusao_check: string
-      rotinas_executadas?: string
-      registrado_por?: string
-    },
+    params:
+      | FormData
+      | {
+          conclusao_check: string
+          rotinas_executadas?: string
+          registrado_por?: string
+          checklist_abastecimento_100?: boolean
+          checklist_validades_ok?: boolean
+          checklist_layout_conforme?: boolean
+          quantidade_sortimento?: number
+          perc_vendas?: number
+          qtd_rupturas?: number
+          itens_sem_vendas?: number
+          responsavel_execucao?: string
+          validador_fiscalizacao?: string
+          status_fiscalizacao?: 'pendente' | 'aprovada' | 'devolvida'
+        },
   ): Promise<VisitaPromotor> {
+    const nowIso = new Date().toISOString()
+    if (params instanceof FormData) {
+      if (!params.has('status')) params.append('status', 'realizada')
+      if (!params.has('realizada_em')) params.append('realizada_em', nowIso)
+      return await pb.collection('visitas_promotor').update<VisitaPromotor>(id, params, {
+        expand: 'promotor,promotor.fornecedor,loja',
+      })
+    }
+
     return await pb.collection('visitas_promotor').update<VisitaPromotor>(
       id,
       {
@@ -88,7 +109,17 @@ export const visitasPromotorService = {
         conclusao_check: params.conclusao_check,
         rotinas_executadas: params.rotinas_executadas,
         registrado_por: params.registrado_por,
-        realizada_em: new Date().toISOString(),
+        realizada_em: nowIso,
+        checklist_abastecimento_100: params.checklist_abastecimento_100,
+        checklist_validades_ok: params.checklist_validades_ok,
+        checklist_layout_conforme: params.checklist_layout_conforme,
+        quantidade_sortimento: params.quantidade_sortimento,
+        perc_vendas: params.perc_vendas,
+        qtd_rupturas: params.qtd_rupturas,
+        itens_sem_vendas: params.itens_sem_vendas,
+        responsavel_execucao: params.responsavel_execucao,
+        validador_fiscalizacao: params.validador_fiscalizacao,
+        status_fiscalizacao: params.status_fiscalizacao || 'pendente',
       },
       {
         expand: 'promotor,promotor.fornecedor,loja',

@@ -15,11 +15,11 @@ export const fornecedoresService = {
     })
   },
 
-  async create(data: Partial<Fornecedor>): Promise<Fornecedor> {
+  async create(data: Partial<Fornecedor> | FormData): Promise<Fornecedor> {
     return await pb.collection('fornecedores').create<Fornecedor>(data)
   },
 
-  async update(id: string, data: Partial<Fornecedor>): Promise<Fornecedor> {
+  async update(id: string, data: Partial<Fornecedor> | FormData): Promise<Fornecedor> {
     return await pb.collection('fornecedores').update<Fornecedor>(id, data)
   },
 

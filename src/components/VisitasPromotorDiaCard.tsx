@@ -17,10 +17,7 @@ import { ConcluirVisitaModal } from '@/components/ConcluirVisitaModal'
 interface VisitasPromotorDiaCardProps {
   visitas: VisitaPromotor[]
   rotinasPromotor: RotinaPromotor[]
-  onConcluirVisita: (
-    visitaId: string,
-    params: { conclusao_check: string; rotinas_executadas?: string },
-  ) => Promise<void>
+  onConcluirVisita: (visitaId: string, params: any) => Promise<void>
   onNavigateToPromotores?: () => void
 }
 

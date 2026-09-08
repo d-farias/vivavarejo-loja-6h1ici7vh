@@ -769,16 +769,20 @@ export default function AgendaPage() {
   }
 
   // Concluir visita de promotor do dia
-  const handleConcluirVisita = async (
-    visitaId: string,
-    params: { conclusao_check: string; rotinas_executadas?: string; realizada_em?: string },
-  ) => {
+  const handleConcluirVisita = async (visitaId: string, params: any) => {
     if (!user) return
     try {
-      await visitasPromotorService.registrarConclusao(visitaId, {
-        ...params,
-        registrado_por: user.id,
-      })
+      if (params instanceof FormData) {
+        if (!params.has('registrado_por')) {
+          params.append('registrado_por', user.id)
+        }
+        await visitasPromotorService.registrarConclusao(visitaId, params)
+      } else {
+        await visitasPromotorService.registrarConclusao(visitaId, {
+          ...params,
+          registrado_por: user.id,
+        })
+      }
       loadData()
     } catch (err) {
       console.error('Erro ao concluir visita:', err)

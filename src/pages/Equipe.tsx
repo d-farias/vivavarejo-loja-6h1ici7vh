@@ -13,9 +13,12 @@ import {
   RefreshCw,
   Briefcase,
   ChevronRight,
+  ChevronDown,
   UserCheck,
   Store,
   Phone,
+  Bookmark,
+  ChevronsUpDown,
 } from 'lucide-react'
 import { formatPhoneBR } from '@/lib/phone-utils'
 import { normalizarNomeCanonico, getChaveCanonico } from '@/lib/cargos'
@@ -28,6 +31,8 @@ export default function Equipe() {
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  // Estado para acordeão: inicia RECOLHIDO por solicitação textual do dono do produto
+  const [expandedKeys, setExpandedKeys] = useState<Record<string, boolean>>({})
 
   const loadData = useCallback(async () => {
     if (!user) return
@@ -52,9 +57,33 @@ export default function Equipe() {
     loadData()
   }, [loadData])
 
+  // Agrupar colaboradores por função canônica
+  const colaboradoresPorFuncao = useMemo(() => {
+    const map = new Map<string, Funcionario[]>()
+    funcionarios.forEach((fc) => {
+      const raw = fc.expand?.funcao?.nome || 'Operação'
+      const canonico = normalizarNomeCanonico(raw) || 'Operação'
+      const chave = getChaveCanonico(canonico) || 'operacao'
+      if (!map.has(chave)) {
+        map.set(chave, [])
+      }
+      map.get(chave)!.push(fc)
+    })
+    return map
+  }, [funcionarios])
+
   // Group routines by Area (or responsavel fallback) using unified canonical names
+  // Unifica também com contagem de colaboradores da mesma função canônica
   const groupedData = useMemo(() => {
-    const map = new Map<string, { area: string; items: Rotina[] }>()
+    const map = new Map<
+      string,
+      {
+        chave: string
+        funcaoNome: string
+        items: Rotina[]
+        colaboradores: Funcionario[]
+      }
+    >()
 
     rotinas.forEach((rotina) => {
       const raw = rotina.area || rotina.responsavel || 'Geral'
@@ -62,19 +91,56 @@ export default function Equipe() {
       const chave = getChaveCanonico(canonico) || 'geral'
 
       if (!map.has(chave)) {
-        map.set(chave, { area: canonico, items: [] })
+        map.set(chave, {
+          chave,
+          funcaoNome: canonico,
+          items: [],
+          colaboradores: colaboradoresPorFuncao.get(chave) || [],
+        })
       }
       map.get(chave)!.items.push(rotina)
     })
 
+    // Adiciona funções que têm funcionários mas eventualmente não têm rotinas cadastradas ainda
+    colaboradoresPorFuncao.forEach((funcs, chave) => {
+      if (!map.has(chave) && funcs.length > 0) {
+        const canonico = normalizarNomeCanonico(funcs[0].expand?.funcao?.nome) || 'Outros'
+        map.set(chave, {
+          chave,
+          funcaoNome: canonico,
+          items: [],
+          colaboradores: funcs,
+        })
+      }
+    })
+
     return Array.from(map.values())
-      .map(({ area, items }) => ({
-        area,
-        items,
-        count: items.length,
+      .map((group) => ({
+        ...group,
+        totalRotinas: group.items.length,
+        totalColaboradores: group.colaboradores.length,
       }))
-      .sort((a, b) => b.count - a.count || a.area.localeCompare(b.area))
-  }, [rotinas])
+      .sort((a, b) => b.totalRotinas - a.totalRotinas || a.funcaoNome.localeCompare(b.funcaoNome))
+  }, [rotinas, colaboradoresPorFuncao])
+
+  const toggleGroup = (chave: string) => {
+    setExpandedKeys((prev) => ({
+      ...prev,
+      [chave]: !prev[chave],
+    }))
+  }
+
+  const expandAll = () => {
+    const next: Record<string, boolean> = {}
+    groupedData.forEach((g) => {
+      next[g.chave] = true
+    })
+    setExpandedKeys(next)
+  }
+
+  const collapseAll = () => {
+    setExpandedKeys({})
+  }
 
   if (loading) {
     return (
@@ -211,66 +277,163 @@ export default function Equipe() {
         </Link>
       </div>
 
-      {/* Area Groups List */}
-      <div className="space-y-5">
-        {groupedData.map(({ area, items, count }) => (
-          <div
-            key={area}
-            className="bg-white border border-[#E5E7EB] rounded-lg overflow-hidden shadow-xs"
+      {/* Controles de visualização do Acordeão */}
+      <div className="flex items-center justify-between gap-2 text-xs text-[#6B7280]">
+        <span className="flex items-center gap-1.5 font-medium">
+          <Bookmark className="w-3.5 h-3.5 text-[#2563EB]" />
+          <span>Toque no flag para expandir e ver as rotinas detalhadas da função</span>
+        </span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={expandAll}
+            className="hover:text-[#2563EB] font-semibold transition-colors"
           >
-            {/* Group Header */}
-            <div className="p-4 bg-[#F7F7F5] border-b border-[#E5E7EB] flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded bg-white border border-[#E5E7EB] flex items-center justify-center text-[#4B5563]">
-                  <Briefcase className="w-3.5 h-3.5" />
-                </div>
-                <h2 className="text-base font-bold text-[#1F2937]">{area}</h2>
-              </div>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white border border-[#E5E7EB] text-[#4B5563]">
-                {count} {count === 1 ? 'rotina' : 'rotinas'}
-              </span>
-            </div>
+            Abrir todos
+          </button>
+          <span>•</span>
+          <button
+            onClick={collapseAll}
+            className="hover:text-[#2563EB] font-semibold transition-colors"
+          >
+            Recolher todos
+          </button>
+        </div>
+      </div>
 
-            {/* Routines Under Group */}
-            <div className="divide-y divide-[#E5E7EB]">
-              {items.map((routine) => (
-                <div
-                  key={routine.id}
-                  className="p-3.5 sm:p-4 hover:bg-gray-50/70 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+      {/* Area Groups List — Acordeão recolhido por função e quantidade */}
+      <div className="space-y-3">
+        {groupedData.map(
+          ({ chave, funcaoNome, items, colaboradores, totalRotinas, totalColaboradores }) => {
+            const isExpanded = !!expandedKeys[chave]
+
+            return (
+              <div
+                key={chave}
+                className={`bg-white border rounded-lg overflow-hidden shadow-xs transition-colors ${
+                  isExpanded ? 'border-[#2563EB]/40 ring-1 ring-[#2563EB]/20' : 'border-[#E5E7EB]'
+                }`}
+              >
+                {/* Group Header com botão Acordeão / Flag clicável */}
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(chave)}
+                  className="w-full p-4 bg-[#F7F7F5] hover:bg-gray-100/80 transition-colors flex items-center justify-between text-left gap-3 focus:outline-none"
+                  aria-expanded={isExpanded}
                 >
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-semibold text-[#1F2937]">{routine.nome}</div>
-                    {routine.observacoes && (
-                      <p className="text-xs text-[#6B7280] line-clamp-1 mt-0.5">
-                        {routine.observacoes}
-                      </p>
-                    )}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded bg-white border border-[#E5E7EB] flex items-center justify-center text-[#2563EB] shrink-0">
+                      <Briefcase className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <h2 className="text-sm sm:text-base font-bold text-[#1F2937] truncate">
+                        {funcaoNome}
+                      </h2>
+                      {totalColaboradores > 0 && (
+                        <span className="text-[11px] text-[#6B7280] block sm:hidden">
+                          {totalColaboradores} {totalColaboradores === 1 ? 'membro' : 'membros'}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-3 text-xs text-[#6B7280] shrink-0 flex-wrap">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-[#9CA3AF]" />
-                      <span>{routine.frequencia}</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {/* Badges de Quantidade ao lado do nome da função */}
+                    {totalColaboradores > 0 && (
+                      <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white border border-[#E5E7EB] text-[#4B5563]">
+                        <UserCheck className="w-3 h-3 text-[#2563EB]" />
+                        <span>
+                          {totalColaboradores} {totalColaboradores === 1 ? 'membro' : 'membros'}
+                        </span>
+                      </span>
+                    )}
+
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20">
+                      {totalRotinas} {totalRotinas === 1 ? 'rotina' : 'rotinas'}
                     </span>
 
-                    {routine.horario_limite && (
-                      <span className="font-mono text-[11px] px-1.5 py-0.5 rounded border border-[#E5E7EB] bg-[#F7F7F5] text-[#374151]">
-                        {routine.horario_limite}
-                      </span>
+                    {/* Flag / Chevron indicando expansão da rotina */}
+                    <div
+                      className={`p-1.5 rounded-md bg-white border border-[#E5E7EB] text-[#4B5563] transition-transform duration-200 ${
+                        isExpanded ? 'rotate-180 text-[#2563EB] border-[#2563EB]/40' : ''
+                      }`}
+                      title={isExpanded ? 'Recolher rotinas' : 'Abrir rotinas detalhadas'}
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </div>
+                  </div>
+                </button>
+
+                {/* Rotinas Detalhadas — Apenas quando expandido */}
+                {isExpanded && (
+                  <div className="divide-y divide-[#E5E7EB] bg-white animate-in fade-in-50 duration-150">
+                    {/* Colaboradores desta função (se houver) */}
+                    {colaboradores.length > 0 && (
+                      <div className="p-3 bg-[#F9FAFB] border-b border-[#E5E7EB] flex items-center gap-2 flex-wrap text-xs text-[#4B5563]">
+                        <span className="font-semibold text-[#1F2937] flex items-center gap-1">
+                          <UserCheck className="w-3.5 h-3.5 text-[#2563EB]" />
+                          <span>Equipe nesta função:</span>
+                        </span>
+                        {colaboradores.map((fc) => (
+                          <span
+                            key={fc.id}
+                            className="px-2 py-0.5 rounded bg-white border border-[#E5E7EB] font-medium text-[#1F2937]"
+                          >
+                            {fc.nome}
+                            {fc.telefone && ` (${formatPhoneBR(fc.telefone)})`}
+                          </span>
+                        ))}
+                      </div>
                     )}
 
-                    {routine.validacao && (
-                      <span className="flex items-center gap-1 text-[11px] text-[#4B5563]">
-                        <ShieldCheck className="w-3.5 h-3.5 text-[#9CA3AF]" />
-                        <span>Validação: {normalizarNomeCanonico(routine.validacao)}</span>
-                      </span>
+                    {items.length === 0 ? (
+                      <div className="p-4 text-center text-xs text-[#6B7280]">
+                        Nenhuma rotina cadastrada para esta função.
+                      </div>
+                    ) : (
+                      items.map((routine) => (
+                        <div
+                          key={routine.id}
+                          className="p-3.5 sm:p-4 hover:bg-gray-50/70 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-semibold text-[#1F2937]">
+                              {routine.nome}
+                            </div>
+                            {routine.observacoes && (
+                              <p className="text-xs text-[#6B7280] line-clamp-2 mt-0.5">
+                                {routine.observacoes}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-3 text-xs text-[#6B7280] shrink-0 flex-wrap">
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3.5 h-3.5 text-[#9CA3AF]" />
+                              <span>{routine.frequencia}</span>
+                            </span>
+
+                            {routine.horario_limite && (
+                              <span className="font-mono text-[11px] px-1.5 py-0.5 rounded border border-[#E5E7EB] bg-[#F7F7F5] text-[#374151]">
+                                {routine.horario_limite}
+                              </span>
+                            )}
+
+                            {routine.validacao && (
+                              <span className="flex items-center gap-1 text-[11px] text-[#4B5563]">
+                                <ShieldCheck className="w-3.5 h-3.5 text-[#9CA3AF]" />
+                                <span>Validação: {normalizarNomeCanonico(routine.validacao)}</span>
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))
                     )}
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+                )}
+              </div>
+            )
+          },
+        )}
       </div>
     </div>
   )

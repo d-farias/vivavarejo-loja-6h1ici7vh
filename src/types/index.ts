@@ -242,6 +242,8 @@ export interface ModeloComContagem extends ModeloRotina {
 
 // ==================== MÓDULO PROMOTORES & FORNECEDORES ====================
 
+export type PoliticaQuebras = 'troca_total' | 'troca_parcial' | 'sem_troca_avaria_loja'
+
 export interface Fornecedor extends RecordModel {
   nome: string
   contato?: string
@@ -249,6 +251,16 @@ export interface Fornecedor extends RecordModel {
   observacoes?: string
   ativo?: boolean
   cliente?: string
+  // Novos campos exigidos pelo usuário (Frente 2)
+  comprador_nome?: string
+  comprador_telefone?: string
+  comprador_email?: string
+  comprador_categoria?: string
+  layout_descricao?: string
+  layout_foto?: string
+  frequencia_semanal?: string
+  politica_quebras?: PoliticaQuebras
+  is_exemplo?: boolean
   created: string
   updated: string
   expand?: {
@@ -299,10 +311,28 @@ export interface VisitaPromotor extends RecordModel {
   rotinas_executadas?: string
   realizada_em?: string
   registrado_por?: string
+  alerta_enviado_em?: string
+  // Novos campos exigidos pelo usuário (Frente 2)
+  foto_trabalho?: string
+  checklist_abastecimento_100?: boolean
+  checklist_validades_ok?: boolean
+  checklist_layout_conforme?: boolean
+  quantidade_sortimento?: number
+  perc_vendas?: number
+  qtd_rupturas?: number
+  itens_sem_vendas?: number
+  responsavel_execucao?: string
+  validador_fiscalizacao?: string
+  status_fiscalizacao?: 'pendente' | 'aprovada' | 'devolvida'
+  is_exemplo?: boolean
   created: string
   updated: string
   expand?: {
-    promotor?: Promotor
+    promotor?: Promotor & {
+      expand?: {
+        fornecedor?: Fornecedor
+      }
+    }
     loja?: Loja
     registrado_por?: User
   }

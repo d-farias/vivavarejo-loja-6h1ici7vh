@@ -139,11 +139,18 @@ export default function PromotoresPage() {
             loadData()
           }}
           onConcluirVisita={async (visitaId, params) => {
-            await visitasPromotorService.registrarConclusao(visitaId, {
-              ...params,
-              registrado_por: user?.id,
-            })
-            showFeedback('Visita concluída com sucesso!')
+            if (params instanceof FormData) {
+              if (user?.id && !params.has('registrado_por')) {
+                params.append('registrado_por', user.id)
+              }
+              await visitasPromotorService.registrarConclusao(visitaId, params)
+            } else {
+              await visitasPromotorService.registrarConclusao(visitaId, {
+                ...params,
+                registrado_por: user?.id,
+              })
+            }
+            showFeedback('Visita avaliada e concluída com sucesso!')
             loadData()
           }}
           onCancelarVisita={async (visitaId, motivo) => {

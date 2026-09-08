@@ -13,18 +13,27 @@ import {
   Building2,
   Store,
   XCircle,
-  FileText,
   Trash2,
   Edit2,
   Layers,
   Phone,
   Mail,
+  Camera,
+  MessageCircle,
+  ShieldAlert,
+  Sparkles,
+  Info,
+  CheckSquare,
+  BarChart3,
+  ExternalLink,
 } from 'lucide-react'
 import { PromotorModal } from '@/components/PromotorModal'
 import { FornecedorModal } from '@/components/FornecedorModal'
 import { AgendarVisitaModal } from '@/components/AgendarVisitaModal'
 import { ConcluirVisitaModal } from '@/components/ConcluirVisitaModal'
 import { RotinaPromotorModal } from '@/components/RotinaPromotorModal'
+import { buildWhatsAppLink, formatPhoneBR } from '@/lib/phone-utils'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 interface PromotoresFornecedoresManagerProps {
   visitas: VisitaPromotor[]
@@ -34,15 +43,12 @@ interface PromotoresFornecedoresManagerProps {
   rotinasPromotor: RotinaPromotor[]
   onRefresh: () => Promise<void>
   onSaveVisita: (payload: Partial<VisitaPromotor>, id?: string) => Promise<void>
-  onConcluirVisita: (
-    visitaId: string,
-    params: { conclusao_check: string; rotinas_executadas?: string },
-  ) => Promise<void>
+  onConcluirVisita: (visitaId: string, params: any) => Promise<void>
   onCancelarVisita: (visitaId: string, motivo?: string) => Promise<void>
   onDeleteVisita: (visitaId: string) => Promise<void>
   onSavePromotor: (payload: Partial<Promotor>, id?: string) => Promise<void>
   onDeletePromotor: (promotor: Promotor) => Promise<void>
-  onSaveFornecedor: (payload: Partial<Fornecedor>, id?: string) => Promise<void>
+  onSaveFornecedor: (payload: Partial<Fornecedor> | FormData, id?: string) => Promise<void>
   onDeleteFornecedor: (fornecedor: Fornecedor) => Promise<void>
   onSaveRotinaPromotor: (payload: Partial<RotinaPromotor>, id?: string) => Promise<void>
   onDeleteRotinaPromotor: (rotina: RotinaPromotor) => Promise<void>
@@ -96,6 +102,10 @@ export function PromotoresFornecedoresManager({
 
   const [rotinaModalOpen, setRotinaModalOpen] = useState(false)
   const [editingRotina, setEditingRotina] = useState<RotinaPromotor | null>(null)
+
+  // Visualizador de foto
+  const [fotoUrlVisualizar, setFotoUrlVisualizar] = useState<string | null>(null)
+  const [fotoTituloVisualizar, setFotoTituloVisualizar] = useState('')
 
   // KPIs
   const kpis = useMemo(() => {
@@ -296,6 +306,49 @@ export function PromotoresFornecedoresManager({
 
   return (
     <div className="space-y-6">
+      {/* Banner de Demonstração / Modelo de Exemplo Funcional */}
+      {fornecedores.some((f) => f.is_exemplo) && (
+        <div className="p-3.5 sm:p-4 rounded-lg bg-blue-50 border border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-md bg-[#2563EB] text-white flex items-center justify-center shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
+                  Modelo de Exemplo Funcional Ativo
+                </span>
+                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-[#2563EB] text-white">
+                  DEMONSTRAÇÃO
+                </span>
+              </div>
+              <p className="text-xs text-[#374151] mt-0.5">
+                Fornecedor modelo configurado com comprador responsável, layout de gôndola, política
+                de trocas e visita com checklist de abastecimento 100% e foto obrigatória.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={async () => {
+                if (
+                  confirm('Deseja remover os registros de exemplo do fornecedor e promotor modelo?')
+                ) {
+                  const exFornecedor = fornecedores.find((f) => f.is_exemplo)
+                  if (exFornecedor) {
+                    await onDeleteFornecedor(exFornecedor)
+                  }
+                }
+              }}
+              className="text-xs font-semibold text-gray-600 hover:text-red-700 px-3 py-1.5 rounded border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+            >
+              Remover Exemplo
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Sub-navegação do Módulo Promotores & Fornecedores */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E7EB] pb-3">
         <div className="flex items-center gap-1.5 overflow-x-auto">
@@ -673,15 +726,71 @@ export function PromotoresFornecedoresManager({
                           {v.conclusao_check ? (
                             <div className="space-y-1">
                               <div
-                                className="text-xs text-[#1F2937] font-medium truncate"
+                                className="text-xs text-[#1F2937] font-medium line-clamp-2"
                                 title={v.conclusao_check}
                               >
                                 {v.conclusao_check}
                               </div>
-                              {v.rotinas_executadas && (
-                                <div className="text-[11px] text-emerald-700 font-medium">
-                                  ✓ Rotinas registradas
+
+                              {/* Checklist da Visita (Frente 2) */}
+                              <div className="flex items-center gap-2 flex-wrap text-[11px]">
+                                {v.checklist_abastecimento_100 && (
+                                  <span className="text-emerald-700 font-medium bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+                                    Abastecido 100%
+                                  </span>
+                                )}
+                                {v.checklist_validades_ok && (
+                                  <span className="text-blue-700 font-medium bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200">
+                                    Validades OK
+                                  </span>
+                                )}
+                                {v.checklist_layout_conforme && (
+                                  <span className="text-amber-800 font-medium bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
+                                    Layout Conforme
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Indicadores de Loja da Visita */}
+                              {(v.quantidade_sortimento !== undefined ||
+                                v.perc_vendas !== undefined) && (
+                                <div className="text-[11px] text-[#6B7280] flex items-center gap-2 flex-wrap">
+                                  {v.quantidade_sortimento !== undefined && (
+                                    <span>
+                                      Sortimento: <b>{v.quantidade_sortimento} itens</b>
+                                    </span>
+                                  )}
+                                  {v.perc_vendas !== undefined && (
+                                    <span>
+                                      Vendas: <b>{v.perc_vendas}%</b>
+                                    </span>
+                                  )}
+                                  {v.qtd_rupturas !== undefined && v.qtd_rupturas > 0 && (
+                                    <span className="text-red-600 font-semibold">
+                                      Rupturas: {v.qtd_rupturas}
+                                    </span>
+                                  )}
                                 </div>
+                              )}
+
+                              {/* Foto do trabalho realizado se houver */}
+                              {v.foto_trabalho && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const pbBase =
+                                      (import.meta as any).env.VITE_POCKETBASE_URL || ''
+                                    const url = `${pbBase}/api/files/visitas_promotor/${v.id}/${v.foto_trabalho}`
+                                    setFotoUrlVisualizar(url)
+                                    setFotoTituloVisualizar(
+                                      `Foto da Visita: ${pObj?.nome || 'Promotor'} (${lObj?.nome || 'Loja'})`,
+                                    )
+                                  }}
+                                  className="inline-flex items-center gap-1 text-[11px] text-[#2563EB] hover:underline font-semibold mt-0.5"
+                                >
+                                  <Camera className="w-3 h-3" />
+                                  <span>Ver foto do trabalho</span>
+                                </button>
                               )}
                             </div>
                           ) : v.observacoes ? (
@@ -698,6 +807,23 @@ export function PromotoresFornecedoresManager({
 
                         <td className="p-3.5 text-right">
                           <div className="inline-flex items-center gap-1">
+                            {/* Botão de Aviso ao Comprador quando houver atraso ou ausência */}
+                            {atrasada && fObj?.comprador_telefone && (
+                              <a
+                                href={buildWhatsAppLink(
+                                  fObj.comprador_telefone,
+                                  `Olá, ${fObj.comprador_nome || 'Gestor'}. Aviso da loja ${lObj?.nome || 'Supermercado'}: O promotor ${pObj?.nome || 'representante'} do fornecedor ${fObj.nome} estava agendado para hoje às ${v.hora_prevista || 'horário comercial'} e até o momento NÃO compareceu à visita. Favor alinhar com a indústria.`,
+                                )}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-amber-50 text-amber-800 hover:bg-amber-100 rounded text-xs font-semibold border border-amber-300 transition-colors"
+                                title="Avisar Comprador/Gestor da Categoria via WhatsApp"
+                              >
+                                <MessageCircle className="w-3.5 h-3.5 text-amber-700" />
+                                <span className="hidden sm:inline">Avisar Comprador</span>
+                              </a>
+                            )}
+
                             {v.status !== 'realizada' && v.status !== 'cancelada' && (
                               <button
                                 onClick={() => {
@@ -705,10 +831,10 @@ export function PromotoresFornecedoresManager({
                                   setConcluirModalOpen(true)
                                 }}
                                 className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded text-xs font-semibold transition-colors border border-emerald-200"
-                                title="Marcar visita como realizada"
+                                title="Avaliar e concluir visita"
                               >
                                 <CheckCircle2 className="w-3.5 h-3.5" />
-                                <span className="hidden sm:inline">Concluir</span>
+                                <span className="hidden sm:inline">Avaliar/Concluir</span>
                               </button>
                             )}
 
@@ -945,47 +1071,113 @@ export function PromotoresFornecedoresManager({
                 <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563] text-xs font-semibold uppercase tracking-wider">
                   <tr>
                     <th className="p-3.5">Fornecedor / Indústria</th>
-                    <th className="p-3.5">Rede Vinculada</th>
-                    <th className="p-3.5">Contato & Telefone</th>
-                    <th className="p-3.5">Observações</th>
+                    <th className="p-3.5">Comprador / Gestor</th>
+                    <th className="p-3.5">Layout & Frequência</th>
+                    <th className="p-3.5">Política de Quebras</th>
                     <th className="p-3.5">Status</th>
                     <th className="p-3.5 text-right">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5E7EB]">
                   {filteredFornecedores.map((f) => {
-                    const cObj = clientes.find((c: any) => c.id === f.cliente)
                     return (
-                      <tr key={f.id} className="hover:bg-gray-50/80 transition-colors">
+                      <tr
+                        key={f.id}
+                        className={`hover:bg-gray-50/80 transition-colors ${f.is_exemplo ? 'bg-blue-50/20' : ''}`}
+                      >
                         <td className="p-3.5 font-semibold text-[#1F2937]">
                           <div className="flex items-center gap-2">
                             <Building2 className="w-4 h-4 text-[#2563EB] shrink-0" />
-                            <span>{f.nome}</span>
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span>{f.nome}</span>
+                                {f.is_exemplo && (
+                                  <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#2563EB] text-white">
+                                    MODELO
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-xs text-[#6B7280] font-normal">
+                                {f.telefone || f.contato || 'Sem contato indústria'}
+                              </div>
+                            </div>
                           </div>
                         </td>
 
+                        {/* Comprador / Gestor de Categoria (Frente 2) */}
                         <td className="p-3.5 text-[#4B5563]">
-                          {cObj ? (
-                            <span className="text-xs font-medium text-[#1F2937]">{cObj.nome}</span>
+                          {f.comprador_nome ? (
+                            <div className="space-y-0.5">
+                              <div className="font-semibold text-xs text-[#1F2937] flex items-center gap-1">
+                                <UserCheck className="w-3.5 h-3.5 text-[#2563EB]" />
+                                <span>{f.comprador_nome}</span>
+                              </div>
+                              {f.comprador_categoria && (
+                                <div className="text-[11px] text-[#2563EB]">
+                                  {f.comprador_categoria}
+                                </div>
+                              )}
+                              {f.comprador_telefone && (
+                                <a
+                                  href={buildWhatsAppLink(
+                                    f.comprador_telefone,
+                                    `Olá, ${f.comprador_nome}. Contato da loja referente ao fornecedor ${f.nome}: `,
+                                  )}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-[11px] text-emerald-700 hover:underline font-mono"
+                                >
+                                  <Phone className="w-3 h-3" />
+                                  <span>{formatPhoneBR(f.comprador_telefone)}</span>
+                                </a>
+                              )}
+                            </div>
                           ) : (
-                            <span className="text-[11px] font-medium text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
-                              Multicliente (Geral)
-                            </span>
+                            <span className="text-xs text-gray-400">Não informado</span>
                           )}
                         </td>
 
-                        <td className="p-3.5 text-[#4B5563]">
-                          <div className="space-y-0.5">
-                            {f.contato && <div className="text-xs">{f.contato}</div>}
-                            {f.telefone && (
-                              <div className="text-[11px] text-[#6B7280]">{f.telefone}</div>
+                        {/* Layout & Frequência (Frente 2) */}
+                        <td className="p-3.5 text-[#4B5563] max-w-xs">
+                          <div className="space-y-1">
+                            {f.frequencia_semanal && (
+                              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-100 text-xs font-medium text-[#374151]">
+                                <Clock className="w-3 h-3 text-[#6B7280]" />
+                                <span>{f.frequencia_semanal}</span>
+                              </div>
                             )}
-                            {!f.contato && !f.telefone && <span className="text-gray-400">-</span>}
+                            {f.layout_descricao ? (
+                              <p
+                                className="text-xs text-[#6B7280] line-clamp-2"
+                                title={f.layout_descricao}
+                              >
+                                {f.layout_descricao}
+                              </p>
+                            ) : (
+                              <span className="text-xs text-gray-400 block">
+                                Layout não descrito
+                              </span>
+                            )}
                           </div>
                         </td>
 
-                        <td className="p-3.5 text-[#6B7280] max-w-xs truncate">
-                          {f.observacoes || '-'}
+                        {/* Política de Quebras (Frente 2) */}
+                        <td className="p-3.5">
+                          {f.politica_quebras === 'troca_total' ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              Troca Total (100%)
+                            </span>
+                          ) : f.politica_quebras === 'troca_parcial' ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                              Troca Parcial
+                            </span>
+                          ) : f.politica_quebras === 'sem_troca_avaria_loja' ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-50 text-red-700 border border-red-200">
+                              Sem Troca (Loja)
+                            </span>
+                          ) : (
+                            <span className="text-xs text-gray-400">A definir</span>
+                          )}
                         </td>
 
                         <td className="p-3.5">
@@ -1204,6 +1396,30 @@ export function PromotoresFornecedoresManager({
         lojas={lojas}
         onSave={(payload) => onSaveRotinaPromotor(payload, editingRotina?.id)}
       />
+
+      {/* Visualizador de Foto do Trabalho Realizado */}
+      <Dialog
+        open={!!fotoUrlVisualizar}
+        onOpenChange={(open) => !open && setFotoUrlVisualizar(null)}
+      >
+        <DialogContent className="max-w-2xl bg-white p-4">
+          <DialogHeader>
+            <DialogTitle className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
+              <Camera className="w-4 h-4 text-[#2563EB]" />
+              <span>{fotoTituloVisualizar || 'Comprovação de Trabalho'}</span>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="mt-2 bg-neutral-900 rounded-lg p-2 flex items-center justify-center max-h-[70vh] overflow-hidden">
+            {fotoUrlVisualizar ? (
+              <img
+                src={fotoUrlVisualizar}
+                alt={fotoTituloVisualizar}
+                className="max-h-[65vh] max-w-full object-contain rounded"
+              />
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

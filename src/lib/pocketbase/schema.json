@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08T23:17:37.193Z",
+  "generatedAt": "2026-09-08T23:44:29.303Z",
   "collections": [
     {
       "name": "users",
@@ -946,6 +946,61 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "comprador_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "comprador_telefone",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "comprador_email",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "comprador_categoria",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "layout_descricao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "layout_foto",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "frequencia_semanal",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "politica_quebras",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["troca_total", "troca_parcial", "sem_troca_avaria_loja"]
+        },
+        {
+          "name": "is_exemplo",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -1187,6 +1242,79 @@
         {
           "name": "alerta_enviado_em",
           "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "foto_trabalho",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "checklist_abastecimento_100",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "checklist_validades_ok",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "checklist_layout_conforme",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quantidade_sortimento",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "perc_vendas",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "qtd_rupturas",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "itens_sem_vendas",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsavel_execucao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "validador_fiscalizacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status_fiscalizacao",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["pendente", "aprovada", "devolvida"]
+        },
+        {
+          "name": "is_exemplo",
+          "type": "bool",
           "required": false,
           "system": false
         }
