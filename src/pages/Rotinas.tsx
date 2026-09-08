@@ -352,23 +352,15 @@ export default function Rotinas() {
 
   return (
     <div className="space-y-6">
-      {/* Seção 1: Modelos do meu Segmento (Vitrine / Demonstração / Aplicação) */}
-      <ModelosSegmentoVitrine
-        userPerfil={perfil}
-        lojas={lojas}
-        clientes={clientes}
-        onRotinasAtualizadas={loadData}
-      />
-
       {/* Header Row: Título + Seletor de Loja + Ações de Gestão */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#1F2937] tracking-tight">
-            Biblioteca de Rotinas
+            Rotinas Operacionais
           </h1>
           <p className="text-sm text-[#6B7280] mt-1">
             {lojaSelecionada
-              ? `Rotinas operacionais configuradas para ${lojaSelecionada.nome}.`
+              ? `Acompanhamento e catálogo de rotinas ativas para ${lojaSelecionada.nome}.`
               : 'Gestão operacional de rotinas da loja. Cadastre, edite, exclua ou importe planilhas.'}
           </p>
         </div>
@@ -401,6 +393,14 @@ export default function Rotinas() {
           )}
         </div>
       </div>
+
+      {/* Bloco de Biblioteca de Modelos por Segmento (Inicia SEMPRE fechado/colapsado) */}
+      <ModelosSegmentoVitrine
+        userPerfil={perfil}
+        lojas={lojas}
+        clientes={clientes}
+        onRotinasAtualizadas={loadData}
+      />
 
       {/* Filter and Search Bar */}
       <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 shadow-xs space-y-3.5">
