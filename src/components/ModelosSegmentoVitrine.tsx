@@ -27,6 +27,8 @@ interface ModelosSegmentoVitrineProps {
   lojas: Loja[]
   clientes: Cliente[]
   onRotinasAtualizadas?: () => void
+  onSelectModelo?: (modelo: ModeloComContagem) => void
+  selectedModeloId?: string | null
 }
 
 const STORAGE_KEY_SEGMENTO = 'vivavarejo_vitrine_segmento'
@@ -36,12 +38,14 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
   lojas,
   clientes,
   onRotinasAtualizadas,
+  onSelectModelo,
+  selectedModeloId,
 }) => {
-  // A biblioteca deve iniciar SEMPRE fechada/colapsada em todas as visitas à tela
-  const [isAberta, setIsAberta] = useState<boolean>(false)
+  // A biblioteca volta a ficar aberta/visível normalmente na tela (revertido para como era antes da v0.0.60)
+  const [isAberta, setIsAberta] = useState<boolean>(true)
 
   // Segmento persistido no localStorage para preservar a escolha do usuário
-  // (ex.: supermercado) sem resetar ao abrir/fechar ou navegar entre telas
+  // (ex.: supermercado) sem resetar ao navegar entre telas
   const [selectedSegmento, setSelectedSegmento] = useState<string>(() => {
     try {
       return localStorage.getItem(STORAGE_KEY_SEGMENTO) || 'Supermercado/Food'
@@ -80,12 +84,12 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
     }
   }
 
-  // Carrega apenas quando o usuário optar por visualizar a biblioteca (ou se já aberta)
+  // Carrega ao montar ou quando a biblioteca estiver aberta
   useEffect(() => {
-    if (isAberta && !hasLoadedOnce) {
+    if (!hasLoadedOnce) {
       carregarModelos()
     }
-  }, [isAberta, hasLoadedOnce])
+  }, [hasLoadedOnce])
 
   const handleSelectSegmento = (seg: string) => {
     setSelectedSegmento(seg)
@@ -106,6 +110,9 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
   })
 
   const handleActionAplicar = (modelo: ModeloComContagem) => {
+    if (onSelectModelo) {
+      onSelectModelo(modelo)
+    }
     if (podeAplicarDeFato) {
       setAplicarModal({ open: true, modeloId: modelo.id })
     } else {
@@ -115,6 +122,13 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
         assunto: `Interesse em liberar e aplicar na minha rede o modelo "${modelo.nome}"`,
       })
     }
+  }
+
+  const handleVisualizarRotinas = (modelo: ModeloComContagem) => {
+    if (onSelectModelo) {
+      onSelectModelo(modelo)
+    }
+    setDetalhesModelo(modelo)
   }
 
   return (
@@ -290,15 +304,18 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
                         {modelo.descricao || 'Padrão completo de rotinas operacionais.'}
                       </p>
                     </div>
-
                     {/* Footer do Card com Ações */}
                     <div className="pt-3 mt-3 border-t border-[#E5E7EB]/80 flex items-center justify-between gap-2">
                       <button
                         type="button"
-                        onClick={() => setDetalhesModelo(modelo)}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-[#4B5563] hover:text-[#1F2937] hover:bg-gray-100 rounded transition-colors"
+                        onClick={() => handleVisualizarRotinas(modelo)}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded transition-colors ${
+                          selectedModeloId === modelo.id
+                            ? 'bg-[#2563EB] text-white'
+                            : 'text-[#4B5563] hover:text-[#1F2937] hover:bg-gray-100'
+                        }`}
                       >
-                        <Eye className="w-3.5 h-3.5 text-[#6B7280]" />
+                        <Eye className="w-3.5 h-3.5" />
                         <span>Visualizar Rotinas</span>
                       </button>
 
@@ -318,11 +335,11 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
                           className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-[#2563EB] bg-blue-50 hover:bg-blue-100/80 border border-blue-200 rounded transition-colors"
                           title="Demonstração — Fale com o especialista para liberar acesso ADM para sua rede"
                         >
-                          <Sparkles className="w-3 h-3" />
+                          <Sparkles className="w-3.5 h-3.5" />
                           <span>Liberar na Rede</span>
                         </button>
                       )}
-                    </div>
+                    </div>{' '}
                   </div>
                 )
               })}
@@ -369,6 +386,10 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
           onClose={() => setAplicarModal({ open: false })}
           onSuccess={() => {
             setAplicarModal({ open: false })
+            if (aplicarModal.modeloId && onSelectModelo) {
+              const mod = modelos.find((m) => m.id === aplicarModal.modeloId)
+              if (mod) onSelectModelo(mod)
+            }
             if (onRotinasAtualizadas) {
               onRotinasAtualizadas()
             }

@@ -13,7 +13,8 @@ import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
 import { BotaoAvisoWhatsApp } from '@/components/BotaoAvisoWhatsApp'
 import { ModelosSegmentoVitrine } from '@/components/ModelosSegmentoVitrine'
 import { clientesService } from '@/services/clientes'
-import type { Cliente } from '@/types'
+import { funcoesService } from '@/services/funcoes'
+import type { Cliente, Funcao, ModeloComContagem } from '@/types'
 import {
   Search,
   Filter,
@@ -35,6 +36,10 @@ import {
   Store,
   Camera,
   Phone,
+  Briefcase,
+  ChevronDown,
+  ChevronUp,
+  Sparkles,
 } from 'lucide-react'
 
 export default function Rotinas() {
@@ -46,6 +51,7 @@ export default function Rotinas() {
   const [rotinas, setRotinas] = useState<Rotina[]>([])
   const [execucoes, setExecucoes] = useState<ExecucaoRotina[]>([])
   const [clientes, setClientes] = useState<Cliente[]>([])
+  const [funcoesLoja, setFuncoesLoja] = useState<Funcao[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -58,6 +64,19 @@ export default function Rotinas() {
     rotina?: Rotina
   } | null>(null)
 
+  // Controle da seção recolhível de Departamentos e Funções (inicia recolhida para poupar espaço no mobile)
+  const [departamentosAberto, setDepartamentosAberto] = useState<boolean>(false)
+
+  // Controle de escolha do modelo na biblioteca para exibir rotinas
+  const [modeloSelecionado, setModeloSelecionado] = useState<ModeloComContagem | null>(() => {
+    try {
+      const saved = localStorage.getItem('vivavarejo_rotinas_modelo_ativo')
+      return saved ? JSON.parse(saved) : null
+    } catch {
+      return null
+    }
+  })
+
   // Modais de CRUD e Importação
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
   const [editingRotina, setEditingRotina] = useState<Rotina | null>(null)
@@ -68,14 +87,19 @@ export default function Rotinas() {
     if (!user) return
     setError(false)
     try {
-      const [allRoutines, todayExecs, allClientes] = await Promise.all([
+      const [allRoutines, todayExecs, allClientes, funcs] = await Promise.all([
         rotinasService.getAll(lojaSelecionadaId),
         execucoesService.getTodayExecutions(user.id),
         clientesService.getAll().catch(() => [] as Cliente[]),
+        (lojaSelecionadaId && lojaSelecionadaId !== 'todas'
+          ? funcoesService.getByLoja(lojaSelecionadaId)
+          : funcoesService.getAll()
+        ).catch(() => [] as Funcao[]),
       ])
       setRotinas(allRoutines)
       setExecucoes(todayExecs)
       setClientes(allClientes)
+      setFuncoesLoja(funcs)
     } catch {
       setError(true)
     } finally {
@@ -394,309 +418,510 @@ export default function Rotinas() {
         </div>
       </div>
 
-      {/* Bloco de Biblioteca de Modelos por Segmento (Inicia SEMPRE fechado/colapsado) */}
+      {/* Bloco de Biblioteca de Modelos por Segmento (Revertido: volta a ficar aberta normalmente) */}
       <ModelosSegmentoVitrine
         userPerfil={perfil}
         lojas={lojas}
         clientes={clientes}
         onRotinasAtualizadas={loadData}
+        onSelectModelo={(mod) => {
+          setModeloSelecionado(mod)
+          try {
+            localStorage.setItem('vivavarejo_rotinas_modelo_ativo', JSON.stringify(mod))
+          } catch {
+            // noop
+          }
+        }}
+        selectedModeloId={modeloSelecionado?.id || null}
       />
 
-      {/* Filter and Search Bar */}
-      <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 shadow-xs space-y-3.5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          {/* Search Input */}
-          <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar por rotina, responsável, área..."
-              className="w-full pl-9 pr-8 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937] placeholder:text-gray-400"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
+      {/* Seção de Departamentos e Funções (Inicia RECOLHIDA — barra/botão compacto min-h 40px) */}
+      <div className="bg-white border border-[#E5E7EB] rounded-lg shadow-xs overflow-hidden transition-all">
+        <div className="p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-md bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0">
+              <Briefcase className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-xs sm:text-sm font-bold text-[#1F2937]">
+                  Departamentos e Funções
+                </h2>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-gray-100 text-[#4B5563]">
+                  {availableAreas.length} departamentos • {funcoesLoja.length} funções
+                </span>
+              </div>
+              <p className="text-[11px] text-[#6B7280] truncate">
+                {departamentosAberto
+                  ? 'Mapeamento de áreas de atuação e cargos vinculados à operação.'
+                  : 'Visão departamental e cargos operacionais da loja.'}
+              </p>
+            </div>
           </div>
 
-          <span className="text-xs text-[#6B7280]">
-            Exibindo <strong>{filteredRotinas.length}</strong> de {rotinas.length} rotinas
-          </span>
+          <button
+            type="button"
+            onClick={() => setDepartamentosAberto((prev) => !prev)}
+            aria-expanded={departamentosAberto}
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[40px] text-xs font-semibold rounded-md border border-[#E5E7EB] bg-white hover:bg-gray-50 active:bg-gray-100 text-[#374151] transition-colors shadow-2xs self-stretch sm:self-auto"
+          >
+            {departamentosAberto ? (
+              <>
+                <ChevronUp className="w-3.5 h-3.5 text-[#6B7280]" />
+                <span>Ocultar departamentos e funções</span>
+              </>
+            ) : (
+              <>
+                <ChevronDown className="w-3.5 h-3.5 text-[#6B7280]" />
+                <span>Visualizar departamentos e funções</span>
+              </>
+            )}
+          </button>
         </div>
 
-        {/* Filter Chips Bar */}
-        <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
-          {/* Frequency filters */}
-          <div className="flex items-center gap-2 flex-wrap text-xs">
-            <span className="font-semibold text-[#4B5563] flex items-center gap-1 mr-1">
-              <Filter className="w-3.5 h-3.5" />
-              Frequência:
-            </span>
-            {frequencyFilters.map((freq) => {
-              const active = selectedFreq === freq
-              return (
-                <button
-                  key={freq}
-                  onClick={() => setSelectedFreq(freq)}
-                  className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-all duration-200 ${
-                    active
-                      ? 'bg-[#2563EB] text-white border-[#2563EB] shadow-xs'
-                      : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:border-gray-400 hover:text-[#1F2937]'
-                  }`}
-                >
-                  {freq}
-                </button>
-              )
-            })}
+        {/* Conteúdo Expansível: só renderiza quando o usuário clica para abrir */}
+        {departamentosAberto && (
+          <div className="px-3.5 pb-4 pt-2 border-t border-[#E5E7EB] bg-[#F7F7F5]/30 space-y-3.5 animate-fade-in">
+            {/* Departamentos / Áreas */}
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563] block mb-2">
+                Departamentos / Setores Mapeados ({availableAreas.length})
+              </span>
+              {availableAreas.length === 0 ? (
+                <p className="text-xs text-[#9CA3AF] italic">
+                  Nenhum departamento identificado nas rotinas cadastradas.
+                </p>
+              ) : (
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {availableAreas.map((area) => (
+                    <button
+                      key={area}
+                      type="button"
+                      onClick={() => {
+                        setSelectedArea(selectedArea === area ? 'Todas' : area)
+                      }}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
+                        selectedArea === area
+                          ? 'bg-[#2563EB] text-white border-[#2563EB]'
+                          : 'bg-white text-[#374151] border-[#E5E7EB] hover:border-gray-400'
+                      }`}
+                      title={`Filtrar rotinas pelo departamento ${area}`}
+                    >
+                      <span>{area}</span>
+                      <span className="text-[10px] opacity-75">
+                        (
+                        {
+                          rotinas.filter(
+                            (r) =>
+                              (r.area && r.area.trim() === area) ||
+                              (!r.area && r.responsavel && r.responsavel.trim() === area),
+                          ).length
+                        }
+                        )
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Funções / Cargos Operacionais */}
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563] block mb-2">
+                Funções e Cargos Cadastrados ({funcoesLoja.length})
+              </span>
+              {funcoesLoja.length === 0 ? (
+                <p className="text-xs text-[#9CA3AF] italic">
+                  Nenhuma função específica vinculada a esta loja ainda.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                  {funcoesLoja.map((f) => (
+                    <div
+                      key={f.id}
+                      className="p-2 bg-white border border-[#E5E7EB] rounded-md text-xs flex items-center justify-between gap-2 shadow-2xs"
+                    >
+                      <div className="min-w-0">
+                        <span className="font-semibold text-[#1F2937] block truncate">
+                          {f.nome}
+                        </span>
+                        {f.telefone && (
+                          <span className="text-[11px] text-[#6B7280] font-mono block truncate">
+                            WhatsApp: {f.telefone}
+                          </span>
+                        )}
+                      </div>
+                      {f.chefe_imediato_funcao && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-[#2563EB] border border-blue-100 shrink-0">
+                          Subordinado
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Fluxo das Rotinas: Só aparece após o usuário escolher um modelo na Biblioteca */}
+      {!modeloSelecionado ? (
+        <div className="p-8 sm:p-10 text-center bg-white border border-dashed border-[#E5E7EB] rounded-xl space-y-3 shadow-xs animate-fade-in">
+          <div className="w-12 h-12 rounded-full bg-blue-50 text-[#2563EB] mx-auto flex items-center justify-center">
+            <Sparkles className="w-6 h-6" />
+          </div>
+          <div className="max-w-md mx-auto space-y-1">
+            <h3 className="text-sm sm:text-base font-bold text-[#1F2937]">
+              Nenhum modelo de rotinas selecionado
+            </h3>
+            <p className="text-xs sm:text-sm text-[#6B7280] leading-relaxed">
+              Escolha um modelo na Biblioteca de Modelos acima para carregar as rotinas da sua loja.
+            </p>
+          </div>
+          <p className="text-[11px] text-[#9CA3AF]">
+            Clique em <strong>Visualizar Rotinas</strong> ou <strong>Aplicar na Loja</strong> em
+            qualquer modelo para liberar o checklist operacional abaixo.
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Barra indicadora do modelo atualmente ativo com opção de trocar */}
+          <div className="bg-blue-50/70 border border-blue-200/80 rounded-lg p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-md bg-[#2563EB] text-white flex items-center justify-center shrink-0">
+                <Check className="w-4 h-4 stroke-[2.5]" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-bold text-[#1F2937] truncate">
+                    Rotinas ativas: {modeloSelecionado.nome}
+                  </span>
+                  {modeloSelecionado.segmento && (
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-100 text-[#2563EB]">
+                      {modeloSelecionado.segmento}
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-[#4B5563] truncate">
+                  {filteredRotinas.length} rotinas operacionais disponíveis no catálogo.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setModeloSelecionado(null)
+                try {
+                  localStorage.removeItem('vivavarejo_rotinas_modelo_ativo')
+                } catch {
+                  // noop
+                }
+              }}
+              className="inline-flex items-center gap-1 text-xs text-[#2563EB] hover:text-[#1D4ED8] font-semibold underline self-start sm:self-auto shrink-0"
+            >
+              <span>Escolher outro modelo</span>
+            </button>
           </div>
 
-          {/* Area filters */}
-          {availableAreas.length > 0 && (
-            <div className="flex items-center gap-1.5 flex-wrap text-xs pt-1">
-              <span className="font-semibold text-[#4B5563] mr-1">Área:</span>
-              <button
-                onClick={() => setSelectedArea('Todas')}
-                className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all duration-200 ${
-                  selectedArea === 'Todas'
-                    ? 'bg-[#2563EB] text-white border-[#2563EB]'
-                    : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:border-gray-400 hover:text-[#1F2937]'
-                }`}
-              >
-                Todas
-              </button>
-              {availableAreas.map((area) => {
-                const active = selectedArea === area
-                return (
+          {/* Filter and Search Bar */}
+          <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 shadow-xs space-y-3.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              {/* Search Input */}
+              <div className="relative w-full sm:w-80">
+                <Search className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Buscar por rotina, responsável, área..."
+                  className="w-full pl-9 pr-8 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937] placeholder:text-gray-400"
+                />
+                {searchTerm && (
                   <button
-                    key={area}
-                    onClick={() => setSelectedArea(area)}
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              <span className="text-xs text-[#6B7280]">
+                Exibindo <strong>{filteredRotinas.length}</strong> de {rotinas.length} rotinas
+              </span>
+            </div>
+
+            {/* Filter Chips Bar */}
+            <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
+              {/* Frequency filters */}
+              <div className="flex items-center gap-2 flex-wrap text-xs">
+                <span className="font-semibold text-[#4B5563] flex items-center gap-1 mr-1">
+                  <Filter className="w-3.5 h-3.5" />
+                  Frequência:
+                </span>
+                {frequencyFilters.map((freq) => {
+                  const active = selectedFreq === freq
+                  return (
+                    <button
+                      key={freq}
+                      onClick={() => setSelectedFreq(freq)}
+                      className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-all duration-200 ${
+                        active
+                          ? 'bg-[#2563EB] text-white border-[#2563EB] shadow-xs'
+                          : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:border-gray-400 hover:text-[#1F2937]'
+                      }`}
+                    >
+                      {freq}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Area filters */}
+              {availableAreas.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap text-xs pt-1">
+                  <span className="font-semibold text-[#4B5563] mr-1">Área:</span>
+                  <button
+                    onClick={() => setSelectedArea('Todas')}
                     className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all duration-200 ${
-                      active
+                      selectedArea === 'Todas'
                         ? 'bg-[#2563EB] text-white border-[#2563EB]'
                         : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:border-gray-400 hover:text-[#1F2937]'
                     }`}
                   >
-                    {area}
+                    Todas
                   </button>
+                  {availableAreas.map((area) => {
+                    const active = selectedArea === area
+                    return (
+                      <button
+                        key={area}
+                        onClick={() => setSelectedArea(area)}
+                        className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all duration-200 ${
+                          active
+                            ? 'bg-[#2563EB] text-white border-[#2563EB]'
+                            : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:border-gray-400 hover:text-[#1F2937]'
+                        }`}
+                      >
+                        {area}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Routine Cards Grid */}
+          {filteredRotinas.length === 0 ? (
+            <div className="p-10 text-center bg-white border border-[#E5E7EB] rounded-lg space-y-3">
+              <AlertCircle className="w-8 h-8 text-[#9CA3AF] mx-auto" />
+              <p className="text-sm text-[#4B5563] font-medium">
+                Nenhuma rotina encontrada com esses critérios.
+              </p>
+              <button
+                onClick={clearFilters}
+                className="px-4 py-2 text-xs font-semibold bg-[#F7F7F5] border border-[#E5E7EB] text-[#1F2937] hover:bg-gray-100 rounded-md transition-colors"
+              >
+                Limpar filtros
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredRotinas.map((rotina) => {
+                const isDone = completionMap.has(rotina.id)
+                const status = getHorarioStatus(rotina.horario_limite, isDone)
+                const pastDue = status.isAtrasada
+
+                return (
+                  <div
+                    key={rotina.id}
+                    className={`bg-white border rounded-lg p-4 flex flex-col justify-between shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+                      isDone
+                        ? 'opacity-70 border-[#E5E7EB] bg-gray-50/50'
+                        : pastDue
+                          ? 'border-red-300 bg-red-50/10'
+                          : 'border-[#E5E7EB] hover:border-[#2563EB]/50'
+                    }`}
+                  >
+                    <div>
+                      {/* Top Bar: Name + Badges + Edit/Delete quick buttons */}
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <h3
+                          className={`font-bold text-base leading-snug cursor-pointer hover:text-[#2563EB] transition-colors flex-1 ${
+                            isDone ? 'line-through text-[#6B7280]' : 'text-[#1F2937]'
+                          }`}
+                          onClick={() => setSelectedRotina(rotina)}
+                        >
+                          {rotina.nome}
+                        </h3>
+
+                        {podeGerenciar && (
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              onClick={() => handleOpenEdit(rotina)}
+                              className="p-1 text-[#9CA3AF] hover:text-[#2563EB] rounded transition-colors"
+                              title="Editar rotina"
+                              aria-label={`Editar ${rotina.nome}`}
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => setDeleteConfirmId(rotina.id)}
+                              className="p-1 text-[#9CA3AF] hover:text-[#B91C1C] rounded transition-colors"
+                              title="Excluir rotina"
+                              aria-label={`Excluir ${rotina.nome}`}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Status do Horário Limite e Botão WhatsApp */}
+                      <div className="mb-2.5 flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {!isDone && pastDue && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold bg-red-100 text-[#B91C1C] rounded border border-red-200">
+                              <AlertTriangle className="w-3.5 h-3.5" />
+                              <span>
+                                ATRASADA ({status.normalizedHorario || rotina.horario_limite})
+                              </span>
+                            </span>
+                          )}
+                          {!isDone && !pastDue && status.hasHorario && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-[#2563EB]/10 text-[#2563EB] rounded border border-[#2563EB]/20">
+                              <Clock className="w-3.5 h-3.5" />
+                              <span>{status.displayLabel}</span>
+                            </span>
+                          )}
+                          {!isDone && status.isIntegral && (
+                            <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 text-[#4B5563] rounded border border-gray-200">
+                              Integral (dia todo)
+                            </span>
+                          )}
+                          {isDone && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded border border-emerald-200">
+                              <Check className="w-3.5 h-3.5" />
+                              <span>Concluída hoje</span>
+                            </span>
+                          )}
+                        </div>
+                        {/* Botão Avisar por WhatsApp quando não concluída */}
+                        {!isDone && (pastDue || status.hasHorario) && (
+                          <BotaoAvisoWhatsApp
+                            lojaNome={rotina.expand?.loja?.nome}
+                            tarefaTitulo={rotina.nome}
+                            setor={rotina.area || 'Operação Loja'}
+                            horario={status.normalizedHorario || rotina.horario_limite}
+                            situacao={pastDue ? 'Atrasada' : 'Pendente (próxima do horário)'}
+                            telefoneResponsavel={
+                              rotina.telefone_responsavel || rotina.expand?.funcao?.telefone
+                            }
+                            telefoneChefe={
+                              rotina.telefone_chefe ||
+                              rotina.expand?.funcao?.expand?.chefe_imediato_funcao?.telefone
+                            }
+                            nomeResponsavel={rotina.responsavel}
+                            nomeChefe={rotina.expand?.funcao?.expand?.chefe_imediato_funcao?.nome}
+                            compact
+                          />
+                        )}
+
+                        {isDone && completionMap.get(rotina.id)?.foto && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              const exec = completionMap.get(rotina.id)
+                              if (exec) {
+                                setVisualizarFotoExecucao({ execucao: exec, rotina })
+                              }
+                            }}
+                            className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold bg-blue-50 text-[#2563EB] rounded border border-blue-200 hover:bg-blue-100 transition-colors"
+                            title="Ver foto de comprovação"
+                          >
+                            <Camera className="w-3 h-3" />
+                            <span>Foto</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Metadata Chips */}
+                      <div className="flex items-center gap-1.5 flex-wrap mb-3 text-xs">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#F7F7F5] border border-[#E5E7EB] text-[#4B5563]">
+                          <User className="w-3 h-3 text-[#9CA3AF]" />
+                          <span>{rotina.responsavel}</span>
+                        </span>
+
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#F7F7F5] border border-[#E5E7EB] text-[#4B5563]">
+                          <span>{rotina.frequencia}</span>
+                        </span>
+
+                        {rotina.area && (
+                          <span className="inline-block px-2 py-0.5 rounded bg-gray-100 text-[#4B5563] text-[11px]">
+                            {rotina.area}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Details Lines */}
+                      <div className="space-y-1 text-xs text-[#6B7280] mb-4">
+                        {rotina.ferramenta && (
+                          <div className="flex items-start gap-1.5">
+                            <Wrench className="w-3.5 h-3.5 text-[#9CA3AF] shrink-0 mt-0.5" />
+                            <span className="text-[#6B7280]">Ferramenta:</span>
+                            <span className="text-[#374151] font-medium truncate">
+                              {rotina.ferramenta}
+                            </span>
+                          </div>
+                        )}
+                        {rotina.validacao && (
+                          <div className="flex items-start gap-1.5">
+                            <ShieldCheck className="w-3.5 h-3.5 text-[#9CA3AF] shrink-0 mt-0.5" />
+                            <span className="text-[#6B7280]">Validação:</span>
+                            <span className="text-[#374151] font-medium truncate">
+                              {rotina.validacao}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Bottom Action Row */}
+                    <div className="pt-3 border-t border-[#E5E7EB] flex items-center justify-between">
+                      <button
+                        onClick={() => setSelectedRotina(rotina)}
+                        className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-1 group transition-colors"
+                      >
+                        <span>Ver detalhes</span>
+                        <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </button>
+
+                      <button
+                        onClick={() => handleToggle(rotina.id)}
+                        disabled={submittingId === rotina.id}
+                        title={isDone ? 'Desmarcar conclusão' : 'Marcar conclusão hoje'}
+                        aria-label={`Marcar ${rotina.nome}`}
+                        className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-150 transform active:scale-90 ${
+                          isDone
+                            ? 'bg-[#2563EB] border-[#2563EB] text-white'
+                            : pastDue
+                              ? 'border-red-400 hover:border-red-600 text-transparent hover:text-red-400 bg-white'
+                              : 'border-[#D1D5DB] hover:border-[#2563EB] text-transparent hover:text-gray-300 bg-white'
+                        }`}
+                      >
+                        <Check className="w-4 h-4 stroke-[2.5]" />
+                      </button>
+                    </div>
+                  </div>
                 )
               })}
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Routine Cards Grid */}
-      {filteredRotinas.length === 0 ? (
-        <div className="p-10 text-center bg-white border border-[#E5E7EB] rounded-lg space-y-3">
-          <AlertCircle className="w-8 h-8 text-[#9CA3AF] mx-auto" />
-          <p className="text-sm text-[#4B5563] font-medium">
-            Nenhuma rotina encontrada com esses critérios.
-          </p>
-          <button
-            onClick={clearFilters}
-            className="px-4 py-2 text-xs font-semibold bg-[#F7F7F5] border border-[#E5E7EB] text-[#1F2937] hover:bg-gray-100 rounded-md transition-colors"
-          >
-            Limpar filtros
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredRotinas.map((rotina) => {
-            const isDone = completionMap.has(rotina.id)
-            const status = getHorarioStatus(rotina.horario_limite, isDone)
-            const pastDue = status.isAtrasada
-
-            return (
-              <div
-                key={rotina.id}
-                className={`bg-white border rounded-lg p-4 flex flex-col justify-between shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
-                  isDone
-                    ? 'opacity-70 border-[#E5E7EB] bg-gray-50/50'
-                    : pastDue
-                      ? 'border-red-300 bg-red-50/10'
-                      : 'border-[#E5E7EB] hover:border-[#2563EB]/50'
-                }`}
-              >
-                <div>
-                  {/* Top Bar: Name + Badges + Edit/Delete quick buttons */}
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <h3
-                      className={`font-bold text-base leading-snug cursor-pointer hover:text-[#2563EB] transition-colors flex-1 ${
-                        isDone ? 'line-through text-[#6B7280]' : 'text-[#1F2937]'
-                      }`}
-                      onClick={() => setSelectedRotina(rotina)}
-                    >
-                      {rotina.nome}
-                    </h3>
-
-                    {podeGerenciar && (
-                      <div className="flex items-center gap-1 shrink-0">
-                        <button
-                          onClick={() => handleOpenEdit(rotina)}
-                          className="p-1 text-[#9CA3AF] hover:text-[#2563EB] rounded transition-colors"
-                          title="Editar rotina"
-                          aria-label={`Editar ${rotina.nome}`}
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => setDeleteConfirmId(rotina.id)}
-                          className="p-1 text-[#9CA3AF] hover:text-[#B91C1C] rounded transition-colors"
-                          title="Excluir rotina"
-                          aria-label={`Excluir ${rotina.nome}`}
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Status do Horário Limite e Botão WhatsApp */}
-                  <div className="mb-2.5 flex items-center justify-between gap-2 flex-wrap">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {!isDone && pastDue && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold bg-red-100 text-[#B91C1C] rounded border border-red-200">
-                          <AlertTriangle className="w-3.5 h-3.5" />
-                          <span>
-                            ATRASADA ({status.normalizedHorario || rotina.horario_limite})
-                          </span>
-                        </span>
-                      )}
-                      {!isDone && !pastDue && status.hasHorario && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-[#2563EB]/10 text-[#2563EB] rounded border border-[#2563EB]/20">
-                          <Clock className="w-3.5 h-3.5" />
-                          <span>{status.displayLabel}</span>
-                        </span>
-                      )}
-                      {!isDone && status.isIntegral && (
-                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 text-[#4B5563] rounded border border-gray-200">
-                          Integral (dia todo)
-                        </span>
-                      )}
-                      {isDone && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded border border-emerald-200">
-                          <Check className="w-3.5 h-3.5" />
-                          <span>Concluída hoje</span>
-                        </span>
-                      )}
-                    </div>
-                    {/* Botão Avisar por WhatsApp quando não concluída */}
-                    {!isDone && (pastDue || status.hasHorario) && (
-                      <BotaoAvisoWhatsApp
-                        lojaNome={rotina.expand?.loja?.nome}
-                        tarefaTitulo={rotina.nome}
-                        setor={rotina.area || 'Operação Loja'}
-                        horario={status.normalizedHorario || rotina.horario_limite}
-                        situacao={pastDue ? 'Atrasada' : 'Pendente (próxima do horário)'}
-                        telefoneResponsavel={
-                          rotina.telefone_responsavel || rotina.expand?.funcao?.telefone
-                        }
-                        telefoneChefe={
-                          rotina.telefone_chefe ||
-                          rotina.expand?.funcao?.expand?.chefe_imediato_funcao?.telefone
-                        }
-                        nomeResponsavel={rotina.responsavel}
-                        nomeChefe={rotina.expand?.funcao?.expand?.chefe_imediato_funcao?.nome}
-                        compact
-                      />
-                    )}
-
-                    {isDone && completionMap.get(rotina.id)?.foto && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          const exec = completionMap.get(rotina.id)
-                          if (exec) {
-                            setVisualizarFotoExecucao({ execucao: exec, rotina })
-                          }
-                        }}
-                        className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold bg-blue-50 text-[#2563EB] rounded border border-blue-200 hover:bg-blue-100 transition-colors"
-                        title="Ver foto de comprovação"
-                      >
-                        <Camera className="w-3 h-3" />
-                        <span>Foto</span>
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Metadata Chips */}
-                  <div className="flex items-center gap-1.5 flex-wrap mb-3 text-xs">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#F7F7F5] border border-[#E5E7EB] text-[#4B5563]">
-                      <User className="w-3 h-3 text-[#9CA3AF]" />
-                      <span>{rotina.responsavel}</span>
-                    </span>
-
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#F7F7F5] border border-[#E5E7EB] text-[#4B5563]">
-                      <span>{rotina.frequencia}</span>
-                    </span>
-
-                    {rotina.area && (
-                      <span className="inline-block px-2 py-0.5 rounded bg-gray-100 text-[#4B5563] text-[11px]">
-                        {rotina.area}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Details Lines */}
-                  <div className="space-y-1 text-xs text-[#6B7280] mb-4">
-                    {rotina.ferramenta && (
-                      <div className="flex items-start gap-1.5">
-                        <Wrench className="w-3.5 h-3.5 text-[#9CA3AF] shrink-0 mt-0.5" />
-                        <span className="text-[#6B7280]">Ferramenta:</span>
-                        <span className="text-[#374151] font-medium truncate">
-                          {rotina.ferramenta}
-                        </span>
-                      </div>
-                    )}
-                    {rotina.validacao && (
-                      <div className="flex items-start gap-1.5">
-                        <ShieldCheck className="w-3.5 h-3.5 text-[#9CA3AF] shrink-0 mt-0.5" />
-                        <span className="text-[#6B7280]">Validação:</span>
-                        <span className="text-[#374151] font-medium truncate">
-                          {rotina.validacao}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Bottom Action Row */}
-                <div className="pt-3 border-t border-[#E5E7EB] flex items-center justify-between">
-                  <button
-                    onClick={() => setSelectedRotina(rotina)}
-                    className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-1 group transition-colors"
-                  >
-                    <span>Ver detalhes</span>
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                  </button>
-
-                  <button
-                    onClick={() => handleToggle(rotina.id)}
-                    disabled={submittingId === rotina.id}
-                    title={isDone ? 'Desmarcar conclusão' : 'Marcar conclusão hoje'}
-                    aria-label={`Marcar ${rotina.nome}`}
-                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-150 transform active:scale-90 ${
-                      isDone
-                        ? 'bg-[#2563EB] border-[#2563EB] text-white'
-                        : pastDue
-                          ? 'border-red-400 hover:border-red-600 text-transparent hover:text-red-400 bg-white'
-                          : 'border-[#D1D5DB] hover:border-[#2563EB] text-transparent hover:text-gray-300 bg-white'
-                    }`}
-                  >
-                    <Check className="w-4 h-4 stroke-[2.5]" />
-                  </button>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+        </>
       )}
 
       {/* Routine Detail Modal */}
