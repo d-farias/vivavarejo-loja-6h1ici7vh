@@ -179,6 +179,8 @@ export default function Rotinas() {
   const [rotinasModelo, setRotinasModelo] = useState<Rotina[]>([])
   const [loadingModeloRotinas, setLoadingModeloRotinas] = useState<boolean>(false)
 
+  // Quando modeloSelecionado muda, limpa imediatamente qualquer resquício antigo
+  // para evitar exibição temporária de rotinas do modelo anterior
   useEffect(() => {
     if (!modeloSelecionado) {
       setRotinasModelo([])
@@ -186,6 +188,8 @@ export default function Rotinas() {
     }
 
     let isMounted = true
+    // Reseta imediatamente ao trocar de modelo para não mesclar dados
+    setRotinasModelo([])
     setLoadingModeloRotinas(true)
 
     const carregarRotinasDoModelo = async () => {
@@ -194,23 +198,29 @@ export default function Rotinas() {
         const itensModelo = await modelosRotinasService.getItens(modeloSelecionado.id)
         if (!isMounted) return
 
-        // 2. Mapeia para Rotina para que a interface exiba imediatamente as rotinas do novo modelo
-        // Se a loja tiver rotinas cadastradas/aplicadas correspondentes, reconciliamos os IDs e execuções
+        // 2. Mapeia para Rotina EXCLUSIVAMENTE a partir dos itens do modelo selecionado
+        // Importante: NÃO fazer match frouxo por nome contra a coleção global de rotinas da loja
+        // porque a loja de teste pode conter rotinas legadas de supermercado que colidiriam de forma errônea.
+        // Se a rotina do modelo já foi aplicada nesta loja específica, reconcilia apenas se for exata para a loja selecionada.
         const rotinasMapeadas: Rotina[] = itensModelo.map((item, index) => {
-          // Busca se já existe uma rotina na loja com mesmo nome e horário para preservar ID real da loja
-          const correspondente = rotinas.find(
-            (r) =>
-              r.nome.trim().toLowerCase() === item.nome.trim().toLowerCase() ||
-              (item.horario_limite &&
-                r.horario_limite?.trim() === item.horario_limite.trim() &&
-                r.nome.toLowerCase().includes(item.nome.toLowerCase().slice(0, 15))),
-          )
+          // Só busca correspondente se pertencer à loja específica selecionada
+          const correspondente =
+            lojaSelecionadaId && lojaSelecionadaId !== 'todas'
+              ? rotinas.find(
+                  (r) =>
+                    r.loja === lojaSelecionadaId &&
+                    r.nome.trim().toLowerCase() === item.nome.trim().toLowerCase() &&
+                    (item.horario_limite
+                      ? r.horario_limite?.trim() === item.horario_limite.trim()
+                      : true),
+                )
+              : undefined
 
           if (correspondente) {
             return correspondente
           }
 
-          // Caso ainda não tenha sido aplicada no banco como rotina individual da loja, gera objeto de exibição completo
+          // Gera objeto de rotina dinâmico pertencente 100% ao modelo selecionado
           const pseudoId = `mod-${modeloSelecionado.id}-${item.id || index}`
           return {
             id: pseudoId,
@@ -251,13 +261,13 @@ export default function Rotinas() {
   }, [modeloSelecionado, rotinas, lojaSelecionadaId])
 
   // Rotinas base para a listagem: quando há um modelo selecionado, exibe as rotinas desse modelo;
-  // se não houver modelo (neutro), usa a listagem padrão da loja.
+  // se não houver modelo (neutro), não exibe rotinas (estado neutro aguardando escolha na biblioteca).
   const rotinasExibicao = useMemo(() => {
-    if (!modeloSelecionado) return rotinas
+    if (!modeloSelecionado) return []
     return rotinasModelo
-  }, [modeloSelecionado, rotinasModelo, rotinas])
+  }, [modeloSelecionado, rotinasModelo])
 
-  // Extract unique areas from currently displayed routines (adapta-se ao modelo escolhido)
+  // Extract unique areas/departamentos das rotinas do modelo selecionado (zero vestígio de outros segmentos)
   const availableAreas = useMemo(() => {
     const areas = new Set<string>()
     rotinasExibicao.forEach((r) => {
@@ -266,6 +276,42 @@ export default function Rotinas() {
     })
     return Array.from(areas).sort()
   }, [rotinasExibicao])
+
+  // Deriva dinamicamente as funções/cargos correspondentes ao modelo selecionado:
+  // 1) Se um modelo estiver selecionado, extrai os responsáveis/funções presentes nas rotinas desse modelo
+  //    e enriquece com dados existentes em funcoesLoja (como telefone e subordinação) se houver match.
+  // 2) Se nenhum modelo estiver selecionado, não exibe funções legadas de supermercado.
+  const funcoesExibicao = useMemo(() => {
+    if (!modeloSelecionado) return []
+
+    const funcoesMap = new Map<string, Funcao>()
+
+    // Para cada rotina do modelo selecionado, extrai o cargo/responsável
+    rotinasExibicao.forEach((r) => {
+      const nomeResp = (r.responsavel || '').trim()
+      if (!nomeResp) return
+
+      const chave = nomeResp.toLowerCase()
+      if (!funcoesMap.has(chave)) {
+        // Tenta encontrar cadastro prévio na loja com dados de telefone/chefe
+        const existente = funcoesLoja.find((f) => f.nome.trim().toLowerCase() === chave)
+
+        funcoesMap.set(chave, {
+          id: existente?.id || `func-mod-${chave}`,
+          collectionId: 'funcoes',
+          collectionName: 'funcoes',
+          created: existente?.created || new Date().toISOString(),
+          updated: existente?.updated || new Date().toISOString(),
+          nome: existente?.nome || nomeResp,
+          telefone: existente?.telefone || '',
+          chefe_imediato_funcao: existente?.chefe_imediato_funcao || '',
+          loja: lojaSelecionadaId && lojaSelecionadaId !== 'todas' ? lojaSelecionadaId : '',
+        } as Funcao)
+      }
+    })
+
+    return Array.from(funcoesMap.values()).sort((a, b) => a.nome.localeCompare(b.nome))
+  }, [modeloSelecionado, rotinasExibicao, funcoesLoja, lojaSelecionadaId])
 
   const frequencyFilters = ['Todas', 'Diária', 'Semanal', 'Conforme demanda']
 
@@ -591,6 +637,10 @@ export default function Rotinas() {
           }
         }}
         onSelectModelo={(mod) => {
+          // Ao selecionar um modelo, resetamos os filtros para não manter filtro de área do modelo anterior
+          setSelectedArea('Todas')
+          setSelectedFreq('Todas')
+          setSearchTerm('')
           setModeloSelecionado(mod)
           // Rola suavemente até o catálogo de rotinas caso o usuário esteja em celular
           setTimeout(() => {
@@ -615,14 +665,21 @@ export default function Rotinas() {
                 <h2 className="text-xs sm:text-sm font-bold text-[#1F2937]">
                   Departamentos e Funções
                 </h2>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-gray-100 text-[#4B5563]">
-                  {availableAreas.length} departamentos • {funcoesLoja.length} funções
-                </span>
+                {modeloSelecionado ? (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-[#2563EB] border border-blue-200">
+                    {availableAreas.length} departamentos • {funcoesExibicao.length} funções (
+                    {modeloSelecionado.nome})
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-gray-100 text-[#6B7280]">
+                    Aguardando seleção de modelo
+                  </span>
+                )}
               </div>
               <p className="text-[11px] text-[#6B7280] truncate">
-                {departamentosAberto
-                  ? 'Mapeamento de áreas de atuação e cargos vinculados à operação.'
-                  : 'Visão departamental e cargos operacionais da loja.'}
+                {modeloSelecionado
+                  ? `Mapeamento departamental e cargos operacionais para o modelo ${modeloSelecionado.nome}.`
+                  : 'Escolha um modelo na biblioteca acima para visualizar departamentos e funções mapeados.'}
               </p>
             </div>
           </div>
@@ -655,9 +712,13 @@ export default function Rotinas() {
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563] block mb-2">
                 Departamentos / Setores Mapeados ({availableAreas.length})
               </span>
-              {availableAreas.length === 0 ? (
+              {!modeloSelecionado ? (
                 <p className="text-xs text-[#9CA3AF] italic">
-                  Nenhum departamento identificado nas rotinas cadastradas.
+                  Escolha um modelo na biblioteca acima para visualizar os departamentos mapeados.
+                </p>
+              ) : availableAreas.length === 0 ? (
+                <p className="text-xs text-[#9CA3AF] italic">
+                  Nenhum departamento identificado nas rotinas deste modelo.
                 </p>
               ) : (
                 <div className="flex items-center gap-1.5 flex-wrap">
@@ -696,15 +757,19 @@ export default function Rotinas() {
             {/* Funções / Cargos Operacionais */}
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563] block mb-2">
-                Funções e Cargos Cadastrados ({funcoesLoja.length})
+                Funções e Cargos Mapeados no Modelo ({funcoesExibicao.length})
               </span>
-              {funcoesLoja.length === 0 ? (
+              {!modeloSelecionado ? (
                 <p className="text-xs text-[#9CA3AF] italic">
-                  Nenhuma função específica vinculada a esta loja ainda.
+                  Escolha um modelo na biblioteca para visualizar as funções operacionais.
+                </p>
+              ) : funcoesExibicao.length === 0 ? (
+                <p className="text-xs text-[#9CA3AF] italic">
+                  Nenhuma função específica identificada para este modelo.
                 </p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                  {funcoesLoja.map((f) => (
+                  {funcoesExibicao.map((f) => (
                     <div
                       key={f.id}
                       className="p-2 bg-white border border-[#E5E7EB] rounded-md text-xs flex items-center justify-between gap-2 shadow-2xs"
@@ -713,9 +778,13 @@ export default function Rotinas() {
                         <span className="font-semibold text-[#1F2937] block truncate">
                           {f.nome}
                         </span>
-                        {f.telefone && (
+                        {f.telefone ? (
                           <span className="text-[11px] text-[#6B7280] font-mono block truncate">
                             WhatsApp: {f.telefone}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-[#9CA3AF] block truncate">
+                            Responsável operacional no modelo
                           </span>
                         )}
                       </div>
@@ -781,6 +850,9 @@ export default function Rotinas() {
               type="button"
               onClick={() => {
                 setModeloSelecionado(null)
+                setSelectedArea('Todas')
+                setSelectedFreq('Todas')
+                setSearchTerm('')
                 try {
                   localStorage.removeItem('vivavarejo_rotinas_modelo_ativo')
                   localStorage.removeItem('vivavarejo_vitrine_segmento')
