@@ -71,6 +71,15 @@ export default function Rotinas() {
   // Inicia sempre neutro (null): o usuário precisa tocar/escolher um modelo na biblioteca
   const [modeloSelecionado, setModeloSelecionado] = useState<ModeloComContagem | null>(null)
 
+  // Remove qualquer resquício legado de modelo gravado para garantir início neutro
+  useEffect(() => {
+    try {
+      localStorage.removeItem('vivavarejo_rotinas_modelo_ativo')
+    } catch {
+      // noop
+    }
+  }, [])
+
   // Modais de CRUD e Importação
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
   const [editingRotina, setEditingRotina] = useState<Rotina | null>(null)

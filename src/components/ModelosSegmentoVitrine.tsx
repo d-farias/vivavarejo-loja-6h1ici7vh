@@ -31,8 +31,6 @@ interface ModelosSegmentoVitrineProps {
   selectedModeloId?: string | null
 }
 
-const STORAGE_KEY_SEGMENTO = 'vivavarejo_vitrine_segmento'
-
 export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
   userPerfil,
   lojas,
@@ -47,6 +45,15 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
   // Segmento neutro por padrão: nenhum segmento pré-selecionado nem fallback fixo
   // Torna-se ativo apenas quando o usuário filtra pelos pills ou escolhe um modelo
   const [selectedSegmento, setSelectedSegmento] = useState<string>('Todos')
+
+  // Limpeza proativa de qualquer segmento legado gravado anteriormente
+  useEffect(() => {
+    try {
+      localStorage.removeItem('vivavarejo_vitrine_segmento')
+    } catch {
+      // noop
+    }
+  }, [])
 
   const [modelos, setModelos] = useState<ModeloComContagem[]>([])
   const [loading, setLoading] = useState(false)
@@ -87,15 +94,6 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
 
   const handleSelectSegmento = (seg: string) => {
     setSelectedSegmento(seg)
-    try {
-      if (seg === 'Todos') {
-        localStorage.removeItem(STORAGE_KEY_SEGMENTO)
-      } else {
-        localStorage.setItem(STORAGE_KEY_SEGMENTO, seg)
-      }
-    } catch {
-      // noop
-    }
   }
 
   // Filtro de modelos por segmento
