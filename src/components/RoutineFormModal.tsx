@@ -135,7 +135,7 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-200"
@@ -143,14 +143,14 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-xl bg-white rounded-lg shadow-xl border border-[#E5E7EB] z-10 overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-xl bg-white rounded-xl shadow-xl border border-[#E5E7EB] z-10 overflow-hidden flex flex-col max-h-[94vh]">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center justify-between bg-white">
-          <div>
-            <h2 className="text-lg font-bold text-[#1F2937]">
+        <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-[#E5E7EB] flex items-center justify-between bg-white shrink-0">
+          <div className="min-w-0 pr-2">
+            <h2 className="text-base sm:text-lg font-bold text-[#1F2937] truncate">
               {isEditing ? 'Editar Rotina' : 'Nova Rotina Operacional'}
             </h2>
-            <p className="text-xs text-[#6B7280]">
+            <p className="text-[11px] sm:text-xs text-[#6B7280] truncate">
               {isEditing
                 ? 'Atualize as orientações, horários e responsáveis da rotina'
                 : 'Cadastre uma nova rotina para acompanhamento no VivaVarejo'}
@@ -158,366 +158,369 @@ export function RoutineFormModal({ isOpen, onClose, onSave, initialData }: Routi
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded text-[#9CA3AF] hover:text-[#1F2937] transition-colors"
+            className="p-1.5 rounded-lg text-[#9CA3AF] hover:text-[#1F2937] hover:bg-gray-100 transition-colors shrink-0 min-h-[36px] min-w-[36px] flex items-center justify-center"
             aria-label="Fechar"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="overflow-y-auto p-6 space-y-4">
-          {/* Vínculo de Loja e Função */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-md bg-[#F7F7F5] border border-[#E5E7EB]">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
-                <Store className="w-3.5 h-3.5 text-[#2563EB]" />
-                <span>Loja de Aplicação</span>
-              </label>
-              <select
-                value={lojaId}
-                onChange={(e) => {
-                  setLojaId(e.target.value)
-                  setFuncaoId('')
-                }}
-                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
-              >
-                <option value="">Todas as lojas (Sem vínculo exclusivo)</option>
-                {lojas.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.nome} {l.expand?.cliente ? `• ${l.expand.cliente.nome}` : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
+        {/* Form Body com scroll seguro */}
+        <div className="scrollbar-mobile-vertical flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+          <form id="routine-form" onSubmit={handleSubmit} className="space-y-4">
+            {/* Vínculo de Loja e Função */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-md bg-[#F7F7F5] border border-[#E5E7EB]">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
+                  <Store className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <span>Loja de Aplicação</span>
+                </label>
+                <select
+                  value={lojaId}
+                  onChange={(e) => {
+                    setLojaId(e.target.value)
+                    setFuncaoId('')
+                  }}
+                  className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                >
+                  <option value="">Todas as lojas (Sem vínculo exclusivo)</option>
+                  {lojas.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.nome} {l.expand?.cliente ? `• ${l.expand.cliente.nome}` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
-                <Briefcase className="w-3.5 h-3.5 text-[#2563EB]" />
-                <span>Função de Loja (opcional)</span>
-              </label>
-              <select
-                value={funcaoId}
-                onChange={(e) => {
-                  const val = e.target.value
-                  setFuncaoId(val)
-                  const fObj = funcoesLoja.find((f) => f.id === val)
-                  if (fObj) {
-                    if (!responsavel) {
-                      setResponsavel(fObj.nome)
-                    }
-                    // Autopreenchimento do telefone do responsável a partir da função se tiver
-                    if (fObj.telefone && !telefoneResponsavel) {
-                      setTelefoneResponsavel(formatPhoneBR(fObj.telefone))
-                    }
-                    // Autopreenchimento do telefone do chefe imediato se a função apontar para uma função superior
-                    if (fObj.chefe_imediato_funcao) {
-                      const chefeFuncao = funcoesLoja.find(
-                        (cf) => cf.id === fObj.chefe_imediato_funcao,
-                      )
-                      if (chefeFuncao?.telefone && !telefoneChefe) {
-                        setTelefoneChefe(formatPhoneBR(chefeFuncao.telefone))
-                      } else {
-                        // Tenta encontrar um funcionário que ocupa o cargo de chefe imediato
-                        const chefeColab = funcionariosLoja.find(
-                          (fc) => fc.funcao === fObj.chefe_imediato_funcao && fc.telefone,
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
+                  <Briefcase className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <span>Função de Loja (opcional)</span>
+                </label>
+                <select
+                  value={funcaoId}
+                  onChange={(e) => {
+                    const val = e.target.value
+                    setFuncaoId(val)
+                    const fObj = funcoesLoja.find((f) => f.id === val)
+                    if (fObj) {
+                      if (!responsavel) {
+                        setResponsavel(fObj.nome)
+                      }
+                      // Autopreenchimento do telefone do responsável a partir da função se tiver
+                      if (fObj.telefone && !telefoneResponsavel) {
+                        setTelefoneResponsavel(formatPhoneBR(fObj.telefone))
+                      }
+                      // Autopreenchimento do telefone do chefe imediato se a função apontar para uma função superior
+                      if (fObj.chefe_imediato_funcao) {
+                        const chefeFuncao = funcoesLoja.find(
+                          (cf) => cf.id === fObj.chefe_imediato_funcao,
                         )
-                        if (chefeColab?.telefone && !telefoneChefe) {
-                          setTelefoneChefe(formatPhoneBR(chefeColab.telefone))
+                        if (chefeFuncao?.telefone && !telefoneChefe) {
+                          setTelefoneChefe(formatPhoneBR(chefeFuncao.telefone))
+                        } else {
+                          // Tenta encontrar um funcionário que ocupa o cargo de chefe imediato
+                          const chefeColab = funcionariosLoja.find(
+                            (fc) => fc.funcao === fObj.chefe_imediato_funcao && fc.telefone,
+                          )
+                          if (chefeColab?.telefone && !telefoneChefe) {
+                            setTelefoneChefe(formatPhoneBR(chefeColab.telefone))
+                          }
                         }
                       }
                     }
-                  }
-                }}
-                disabled={!lojaId || funcoesLoja.length === 0}
-                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] disabled:opacity-50"
-              >
-                <option value="">Selecione ou deixe geral...</option>
-                {funcoesLoja.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.nome}
-                  </option>
-                ))}
-              </select>
+                  }}
+                  disabled={!lojaId || funcoesLoja.length === 0}
+                  className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] disabled:opacity-50"
+                >
+                  <option value="">Selecione ou deixe geral...</option>
+                  {funcoesLoja.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.nome}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
 
-          {/* Autopreenchimento por Funcionário da loja (opcional para preencher contatos) */}
-          {funcionariosLoja.length > 0 && (
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
-                <UserIcon className="w-3.5 h-3.5 text-[#2563EB]" />
-                <span>Atribuir a Funcionário Específico (opcional)</span>
-              </label>
-              <select
-                value={funcionarioId}
-                onChange={(e) => {
-                  const fid = e.target.value
-                  setFuncionarioId(fid)
-                  const fColab = funcionariosLoja.find((fc) => fc.id === fid)
-                  if (fColab) {
-                    setResponsavel(fColab.nome)
-                    if (fColab.funcao && !funcaoId) {
-                      setFuncaoId(fColab.funcao)
-                    }
-                    if (fColab.telefone) {
-                      setTelefoneResponsavel(formatPhoneBR(fColab.telefone))
-                    }
-                    // Resolver chefe imediato da função desse funcionário
-                    const fCargo = funcoesLoja.find((fc) => fc.id === fColab.funcao)
-                    if (fCargo?.chefe_imediato_funcao) {
-                      const cargoChefe = funcoesLoja.find(
-                        (cf) => cf.id === fCargo.chefe_imediato_funcao,
-                      )
-                      if (cargoChefe?.telefone && !telefoneChefe) {
-                        setTelefoneChefe(formatPhoneBR(cargoChefe.telefone))
-                      } else {
-                        const colabChefe = funcionariosLoja.find(
-                          (fc) => fc.funcao === fCargo.chefe_imediato_funcao && fc.telefone,
+            {/* Autopreenchimento por Funcionário da loja (opcional para preencher contatos) */}
+            {funcionariosLoja.length > 0 && (
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
+                  <UserIcon className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <span>Atribuir a Funcionário Específico (opcional)</span>
+                </label>
+                <select
+                  value={funcionarioId}
+                  onChange={(e) => {
+                    const fid = e.target.value
+                    setFuncionarioId(fid)
+                    const fColab = funcionariosLoja.find((fc) => fc.id === fid)
+                    if (fColab) {
+                      setResponsavel(fColab.nome)
+                      if (fColab.funcao && !funcaoId) {
+                        setFuncaoId(fColab.funcao)
+                      }
+                      if (fColab.telefone) {
+                        setTelefoneResponsavel(formatPhoneBR(fColab.telefone))
+                      }
+                      // Resolver chefe imediato da função desse funcionário
+                      const fCargo = funcoesLoja.find((fc) => fc.id === fColab.funcao)
+                      if (fCargo?.chefe_imediato_funcao) {
+                        const cargoChefe = funcoesLoja.find(
+                          (cf) => cf.id === fCargo.chefe_imediato_funcao,
                         )
-                        if (colabChefe?.telefone && !telefoneChefe) {
-                          setTelefoneChefe(formatPhoneBR(colabChefe.telefone))
+                        if (cargoChefe?.telefone && !telefoneChefe) {
+                          setTelefoneChefe(formatPhoneBR(cargoChefe.telefone))
+                        } else {
+                          const colabChefe = funcionariosLoja.find(
+                            (fc) => fc.funcao === fCargo.chefe_imediato_funcao && fc.telefone,
+                          )
+                          if (colabChefe?.telefone && !telefoneChefe) {
+                            setTelefoneChefe(formatPhoneBR(colabChefe.telefone))
+                          }
                         }
                       }
                     }
-                  }
-                }}
-                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
-              >
-                <option value="">Nenhum funcionário específico selecionado</option>
-                {funcionariosLoja.map((fc) => (
-                  <option key={fc.id} value={fc.id}>
-                    {fc.nome} {fc.expand?.funcao?.nome ? `— ${fc.expand.funcao.nome}` : ''}
-                  </option>
-                ))}
-              </select>
-              <p className="text-[11px] text-[#6B7280] mt-0.5">
-                Ao selecionar, preenche o responsável e seus contatos telefônicos de alerta
-                automaticamente.
-              </p>
-            </div>
-          )}
+                  }}
+                  className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                >
+                  <option value="">Nenhum funcionário específico selecionado</option>
+                  {funcionariosLoja.map((fc) => (
+                    <option key={fc.id} value={fc.id}>
+                      {fc.nome} {fc.expand?.funcao?.nome ? `— ${fc.expand.funcao.nome}` : ''}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[11px] text-[#6B7280] mt-0.5">
+                  Ao selecionar, preenche o responsável e seus contatos telefônicos de alerta
+                  automaticamente.
+                </p>
+              </div>
+            )}
 
-          {/* Nome da Rotina */}
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1">
-              Nome da rotina <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              placeholder="Ex: Auditoria Matinal de Preços e Encartes"
-              className={`w-full px-3 py-2 text-sm bg-white border ${
-                errors.nome ? 'border-[#B91C1C]' : 'border-[#E5E7EB]'
-              } rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]`}
-            />
-            {errors.nome && <p className="text-[11px] text-red-500 mt-1">{errors.nome}</p>}
-          </div>
-
-          {/* Grid 2 col: Responsável e Área */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Nome da Rotina */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1">
-                Responsável direto <span className="text-red-500">*</span>
+                Nome da rotina <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                value={responsavel}
-                onChange={(e) => setResponsavel(e.target.value)}
-                placeholder="Ex: Cartazista, Analista, Gerente"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Ex: Auditoria Matinal de Preços e Encartes"
                 className={`w-full px-3 py-2 text-sm bg-white border ${
-                  errors.responsavel ? 'border-[#B91C1C]' : 'border-[#E5E7EB]'
+                  errors.nome ? 'border-[#B91C1C]' : 'border-[#E5E7EB]'
                 } rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]`}
               />
-              {errors.responsavel && (
-                <p className="text-[11px] text-red-500 mt-1">{errors.responsavel}</p>
-              )}
+              {errors.nome && <p className="text-[11px] text-red-500 mt-1">{errors.nome}</p>}
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1">
-                Área / Setor da Loja
-              </label>
-              <input
-                type="text"
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-                placeholder="Ex: Prevenção, Mercearia, Frente de Caixa"
-                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
-              />
-            </div>
-          </div>
-
-          {/* Grid 2 col: Frequência e Horário Limite */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1">
-                Frequência
-              </label>
-              <select
-                value={frequencia}
-                onChange={(e) => setFrequencia(e.target.value as FrequenciaRotina)}
-                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
-              >
-                {FREQUENCIAS.map((f) => (
-                  <option key={f} value={f}>
-                    {f}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center justify-between">
-                <span>Horário Limite</span>
-                <span className="text-[10px] text-[#6B7280] font-normal lowercase">
-                  ex: 10:00 ou Integral
-                </span>
-              </label>
-              <div className="relative">
-                <Clock className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={horarioLimite}
-                  onChange={(e) => setHorarioLimite(e.target.value)}
-                  placeholder="Ex: 10:00, 11Hs, Integral"
-                  className="w-full pl-9 pr-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Grid 2 col: Validação e Ferramenta */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
-                <span>Validação (quem valida)</span>
-              </label>
-              <input
-                type="text"
-                value={validacao}
-                onChange={(e) => setValidacao(e.target.value)}
-                placeholder="Ex: Gerente Operacional (GO), Líder Prevenção"
-                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
-                <Wrench className="w-3.5 h-3.5 text-[#2563EB]" />
-                <span>Ferramenta necessária</span>
-              </label>
-              <input
-                type="text"
-                value={ferramenta}
-                onChange={(e) => setFerramenta(e.target.value)}
-                placeholder="Ex: Coletor RF, Checklist, Manual"
-                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
-              />
-            </div>
-          </div>
-
-          {/* Seção WhatsApp: Telefones do Responsável e do Chefe Imediato (com máscara formatPhoneBR) */}
-          <div className="p-3.5 rounded-lg border border-emerald-200 bg-emerald-50/50 space-y-3">
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-emerald-600" />
-              <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider">
-                Avisos e Alertas por WhatsApp (Opcional)
-              </span>
-            </div>
-            <p className="text-[11px] text-emerald-800 leading-relaxed">
-              Informe ou ajuste os números para disparo rápido de lembretes e cobranças operacionais
-              de prazos.
-            </p>
-
+            {/* Grid 2 col: Responsável e Área */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-emerald-950 mb-1">
-                  Telefone do Responsável direto
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1">
+                  Responsável direto <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  value={telefoneResponsavel}
-                  onChange={(e) => setTelefoneResponsavel(formatPhoneBR(e.target.value))}
-                  placeholder="(00) 00000-0000"
-                  className="w-full px-3 py-2 text-sm bg-white border border-emerald-300 rounded-md outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 text-[#1F2937]"
+                  value={responsavel}
+                  onChange={(e) => setResponsavel(e.target.value)}
+                  placeholder="Ex: Cartazista, Analista, Gerente"
+                  className={`w-full px-3 py-2 text-sm bg-white border ${
+                    errors.responsavel ? 'border-[#B91C1C]' : 'border-[#E5E7EB]'
+                  } rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]`}
+                />
+                {errors.responsavel && (
+                  <p className="text-[11px] text-red-500 mt-1">{errors.responsavel}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1">
+                  Área / Setor da Loja
+                </label>
+                <input
+                  type="text"
+                  value={area}
+                  onChange={(e) => setArea(e.target.value)}
+                  placeholder="Ex: Prevenção, Mercearia, Frente de Caixa"
+                  className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
+                />
+              </div>
+            </div>
+
+            {/* Grid 2 col: Frequência e Horário Limite */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1">
+                  Frequência
+                </label>
+                <select
+                  value={frequencia}
+                  onChange={(e) => setFrequencia(e.target.value as FrequenciaRotina)}
+                  className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
+                >
+                  {FREQUENCIAS.map((f) => (
+                    <option key={f} value={f}>
+                      {f}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center justify-between">
+                  <span>Horário Limite</span>
+                  <span className="text-[10px] text-[#6B7280] font-normal lowercase">
+                    ex: 10:00 ou Integral
+                  </span>
+                </label>
+                <div className="relative">
+                  <Clock className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={horarioLimite}
+                    onChange={(e) => setHorarioLimite(e.target.value)}
+                    placeholder="Ex: 10:00, 11Hs, Integral"
+                    className="w-full pl-9 pr-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Grid 2 col: Validação e Ferramenta */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <span>Validação (quem valida)</span>
+                </label>
+                <input
+                  type="text"
+                  value={validacao}
+                  onChange={(e) => setValidacao(e.target.value)}
+                  placeholder="Ex: Gerente Operacional (GO), Líder Prevenção"
+                  className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-emerald-950 mb-1">
-                  Telefone do Chefe imediato
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
+                  <Wrench className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <span>Ferramenta necessária</span>
                 </label>
                 <input
                   type="text"
-                  value={telefoneChefe}
-                  onChange={(e) => setTelefoneChefe(formatPhoneBR(e.target.value))}
-                  placeholder="(00) 00000-0000"
-                  className="w-full px-3 py-2 text-sm bg-white border border-emerald-300 rounded-md outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 text-[#1F2937]"
+                  value={ferramenta}
+                  onChange={(e) => setFerramenta(e.target.value)}
+                  placeholder="Ex: Coletor RF, Checklist, Manual"
+                  className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
                 />
               </div>
             </div>
-          </div>
 
-          {/* Status */}
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1">
-              Status da Rotina
-            </label>
-            <div className="flex gap-2">
-              {STATUS_OPTIONS.map((st) => (
-                <button
-                  key={st}
-                  type="button"
-                  onClick={() => setStatus(st)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
-                    status === st
-                      ? 'bg-[#2563EB] text-white border-[#2563EB]'
-                      : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:bg-gray-50'
-                  }`}
-                >
-                  {st}
-                </button>
-              ))}
+            {/* Seção WhatsApp: Telefones do Responsável e do Chefe Imediato (com máscara formatPhoneBR) */}
+            <div className="p-3.5 rounded-lg border border-emerald-200 bg-emerald-50/50 space-y-3">
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-emerald-600" />
+                <span className="text-xs font-bold text-emerald-950 uppercase tracking-wider">
+                  Avisos e Alertas por WhatsApp (Opcional)
+                </span>
+              </div>
+              <p className="text-[11px] text-emerald-800 leading-relaxed">
+                Informe ou ajuste os números para disparo rápido de lembretes e cobranças
+                operacionais de prazos.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-emerald-950 mb-1">
+                    Telefone do Responsável direto
+                  </label>
+                  <input
+                    type="text"
+                    value={telefoneResponsavel}
+                    onChange={(e) => setTelefoneResponsavel(formatPhoneBR(e.target.value))}
+                    placeholder="(00) 00000-0000"
+                    className="w-full px-3 py-2 text-sm bg-white border border-emerald-300 rounded-md outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 text-[#1F2937]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-emerald-950 mb-1">
+                    Telefone do Chefe imediato
+                  </label>
+                  <input
+                    type="text"
+                    value={telefoneChefe}
+                    onChange={(e) => setTelefoneChefe(formatPhoneBR(e.target.value))}
+                    placeholder="(00) 00000-0000"
+                    className="w-full px-3 py-2 text-sm bg-white border border-emerald-300 rounded-md outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 text-[#1F2937]"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* Observações / Justificativas */}
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
-              <Info className="w-3.5 h-3.5 text-[#6B7280]" />
-              <span>Observações / Orientações / Justificativa</span>
-            </label>
-            <textarea
-              rows={3}
-              value={observacoes}
-              onChange={(e) => setObservacoes(e.target.value)}
-              placeholder="Instruções operacionais para quem executa ou valida..."
-              className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
-            />
-          </div>
+            {/* Status */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1">
+                Status da Rotina
+              </label>
+              <div className="flex gap-2">
+                {STATUS_OPTIONS.map((st) => (
+                  <button
+                    key={st}
+                    type="button"
+                    onClick={() => setStatus(st)}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
+                      status === st
+                        ? 'bg-[#2563EB] text-white border-[#2563EB]'
+                        : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:bg-gray-50'
+                    }`}
+                  >
+                    {st}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-          {/* Footer Actions */}
-          <div className="pt-3 border-t border-[#E5E7EB] flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={loading}
-              className="px-4 py-2 text-xs font-semibold text-[#4B5563] hover:text-[#1F2937] transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-5 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors disabled:opacity-60"
-            >
-              {loading ? 'Salvando...' : isEditing ? 'Atualizar Rotina' : 'Cadastrar Rotina'}
-            </button>
-          </div>
-        </form>
+            {/* Observações / Justificativas */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
+                <Info className="w-3.5 h-3.5 text-[#6B7280]" />
+                <span>Observações / Orientações / Justificativa</span>
+              </label>
+              <textarea
+                rows={3}
+                value={observacoes}
+                onChange={(e) => setObservacoes(e.target.value)}
+                placeholder="Instruções operacionais para quem executa ou valida..."
+                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937]"
+              />
+            </div>
+          </form>
+        </div>
+
+        {/* Footer Actions fixo */}
+        <div className="px-4 py-3 sm:px-6 sm:py-3.5 border-t border-[#E5E7EB] bg-[#F7F7F5] flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            className="w-full sm:w-auto h-10 sm:h-9 px-4 border border-[#E5E7EB] bg-white hover:bg-gray-50 text-xs font-semibold text-[#4B5563] rounded-md transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            form="routine-form"
+            type="submit"
+            disabled={loading}
+            className="w-full sm:w-auto h-10 sm:h-9 px-5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors disabled:opacity-60 flex items-center justify-center"
+          >
+            {loading ? 'Salvando...' : isEditing ? 'Atualizar Rotina' : 'Cadastrar Rotina'}
+          </button>
+        </div>
       </div>
     </div>
   )

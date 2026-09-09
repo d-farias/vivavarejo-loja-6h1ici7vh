@@ -81,36 +81,38 @@ export const FotoVisualizadorModal: React.FC<FotoVisualizadorModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-sm animate-in fade-in duration-200">
       <div
         className={`relative bg-white rounded-xl shadow-2xl border border-[#E5E7EB] w-full overflow-hidden flex flex-col transition-all duration-200 ${
           isFullscreen
             ? 'fixed inset-2 sm:inset-4 max-w-none max-h-none h-[calc(100vh-16px)] sm:h-[calc(100vh-32px)]'
-            : 'max-w-3xl max-h-[94vh]'
+            : 'max-w-3xl max-h-[94vh] h-full sm:h-auto'
         }`}
       >
-        {/* Header */}
-        <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between bg-white shrink-0">
-          <div className="flex items-center gap-2.5 min-w-0 pr-2">
+        {/* Header fixo */}
+        <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-[#E5E7EB] flex items-center justify-between bg-white shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 pr-2">
             <div className="w-7 h-7 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
               <CheckCircle2 className="w-4 h-4" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm font-bold text-[#1F2937] leading-tight truncate">
+              <h3 className="text-xs sm:text-sm font-bold text-[#1F2937] leading-tight truncate">
                 {rotinaNome}
               </h3>
-              <p className="text-[11px] text-[#6B7280] truncate">{resolvedSubtitulo}</p>
+              <p className="text-[10px] sm:text-[11px] text-[#6B7280] truncate">
+                {resolvedSubtitulo}
+              </p>
             </div>
           </div>
 
           <div className="flex items-center gap-1 shrink-0">
-            {/* Controles de Zoom */}
-            <div className="hidden sm:flex items-center bg-gray-100 rounded-lg p-0.5 mr-1 border border-gray-200">
+            {/* Controles de Zoom visíveis também no celular */}
+            <div className="flex items-center bg-gray-100 rounded-lg p-0.5 border border-gray-200">
               <button
                 type="button"
                 onClick={handleZoomOut}
                 disabled={zoomLevel <= 0.7}
-                className="p-1.5 text-gray-700 hover:text-black hover:bg-white rounded disabled:opacity-40"
+                className="p-1 text-gray-700 hover:text-black hover:bg-white rounded disabled:opacity-40 min-h-[30px] min-w-[30px] flex items-center justify-center"
                 title="Reduzir zoom"
               >
                 <ZoomOut className="w-3.5 h-3.5" />
@@ -118,7 +120,7 @@ export const FotoVisualizadorModal: React.FC<FotoVisualizadorModalProps> = ({
               <button
                 type="button"
                 onClick={handleResetZoom}
-                className="px-1.5 py-1 text-[11px] font-mono text-gray-700 hover:text-black hover:bg-white rounded"
+                className="px-1.5 py-0.5 text-[10px] sm:text-[11px] font-mono text-gray-700 hover:text-black hover:bg-white rounded"
                 title="Tamanho 100%"
               >
                 {Math.round(zoomLevel * 100)}%
@@ -127,7 +129,7 @@ export const FotoVisualizadorModal: React.FC<FotoVisualizadorModalProps> = ({
                 type="button"
                 onClick={handleZoomIn}
                 disabled={zoomLevel >= 3}
-                className="p-1.5 text-gray-700 hover:text-black hover:bg-white rounded disabled:opacity-40"
+                className="p-1 text-gray-700 hover:text-black hover:bg-white rounded disabled:opacity-40 min-h-[30px] min-w-[30px] flex items-center justify-center"
                 title="Aumentar zoom"
               >
                 <ZoomIn className="w-3.5 h-3.5" />
@@ -146,7 +148,7 @@ export const FotoVisualizadorModal: React.FC<FotoVisualizadorModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 text-[#6B7280] hover:text-[#1F2937] hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1.5 text-[#6B7280] hover:text-[#1F2937] hover:bg-gray-100 rounded-lg transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
               title="Fechar"
             >
               <X className="w-4 h-4" />
@@ -154,8 +156,8 @@ export const FotoVisualizadorModal: React.FC<FotoVisualizadorModalProps> = ({
           </div>
         </div>
 
-        {/* Imagem com suporte a zoom e scroll */}
-        <div className="relative flex-1 bg-neutral-950 flex items-center justify-center overflow-auto p-2 select-none min-h-[300px]">
+        {/* Imagem com suporte a zoom e scroll suave */}
+        <div className="relative flex-1 bg-neutral-950 flex items-center justify-center overflow-auto p-2 select-none min-h-[240px] touch-pan-x touch-pan-y">
           <img
             src={resolvedUrl}
             alt={rotinaNome}
@@ -164,43 +166,44 @@ export const FotoVisualizadorModal: React.FC<FotoVisualizadorModalProps> = ({
               transformOrigin: 'center center',
               transition: 'transform 0.15s ease-out',
             }}
-            className="max-h-[68vh] max-w-full object-contain rounded shadow-lg"
+            className="max-h-[64vh] max-w-full object-contain rounded shadow-lg"
           />
         </div>
 
         {/* Footer info e ações */}
-        <div className="px-4 py-2.5 bg-[#F7F7F5] border-t border-[#E5E7EB] flex items-center justify-between text-xs text-[#6B7280] shrink-0">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5 text-[#374151]">
-              <Calendar className="w-3.5 h-3.5 text-[#9CA3AF]" />
+        <div className="px-3 sm:px-4 py-2 sm:py-2.5 bg-[#F7F7F5] border-t border-[#E5E7EB] flex items-center justify-between text-xs text-[#6B7280] shrink-0 gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <span className="flex items-center gap-1 text-[#374151] truncate text-[11px] sm:text-xs">
+              <Calendar className="w-3.5 h-3.5 text-[#9CA3AF] shrink-0" />
               <span>{dataFormatada}</span>
             </span>
             {horaFormatada && (
-              <span className="flex items-center gap-1.5 text-[#6B7280]">
-                <Clock className="w-3.5 h-3.5 text-[#9CA3AF]" />
+              <span className="hidden sm:flex items-center gap-1 text-[#6B7280] text-[11px]">
+                <Clock className="w-3.5 h-3.5 text-[#9CA3AF] shrink-0" />
                 <span>{horaFormatada}</span>
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 shrink-0">
             {resolvedUrl && (
               <a
                 href={resolvedUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 download
-                className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-xs text-[#2563EB] hover:text-[#1D4ED8] hover:bg-blue-50 rounded font-medium"
+                className="inline-flex items-center gap-1 px-2 py-1 text-[11px] sm:text-xs text-[#2563EB] hover:text-[#1D4ED8] hover:bg-blue-50 rounded font-medium"
               >
                 <Download className="w-3 h-3" />
-                <span>Abrir original</span>
+                <span className="hidden sm:inline">Abrir original</span>
+                <span className="sm:hidden">Original</span>
               </a>
             )}
 
             <button
               type="button"
               onClick={onClose}
-              className="px-3.5 py-1 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] font-semibold rounded-md shadow-xs transition-colors"
+              className="px-3 py-1 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] font-semibold rounded-md shadow-xs transition-colors text-xs"
             >
               Fechar
             </button>

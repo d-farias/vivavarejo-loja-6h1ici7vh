@@ -54,30 +54,34 @@ export const ConcluirRotinaModal: React.FC<ConcluirRotinaModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white rounded-xl shadow-2xl border border-[#E5E7EB] w-full max-w-md overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="bg-white rounded-xl shadow-2xl border border-[#E5E7EB] w-full max-w-md overflow-hidden flex flex-col max-h-[94vh]">
         {/* Header */}
-        <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center justify-between bg-[#F7F7F5]/50">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center">
+        <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-b border-[#E5E7EB] flex items-center justify-between bg-[#F7F7F5]/50 shrink-0">
+          <div className="flex items-center gap-2 min-w-0 pr-2">
+            <div className="w-8 h-8 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0">
               <Camera className="w-4 h-4" />
             </div>
-            <div>
-              <h3 className="text-base font-bold text-[#1F2937]">Concluir Rotina</h3>
-              <p className="text-xs text-[#6B7280]">Comprovação de execução (foto opcional)</p>
+            <div className="min-w-0">
+              <h3 className="text-sm sm:text-base font-bold text-[#1F2937] truncate">
+                Concluir Rotina
+              </h3>
+              <p className="text-[11px] sm:text-xs text-[#6B7280] truncate">
+                Comprovação de execução (foto opcional)
+              </p>
             </div>
           </div>
           <button
             onClick={handleClose}
             disabled={submitting}
-            className="p-1.5 text-[#6B7280] hover:text-[#1F2937] hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-1.5 text-[#6B7280] hover:text-[#1F2937] hover:bg-gray-100 rounded-lg transition-colors shrink-0 min-h-[36px] min-w-[36px] flex items-center justify-center"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-5 space-y-4 text-xs sm:text-sm">
+        {/* Content com scroll vertical seguro */}
+        <div className="scrollbar-mobile-vertical flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 text-xs sm:text-sm">
           <div>
             <span className="text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
               Rotina a ser registrada:
@@ -151,14 +155,14 @@ export const ConcluirRotinaModal: React.FC<ConcluirRotinaModalProps> = ({
           </div>
         </div>
 
-        {/* Footer buttons */}
-        <div className="px-5 py-3.5 border-t border-[#E5E7EB] bg-[#F7F7F5]/50 flex items-center justify-between gap-2">
+        {/* Footer buttons fixos no fundo */}
+        <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-t border-[#E5E7EB] bg-[#F7F7F5] flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2 shrink-0">
           {/* Opção sem foto rápida ou cancelar */}
           <button
             type="button"
             disabled={submitting}
             onClick={() => handleConfirmAction(false)}
-            className="px-3.5 py-2 text-xs font-medium text-[#4B5563] hover:bg-gray-200/70 rounded-lg transition-colors border border-transparent hover:border-[#E5E7EB]"
+            className="px-3.5 py-2 text-xs font-medium text-[#4B5563] hover:bg-gray-200/70 rounded-lg transition-colors border border-[#E5E7EB] sm:border-transparent hover:border-[#E5E7EB] text-center"
           >
             {fotoFile ? 'Concluir sem esta foto' : 'Concluir em 1 toque (sem foto)'}
           </button>
@@ -167,7 +171,7 @@ export const ConcluirRotinaModal: React.FC<ConcluirRotinaModalProps> = ({
             type="button"
             disabled={submitting}
             onClick={() => handleConfirmAction(Boolean(fotoFile))}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-lg shadow-xs transition-colors disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-lg shadow-xs transition-colors disabled:opacity-60"
           >
             <Check className="w-4 h-4" />
             <span>

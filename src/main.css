@@ -125,6 +125,62 @@
     padding: 0 !important;
     margin: 0 !important;
   }
+
+  /* Safe area insets para navegação inferior e notch no iOS/PWA */
+  :root {
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sat: env(safe-area-inset-top, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+  }
+}
+
+/* Indicador e barra de rolagem horizontal visível e fluida para mobile */
+.scrollbar-thin-horizontal {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #93c5fd #f3f4f6;
+}
+
+.scrollbar-thin-horizontal::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scrollbar-thin-horizontal::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 9999px;
+}
+
+.scrollbar-thin-horizontal::-webkit-scrollbar-thumb {
+  background-color: #93c5fd;
+  border-radius: 9999px;
+}
+
+.scrollbar-thin-horizontal::-webkit-scrollbar-thumb:hover {
+  background-color: #2563eb;
+}
+
+/* Barra de rolagem vertical visível para formulários e modais no celular */
+.scrollbar-mobile-vertical {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+.scrollbar-mobile-vertical::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scrollbar-mobile-vertical::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 9999px;
+}
+
+.scrollbar-mobile-vertical::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 9999px;
 }
 
 @media print {
