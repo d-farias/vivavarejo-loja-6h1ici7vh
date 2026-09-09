@@ -593,36 +593,21 @@ export function MaterialVendaAba() {
   const isCliente = versao === 'cliente'
 
   // Impressão / Salvar em PDF (otimizado para Mobile iOS Safari e Desktop)
-  // Disparo 100% síncrono no mesmo tick do clique/toque, sem estados intermediários
-  // que causem re-render, reflow ou mensagens na tela do celular antes de abrir.
+  // Execução síncrona no mesmo tick do evento de toque/clique.
   const handlePrint = () => {
-    const originalTitle = document.title
-    document.title = 'VivaVarejo'
-
-    const cleanup = () => {
-      document.title = originalTitle
-      window.removeEventListener('afterprint', cleanup)
-    }
-    window.addEventListener('afterprint', cleanup)
-
+    // No iOS Safari, alterar document.title imediatamente antes do print pode ser tratado
+    // como mutação do DOM / navegação SPA, disparando o bloqueio de impressão automática.
+    // Disparamos o window.print() direto e puro no gesto do usuário.
     try {
       window.print()
     } catch (err) {
       console.error('Falha ao acionar window.print():', err)
-      cleanup()
       toast({
         title: 'Não foi possível abrir o diálogo de impressão',
         description: 'Tente usar o botão de Compartilhar Link ou Enviar pelo WhatsApp.',
         variant: 'destructive',
       })
     }
-
-    // Fallback de segurança para restaurar o título após o retorno do diálogo
-    setTimeout(() => {
-      if (document.title === 'VivaVarejo') {
-        document.title = originalTitle
-      }
-    }, 1000)
   }
 
   // Obter link direto canônico para envio (produção sempre)
@@ -630,30 +615,17 @@ export function MaterialVendaAba() {
     return getCanonicalShareUrl('/admin')
   }
 
+  // Texto curto aprovado: VivaVarejo + tagline + link canônico oficial
   const getShareText = () => {
     const link = getShareUrl()
-    if (isCliente) {
-      return (
-        'VivaVarejo — Sistema Operacional de Loja & Prevenção de Perdas:\n\n' +
-        'Conheça por que o VivaVarejo é a camada de execução entre o ERP e o chão de loja para supermercados, farmácias, moda, açougues e todo o varejo.\n\n' +
-        'Acesse pelo link:\n' +
-        link
-      )
-    }
-    return (
-      'VivaVarejo — Apresentação Comercial, Matriz de Diferenciais e Pitch:\n\n' +
-      'Acesse pelo link:\n' +
-      link
-    )
+    return `VivaVarejo\nDa informação à execução no chão de loja.\n\n${link}`
   }
 
   // Compartilhar Nativo (navigator.share com fallback para cópia)
   const handleNativeShare = async () => {
     const result = await shareVivaVarejo({
-      title: isCliente ? 'Apresentação Comercial VivaVarejo' : 'Guia de Soluções VivaVarejo',
-      text: isCliente
-        ? 'VivaVarejo — Da informação à execução no chão de loja.'
-        : 'VivaVarejo — Sistema Operacional de Loja & Prevenção de Perdas.',
+      title: 'VivaVarejo',
+      text: 'VivaVarejo — Da informação à execução no chão de loja.',
       pathOrUrl: '/admin',
       onCopied: () => {
         setCopiado(true)
@@ -798,13 +770,23 @@ export function MaterialVendaAba() {
           </span>
         </div>
 
+        {/* Instrução de suporte para iOS Safari (caso o navegador exiba o alerta nativo) */}
+        <div className="text-[11px] text-[#4B5563] bg-blue-50/60 border border-blue-100 rounded-lg px-3 py-2 flex items-center gap-2">
+          <Info className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
+          <span>
+            <strong>No iPhone/iPad:</strong> Se aparecer o aviso &ldquo;Este site foi proibido de
+            imprimir automaticamente&rdquo;, toque em <strong>Permitir</strong> para autorizar e
+            gerar o PDF.
+          </span>
+        </div>
+
         {/* BARRA DE AÇÕES RÁPIDAS (Imprimir / Salvar PDF / Compartilhar) */}
         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#E5E7EB]">
           {/* Botão Principal: Imprimir / Salvar em PDF (SEMPRE ACESSÍVEL) */}
           <button
             type="button"
             onClick={handlePrint}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#1E40AF] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors min-h-[42px] flex-1 sm:flex-none cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#1E40AF] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors min-h-[42px] flex-1 sm:flex-none cursor-pointer touch-manipulation"
             title="Abrir diálogo de impressão do sistema / Salvar PDF (funciona no celular e computador)"
           >
             <Printer className="w-4 h-4" />
