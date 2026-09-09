@@ -588,26 +588,23 @@ export function MaterialVendaAba() {
   const { toast } = useToast()
   const [versao, setVersao] = useState<VersaoMaterial>('cliente')
   const [copiado, setCopiado] = useState(false)
-  const [imprimindo, setImprimindo] = useState(false)
 
   const isCliente = versao === 'cliente'
 
   // Impressão / Salvar em PDF (otimizado para Mobile iOS Safari e Desktop)
+  // Disparo 100% síncrono no mesmo tick do clique/toque, sem estados intermediários
+  // que causem re-render, reflow ou mensagens na tela do celular antes de abrir.
   const handlePrint = () => {
-    setImprimindo(true)
     const originalTitle = document.title
     document.title = 'VivaVarejo'
 
-    // Limpeza de estado após o retorno do diálogo de impressão nativo
     const cleanup = () => {
       document.title = originalTitle
-      setImprimindo(false)
       window.removeEventListener('afterprint', cleanup)
     }
     window.addEventListener('afterprint', cleanup)
 
     try {
-      // Disparo síncrono no mesmo tick do gesto do usuário
       window.print()
     } catch (err) {
       console.error('Falha ao acionar window.print():', err)
@@ -619,12 +616,11 @@ export function MaterialVendaAba() {
       })
     }
 
-    // Fallback de segurança para navegadores que não disparam afterprint imediatamente
+    // Fallback de segurança para restaurar o título após o retorno do diálogo
     setTimeout(() => {
       if (document.title === 'VivaVarejo') {
         document.title = originalTitle
       }
-      setImprimindo(false)
     }, 1000)
   }
 
@@ -800,12 +796,11 @@ export function MaterialVendaAba() {
           <button
             type="button"
             onClick={handlePrint}
-            disabled={imprimindo}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#1E40AF] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors min-h-[42px] flex-1 sm:flex-none"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#1E40AF] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors min-h-[42px] flex-1 sm:flex-none cursor-pointer"
             title="Abrir diálogo de impressão do sistema / Salvar PDF (funciona no celular e computador)"
           >
             <Printer className="w-4 h-4" />
-            <span>{imprimindo ? 'Abrindo PDF...' : 'Imprimir / Gerar PDF'}</span>
+            <span>Imprimir / Gerar PDF</span>
           </button>
 
           {/* Botão Compartilhar Nativo */}
@@ -852,29 +847,29 @@ export function MaterialVendaAba() {
          ========================================================================= */}
       <div
         id="material-venda-conteudo"
-        className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-10 shadow-sm space-y-8 print:border-none print:shadow-none print:p-0 print:space-y-6"
+        className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-10 shadow-sm space-y-8 print:border-none print:shadow-none print:p-0 print:space-y-3.5"
       >
         {/* Header do Material Impresso — EXCLUSIVAMENTE VIVAVAREJO */}
-        <div className="border-b border-[#E5E7EB] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="border-b border-[#E5E7EB] pb-6 print:pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:gap-2">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-[#2563EB] flex items-center justify-center text-white shadow-sm shrink-0">
-              <div className="w-5 h-5 border-2 border-white rotate-45 transform" />
+            <div className="w-11 h-11 print:w-9 print:h-9 rounded-xl bg-[#2563EB] flex items-center justify-center text-white shadow-sm shrink-0">
+              <div className="w-5 h-5 print:w-4 print:h-4 border-2 border-white rotate-45 transform" />
             </div>
             <div>
-              <div className="text-lg font-extrabold tracking-wider uppercase text-[#1F2937]">
+              <div className="text-lg print:text-base font-extrabold tracking-wider uppercase text-[#1F2937]">
                 VivaVarejo
               </div>
-              <div className="text-xs text-[#6B7280]">
+              <div className="text-xs print:text-[10px] text-[#6B7280]">
                 Sistema Operacional de Loja & Prevenção de Perdas no Varejo Físico
               </div>
             </div>
           </div>
 
           <div className="text-left sm:text-right">
-            <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#2563EB] border border-blue-100">
+            <span className="inline-block px-3 py-1 print:px-2 print:py-0.5 rounded-full text-xs print:text-[10px] font-bold bg-blue-50 text-[#2563EB] border border-blue-100">
               Apresentação de Soluções & Guia de Diferenciais
             </span>
-            <div className="text-[11px] text-[#6B7280] mt-1 flex items-center sm:justify-end gap-1.5">
+            <div className="text-[11px] print:text-[9.5px] text-[#6B7280] mt-1 print:mt-0.5 flex items-center sm:justify-end gap-1.5">
               <span>A camada de execução entre o ERP e o chão de loja</span>
               {!isCliente && (
                 <span className="font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 text-[10px]">
@@ -906,50 +901,50 @@ export function MaterialVendaAba() {
             OU VERSÃO INTERNA (9 SOLUÇÕES COMPLETAS COM NOTAS DE PITCH CONFIDENCIAIS)
            ========================================================================= */}
         {isCliente ? (
-          <div className="space-y-6">
+          <div className="space-y-6 print:space-y-3.5">
             {/* Abertura Verbatim Versão Cliente */}
-            <div className="space-y-3 print-break-inside-avoid">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#2563EB] border border-blue-200">
-                <Workflow className="w-3.5 h-3.5" />
+            <div className="space-y-3 print:space-y-1.5 print-break-inside-avoid">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 print:px-2 print:py-0.5 rounded-full text-xs print:text-[10px] font-bold bg-blue-50 text-[#2563EB] border border-blue-200">
+                <Workflow className="w-3.5 h-3.5 print:w-3 print:h-3" />
                 <span>Da informação à execução no chão de loja</span>
               </div>
               <div>
-                <h1 className="text-xl sm:text-2xl font-extrabold text-[#1F2937] tracking-tight">
+                <h1 className="text-xl sm:text-2xl print:text-lg font-extrabold text-[#1F2937] tracking-tight">
                   VivaVarejo
                 </h1>
-                <p className="text-base sm:text-lg font-semibold text-[#2563EB] mt-0.5">
+                <p className="text-base sm:text-lg print:text-sm font-semibold text-[#2563EB] mt-0.5">
                   Da informação à execução no chão de loja.
                 </p>
               </div>
-              <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed max-w-3xl">
+              <p className="text-xs sm:text-sm print:text-xs text-[#4B5563] leading-relaxed max-w-3xl">
                 A VivaVarejo transforma indicadores, demandas e problemas operacionais em ações
                 práticas — com responsável, prioridade, prazo e acompanhamento em tempo real.
               </p>
             </div>
 
             {/* Os 5 Pilares Verbatim: O que a VivaVarejo resolve */}
-            <div className="space-y-4 pt-2 border-t border-[#E5E7EB]">
+            <div className="space-y-4 print:space-y-2 pt-2 border-t border-[#E5E7EB]">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+                <span className="text-[11px] print:text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
                   Entrega de Valor
                 </span>
-                <h2 className="text-lg font-extrabold text-[#1F2937] tracking-tight mt-0.5">
+                <h2 className="text-lg print:text-sm font-extrabold text-[#1F2937] tracking-tight mt-0.5">
                   O que a VivaVarejo resolve
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-3.5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-2">
                 {/* 1. Rotina operacional */}
-                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid print:bg-white print:border-gray-300">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
+                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-2.5 space-y-2.5 print:space-y-1 print-break-inside-avoid print:bg-white print:border-gray-300">
+                  <div className="flex items-start gap-3 print:gap-2">
+                    <div className="w-8 h-8 print:w-6 print:h-6 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm print:text-xs shrink-0 mt-0.5">
                       1
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-[#1F2937] leading-tight">
+                      <h3 className="text-sm print:text-xs font-bold text-[#1F2937] leading-tight">
                         Rotina operacional
                       </h3>
-                      <p className="text-xs text-[#4B5563] leading-relaxed mt-1">
+                      <p className="text-xs print:text-[11px] text-[#4B5563] leading-relaxed mt-1 print:mt-0.5">
                         O dia da loja organizado por prioridade e horário, com execução, atraso,
                         aprovação e plano de ação automático.
                       </p>
@@ -958,16 +953,16 @@ export function MaterialVendaAba() {
                 </div>
 
                 {/* 2. Matriz × Loja */}
-                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid print:bg-white print:border-gray-300">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
+                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-2.5 space-y-2.5 print:space-y-1 print-break-inside-avoid print:bg-white print:border-gray-300">
+                  <div className="flex items-start gap-3 print:gap-2">
+                    <div className="w-8 h-8 print:w-6 print:h-6 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm print:text-xs shrink-0 mt-0.5">
                       2
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-[#1F2937] leading-tight">
+                      <h3 className="text-sm print:text-xs font-bold text-[#1F2937] leading-tight">
                         Matriz × Loja
                       </h3>
-                      <p className="text-xs text-[#4B5563] leading-relaxed mt-1">
+                      <p className="text-xs print:text-[11px] text-[#4B5563] leading-relaxed mt-1 print:mt-0.5">
                         Compras, RH, Logística, Marketing, Manutenção e Prevenção abrem demandas
                         direto na fila de execução da loja. Nada mais se perde em e-mails e grupos
                         de WhatsApp.
@@ -977,16 +972,16 @@ export function MaterialVendaAba() {
                 </div>
 
                 {/* 3. Promotores e Fornecedores */}
-                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid print:bg-white print:border-gray-300">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
+                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-2.5 space-y-2.5 print:space-y-1 print-break-inside-avoid print:bg-white print:border-gray-300">
+                  <div className="flex items-start gap-3 print:gap-2">
+                    <div className="w-8 h-8 print:w-6 print:h-6 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm print:text-xs shrink-0 mt-0.5">
                       3
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-[#1F2937] leading-tight">
+                      <h3 className="text-sm print:text-xs font-bold text-[#1F2937] leading-tight">
                         Promotores e Fornecedores
                       </h3>
-                      <p className="text-xs text-[#4B5563] leading-relaxed mt-1">
+                      <p className="text-xs print:text-[11px] text-[#4B5563] leading-relaxed mt-1 print:mt-0.5">
                         Presença, abastecimento, validade, layout e registro fotográfico de cada
                         visita — com alerta ao comprador quando algo sair do combinado.
                       </p>
@@ -995,16 +990,16 @@ export function MaterialVendaAba() {
                 </div>
 
                 {/* 4. Prevenção de perdas */}
-                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid print:bg-white print:border-gray-300">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
+                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-2.5 space-y-2.5 print:space-y-1 print-break-inside-avoid print:bg-white print:border-gray-300">
+                  <div className="flex items-start gap-3 print:gap-2">
+                    <div className="w-8 h-8 print:w-6 print:h-6 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm print:text-xs shrink-0 mt-0.5">
                       4
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-[#1F2937] leading-tight">
+                      <h3 className="text-sm print:text-xs font-bold text-[#1F2937] leading-tight">
                         Prevenção de perdas
                       </h3>
-                      <p className="text-xs text-[#4B5563] leading-relaxed mt-1">
+                      <p className="text-xs print:text-[11px] text-[#4B5563] leading-relaxed mt-1 print:mt-0.5">
                         Quebras por motivo e valor, inventários rotativos, controle de validade e
                         acuracidade em acompanhamento contínuo.
                       </p>
@@ -1013,16 +1008,16 @@ export function MaterialVendaAba() {
                 </div>
 
                 {/* 5. Gestão e indicadores */}
-                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid print:bg-white print:border-gray-300 md:col-span-2">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
+                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-2.5 space-y-2.5 print:space-y-1 print-break-inside-avoid print:bg-white print:border-gray-300 md:col-span-2">
+                  <div className="flex items-start gap-3 print:gap-2">
+                    <div className="w-8 h-8 print:w-6 print:h-6 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm print:text-xs shrink-0 mt-0.5">
                       5
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-[#1F2937] leading-tight">
+                      <h3 className="text-sm print:text-xs font-bold text-[#1F2937] leading-tight">
                         Gestão e indicadores
                       </h3>
-                      <p className="text-xs text-[#4B5563] leading-relaxed mt-1">
+                      <p className="text-xs print:text-[11px] text-[#4B5563] leading-relaxed mt-1 print:mt-0.5">
                         Uma única visão: execução, pontualidade, validação, chamados, perdas,
                         rupturas e vendas.
                       </p>
@@ -1033,14 +1028,14 @@ export function MaterialVendaAba() {
             </div>
 
             {/* O grande diferencial Verbatim */}
-            <div className="bg-blue-50/60 border border-blue-100 rounded-xl p-5 print:p-4 space-y-3 print-break-inside-avoid print:bg-white print:border-gray-300">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+            <div className="bg-blue-50/60 border border-blue-100 rounded-xl p-5 print:p-3 space-y-3 print:space-y-1.5 print-break-inside-avoid print:bg-white print:border-gray-300">
+              <span className="text-[11px] print:text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
                 Posicionamento Estratégico
               </span>
-              <h2 className="text-base sm:text-lg font-extrabold text-[#1F2937] tracking-tight">
+              <h2 className="text-base sm:text-lg print:text-sm font-extrabold text-[#1F2937] tracking-tight">
                 O grande diferencial
               </h2>
-              <div className="space-y-2 text-xs sm:text-sm text-[#1F2937] leading-relaxed">
+              <div className="space-y-2 print:space-y-1 text-xs sm:text-sm print:text-xs text-[#1F2937] leading-relaxed">
                 <p>
                   ERP e BI mostram o que aconteceu. A VivaVarejo garante que o que precisa ser feito
                   seja feito — criando a camada operacional entre a retaguarda e o chão de loja.
@@ -1170,15 +1165,15 @@ export function MaterialVendaAba() {
         {/* =========================================================================
             MATRIZ COMPARATIVA EXPANDIDA & ESPECÍFICA (Tabela com overflow contido)
            ========================================================================= */}
-        <div className="space-y-3 pt-4 border-t border-[#E5E7EB] print:pt-2 print-break-inside-avoid">
+        <div className="space-y-3 print:space-y-1.5 pt-4 print:pt-2 border-t border-[#E5E7EB]">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+            <span className="text-[11px] print:text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
               Comparativo Técnico de Mercado
             </span>
-            <h2 className="text-lg font-extrabold text-[#1F2937] tracking-tight mt-0.5">
+            <h2 className="text-lg print:text-sm font-extrabold text-[#1F2937] tracking-tight mt-0.5">
               Matriz Comparativa: VivaVarejo × Checklists Tradicionais
             </h2>
-            <p className="text-xs text-[#6B7280]">
+            <p className="text-xs print:text-[10.5px] text-[#6B7280]">
               Veja no detalhe como cada capacidade resolve as dores do dia a dia do varejo físico
             </p>
           </div>
@@ -1187,18 +1182,18 @@ export function MaterialVendaAba() {
             <table className="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
                 <tr className="bg-[#F7F7F5] print:bg-gray-100 border-b border-[#E5E7EB] print:border-gray-300 text-[#1F2937]">
-                  <th className="p-3.5 print:p-2.5 font-bold uppercase tracking-wider text-xs w-[36%]">
+                  <th className="p-3.5 print:p-1.5 font-bold uppercase tracking-wider text-xs print:text-[10px] w-[36%]">
                     Diferencial / Capacidade Operacional
                   </th>
-                  <th className="p-3.5 print:p-2.5 font-bold uppercase tracking-wider text-xs bg-blue-50/80 print:bg-blue-100/70 text-[#2563EB] border-x border-[#E5E7EB] print:border-gray-300 w-[34%]">
+                  <th className="p-3.5 print:p-1.5 font-bold uppercase tracking-wider text-xs print:text-[10px] bg-blue-50/80 print:bg-blue-100/70 text-[#2563EB] border-x border-[#E5E7EB] print:border-gray-300 w-[34%]">
                     <div className="flex items-center gap-1.5">
                       <div className="w-2.5 h-2.5 rounded-full bg-[#2563EB]" />
                       <span>VivaVarejo</span>
                     </div>
                   </th>
-                  <th className="p-3.5 print:p-2.5 font-bold uppercase tracking-wider text-xs text-[#6B7280] w-[30%]">
+                  <th className="p-3.5 print:p-1.5 font-bold uppercase tracking-wider text-xs print:text-[10px] text-[#6B7280] w-[30%]">
                     Sistemas Tradicionais
-                    <span className="block text-[10px] font-normal lowercase tracking-normal text-[#9CA3AF]">
+                    <span className="block text-[10px] print:text-[9px] font-normal lowercase tracking-normal text-[#9CA3AF]">
                       (Checklists Genéricos)
                     </span>
                   </th>
@@ -1211,27 +1206,29 @@ export function MaterialVendaAba() {
                     className="hover:bg-gray-50/60 print-break-inside-avoid transition-colors"
                   >
                     {/* Critério */}
-                    <td className="p-3.5 print:p-2.5 align-top">
-                      <div className="font-bold text-[#1F2937] leading-tight">{item.criterio}</div>
-                      <div className="text-[11px] text-[#6B7280] mt-0.5 leading-snug">
+                    <td className="p-3.5 print:p-1.5 align-top">
+                      <div className="font-bold text-[#1F2937] leading-tight print:text-[11px]">
+                        {item.criterio}
+                      </div>
+                      <div className="text-[11px] print:text-[9.5px] text-[#6B7280] mt-0.5 leading-snug">
                         {item.subtexto}
                       </div>
                     </td>
 
                     {/* VivaVarejo */}
-                    <td className="p-3.5 print:p-2.5 bg-blue-50/30 print:bg-blue-50/20 border-x border-[#E5E7EB] print:border-gray-300 align-top">
-                      <div className="flex items-start gap-2">
-                        <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 print:bg-emerald-50">
-                          <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    <td className="p-3.5 print:p-1.5 bg-blue-50/30 print:bg-blue-50/20 border-x border-[#E5E7EB] print:border-gray-300 align-top">
+                      <div className="flex items-start gap-2 print:gap-1.5">
+                        <div className="w-5 h-5 print:w-4 print:h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 print:bg-emerald-50">
+                          <Check className="w-3.5 h-3.5 print:w-3 print:h-3 stroke-[3]" />
                         </div>
-                        <div className="space-y-1">
-                          <div className="text-xs font-semibold text-[#1F2937] leading-snug">
+                        <div className="space-y-1 print:space-y-0.5">
+                          <div className="text-xs print:text-[10.5px] font-semibold text-[#1F2937] leading-snug">
                             {item.vivavarejo.detalhe}
                           </div>
                           {/* Nota Interna da Equipe (oculta na versão cliente) */}
                           {!isCliente && item.vivavarejo.notaInterna && (
-                            <div className="text-[11px] font-normal text-amber-900 bg-amber-50 p-1.5 rounded border border-amber-200 mt-1 leading-snug print:bg-amber-50">
-                              <span className="font-bold text-amber-950 uppercase text-[10px]">
+                            <div className="text-[11px] print:text-[9.5px] font-normal text-amber-900 bg-amber-50 p-1.5 print:p-1 rounded border border-amber-200 mt-1 leading-snug print:bg-amber-50">
+                              <span className="font-bold text-amber-950 uppercase text-[10px] print:text-[9px]">
                                 [Confidencial • Pitch]:{' '}
                               </span>
                               <span>{item.vivavarejo.notaInterna}</span>
@@ -1242,29 +1239,29 @@ export function MaterialVendaAba() {
                     </td>
 
                     {/* Sistemas Tradicionais */}
-                    <td className="p-3.5 print:p-2.5 align-top text-[#4B5563]">
-                      <div className="flex items-start gap-2">
+                    <td className="p-3.5 print:p-1.5 align-top text-[#4B5563]">
+                      <div className="flex items-start gap-2 print:gap-1.5">
                         {item.tradicionais.status === true ? (
-                          <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
-                            <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                          <div className="w-5 h-5 print:w-4 print:h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                            <Check className="w-3.5 h-3.5 print:w-3 print:h-3 stroke-[2.5]" />
                           </div>
                         ) : item.tradicionais.status === 'parcial' ? (
-                          <div className="w-5 h-5 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">
+                          <div className="w-5 h-5 print:w-4 print:h-4 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 mt-0.5 text-xs print:text-[10px] font-bold">
                             ~
                           </div>
                         ) : (
-                          <div className="w-5 h-5 rounded-full bg-gray-200 text-[#6B7280] flex items-center justify-center shrink-0 mt-0.5">
-                            <Minus className="w-3 h-3 stroke-[2.5]" />
+                          <div className="w-5 h-5 print:w-4 print:h-4 rounded-full bg-gray-200 text-[#6B7280] flex items-center justify-center shrink-0 mt-0.5">
+                            <Minus className="w-3 h-3 print:w-2.5 print:h-2.5 stroke-[2.5]" />
                           </div>
                         )}
-                        <div className="space-y-1">
-                          <div className="text-xs text-[#6B7280] leading-snug">
+                        <div className="space-y-1 print:space-y-0.5">
+                          <div className="text-xs print:text-[10.5px] text-[#6B7280] leading-snug">
                             {item.tradicionais.detalhe}
                           </div>
                           {/* Nota Interna da Equipe (oculta na versão cliente) */}
                           {!isCliente && item.tradicionais.notaInterna && (
-                            <div className="text-[11px] font-normal text-amber-900 bg-amber-50 p-1.5 rounded border border-amber-200 mt-1 leading-snug print:bg-amber-50">
-                              <span className="font-bold text-amber-950 uppercase text-[10px]">
+                            <div className="text-[11px] print:text-[9.5px] font-normal text-amber-900 bg-amber-50 p-1.5 print:p-1 rounded border border-amber-200 mt-1 leading-snug print:bg-amber-50">
+                              <span className="font-bold text-amber-950 uppercase text-[10px] print:text-[9px]">
                                 [Confidencial • Intel]:{' '}
                               </span>
                               <span>{item.tradicionais.notaInterna}</span>
@@ -1283,57 +1280,57 @@ export function MaterialVendaAba() {
         {/* =========================================================================
             PILARES ESTRATÉGICOS (Por que o VivaVarejo?)
            ========================================================================= */}
-        <div className="space-y-4 pt-4 border-t border-[#E5E7EB] print-break-inside-avoid">
+        <div className="space-y-4 print:space-y-2 pt-4 print:pt-2 border-t border-[#E5E7EB] print-break-inside-avoid">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+            <span className="text-[11px] print:text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
               Pilares Estratégicos
             </span>
-            <h3 className="text-lg font-extrabold text-[#1F2937] tracking-tight mt-0.5">
+            <h3 className="text-lg print:text-sm font-extrabold text-[#1F2937] tracking-tight mt-0.5">
               Por que a liderança de rede escolhe o VivaVarejo?
             </h3>
-            <p className="text-xs text-[#6B7280]">
+            <p className="text-xs print:text-[10.5px] text-[#6B7280]">
               Três motivos incontestáveis que transformam a rotina de quem opera o chão de loja
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 print:grid-cols-3 print:gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 print:grid-cols-3 print:gap-2">
             {/* Argumento 1 */}
-            <div className="bg-[#F7F7F5] print:bg-white border border-[#E5E7EB] print:border-gray-300 rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid">
-              <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm">
+            <div className="bg-[#F7F7F5] print:bg-white border border-[#E5E7EB] print:border-gray-300 rounded-xl p-5 print:p-2.5 space-y-2.5 print:space-y-1 print-break-inside-avoid">
+              <div className="w-8 h-8 print:w-6 print:h-6 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm print:text-xs">
                 1
               </div>
-              <h4 className="text-sm font-bold text-[#1F2937] leading-tight">
+              <h4 className="text-sm print:text-xs font-bold text-[#1F2937] leading-tight">
                 Foco 100% no Varejo Real de Piso
               </h4>
-              <p className="text-xs text-[#4B5563] leading-relaxed">
+              <p className="text-xs print:text-[11px] text-[#4B5563] leading-relaxed">
                 Construído para o chão de loja: cortes horários de turno, prevenção de perdas
                 multissetorial, controle rigoroso de promotores e interface leve para celular.
               </p>
             </div>
 
             {/* Argumento 2 */}
-            <div className="bg-[#F7F7F5] print:bg-white border border-[#E5E7EB] print:border-gray-300 rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid">
-              <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm">
+            <div className="bg-[#F7F7F5] print:bg-white border border-[#E5E7EB] print:border-gray-300 rounded-xl p-5 print:p-2.5 space-y-2.5 print:space-y-1 print-break-inside-avoid">
+              <div className="w-8 h-8 print:w-6 print:h-6 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm print:text-xs">
                 2
               </div>
-              <h4 className="text-sm font-bold text-[#1F2937] leading-tight">
+              <h4 className="text-sm print:text-xs font-bold text-[#1F2937] leading-tight">
                 Implantação Imediata com Modelos Prontos
               </h4>
-              <p className="text-xs text-[#4B5563] leading-relaxed">
+              <p className="text-xs print:text-[11px] text-[#4B5563] leading-relaxed">
                 Zero tempo perdido: biblioteca de rotinas por segmento e importação fácil do ERP
                 permitem que a equipe execute as rotinas no dia 1, sem semanas de consultoria.
               </p>
             </div>
 
             {/* Argumento 3 */}
-            <div className="bg-[#F7F7F5] print:bg-white border border-[#E5E7EB] print:border-gray-300 rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid">
-              <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm">
+            <div className="bg-[#F7F7F5] print:bg-white border border-[#E5E7EB] print:border-gray-300 rounded-xl p-5 print:p-2.5 space-y-2.5 print:space-y-1 print-break-inside-avoid">
+              <div className="w-8 h-8 print:w-6 print:h-6 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm print:text-xs">
                 3
               </div>
-              <h4 className="text-sm font-bold text-[#1F2937] leading-tight">
+              <h4 className="text-sm print:text-xs font-bold text-[#1F2937] leading-tight">
                 Geração Direta de Margem e Disciplina
               </h4>
-              <p className="text-xs text-[#4B5563] leading-relaxed">
+              <p className="text-xs print:text-[11px] text-[#4B5563] leading-relaxed">
                 Workflow com validação gerencial, cadeia de WhatsApp e redução estatística de 28%
                 nas quebras e 35% nas rupturas protegem o lucro líquido da empresa.
               </p>
@@ -1343,14 +1340,14 @@ export function MaterialVendaAba() {
 
         {/* Assinatura Final de Fechamento em Destaque */}
         {isCliente && (
-          <div className="bg-[#2563EB]/5 border-2 border-[#2563EB]/30 rounded-2xl p-6 sm:p-7 text-center space-y-3 print-break-inside-avoid print:bg-white print:border-[#2563EB]">
-            <div className="text-xl sm:text-2xl font-black text-[#1F2937] tracking-wider uppercase">
+          <div className="bg-[#2563EB]/5 border-2 border-[#2563EB]/30 rounded-2xl p-6 sm:p-7 print:p-3 text-center space-y-3 print:space-y-1.5 print-break-inside-avoid print:bg-white print:border-[#2563EB]">
+            <div className="text-xl sm:text-2xl print:text-base font-black text-[#1F2937] tracking-wider uppercase">
               VivaVarejo
             </div>
-            <div className="inline-block px-4 py-2 rounded-xl bg-[#2563EB] text-white font-extrabold text-sm sm:text-base tracking-wide shadow-xs print:bg-white print:text-[#2563EB] print:border print:border-[#2563EB]">
+            <div className="inline-block px-4 py-2 print:px-3 print:py-1 rounded-xl bg-[#2563EB] text-white font-extrabold text-sm sm:text-base print:text-xs tracking-wide shadow-xs print:bg-white print:text-[#2563EB] print:border print:border-[#2563EB]">
               Informação → Prioridade → Ação → Acompanhamento → Resultado.
             </div>
-            <p className="text-xs text-[#4B5563] max-w-xl mx-auto pt-1">
+            <p className="text-xs print:text-[11px] text-[#4B5563] max-w-xl mx-auto pt-1 print:pt-0">
               A camada de execução definitiva que transforma números e metas em disciplina no chão
               de loja.
             </p>
@@ -1358,7 +1355,7 @@ export function MaterialVendaAba() {
         )}
 
         {/* Rodapé da Apresentação */}
-        <div className="pt-6 border-t border-[#E5E7EB] print:pt-4 print:border-gray-300 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#6B7280] print-break-inside-avoid">
+        <div className="pt-6 border-t border-[#E5E7EB] print:pt-2 print:border-gray-300 flex flex-col sm:flex-row items-center justify-between gap-3 print:gap-1 text-xs print:text-[10px] text-[#6B7280] print-break-inside-avoid">
           <div className="flex items-center gap-2">
             <span className="font-bold text-[#1F2937]">VivaVarejo</span>
             <span>— Excelência em Operação de Varejo & Prevenção de Perdas</span>
@@ -1398,12 +1395,11 @@ export function MaterialVendaAba() {
           <button
             type="button"
             onClick={handlePrint}
-            disabled={imprimindo}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#1E40AF] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors flex-1 sm:flex-none min-h-[42px]"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#1E40AF] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors flex-1 sm:flex-none min-h-[42px] cursor-pointer"
             title="Gerar PDF ou imprimir este material"
           >
             <Printer className="w-4 h-4" />
-            <span>{imprimindo ? 'Abrindo PDF...' : 'Imprimir / Salvar em PDF'}</span>
+            <span>Imprimir / Salvar em PDF</span>
           </button>
 
           {/* Botão Compartilhar Link */}

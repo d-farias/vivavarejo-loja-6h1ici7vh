@@ -186,7 +186,7 @@
 @media print {
   @page {
     size: A4 portrait;
-    margin: 10mm 10mm 12mm 10mm;
+    margin: 8mm 8mm 10mm 8mm;
   }
 
   *,
@@ -204,6 +204,8 @@
     overflow: visible !important;
     height: auto !important;
     min-height: auto !important;
+    font-size: 11.5px !important;
+    line-height: 1.35 !important;
   }
 
   /* Ocultar elementos estruturais de navegação e controles web */
@@ -249,6 +251,7 @@
 
   table {
     page-break-inside: auto;
+    border-collapse: collapse !important;
   }
 
   tr {
@@ -262,6 +265,36 @@
 
   tfoot {
     display: table-footer-group;
+  }
+
+  /* Otimizações de densidade e layout para impressão comercial A4 (4-5 páginas) */
+  #material-venda-conteudo {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  #material-venda-conteudo h1 {
+    font-size: 17px !important;
+    line-height: 1.25 !important;
+  }
+
+  #material-venda-conteudo h2 {
+    font-size: 14px !important;
+    line-height: 1.25 !important;
+  }
+
+  #material-venda-conteudo h3 {
+    font-size: 12.5px !important;
+    line-height: 1.25 !important;
+  }
+
+  #material-venda-conteudo p,
+  #material-venda-conteudo td,
+  #material-venda-conteudo th {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
   }
 }
 
