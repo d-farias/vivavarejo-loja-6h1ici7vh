@@ -901,117 +901,271 @@ export function MaterialVendaAba() {
           </div>
         )}
 
-        {/* Título e Proposta de Valor: A Camada de Execução */}
-        <div className="max-w-3xl space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#2563EB] border border-blue-200">
-            <Workflow className="w-3.5 h-3.5" />
-            <span>Da Informação à Execução: O Sistema Operacional da Loja</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-[#1F2937] tracking-tight">
-            Por que o VivaVarejo supera checklists tradicionais e planilhas passivas?
-          </h1>
-          <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-            Checklists genéricos são formulários estáticos que o piso de loja abandona em poucas
-            semanas. O VivaVarejo é a <strong>camada viva de execução operacional</strong>: conecta
-            os dados da retaguarda (ERP/BI) com quem abre e fecha a loja. Com rotinas horárias com
-            dono, prevenção ativa de perdas em rodízio, controle rigoroso de promotores integrado ao
-            comprador, chamados corporativos e alertas escalonados no WhatsApp, garantimos que o
-            padrão operacional aconteça todos os dias sem desvios.
-          </p>
-        </div>
-
         {/* =========================================================================
-            AS 9 SOLUÇÕES COMPLETAS DA PLATAFORMA VIVAVAREJO
+            ABERTURA E PILARES — VERSÃO CLIENTE (TEXTO APROVADO VERBATIM)
+            OU VERSÃO INTERNA (9 SOLUÇÕES COMPLETAS COM NOTAS DE PITCH CONFIDENCIAIS)
            ========================================================================= */}
-        <div className="space-y-4 pt-2">
-          <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
-              Soluções Integradas
-            </span>
-            <h2 className="text-lg font-extrabold text-[#1F2937] tracking-tight mt-0.5">
-              Tudo o que a plataforma VivaVarejo entrega à sua operação
-            </h2>
-            <p className="text-xs text-[#6B7280]">
-              Uma arquitetura completa para lojistas, encarregados, gerentes de loja, GOs e
-              diretores de rede.
-            </p>
-          </div>
+        {isCliente ? (
+          <div className="space-y-6">
+            {/* Abertura Verbatim Versão Cliente */}
+            <div className="space-y-3 print-break-inside-avoid">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#2563EB] border border-blue-200">
+                <Workflow className="w-3.5 h-3.5" />
+                <span>Da informação à execução no chão de loja</span>
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-extrabold text-[#1F2937] tracking-tight">
+                  VivaVarejo
+                </h1>
+                <p className="text-base sm:text-lg font-semibold text-[#2563EB] mt-0.5">
+                  Da informação à execução no chão de loja.
+                </p>
+              </div>
+              <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed max-w-3xl">
+                A VivaVarejo transforma indicadores, demandas e problemas operacionais em ações
+                práticas — com responsável, prioridade, prazo e acompanhamento em tempo real.
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-3.5">
-            {SOLUCOES_PLATAFORMA.map((solucao) => {
-              const Icon = solucao.icone || Sparkles
-              return (
-                <div
-                  key={solucao.id}
-                  className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-4 flex flex-col justify-between space-y-3 print:space-y-2.5 print-break-inside-avoid print:bg-white print:border-gray-300"
-                >
-                  <div className="space-y-2.5">
-                    {/* Header da Solução */}
-                    <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5 border border-[#2563EB]/20 print:border-[#2563EB]/40">
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="text-sm font-bold text-[#1F2937] leading-tight">
-                            {solucao.numero}. {solucao.titulo}
-                          </h3>
-                          {solucao.destaqueBadge && (
-                            <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-[#2563EB] text-white">
-                              {solucao.destaqueBadge}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs text-[#6B7280] mt-0.5 leading-snug">
-                          {solucao.subtitulo}
-                        </p>
-                      </div>
+            {/* Os 5 Pilares Verbatim: O que a VivaVarejo resolve */}
+            <div className="space-y-4 pt-2 border-t border-[#E5E7EB]">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+                  Entrega de Valor
+                </span>
+                <h2 className="text-lg font-extrabold text-[#1F2937] tracking-tight mt-0.5">
+                  O que a VivaVarejo resolve
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-3.5">
+                {/* 1. Rotina operacional */}
+                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid print:bg-white print:border-gray-300">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
+                      1
                     </div>
-
-                    {/* Benefício Principal */}
-                    <div className="text-xs font-semibold text-[#1F2937] bg-white print:bg-blue-50/40 p-2.5 rounded-lg border border-[#E5E7EB] print:border-blue-100 leading-snug">
-                      {solucao.beneficioPrincipal}
-                    </div>
-
-                    {/* Itens Detalhados: Título em Negrito + Descrição Embaixo */}
-                    <div className="space-y-2 pt-1">
-                      {solucao.itensDetalhados.map((item, iIdx) => (
-                        <div key={iIdx} className="text-xs flex items-start gap-2">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-[#2563EB] shrink-0 mt-0.5" />
-                          <div className="min-w-0 flex-1">
-                            <span className="font-bold text-[#1F2937] block leading-snug">
-                              {item.titulo}
-                            </span>
-                            <span className="text-[#4B5563] text-[11px] sm:text-xs block leading-relaxed mt-0.5">
-                              {item.descricao}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Destaque de Diferencial Exclusivo */}
-                    <div className="text-[11px] text-[#2563EB] bg-blue-50/70 print:bg-gray-50 p-2 rounded-md border border-blue-100 print:border-gray-200 font-medium leading-snug">
-                      {solucao.diferencialExclusivo}
+                    <div>
+                      <h3 className="text-sm font-bold text-[#1F2937] leading-tight">
+                        Rotina operacional
+                      </h3>
+                      <p className="text-xs text-[#4B5563] leading-relaxed mt-1">
+                        O dia da loja organizado por prioridade e horário, com execução, atraso,
+                        aprovação e plano de ação automático.
+                      </p>
                     </div>
                   </div>
-
-                  {/* Dica de Venda Interna (Apenas versão interna com selo âmbar) */}
-                  {!isCliente && solucao.dicaVendaInterna && (
-                    <div className="pt-2 border-t border-[#E5E7EB]/80 print-break-inside-avoid">
-                      <div className="text-[11px] text-amber-900 bg-amber-50 p-2.5 rounded border border-amber-200 leading-relaxed">
-                        <span className="font-bold text-amber-950 uppercase tracking-wider text-[10px] block mb-0.5">
-                          [Confidencial • Dica de Pitch & Fechamento]:
-                        </span>
-                        <span>{solucao.dicaVendaInterna}</span>
-                      </div>
-                    </div>
-                  )}
                 </div>
-              )
-            })}
+
+                {/* 2. Matriz × Loja */}
+                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid print:bg-white print:border-gray-300">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
+                      2
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-[#1F2937] leading-tight">
+                        Matriz × Loja
+                      </h3>
+                      <p className="text-xs text-[#4B5563] leading-relaxed mt-1">
+                        Compras, RH, Logística, Marketing, Manutenção e Prevenção abrem demandas
+                        direto na fila de execução da loja. Nada mais se perde em e-mails e grupos
+                        de WhatsApp.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Promotores e Fornecedores */}
+                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid print:bg-white print:border-gray-300">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
+                      3
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-[#1F2937] leading-tight">
+                        Promotores e Fornecedores
+                      </h3>
+                      <p className="text-xs text-[#4B5563] leading-relaxed mt-1">
+                        Presença, abastecimento, validade, layout e registro fotográfico de cada
+                        visita — com alerta ao comprador quando algo sair do combinado.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. Prevenção de perdas */}
+                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid print:bg-white print:border-gray-300">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
+                      4
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-[#1F2937] leading-tight">
+                        Prevenção de perdas
+                      </h3>
+                      <p className="text-xs text-[#4B5563] leading-relaxed mt-1">
+                        Quebras por motivo e valor, inventários rotativos, controle de validade e
+                        acuracidade em acompanhamento contínuo.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 5. Gestão e indicadores */}
+                <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-4 space-y-2.5 print-break-inside-avoid print:bg-white print:border-gray-300 md:col-span-2">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
+                      5
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-[#1F2937] leading-tight">
+                        Gestão e indicadores
+                      </h3>
+                      <p className="text-xs text-[#4B5563] leading-relaxed mt-1">
+                        Uma única visão: execução, pontualidade, validação, chamados, perdas,
+                        rupturas e vendas.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* O grande diferencial Verbatim */}
+            <div className="bg-blue-50/60 border border-blue-100 rounded-xl p-5 print:p-4 space-y-3 print-break-inside-avoid print:bg-white print:border-gray-300">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+                Posicionamento Estratégico
+              </span>
+              <h2 className="text-base sm:text-lg font-extrabold text-[#1F2937] tracking-tight">
+                O grande diferencial
+              </h2>
+              <div className="space-y-2 text-xs sm:text-sm text-[#1F2937] leading-relaxed">
+                <p>
+                  ERP e BI mostram o que aconteceu. A VivaVarejo garante que o que precisa ser feito
+                  seja feito — criando a camada operacional entre a retaguarda e o chão de loja.
+                </p>
+                <p className="font-semibold text-[#2563EB]">
+                  Resultado: mais velocidade e disciplina operacional, com menos gerente atrás da
+                  tela e mais foco na execução dentro da loja.
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        ) : (
+          /* =========================================================================
+              VERSÃO INTERNA (COM NOTAS CONFIDENCIAIS, PITCH E 9 SOLUÇÕES)
+             ========================================================================= */
+          <div className="space-y-6">
+            <div className="max-w-3xl space-y-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#2563EB] border border-blue-200">
+                <Workflow className="w-3.5 h-3.5" />
+                <span>Da Informação à Execução: O Sistema Operacional da Loja</span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-extrabold text-[#1F2937] tracking-tight">
+                Por que o VivaVarejo supera checklists tradicionais e planilhas passivas?
+              </h1>
+              <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+                Checklists genéricos são formulários estáticos que o piso de loja abandona em poucas
+                semanas. O VivaVarejo é a <strong>camada viva de execução operacional</strong>:
+                conecta os dados da retaguarda (ERP/BI) com quem abre e fecha a loja. Com rotinas
+                horárias com dono, prevenção ativa de perdas em rodízio, controle rigoroso de
+                promotores integrado ao comprador, chamados corporativos e alertas escalonados no
+                WhatsApp, garantimos que o padrão operacional aconteça todos os dias sem desvios.
+              </p>
+            </div>
+
+            <div className="space-y-4 pt-2">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+                  Soluções Integradas (Uso Interno)
+                </span>
+                <h2 className="text-lg font-extrabold text-[#1F2937] tracking-tight mt-0.5">
+                  Tudo o que a plataforma VivaVarejo entrega à sua operação
+                </h2>
+                <p className="text-xs text-[#6B7280]">
+                  Uma arquitetura completa para lojistas, encarregados, gerentes de loja, GOs e
+                  diretores de rede com notas de pitch e concorrência.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-3.5">
+                {SOLUCOES_PLATAFORMA.map((solucao) => {
+                  const Icon = solucao.icone || Sparkles
+                  return (
+                    <div
+                      key={solucao.id}
+                      className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-5 print:p-4 flex flex-col justify-between space-y-3 print:space-y-2.5 print-break-inside-avoid print:bg-white print:border-gray-300"
+                    >
+                      <div className="space-y-2.5">
+                        {/* Header da Solução */}
+                        <div className="flex items-start gap-3">
+                          <div className="w-9 h-9 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5 border border-[#2563EB]/20 print:border-[#2563EB]/40">
+                            <Icon className="w-5 h-5" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="text-sm font-bold text-[#1F2937] leading-tight">
+                                {solucao.numero}. {solucao.titulo}
+                              </h3>
+                              {solucao.destaqueBadge && (
+                                <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-[#2563EB] text-white">
+                                  {solucao.destaqueBadge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-[#6B7280] mt-0.5 leading-snug">
+                              {solucao.subtitulo}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Benefício Principal */}
+                        <div className="text-xs font-semibold text-[#1F2937] bg-white print:bg-blue-50/40 p-2.5 rounded-lg border border-[#E5E7EB] print:border-blue-100 leading-snug">
+                          {solucao.beneficioPrincipal}
+                        </div>
+
+                        {/* Itens Detalhados: Título em Negrito + Descrição Embaixo */}
+                        <div className="space-y-2 pt-1">
+                          {solucao.itensDetalhados.map((item, iIdx) => (
+                            <div key={iIdx} className="text-xs flex items-start gap-2">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-[#2563EB] shrink-0 mt-0.5" />
+                              <div className="min-w-0 flex-1">
+                                <span className="font-bold text-[#1F2937] block leading-snug">
+                                  {item.titulo}
+                                </span>
+                                <span className="text-[#4B5563] text-[11px] sm:text-xs block leading-relaxed mt-0.5">
+                                  {item.descricao}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Destaque de Diferencial Exclusivo */}
+                        <div className="text-[11px] text-[#2563EB] bg-blue-50/70 print:bg-gray-50 p-2 rounded-md border border-blue-100 print:border-gray-200 font-medium leading-snug">
+                          {solucao.diferencialExclusivo}
+                        </div>
+                      </div>
+
+                      {/* Dica de Venda Interna (Apenas versão interna com selo âmbar) */}
+                      {solucao.dicaVendaInterna && (
+                        <div className="pt-2 border-t border-[#E5E7EB]/80 print-break-inside-avoid">
+                          <div className="text-[11px] text-amber-900 bg-amber-50 p-2.5 rounded border border-amber-200 leading-relaxed">
+                            <span className="font-bold text-amber-950 uppercase tracking-wider text-[10px] block mb-0.5">
+                              [Confidencial • Dica de Pitch & Fechamento]:
+                            </span>
+                            <span>{solucao.dicaVendaInterna}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* =========================================================================
             MATRIZ COMPARATIVA EXPANDIDA & ESPECÍFICA (Tabela com overflow contido)
@@ -1186,6 +1340,22 @@ export function MaterialVendaAba() {
             </div>
           </div>
         </div>
+
+        {/* Assinatura Final de Fechamento em Destaque */}
+        {isCliente && (
+          <div className="bg-[#2563EB]/5 border-2 border-[#2563EB]/30 rounded-2xl p-6 sm:p-7 text-center space-y-3 print-break-inside-avoid print:bg-white print:border-[#2563EB]">
+            <div className="text-xl sm:text-2xl font-black text-[#1F2937] tracking-wider uppercase">
+              VivaVarejo
+            </div>
+            <div className="inline-block px-4 py-2 rounded-xl bg-[#2563EB] text-white font-extrabold text-sm sm:text-base tracking-wide shadow-xs print:bg-white print:text-[#2563EB] print:border print:border-[#2563EB]">
+              Informação → Prioridade → Ação → Acompanhamento → Resultado.
+            </div>
+            <p className="text-xs text-[#4B5563] max-w-xl mx-auto pt-1">
+              A camada de execução definitiva que transforma números e metas em disciplina no chão
+              de loja.
+            </p>
+          </div>
+        )}
 
         {/* Rodapé da Apresentação */}
         <div className="pt-6 border-t border-[#E5E7EB] print:pt-4 print:border-gray-300 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#6B7280] print-break-inside-avoid">
