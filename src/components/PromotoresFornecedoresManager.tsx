@@ -20,20 +20,15 @@ import {
   Mail,
   Camera,
   MessageCircle,
-  ShieldAlert,
   Sparkles,
-  Info,
-  CheckSquare,
-  BarChart3,
-  ExternalLink,
 } from 'lucide-react'
 import { PromotorModal } from '@/components/PromotorModal'
 import { FornecedorModal } from '@/components/FornecedorModal'
 import { AgendarVisitaModal } from '@/components/AgendarVisitaModal'
-import { ConcluirVisitaModal } from '@/components/ConcluirVisitaModal'
+import { ConcluirVisitaModal, type CriterioFoco } from '@/components/ConcluirVisitaModal'
 import { RotinaPromotorModal } from '@/components/RotinaPromotorModal'
+import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
 import { buildWhatsAppLink, formatPhoneBR } from '@/lib/phone-utils'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 interface PromotoresFornecedoresManagerProps {
   visitas: VisitaPromotor[]
@@ -50,7 +45,7 @@ interface PromotoresFornecedoresManagerProps {
   onDeletePromotor: (promotor: Promotor) => Promise<void>
   onSaveFornecedor: (payload: Partial<Fornecedor> | FormData, id?: string) => Promise<void>
   onDeleteFornecedor: (fornecedor: Fornecedor) => Promise<void>
-  onSaveRotinaPromotor: (payload: Partial<RotinaPromotor>, id?: string) => Promise<void>
+  onSaveRotinaPromotor: (payload: Partial<RotinaPromotor> | FormData, id?: string) => Promise<void>
   onDeleteRotinaPromotor: (rotina: RotinaPromotor) => Promise<void>
   usuarios?: any[]
   clientes?: any[]
@@ -93,6 +88,7 @@ export function PromotoresFornecedoresManager({
 
   const [concluirModalOpen, setConcluirModalOpen] = useState(false)
   const [visitaParaConcluir, setVisitaParaConcluir] = useState<VisitaPromotor | null>(null)
+  const [focoCriterio, setFocoCriterio] = useState<CriterioFoco>('geral')
 
   const [promotorModalOpen, setPromotorModalOpen] = useState(false)
   const [editingPromotor, setEditingPromotor] = useState<Promotor | null>(null)
@@ -103,9 +99,20 @@ export function PromotoresFornecedoresManager({
   const [rotinaModalOpen, setRotinaModalOpen] = useState(false)
   const [editingRotina, setEditingRotina] = useState<RotinaPromotor | null>(null)
 
-  // Visualizador de foto
-  const [fotoUrlVisualizar, setFotoUrlVisualizar] = useState<string | null>(null)
-  const [fotoTituloVisualizar, setFotoTituloVisualizar] = useState('')
+  // Visualizador de foto em tela cheia com zoom
+  const [fotoModalState, setFotoModalState] = useState<{
+    isOpen: boolean
+    fotoUrl: string | null
+    titulo: string
+    subtitulo?: string
+    dataHora?: string
+  }>({
+    isOpen: false,
+    fotoUrl: null,
+    titulo: '',
+  })
+
+  const pbBase = (import.meta as any).env.VITE_POCKETBASE_URL || ''
 
   // KPIs
   const kpis = useMemo(() => {
@@ -606,7 +613,7 @@ export function PromotoresFornecedoresManager({
                     <th className="p-3.5">Data & Hora</th>
                     <th className="p-3.5">Promotor / Fornecedor</th>
                     <th className="p-3.5">Loja</th>
-                    <th className="p-3.5">Rotinas / Conclusão</th>
+                    <th className="p-3.5">Rotinas / Conclusão & Checklist</th>
                     <th className="p-3.5 text-right">Ações</th>
                   </tr>
                 </thead>
@@ -616,6 +623,29 @@ export function PromotoresFornecedoresManager({
                     const pObj = promotores.find((p) => p.id === v.promotor)
                     const fObj = fornecedores.find((f) => f.id === pObj?.fornecedor)
                     const lObj = lojas.find((l) => l.id === v.loja)
+
+                    // Resolução de foto de gôndola/trabalho da visita ou do fornecedor
+                    const fotoGondolaVisita = v.foto_gondola || v.foto_trabalho
+                    const fotoGondolaUrl = fotoGondolaVisita
+                      ? `${pbBase}/api/files/visitas_promotor/${v.id}/${fotoGondolaVisita}`
+                      : fObj?.layout_foto
+                        ? `${pbBase}/api/files/fornecedores/${fObj.id}/${fObj.layout_foto}`
+                        : null
+
+                    const fotoAbastecimentoVisita = v.foto_abastecimento || v.foto_trabalho
+                    const fotoAbastecimentoUrl = fotoAbastecimentoVisita
+                      ? `${pbBase}/api/files/visitas_promotor/${v.id}/${fotoAbastecimentoVisita}`
+                      : null
+
+                    const fotoValidadesVisita = v.foto_validades || v.foto_trabalho
+                    const fotoValidadesUrl = fotoValidadesVisita
+                      ? `${pbBase}/api/files/visitas_promotor/${v.id}/${fotoValidadesVisita}`
+                      : null
+
+                    // Status dos 3 critérios
+                    const hasLayoutConforme = !!v.checklist_layout_conforme
+                    const hasAbastecimento100 = !!v.checklist_abastecimento_100
+                    const hasValidadesOk = !!v.checklist_validades_ok
 
                     return (
                       <tr key={v.id} className="hover:bg-gray-50/80 transition-colors">
@@ -679,87 +709,221 @@ export function PromotoresFornecedoresManager({
                           </div>
                         </td>
 
-                        <td className="p-3.5 text-[#4B5563] max-w-xs">
-                          {v.conclusao_check ? (
-                            <div className="space-y-1">
+                        <td className="p-3.5 text-[#4B5563] max-w-sm">
+                          <div className="space-y-1.5">
+                            {/* Resumo da Conclusão */}
+                            {v.conclusao_check ? (
                               <div
                                 className="text-xs text-[#1F2937] font-medium line-clamp-2"
                                 title={v.conclusao_check}
                               >
                                 {v.conclusao_check}
                               </div>
+                            ) : v.observacoes ? (
+                              <span
+                                className="text-xs text-[#6B7280] italic truncate block"
+                                title={v.observacoes}
+                              >
+                                {v.observacoes}
+                              </span>
+                            ) : null}
 
-                              {/* Checklist da Visita (Frente 2) */}
-                              <div className="flex items-center gap-2 flex-wrap text-[11px]">
-                                {v.checklist_abastecimento_100 && (
-                                  <span className="text-emerald-700 font-medium bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
-                                    Abastecido 100%
-                                  </span>
-                                )}
-                                {v.checklist_validades_ok && (
-                                  <span className="text-blue-700 font-medium bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200">
-                                    Validades OK
-                                  </span>
-                                )}
-                                {v.checklist_layout_conforme && (
-                                  <span className="text-amber-800 font-medium bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
-                                    Layout Conforme
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* Indicadores de Loja da Visita */}
-                              {(v.quantidade_sortimento !== undefined ||
-                                v.perc_vendas !== undefined) && (
-                                <div className="text-[11px] text-[#6B7280] flex items-center gap-2 flex-wrap">
-                                  {v.quantidade_sortimento !== undefined && (
-                                    <span>
-                                      Sortimento: <b>{v.quantidade_sortimento} itens</b>
-                                    </span>
-                                  )}
-                                  {v.perc_vendas !== undefined && (
-                                    <span>
-                                      Vendas: <b>{v.perc_vendas}%</b>
-                                    </span>
-                                  )}
-                                  {v.qtd_rupturas !== undefined && v.qtd_rupturas > 0 && (
-                                    <span className="text-red-600 font-semibold">
-                                      Rupturas: {v.qtd_rupturas}
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-
-                              {/* Foto do trabalho realizado se houver */}
-                              {v.foto_trabalho && (
+                            {/* CRITÉRIOS DO CHECKLIST CLICÁVEIS (Requisito 1) */}
+                            <div className="flex items-center gap-1.5 flex-wrap text-[11px]">
+                              {/* 1. Layout / Gôndola Conforme */}
+                              {hasLayoutConforme ? (
                                 <button
                                   type="button"
                                   onClick={() => {
-                                    const pbBase =
-                                      (import.meta as any).env.VITE_POCKETBASE_URL || ''
-                                    const url = `${pbBase}/api/files/visitas_promotor/${v.id}/${v.foto_trabalho}`
-                                    setFotoUrlVisualizar(url)
-                                    setFotoTituloVisualizar(
-                                      `Foto da Visita: ${pObj?.nome || 'Promotor'} (${lObj?.nome || 'Loja'})`,
-                                    )
+                                    if (fotoGondolaUrl) {
+                                      setFotoModalState({
+                                        isOpen: true,
+                                        fotoUrl: fotoGondolaUrl,
+                                        titulo: `Gôndola / Layout: ${fObj?.nome || 'Fornecedor'}`,
+                                        subtitulo: `Comprovação de exposição na loja ${lObj?.nome || 'Loja'}`,
+                                        dataHora: v.data_visita
+                                          ? v.data_visita.substring(0, 10)
+                                          : undefined,
+                                      })
+                                    } else {
+                                      setVisitaParaConcluir(v)
+                                      setFocoCriterio('layout')
+                                      setConcluirModalOpen(true)
+                                    }
                                   }}
-                                  className="inline-flex items-center gap-1 text-[11px] text-[#2563EB] hover:underline font-semibold mt-0.5"
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-900 font-bold hover:bg-amber-100 transition-colors shadow-2xs"
+                                  title={
+                                    fotoGondolaUrl
+                                      ? 'Critério atendido com foto! Toque para ver a foto em tela cheia com zoom'
+                                      : 'Layout atendido. Toque para anexar foto ou editar'
+                                  }
                                 >
-                                  <Camera className="w-3 h-3" />
-                                  <span>Ver foto do trabalho</span>
+                                  {fotoGondolaUrl && <Camera className="w-3 h-3 text-amber-700" />}
+                                  <span>Layout/Gôndola Conforme</span>
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setVisitaParaConcluir(v)
+                                    setFocoCriterio('layout')
+                                    setConcluirModalOpen(true)
+                                  }}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-gray-200 bg-gray-50 text-gray-600 font-normal hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 transition-colors"
+                                  title="Não feito: toque para preencher critério e anexar foto"
+                                >
+                                  <span>+ Gôndola</span>
+                                </button>
+                              )}
+
+                              {/* 2. Abastecido 100% */}
+                              {hasAbastecimento100 ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (fotoAbastecimentoUrl) {
+                                      setFotoModalState({
+                                        isOpen: true,
+                                        fotoUrl: fotoAbastecimentoUrl,
+                                        titulo: `Abastecimento 100%: ${fObj?.nome || 'Fornecedor'}`,
+                                        subtitulo: `Comprovação de abastecimento na loja ${lObj?.nome || 'Loja'}`,
+                                        dataHora: v.data_visita
+                                          ? v.data_visita.substring(0, 10)
+                                          : undefined,
+                                      })
+                                    } else {
+                                      setVisitaParaConcluir(v)
+                                      setFocoCriterio('abastecimento')
+                                      setConcluirModalOpen(true)
+                                    }
+                                  }}
+                                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded border transition-colors shadow-2xs ${
+                                    fotoAbastecimentoUrl
+                                      ? 'border-emerald-300 bg-emerald-50 text-emerald-900 font-bold hover:bg-emerald-100'
+                                      : 'border-emerald-200 bg-emerald-50/60 text-emerald-800 font-medium hover:bg-emerald-100'
+                                  }`}
+                                  title={
+                                    fotoAbastecimentoUrl
+                                      ? 'Abastecimento com foto! Toque para ver em tela cheia com zoom'
+                                      : 'Abastecimento atendido. Toque para anexar foto ou editar'
+                                  }
+                                >
+                                  {fotoAbastecimentoUrl && (
+                                    <Camera className="w-3 h-3 text-emerald-700" />
+                                  )}
+                                  <span>Abastecido 100%</span>
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setVisitaParaConcluir(v)
+                                    setFocoCriterio('abastecimento')
+                                    setConcluirModalOpen(true)
+                                  }}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-gray-200 bg-gray-50 text-gray-600 font-normal hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 transition-colors"
+                                  title="Não feito: toque para preencher critério e anexar foto"
+                                >
+                                  <span>+ Abastecimento</span>
+                                </button>
+                              )}
+
+                              {/* 3. Validades OK */}
+                              {hasValidadesOk ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (fotoValidadesUrl) {
+                                      setFotoModalState({
+                                        isOpen: true,
+                                        fotoUrl: fotoValidadesUrl,
+                                        titulo: `Validades Auditadas: ${fObj?.nome || 'Fornecedor'}`,
+                                        subtitulo: `Auditoria de validades na loja ${lObj?.nome || 'Loja'}`,
+                                        dataHora: v.data_visita
+                                          ? v.data_visita.substring(0, 10)
+                                          : undefined,
+                                      })
+                                    } else {
+                                      setVisitaParaConcluir(v)
+                                      setFocoCriterio('validades')
+                                      setConcluirModalOpen(true)
+                                    }
+                                  }}
+                                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded border transition-colors shadow-2xs ${
+                                    fotoValidadesUrl
+                                      ? 'border-blue-300 bg-blue-50 text-blue-900 font-bold hover:bg-blue-100'
+                                      : 'border-blue-200 bg-blue-50/60 text-blue-800 font-medium hover:bg-blue-100'
+                                  }`}
+                                  title={
+                                    fotoValidadesUrl
+                                      ? 'Validades com foto! Toque para ver em tela cheia com zoom'
+                                      : 'Validades atendidas. Toque para anexar foto ou editar'
+                                  }
+                                >
+                                  {fotoValidadesUrl && <Camera className="w-3 h-3 text-blue-700" />}
+                                  <span>Validades OK</span>
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setVisitaParaConcluir(v)
+                                    setFocoCriterio('validades')
+                                    setConcluirModalOpen(true)
+                                  }}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-gray-200 bg-gray-50 text-gray-600 font-normal hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 transition-colors"
+                                  title="Não feito: toque para preencher critério e anexar foto"
+                                >
+                                  <span>+ Validades</span>
                                 </button>
                               )}
                             </div>
-                          ) : v.observacoes ? (
-                            <span
-                              className="text-xs text-[#6B7280] italic truncate block"
-                              title={v.observacoes}
-                            >
-                              {v.observacoes}
-                            </span>
-                          ) : (
-                            <span className="text-xs text-gray-400">-</span>
-                          )}
+
+                            {/* Indicadores de Loja da Visita */}
+                            {(v.quantidade_sortimento !== undefined ||
+                              v.perc_vendas !== undefined) && (
+                              <div className="text-[11px] text-[#6B7280] flex items-center gap-2 flex-wrap">
+                                {v.quantidade_sortimento !== undefined && (
+                                  <span>
+                                    Sortimento: <b>{v.quantidade_sortimento} itens</b>
+                                  </span>
+                                )}
+                                {v.perc_vendas !== undefined && (
+                                  <span>
+                                    Vendas: <b>{v.perc_vendas}%</b>
+                                  </span>
+                                )}
+                                {v.qtd_rupturas !== undefined && v.qtd_rupturas > 0 && (
+                                  <span className="text-red-600 font-semibold">
+                                    Rupturas: {v.qtd_rupturas}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Link direto para a foto geral do trabalho se existir */}
+                            {v.foto_trabalho && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const url = `${pbBase}/api/files/visitas_promotor/${v.id}/${v.foto_trabalho}`
+                                  setFotoModalState({
+                                    isOpen: true,
+                                    fotoUrl: url,
+                                    titulo: `Foto da Visita: ${pObj?.nome || 'Promotor'}`,
+                                    subtitulo: `Loja ${lObj?.nome || 'Loja'} - ${v.data_visita ? v.data_visita.substring(0, 10) : ''}`,
+                                    dataHora: v.data_visita
+                                      ? v.data_visita.substring(0, 10)
+                                      : undefined,
+                                  })
+                                }}
+                                className="inline-flex items-center gap-1 text-[11px] text-[#2563EB] hover:underline font-semibold mt-0.5"
+                              >
+                                <Camera className="w-3 h-3" />
+                                <span>Ver foto do trabalho em tela cheia</span>
+                              </button>
+                            )}
+                          </div>
                         </td>
 
                         <td className="p-3.5 text-right">
@@ -785,6 +949,7 @@ export function PromotoresFornecedoresManager({
                               <button
                                 onClick={() => {
                                   setVisitaParaConcluir(v)
+                                  setFocoCriterio('geral')
                                   setConcluirModalOpen(true)
                                 }}
                                 className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded text-xs font-semibold transition-colors border border-emerald-200"
@@ -1214,7 +1379,7 @@ export function PromotoresFornecedoresManager({
               <table className="w-full text-left text-xs sm:text-sm">
                 <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563] text-xs font-semibold uppercase tracking-wider">
                   <tr>
-                    <th className="p-3.5">Título da Rotina</th>
+                    <th className="p-3.5">Título da Rotina (Item Padrão)</th>
                     <th className="p-3.5">Frequência</th>
                     <th className="p-3.5">Fornecedor / Loja</th>
                     <th className="p-3.5">Descrição</th>
@@ -1223,16 +1388,64 @@ export function PromotoresFornecedoresManager({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5E7EB]">
-                  {filteredRotinas.map((r) => {
+                  {filteredRotinas.map((r, idx) => {
                     const fObj = fornecedores.find((f) => f.id === r.fornecedor)
                     const lObj = lojas.find((l) => l.id === r.loja)
 
+                    // REGRA DO REQUISITO 2:
+                    // Primeiro item da rotina padrão do promotor (idx === 0) ou rotina com foto
+                    const isPrimeiroItem = idx === 0
+                    const hasFoto = !!r.foto_trabalho
+                    const rotinaFotoUrl = hasFoto
+                      ? `${pbBase}/api/files/rotinas_promotor/${r.id}/${r.foto_trabalho}`
+                      : null
+
                     return (
                       <tr key={r.id} className="hover:bg-gray-50/80 transition-colors">
-                        <td className="p-3.5 font-semibold text-[#1F2937]">
+                        {/* Título com regra visual do Requisito 2:
+                            - com foto/executado -> NEGRITO e toque abre a foto
+                            - sem foto/não feito -> SEM NEGRITO e toque abre o campo para preencher/anexar */}
+                        <td className="p-3.5 text-[#1F2937]">
                           <div className="flex items-center gap-2">
                             <Layers className="w-4 h-4 text-[#2563EB] shrink-0" />
-                            <span>{r.titulo}</span>
+
+                            {hasFoto ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (rotinaFotoUrl) {
+                                    setFotoModalState({
+                                      isOpen: true,
+                                      fotoUrl: rotinaFotoUrl,
+                                      titulo: r.titulo,
+                                      subtitulo: `Foto de execução da rotina (${fObj?.nome || 'Fornecedor'})`,
+                                    })
+                                  }
+                                }}
+                                className="font-bold text-[#1F2937] hover:text-[#2563EB] inline-flex items-center gap-1.5 transition-colors text-left"
+                                title="Rotina com foto de trabalho: toque para ver em tela cheia com zoom"
+                              >
+                                <span>{r.titulo}</span>
+                                <Camera className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditingRotina(r)
+                                  setRotinaModalOpen(true)
+                                }}
+                                className="font-normal text-[#4B5563] hover:text-[#2563EB] text-left transition-colors"
+                                title="Sem foto de trabalho: toque para editar e anexar a foto do trabalho"
+                              >
+                                <span>{r.titulo}</span>
+                                {isPrimeiroItem && (
+                                  <span className="ml-1 text-[10px] text-[#2563EB] font-medium bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200">
+                                    + Anexar Foto
+                                  </span>
+                                )}
+                              </button>
+                            )}
                           </div>
                         </td>
 
@@ -1314,6 +1527,7 @@ export function PromotoresFornecedoresManager({
         onOpenChange={setConcluirModalOpen}
         visita={visitaParaConcluir}
         rotinasDisponiveis={rotinasPromotor.filter((r) => r.ativa !== false)}
+        focoInicial={focoCriterio}
         onConcluir={(params) => {
           if (!visitaParaConcluir) return Promise.resolve()
           return onConcluirVisita(visitaParaConcluir.id, params)
@@ -1346,29 +1560,15 @@ export function PromotoresFornecedoresManager({
         onSave={(payload) => onSaveRotinaPromotor(payload, editingRotina?.id)}
       />
 
-      {/* Visualizador de Foto do Trabalho Realizado */}
-      <Dialog
-        open={!!fotoUrlVisualizar}
-        onOpenChange={(open) => !open && setFotoUrlVisualizar(null)}
-      >
-        <DialogContent className="max-w-2xl bg-white p-4">
-          <DialogHeader>
-            <DialogTitle className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
-              <Camera className="w-4 h-4 text-[#2563EB]" />
-              <span>{fotoTituloVisualizar || 'Comprovação de Trabalho'}</span>
-            </DialogTitle>
-          </DialogHeader>
-          <div className="mt-2 bg-neutral-900 rounded-lg p-2 flex items-center justify-center max-h-[70vh] overflow-hidden">
-            {fotoUrlVisualizar ? (
-              <img
-                src={fotoUrlVisualizar}
-                alt={fotoTituloVisualizar}
-                className="max-h-[65vh] max-w-full object-contain rounded"
-              />
-            ) : null}
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Visualizador de Foto em Tela Cheia com Zoom (Reutilizando FotoVisualizadorModal) */}
+      <FotoVisualizadorModal
+        isOpen={fotoModalState.isOpen}
+        fotoUrl={fotoModalState.fotoUrl}
+        titulo={fotoModalState.titulo}
+        subtitulo={fotoModalState.subtitulo}
+        dataHora={fotoModalState.dataHora}
+        onClose={() => setFotoModalState((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   )
 }

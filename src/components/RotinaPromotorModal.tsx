@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { Camera, Image as ImageIcon } from 'lucide-react'
 
 interface RotinaPromotorModalProps {
   open: boolean
@@ -18,7 +19,7 @@ interface RotinaPromotorModalProps {
   data: RotinaPromotor | null
   fornecedores: Fornecedor[]
   lojas: Loja[]
-  onSave: (payload: Partial<RotinaPromotor>) => Promise<void>
+  onSave: (payload: Partial<RotinaPromotor> | FormData) => Promise<void>
 }
 
 export function RotinaPromotorModal({
@@ -35,6 +36,7 @@ export function RotinaPromotorModal({
   const [loja, setLoja] = useState('')
   const [frequencia, setFrequencia] = useState('Em cada visita')
   const [ativa, setAtiva] = useState(true)
+  const [fotoFile, setFotoFile] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
@@ -45,6 +47,7 @@ export function RotinaPromotorModal({
       setLoja(data.loja || '')
       setFrequencia(data.frequencia || 'Em cada visita')
       setAtiva(data.ativa !== false)
+      setFotoFile(null)
     } else {
       setTitulo('')
       setDescricao('')
@@ -52,6 +55,7 @@ export function RotinaPromotorModal({
       setLoja('')
       setFrequencia('Em cada visita')
       setAtiva(true)
+      setFotoFile(null)
     }
   }, [data, open])
 
@@ -61,23 +65,41 @@ export function RotinaPromotorModal({
 
     setSubmitting(true)
     try {
-      await onSave({
-        titulo: titulo.trim(),
-        descricao: descricao.trim() || undefined,
-        fornecedor: fornecedor || undefined,
-        loja: loja || undefined,
-        frequencia: frequencia.trim() || undefined,
-        ativa,
-      })
+      if (fotoFile) {
+        const formData = new FormData()
+        formData.append('titulo', titulo.trim())
+        if (descricao.trim()) formData.append('descricao', descricao.trim())
+        if (fornecedor) formData.append('fornecedor', fornecedor)
+        if (loja) formData.append('loja', loja)
+        if (frequencia.trim()) formData.append('frequencia', frequencia.trim())
+        formData.append('ativa', String(ativa))
+        formData.append('foto_trabalho', fotoFile)
+        await onSave(formData)
+      } else {
+        await onSave({
+          titulo: titulo.trim(),
+          descricao: descricao.trim() || undefined,
+          fornecedor: fornecedor || undefined,
+          loja: loja || undefined,
+          frequencia: frequencia.trim() || undefined,
+          ativa,
+        })
+      }
       onOpenChange(false)
     } finally {
       setSubmitting(false)
     }
   }
 
+  const pbBase = (import.meta as any).env.VITE_POCKETBASE_URL || ''
+  const currentFotoUrl =
+    data?.foto_trabalho && data.id
+      ? `${pbBase}/api/files/rotinas_promotor/${data.id}/${data.foto_trabalho}`
+      : null
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] bg-white">
+      <DialogContent className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto bg-white">
         <DialogHeader>
           <DialogTitle className="text-base font-bold text-[#1F2937]">
             {data ? 'Editar Rotina de Promotor' : 'Nova Rotina Operacional de Promotor'}
@@ -93,9 +115,59 @@ export function RotinaPromotorModal({
               required
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
-              placeholder="Ex: Abastecimento de gôndola e pontos extras"
+              placeholder="Ex: Abastecimento 100% e Puxar Frente (FIFO)"
               className="text-sm"
             />
+          </div>
+
+          {/* Foto de Referência / Trabalho da Rotina */}
+          <div className="p-3 bg-blue-50/40 border border-blue-200 rounded-lg space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Camera className="w-4 h-4 text-[#2563EB]" />
+                <Label className="text-xs font-bold text-[#1F2937] uppercase tracking-wider">
+                  Foto do Trabalho / Exposição de Referência
+                </Label>
+              </div>
+              <span className="text-[10px] text-[#2563EB] font-semibold bg-white px-2 py-0.5 rounded border border-blue-200">
+                Padrão / Execução
+              </span>
+            </div>
+            <p className="text-[11px] text-[#4B5563]">
+              Anexe a foto do trabalho realizado ou modelo de execução de gôndola para esta rotina.
+            </p>
+
+            {currentFotoUrl && !fotoFile && (
+              <div className="flex items-center gap-3 p-2 bg-white rounded border border-[#E5E7EB]">
+                <img
+                  src={currentFotoUrl}
+                  alt="Foto atual"
+                  className="w-12 h-12 object-cover rounded"
+                />
+                <div className="text-xs text-[#374151]">
+                  <div className="font-medium">Foto atual cadastrada</div>
+                  <div className="text-[11px] text-[#6B7280]">
+                    Selecione um novo arquivo para substituir
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <Input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) setFotoFile(file)
+              }}
+              className="text-xs bg-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-[#2563EB]/10 file:text-[#2563EB]"
+            />
+            {fotoFile && (
+              <div className="text-[11px] text-emerald-700 font-medium">
+                ✓ Novo arquivo: {fotoFile.name} ({(fotoFile.size / 1024).toFixed(0)} KB)
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5">
@@ -105,7 +177,7 @@ export function RotinaPromotorModal({
             <Input
               value={frequencia}
               onChange={(e) => setFrequencia(e.target.value)}
-              placeholder="Ex: Em cada visita, Semanal, Até 11:00..."
+              placeholder="Ex: Toda visita, Semanal, Até 11:00..."
               className="text-sm"
             />
           </div>

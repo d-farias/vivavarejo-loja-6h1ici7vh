@@ -290,6 +290,7 @@ export interface RotinaPromotor extends RecordModel {
   loja?: string
   frequencia?: string
   ativa?: boolean
+  foto_trabalho?: string
   created: string
   updated: string
   expand?: {
@@ -314,6 +315,9 @@ export interface VisitaPromotor extends RecordModel {
   alerta_enviado_em?: string
   // Novos campos exigidos pelo usuário (Frente 2)
   foto_trabalho?: string
+  foto_gondola?: string
+  foto_abastecimento?: string
+  foto_validades?: string
   checklist_abastecimento_100?: boolean
   checklist_validades_ok?: boolean
   checklist_layout_conforme?: boolean

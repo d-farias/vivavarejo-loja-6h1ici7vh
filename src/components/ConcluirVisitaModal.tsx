@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import type { VisitaPromotor, RotinaPromotor } from '@/types'
 import {
   Dialog,
@@ -20,12 +20,16 @@ import {
   CheckSquare,
   BarChart2,
   ShieldCheck,
+  Sparkles,
 } from 'lucide-react'
 
 export interface ConcluirVisitaPayload {
   conclusao_check: string
   rotinas_executadas?: string
   foto_trabalho?: File
+  foto_gondola?: File
+  foto_abastecimento?: File
+  foto_validades?: File
   checklist_abastecimento_100: boolean
   checklist_validades_ok: boolean
   checklist_layout_conforme: boolean
@@ -37,11 +41,14 @@ export interface ConcluirVisitaPayload {
   validador_fiscalizacao?: string
 }
 
+export type CriterioFoco = 'abastecimento' | 'validades' | 'layout' | 'geral'
+
 interface ConcluirVisitaModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   visita: VisitaPromotor | null
   rotinasDisponiveis?: RotinaPromotor[]
+  focoInicial?: CriterioFoco
   onConcluir: (payload: ConcluirVisitaPayload | FormData) => Promise<void>
 }
 
@@ -50,6 +57,7 @@ export function ConcluirVisitaModal({
   onOpenChange,
   visita,
   rotinasDisponiveis = [],
+  focoInicial = 'geral',
   onConcluir,
 }: ConcluirVisitaModalProps) {
   const [conclusaoCheck, setConclusaoCheck] = useState('')
@@ -73,6 +81,11 @@ export function ConcluirVisitaModal({
 
   const [submitting, setSubmitting] = useState(false)
 
+  // Refs para scroll/foco imediato
+  const checklistRef = useRef<HTMLDivElement>(null)
+  const fotoInputRef = useRef<HTMLInputElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
   useEffect(() => {
     if (visita) {
       setConclusaoCheck(visita.conclusao_check || '')
@@ -86,9 +99,26 @@ export function ConcluirVisitaModal({
       } else {
         setSelectedRotinas([])
       }
-      setChecklistAbastecimento(visita.checklist_abastecimento_100 ?? true)
-      setChecklistValidades(visita.checklist_validades_ok ?? true)
-      setChecklistLayout(visita.checklist_layout_conforme ?? true)
+
+      // Se abrir por um critério específico que não estava feito, pré-marca ou prepara para preenchimento
+      if (focoInicial === 'abastecimento') {
+        setChecklistAbastecimento(true)
+      } else {
+        setChecklistAbastecimento(visita.checklist_abastecimento_100 ?? true)
+      }
+
+      if (focoInicial === 'validades') {
+        setChecklistValidades(true)
+      } else {
+        setChecklistValidades(visita.checklist_validades_ok ?? true)
+      }
+
+      if (focoInicial === 'layout') {
+        setChecklistLayout(true)
+      } else {
+        setChecklistLayout(visita.checklist_layout_conforme ?? true)
+      }
+
       setQuantidadeSortimento(visita.quantidade_sortimento ?? 30)
       setPercVendas(visita.perc_vendas ?? 95)
       setQtdRupturas(visita.qtd_rupturas ?? 0)
@@ -96,6 +126,24 @@ export function ConcluirVisitaModal({
       setResponsavelExecucao(visita.responsavel_execucao || 'Encarregado / GO')
       setValidadorFiscalizacao(visita.validador_fiscalizacao || 'Gerente de Loja')
       setFotoFile(null)
+
+      // Se não havia resumo preenchido, sugerir texto baseado no foco
+      if (!visita.conclusao_check) {
+        if (focoInicial === 'layout') {
+          setConclusaoCheck('Exposição e gôndola organizadas conforme planograma e foto anexada.')
+        } else if (focoInicial === 'abastecimento') {
+          setConclusaoCheck('Reposição e abastecimento 100% finalizados com foto comprobatória.')
+        } else if (focoInicial === 'validades') {
+          setConclusaoCheck('Auditoria de validades realizada e trocas segregadas.')
+        }
+      }
+
+      // Foco suave
+      setTimeout(() => {
+        if (focoInicial !== 'geral') {
+          checklistRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 100)
     } else {
       setConclusaoCheck('')
       setSelectedRotinas([])
@@ -110,7 +158,7 @@ export function ConcluirVisitaModal({
       setValidadorFiscalizacao('Gerente de Loja')
       setFotoFile(null)
     }
-  }, [visita, open])
+  }, [visita, open, focoInicial])
 
   const toggleRotina = (titulo: string) => {
     setSelectedRotinas((prev) =>
@@ -142,6 +190,16 @@ export function ConcluirVisitaModal({
         formData.append('responsavel_execucao', responsavelExecucao)
         formData.append('validador_fiscalizacao', validadorFiscalizacao)
         formData.append('foto_trabalho', fotoFile)
+
+        // Se o foco era layout/gondola, alimentar também foto_gondola
+        if (focoInicial === 'layout') {
+          formData.append('foto_gondola', fotoFile)
+        } else if (focoInicial === 'abastecimento') {
+          formData.append('foto_abastecimento', fotoFile)
+        } else if (focoInicial === 'validades') {
+          formData.append('foto_validades', fotoFile)
+        }
+
         await onConcluir(formData)
       } else {
         await onConcluir({
@@ -205,18 +263,53 @@ export function ConcluirVisitaModal({
           )}
         </div>
 
+        {focoInicial !== 'geral' && (
+          <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-md text-xs text-[#1E40AF] flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#2563EB] shrink-0" />
+            <span>
+              Preenchimento rápido para o critério:{' '}
+              <b>
+                {focoInicial === 'layout'
+                  ? 'Layout / Gôndola Conforme'
+                  : focoInicial === 'abastecimento'
+                    ? 'Abastecimento 100%'
+                    : 'Validades OK'}
+              </b>
+              . Marque o critério e anexe a foto comprobatória abaixo.
+            </span>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4 pt-1">
           {/* Checklist Expresso do Usuário: Abastecimento 100%, Validades e Layout */}
-          <div className="p-3 bg-emerald-50/50 border border-emerald-200 rounded-lg space-y-2">
-            <div className="flex items-center gap-2">
-              <CheckSquare className="w-4 h-4 text-emerald-700" />
-              <div className="text-xs font-bold text-[#1F2937] uppercase tracking-wider">
-                Checklist Operacional da Visita (Padrão de Reposição)
+          <div
+            ref={checklistRef}
+            className={`p-3 rounded-lg space-y-2 border ${
+              focoInicial !== 'geral'
+                ? 'bg-blue-50/50 border-blue-300 ring-2 ring-blue-100'
+                : 'bg-emerald-50/50 border-emerald-200'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckSquare className="w-4 h-4 text-emerald-700" />
+                <div className="text-xs font-bold text-[#1F2937] uppercase tracking-wider">
+                  Checklist Operacional da Visita (Critérios de Reposição)
+                </div>
               </div>
+              <span className="text-[10px] text-[#2563EB] font-semibold bg-white px-2 py-0.5 rounded border border-blue-200">
+                Toque para marcar
+              </span>
             </div>
 
             <div className="space-y-2 pt-1 text-xs">
-              <label className="flex items-center gap-2 cursor-pointer font-medium text-[#1F2937]">
+              <label
+                className={`flex items-center gap-2 cursor-pointer p-1.5 rounded transition-colors ${
+                  focoInicial === 'abastecimento'
+                    ? 'bg-blue-100/60 font-bold text-[#1E3A8A]'
+                    : 'font-medium text-[#1F2937] hover:bg-white/60'
+                }`}
+              >
                 <input
                   type="checkbox"
                   checked={checklistAbastecimento}
@@ -226,7 +319,13 @@ export function ConcluirVisitaModal({
                 <span>Abastecimento 100% com base no estoque em loja (critério reposição)</span>
               </label>
 
-              <label className="flex items-center gap-2 cursor-pointer font-medium text-[#1F2937]">
+              <label
+                className={`flex items-center gap-2 cursor-pointer p-1.5 rounded transition-colors ${
+                  focoInicial === 'validades'
+                    ? 'bg-blue-100/60 font-bold text-[#1E3A8A]'
+                    : 'font-medium text-[#1F2937] hover:bg-white/60'
+                }`}
+              >
                 <input
                   type="checkbox"
                   checked={checklistValidades}
@@ -236,7 +335,13 @@ export function ConcluirVisitaModal({
                 <span>Validades auditadas (FIFO aplicado e separação de trocas/quebras)</span>
               </label>
 
-              <label className="flex items-center gap-2 cursor-pointer font-medium text-[#1F2937]">
+              <label
+                className={`flex items-center gap-2 cursor-pointer p-1.5 rounded transition-colors ${
+                  focoInicial === 'layout'
+                    ? 'bg-blue-100/60 font-bold text-[#1E3A8A]'
+                    : 'font-medium text-[#1F2937] hover:bg-white/60'
+                }`}
+              >
                 <input
                   type="checkbox"
                   checked={checklistLayout}
@@ -263,10 +368,12 @@ export function ConcluirVisitaModal({
               </span>
             </div>
             <p className="text-[11px] text-[#4B5563]">
-              Registre ou anexe a foto da gôndola abastecida conforme layout para validação pela
-              gerência.
+              {focoInicial === 'layout'
+                ? 'Anexe a foto da exposição ou gôndola para comprovação visual imediata.'
+                : 'Registre ou anexe a foto da gôndola abastecida conforme layout para validação pela gerência.'}
             </p>
             <Input
+              ref={fotoInputRef}
               type="file"
               accept="image/*"
               capture="environment"
@@ -279,6 +386,12 @@ export function ConcluirVisitaModal({
             {fotoFile && (
               <div className="text-[11px] text-emerald-700 font-medium">
                 ✓ Arquivo selecionado: {fotoFile.name} ({(fotoFile.size / 1024).toFixed(0)} KB)
+              </div>
+            )}
+            {visita.foto_trabalho && !fotoFile && (
+              <div className="text-[11px] text-[#6B7280]">
+                Já existe foto registrada nesta visita. Enviar novo arquivo substituirá a foto
+                atual.
               </div>
             )}
           </div>
@@ -297,7 +410,7 @@ export function ConcluirVisitaModal({
               </span>
             </div>
             <p className="text-[11px] text-[#6B7280]">
-              Preencha os indicadores da visita ou aguarde sincronização futura via integração ERP.
+              Preencha os indicadores da visita ou mantenha os valores sincronizados.
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
@@ -420,6 +533,7 @@ export function ConcluirVisitaModal({
               Resumo / Observações do que foi Feito <span className="text-red-500">*</span>
             </Label>
             <Textarea
+              ref={textareaRef}
               required
               rows={3}
               value={conclusaoCheck}
@@ -443,7 +557,7 @@ export function ConcluirVisitaModal({
               className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white"
               disabled={submitting || !conclusaoCheck.trim()}
             >
-              {submitting ? 'Salvando...' : 'Confirmar Avaliação e Concluir'}
+              {submitting ? 'Salvando...' : 'Confirmar e Salvar'}
             </Button>
           </DialogFooter>
         </form>

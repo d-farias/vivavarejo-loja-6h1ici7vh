@@ -91,6 +91,10 @@ export const visitasPromotorService = {
           responsavel_execucao?: string
           validador_fiscalizacao?: string
           status_fiscalizacao?: 'pendente' | 'aprovada' | 'devolvida'
+          foto_trabalho?: string
+          foto_gondola?: string
+          foto_abastecimento?: string
+          foto_validades?: string
         },
   ): Promise<VisitaPromotor> {
     const nowIso = new Date().toISOString()
@@ -120,6 +124,10 @@ export const visitasPromotorService = {
         responsavel_execucao: params.responsavel_execucao,
         validador_fiscalizacao: params.validador_fiscalizacao,
         status_fiscalizacao: params.status_fiscalizacao || 'pendente',
+        foto_trabalho: params.foto_trabalho,
+        foto_gondola: params.foto_gondola,
+        foto_abastecimento: params.foto_abastecimento,
+        foto_validades: params.foto_validades,
       },
       {
         expand: 'promotor,promotor.fornecedor,loja',
@@ -160,13 +168,13 @@ export const rotinasPromotorService = {
     return await pb.collection('rotinas_promotor').getFullList<RotinaPromotor>(options)
   },
 
-  async create(data: Partial<RotinaPromotor>): Promise<RotinaPromotor> {
+  async create(data: Partial<RotinaPromotor> | FormData): Promise<RotinaPromotor> {
     return await pb.collection('rotinas_promotor').create<RotinaPromotor>(data, {
       expand: 'fornecedor,loja',
     })
   },
 
-  async update(id: string, data: Partial<RotinaPromotor>): Promise<RotinaPromotor> {
+  async update(id: string, data: Partial<RotinaPromotor> | FormData): Promise<RotinaPromotor> {
     return await pb.collection('rotinas_promotor').update<RotinaPromotor>(id, data, {
       expand: 'fornecedor,loja',
     })

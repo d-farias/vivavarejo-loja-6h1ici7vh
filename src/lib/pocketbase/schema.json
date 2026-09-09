@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-09T00:27:20.055Z",
+  "generatedAt": "2026-09-09T00:52:21.027Z",
   "collections": [
     {
       "name": "users",
@@ -1142,6 +1142,12 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "foto_trabalho",
+          "type": "file",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -1315,6 +1321,24 @@
         {
           "name": "is_exemplo",
           "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "foto_gondola",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "foto_abastecimento",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "foto_validades",
+          "type": "file",
           "required": false,
           "system": false
         }
