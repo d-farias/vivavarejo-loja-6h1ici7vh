@@ -594,24 +594,38 @@ export function MaterialVendaAba() {
 
   // Impressão / Salvar em PDF (otimizado para Mobile iOS Safari e Desktop)
   const handlePrint = () => {
+    setImprimindo(true)
+    const originalTitle = document.title
+    document.title = 'VivaVarejo'
+
+    // Limpeza de estado após o retorno do diálogo de impressão nativo
+    const cleanup = () => {
+      document.title = originalTitle
+      setImprimindo(false)
+      window.removeEventListener('afterprint', cleanup)
+    }
+    window.addEventListener('afterprint', cleanup)
+
     try {
-      setImprimindo(true)
-      const originalTitle = document.title
-      document.title = 'VivaVarejo'
-      setTimeout(() => {
-        window.print()
-        document.title = originalTitle
-        setImprimindo(false)
-      }, 100)
+      // Disparo síncrono no mesmo tick do gesto do usuário
+      window.print()
     } catch (err) {
       console.error('Falha ao acionar window.print():', err)
-      setImprimindo(false)
+      cleanup()
       toast({
         title: 'Não foi possível abrir o diálogo de impressão',
         description: 'Tente usar o botão de Compartilhar Link ou Enviar pelo WhatsApp.',
         variant: 'destructive',
       })
     }
+
+    // Fallback de segurança para navegadores que não disparam afterprint imediatamente
+    setTimeout(() => {
+      if (document.title === 'VivaVarejo') {
+        document.title = originalTitle
+      }
+      setImprimindo(false)
+    }, 1000)
   }
 
   // Obter link direto para envio
@@ -680,11 +694,14 @@ export function MaterialVendaAba() {
     }
   }
 
-  // Enviar direto via WhatsApp
+  // Enviar direto via WhatsApp (usa wa.me com target _blank e fallback seguro)
   const handleWhatsAppShare = () => {
     const mensagem = encodeURIComponent(getShareText())
-    const waUrl = `https://api.whatsapp.com/send?text=${mensagem}`
-    window.open(waUrl, '_blank', 'noopener,noreferrer')
+    const waUrl = `https://wa.me/?text=${mensagem}`
+    const win = window.open(waUrl, '_blank', 'noopener,noreferrer')
+    if (!win) {
+      window.location.href = waUrl
+    }
   }
 
   return (
