@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <!-- Sombra suave para o card central -->
+    <filter id="card-shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.06" />
+    </filter>
+    <filter id="icon-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#2563EB" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Fundo suave corporativo VivaVarejo -->
+  <rect width="1200" height="630" fill="#F7F7F5" />
+
+  <!-- Padrão geométrico suave no fundo -->
+  <g opacity="0.35">
+    <circle cx="1080" cy="90" r="240" fill="#E0E7FF" />
+    <circle cx="120" cy="540" r="180" fill="#DBEAFE" />
+  </g>
+
+  <!-- Card Central Elegante -->
+  <rect x="70" y="65" width="1060" height="500" rx="28" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="2" filter="url(#card-shadow)" />
+
+  <!-- Faixa de destaque azul na base do card -->
+  <path d="M 70 537 A 28 28 0 0 0 98 565 L 1102 565 A 28 28 0 0 0 1130 537 L 1130 545 L 70 545 Z" fill="#2563EB" />
+
+  <!-- CONTEÚDO PRINCIPAL: Ícone da marca + Tipografia -->
+  <g transform="translate(140, 160)">
+    <!-- Ícone Quadrado Azul Arredondado com Losango Branco Girado 45° (o símbolo oficial do app) -->
+    <g filter="url(#icon-shadow)">
+      <rect x="0" y="0" width="160" height="160" rx="36" fill="#2563EB" />
+      <g transform="translate(80, 80) rotate(45)">
+        <rect x="-30" y="-30" width="60" height="60" rx="10" fill="none" stroke="#FFFFFF" stroke-width="12" />
+        <circle cx="0" cy="0" r="8" fill="#FFFFFF" />
+      </g>
+    </g>
+
+    <!-- Bloco Tipográfico da Marca -->
+    <g transform="translate(200, 30)">
+      <!-- Nome da Marca -->
+      <text x="0" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="64" font-weight="900" letter-spacing="1.5" fill="#1F2937">
+        VivaVarejo
+      </text>
+
+      <!-- Tagline Oficial Aprovada -->
+      <text x="0" y="112" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" fill="#2563EB">
+        Da informação à execução no chão de loja.
+      </text>
+    </g>
+  </g>
+
+  <!-- Tag corporativa / Badge no rodapé do card -->
+  <g transform="translate(140, 420)">
+    <rect x="0" y="0" width="530" height="40" rx="20" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.5" />
+    <text x="24" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="700" fill="#1D4ED8" letter-spacing="0.5">
+      SISTEMA OPERACIONAL DE LOJA &amp; PREVENÇÃO DE PERDAS
+    </text>
+  </g>
+
+  <!-- Domínio Oficial Canônico -->
+  <g transform="translate(860, 445)">
+    <text x="240" y="0" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="700" fill="#6B7280">
+      vivavarejo.goskip.app
+    </text>
+  </g>
+</svg>

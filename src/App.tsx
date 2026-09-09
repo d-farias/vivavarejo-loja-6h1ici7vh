@@ -30,6 +30,22 @@ const DocumentTitleSync = () => {
     }
   }, [location.pathname])
 
+  // Observer de proteção: caso algum código externo/terceiro tente alterar document.title em runtime,
+  // restaura imediatamente para 'VivaVarejo' (exceto durante a impressão, que é rápida e permitida).
+  useEffect(() => {
+    const titleElement = document.querySelector('title')
+    if (!titleElement) return
+
+    const observer = new MutationObserver(() => {
+      if (document.title !== 'VivaVarejo') {
+        document.title = 'VivaVarejo'
+      }
+    })
+
+    observer.observe(titleElement, { childList: true, characterData: true, subtree: true })
+    return () => observer.disconnect()
+  }, [])
+
   return null
 }
 

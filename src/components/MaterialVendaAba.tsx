@@ -26,6 +26,7 @@ import {
   ZoomIn,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { getCanonicalShareUrl, shareVivaVarejo } from '@/lib/share-utils'
 
 export type VersaoMaterial = 'cliente' | 'interna'
 
@@ -624,53 +625,60 @@ export function MaterialVendaAba() {
     }, 1000)
   }
 
-  // Obter link direto para envio
+  // Obter link direto canônico para envio (produção sempre)
   const getShareUrl = () => {
-    if (typeof window === 'undefined') return ''
-    return window.location.href
+    return getCanonicalShareUrl('/admin')
   }
 
   const getShareText = () => {
+    const link = getShareUrl()
     if (isCliente) {
       return (
         'VivaVarejo — Sistema Operacional de Loja & Prevenção de Perdas:\n\n' +
         'Conheça por que o VivaVarejo é a camada de execução entre o ERP e o chão de loja para supermercados, farmácias, moda, açougues e todo o varejo.\n\n' +
         'Acesse pelo link:\n' +
-        getShareUrl()
+        link
       )
     }
     return (
-      '[USO INTERNO] Apresentação Comercial, Matriz de Diferenciais e Pitch — VivaVarejo:\n' +
-      getShareUrl()
+      'VivaVarejo — Apresentação Comercial, Matriz de Diferenciais e Pitch:\n\n' +
+      'Acesse pelo link:\n' +
+      link
     )
   }
 
   // Compartilhar Nativo (navigator.share com fallback para cópia)
   const handleNativeShare = async () => {
-    const url = getShareUrl()
-    const text = isCliente
-      ? 'Apresentação Comercial VivaVarejo — A Camada de Execução no Varejo Físico'
-      : 'Guia de Pitch Comercial VivaVarejo (Uso Interno da Equipe)'
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: text,
-          text: isCliente
-            ? 'Guia completo de soluções e diferenciais do VivaVarejo frente a sistemas convencionais.'
-            : text,
-          url,
+    const result = await shareVivaVarejo({
+      title: isCliente ? 'Apresentação Comercial VivaVarejo' : 'Guia de Soluções VivaVarejo',
+      text: isCliente
+        ? 'VivaVarejo — Da informação à execução no chão de loja.'
+        : 'VivaVarejo — Sistema Operacional de Loja & Prevenção de Perdas.',
+      pathOrUrl: '/admin',
+      onCopied: () => {
+        setCopiado(true)
+        toast({
+          title: 'Link copiado!',
+          description: 'O link oficial VivaVarejo foi copiado para sua área de transferência.',
         })
-        return
-      } catch (err: unknown) {
-        if ((err as Error)?.name === 'AbortError') return
-      }
-    }
+        setTimeout(() => setCopiado(false), 2500)
+      },
+      onError: () => {
+        toast({
+          title: 'Erro ao copiar',
+          description: 'Não foi possível copiar o link automaticamente.',
+          variant: 'destructive',
+        })
+      },
+    })
 
-    handleCopyLink()
+    if (result === 'copied') {
+      setCopiado(true)
+      setTimeout(() => setCopiado(false), 2500)
+    }
   }
 
-  // Copiar link
+  // Copiar link oficial
   const handleCopyLink = async () => {
     try {
       const url = getShareUrl()
@@ -678,13 +686,13 @@ export function MaterialVendaAba() {
       setCopiado(true)
       toast({
         title: 'Link copiado!',
-        description: 'O link foi copiado para sua área de transferência.',
+        description: 'O link oficial VivaVarejo foi copiado para sua área de transferência.',
       })
       setTimeout(() => setCopiado(false), 2500)
     } catch {
       toast({
         title: 'Erro ao copiar',
-        description: 'Copie o endereço diretamente da barra do navegador.',
+        description: 'Copie o endereço oficial: ' + getShareUrl(),
         variant: 'destructive',
       })
     }
