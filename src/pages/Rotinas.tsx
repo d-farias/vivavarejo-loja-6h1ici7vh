@@ -58,7 +58,8 @@ export default function Rotinas() {
   const [error, setError] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedFreq, setSelectedFreq] = useState<string>('Todas')
-  const [selectedArea, setSelectedArea] = useState<string>('Todas')
+  const [selectedDepartamento, setSelectedDepartamento] = useState<string>('Todos')
+  const [selectedFuncao, setSelectedFuncao] = useState<string>('Todas')
   const [selectedRotina, setSelectedRotina] = useState<Rotina | null>(null)
   const [submittingId, setSubmittingId] = useState<string | null>(null)
   const [visualizarFotoExecucao, setVisualizarFotoExecucao] = useState<{
@@ -251,22 +252,21 @@ export default function Rotinas() {
 
   // Importados de @/lib/cargos para manter o padrão unificado em todas as telas
 
-  // 1. Departamentos / Áreas: derivados APENAS de rotinas efetivamente conciliadas COM A LOJA
-  // Se não houver rotinas conciliadas para este modelo, permanece 100% EM BRANCO (Array vazio).
-  // Deduplica usando os nomes canônicos
-  const availableAreas = useMemo(() => {
+  // 1. Departamentos / Setores: derivados de rotinas conciliadas da loja (ou área/função mapeada)
+  // Se não houver rotinas conciliadas para este modelo, permanece em branco.
+  const availableDepartamentos = useMemo(() => {
     if (!modeloSelecionado || !isConciliado) return []
-    const areasMap = new Map<string, string>()
+    const deptosMap = new Map<string, string>()
     rotinasConciliadas.forEach((r) => {
       const raw = (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim()) || ''
       if (!raw) return
       const canonico = normalizarNomeCanonico(raw)
       const chave = getChaveCanonico(canonico)
-      if (!areasMap.has(chave)) {
-        areasMap.set(chave, canonico)
+      if (!deptosMap.has(chave)) {
+        deptosMap.set(chave, canonico)
       }
     })
-    return Array.from(areasMap.values()).sort((a, b) => a.localeCompare(b))
+    return Array.from(deptosMap.values()).sort((a, b) => a.localeCompare(b))
   }, [modeloSelecionado, isConciliado, rotinasConciliadas])
 
   // 2. Funções / Cargos: derivados APENAS de rotinas efetivamente conciliadas COM A LOJA
@@ -468,8 +468,7 @@ export default function Rotinas() {
         const matchResp = r.responsavel.toLowerCase().includes(query)
         const matchFerramenta = r.ferramenta?.toLowerCase().includes(query) || false
         const matchValidacao = r.validacao?.toLowerCase().includes(query) || false
-        const matchArea = r.area?.toLowerCase().includes(query) || false
-        if (!matchName && !matchResp && !matchFerramenta && !matchValidacao && !matchArea) {
+        if (!matchName && !matchResp && !matchFerramenta && !matchValidacao) {
           return false
         }
       }
@@ -489,17 +488,32 @@ export default function Rotinas() {
         }
       }
 
-      // Area filter
-      if (selectedArea !== 'Todas') {
-        const rawRoutineArea =
+      // Filtro por Departamento / Setor (clicado no grupo acima)
+      if (selectedDepartamento !== 'Todos') {
+        const rawRoutineDept =
           (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim()) || ''
-        const canonicoRoutineArea = normalizarNomeCanonico(rawRoutineArea)
-        const chaveRoutine = getChaveCanonico(canonicoRoutineArea)
-        const chaveSelected = getChaveCanonico(selectedArea)
+        const canonicoRoutineDept = normalizarNomeCanonico(rawRoutineDept)
+        const chaveRoutine = getChaveCanonico(canonicoRoutineDept)
+        const chaveSelected = getChaveCanonico(selectedDepartamento)
         if (
           chaveRoutine !== chaveSelected &&
-          canonicoRoutineArea !== selectedArea &&
-          rawRoutineArea !== selectedArea
+          canonicoRoutineDept !== selectedDepartamento &&
+          rawRoutineDept !== selectedDepartamento
+        ) {
+          return false
+        }
+      }
+
+      // Filtro por Função / Cargo (clicado no grupo acima)
+      if (selectedFuncao !== 'Todas') {
+        const rawResp = (r.responsavel && r.responsavel.trim()) || ''
+        const canonicoResp = normalizarNomeCanonico(rawResp)
+        const chaveResp = getChaveCanonico(canonicoResp)
+        const chaveSelectedFunc = getChaveCanonico(selectedFuncao)
+        if (
+          chaveResp !== chaveSelectedFunc &&
+          canonicoResp !== selectedFuncao &&
+          rawResp !== selectedFuncao
         ) {
           return false
         }
@@ -507,12 +521,13 @@ export default function Rotinas() {
 
       return true
     })
-  }, [rotinasExibicao, searchTerm, selectedFreq, selectedArea])
+  }, [rotinasExibicao, searchTerm, selectedFreq, selectedDepartamento, selectedFuncao])
 
   const clearFilters = () => {
     setSearchTerm('')
     setSelectedFreq('Todas')
-    setSelectedArea('Todas')
+    setSelectedDepartamento('Todos')
+    setSelectedFuncao('Todas')
   }
 
   // Esc key closes modals
@@ -626,8 +641,9 @@ export default function Rotinas() {
           }
         }}
         onSelectModelo={(mod) => {
-          // Ao selecionar um modelo, resetamos os filtros para não manter filtro de área do modelo anterior
-          setSelectedArea('Todas')
+          // Ao selecionar um modelo, resetamos os filtros para não manter filtros do modelo anterior
+          setSelectedDepartamento('Todos')
+          setSelectedFuncao('Todas')
           setSelectedFreq('Todas')
           setSearchTerm('')
           setModeloSelecionado(mod)
@@ -657,8 +673,8 @@ export default function Rotinas() {
                 {modeloSelecionado ? (
                   isConciliado ? (
                     <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      {availableAreas.length} departamentos • {funcoesExibicao.length} funções
-                      conciliadas ({modeloSelecionado.nome})
+                      {availableDepartamentos.length} departamentos • {funcoesExibicao.length}{' '}
+                      funções conciliadas ({modeloSelecionado.nome})
                     </span>
                   ) : (
                     <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
@@ -674,7 +690,7 @@ export default function Rotinas() {
               <p className="text-[11px] text-[#6B7280] truncate">
                 {modeloSelecionado
                   ? isConciliado
-                    ? `Departamentos e funções conciliados na loja para o modelo ${modeloSelecionado.nome}.`
+                    ? 'Clique num departamento ou função para detalhar as rotinas correspondentes abaixo.'
                     : `Nenhuma função conciliada para ${modeloSelecionado.nome}. Importe a planilha ou aplique o modelo para conciliar.`
                   : 'Escolha um modelo na biblioteca acima para visualizar departamentos e funções mapeados.'}
               </p>
@@ -703,17 +719,28 @@ export default function Rotinas() {
 
         {/* Conteúdo Expansível: só renderiza quando o usuário clica para abrir */}
         {departamentosAberto && (
-          <div className="px-3.5 pb-4 pt-2 border-t border-[#E5E7EB] bg-[#F7F7F5]/30 space-y-3.5 animate-fade-in">
-            {/* Departamentos / Áreas */}
+          <div className="px-3.5 pb-4 pt-2 border-t border-[#E5E7EB] bg-[#F7F7F5]/30 space-y-4 animate-fade-in">
+            {/* 1. Departamentos / Setores */}
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563] block mb-2">
-                Departamentos / Setores Conciliados ({availableAreas.length})
-              </span>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563]">
+                  Departamentos / Setores ({availableDepartamentos.length})
+                </span>
+                {selectedDepartamento !== 'Todos' && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDepartamento('Todos')}
+                    className="text-[11px] text-[#2563EB] hover:underline font-semibold"
+                  >
+                    Mostrar todos os departamentos
+                  </button>
+                )}
+              </div>
               {!modeloSelecionado ? (
                 <p className="text-xs text-[#9CA3AF] italic">
                   Escolha um modelo na biblioteca acima para visualizar os departamentos mapeados.
                 </p>
-              ) : availableAreas.length === 0 ? (
+              ) : availableDepartamentos.length === 0 ? (
                 <div className="p-3 bg-amber-50/60 border border-amber-200/70 rounded-md text-xs text-amber-900 space-y-1">
                   <p className="font-semibold">Nenhum departamento conciliado para este modelo.</p>
                   <p className="text-[11px] text-amber-800">
@@ -723,50 +750,85 @@ export default function Rotinas() {
                 </div>
               ) : (
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  {availableAreas.map((area) => (
-                    <button
-                      key={area}
-                      type="button"
-                      onClick={() => {
-                        setSelectedArea(selectedArea === area ? 'Todas' : area)
-                      }}
-                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
-                        selectedArea === area
-                          ? 'bg-[#2563EB] text-white border-[#2563EB]'
-                          : 'bg-white text-[#374151] border-[#E5E7EB] hover:border-gray-400'
-                      }`}
-                      title={`Filtrar rotinas pelo departamento ${area}`}
-                    >
-                      <span>{area}</span>
-                      <span className="text-[10px] opacity-75">
-                        (
-                        {
-                          rotinasExibicao.filter((r) => {
-                            const raw =
-                              (r.area && r.area.trim()) ||
-                              (r.responsavel && r.responsavel.trim()) ||
-                              ''
-                            const canon = normalizarNomeCanonico(raw)
-                            return (
-                              getChaveCanonico(canon) === getChaveCanonico(area) ||
-                              canon === area ||
-                              raw === area
-                            )
-                          }).length
-                        }
-                        )
-                      </span>
-                    </button>
-                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedDepartamento('Todos')
+                    }}
+                    className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-all ${
+                      selectedDepartamento === 'Todos'
+                        ? 'bg-[#2563EB] text-white border-[#2563EB] shadow-2xs'
+                        : 'bg-white text-[#374151] border-[#E5E7EB] hover:border-gray-400'
+                    }`}
+                  >
+                    <span>Todos</span>
+                  </button>
+                  {availableDepartamentos.map((depto) => {
+                    const isSelected = selectedDepartamento === depto
+                    const count = rotinasExibicao.filter((r) => {
+                      const raw =
+                        (r.area && r.area.trim()) || (r.responsavel && r.responsavel.trim()) || ''
+                      const canon = normalizarNomeCanonico(raw)
+                      return (
+                        getChaveCanonico(canon) === getChaveCanonico(depto) ||
+                        canon === depto ||
+                        raw === depto
+                      )
+                    }).length
+
+                    return (
+                      <button
+                        key={depto}
+                        type="button"
+                        onClick={() => {
+                          const next = isSelected ? 'Todos' : depto
+                          setSelectedDepartamento(next)
+                          // Rola suavemente até as rotinas detalhadas abaixo
+                          setTimeout(() => {
+                            const el = document.getElementById('catalogo-rotinas-container')
+                            if (el) {
+                              el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                            }
+                          }, 50)
+                        }}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border transition-all ${
+                          isSelected
+                            ? 'bg-[#2563EB] text-white border-[#2563EB] shadow-2xs'
+                            : 'bg-white text-[#374151] border-[#E5E7EB] hover:border-[#2563EB] hover:text-[#2563EB]'
+                        }`}
+                        title={`Clique para detalhar as rotinas de ${depto} abaixo`}
+                      >
+                        <span>{depto}</span>
+                        <span
+                          className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
+                            isSelected ? 'bg-white/20 text-white' : 'bg-gray-100 text-[#6B7280]'
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      </button>
+                    )
+                  })}
                 </div>
               )}
             </div>
 
-            {/* Funções / Cargos Operacionais */}
+            {/* 2. Funções / Cargos */}
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563] block mb-2">
-                Funções e Cargos Conciliados na Loja ({funcoesExibicao.length})
-              </span>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563]">
+                  Funções / Cargos ({funcoesExibicao.length})
+                </span>
+                {selectedFuncao !== 'Todas' && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedFuncao('Todas')}
+                    className="text-[11px] text-[#2563EB] hover:underline font-semibold"
+                  >
+                    Mostrar todas as funções
+                  </button>
+                )}
+              </div>
               {!modeloSelecionado ? (
                 <p className="text-xs text-[#9CA3AF] italic">
                   Escolha um modelo na biblioteca para visualizar as funções operacionais.
@@ -781,46 +843,77 @@ export default function Rotinas() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                  {funcoesExibicao.map((f) => (
-                    <div
-                      key={f.id}
-                      className="p-2 bg-white border border-[#E5E7EB] rounded-md text-xs flex items-center justify-between gap-2 shadow-2xs"
-                    >
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="font-semibold text-[#1F2937] block truncate">
-                            {f.nome}
-                          </span>
-                          {(f as unknown as { totalRotinas?: number }).totalRotinas !==
-                            undefined && (
-                            <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded-full bg-blue-50 text-[#2563EB] border border-blue-100 shrink-0">
-                              {(f as unknown as { totalRotinas?: number }).totalRotinas}{' '}
-                              {(f as unknown as { totalRotinas?: number }).totalRotinas === 1
-                                ? 'rotina'
-                                : 'rotinas'}
+                  {funcoesExibicao.map((f) => {
+                    const isSelected = selectedFuncao === f.nome
+                    const rotinasCount =
+                      (f as unknown as { totalRotinas?: number }).totalRotinas || 0
+
+                    return (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => {
+                          const next = isSelected ? 'Todas' : f.nome
+                          setSelectedFuncao(next)
+                          // Rola suavemente até o detalhe da rotina abaixo
+                          setTimeout(() => {
+                            const el = document.getElementById('catalogo-rotinas-container')
+                            if (el) {
+                              el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                            }
+                          }, 50)
+                        }}
+                        className={`p-2.5 rounded-md text-xs text-left transition-all border flex items-center justify-between gap-2 ${
+                          isSelected
+                            ? 'bg-blue-50/80 border-[#2563EB] ring-2 ring-[#2563EB]/20 shadow-xs'
+                            : 'bg-white border-[#E5E7EB] hover:border-[#2563EB]/60 hover:bg-gray-50/70 shadow-2xs'
+                        }`}
+                        title={`Clique para detalhar as rotinas de ${f.nome} abaixo`}
+                      >
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span
+                              className={`font-semibold block truncate ${
+                                isSelected ? 'text-[#2563EB]' : 'text-[#1F2937]'
+                              }`}
+                            >
+                              {f.nome}
+                            </span>
+                            <span
+                              className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full border ${
+                                isSelected
+                                  ? 'bg-[#2563EB] text-white border-[#2563EB]'
+                                  : 'bg-blue-50 text-[#2563EB] border-blue-100'
+                              }`}
+                            >
+                              {rotinasCount} {rotinasCount === 1 ? 'rotina' : 'rotinas'}
+                            </span>
+                          </div>
+                          {f.telefone ? (
+                            <span className="text-[11px] text-[#6B7280] font-mono block truncate mt-0.5">
+                              WhatsApp: {f.telefone}
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-[#9CA3AF] block truncate mt-0.5">
+                              Responsável conciliado
                             </span>
                           )}
                         </div>
-                        {f.telefone ? (
-                          <span className="text-[11px] text-[#6B7280] font-mono block truncate">
-                            WhatsApp: {f.telefone}
+                        {isSelected ? (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#2563EB] text-white shrink-0">
+                            Ativo
                           </span>
-                        ) : (
-                          <span className="text-[10px] text-[#9CA3AF] block truncate">
-                            Responsável operacional conciliado
+                        ) : f.chefe_imediato_funcao ? (
+                          <span
+                            className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-[#4B5563] shrink-0"
+                            title={`Chefe imediato: ${f.chefe_imediato_funcao}`}
+                          >
+                            Subordinado
                           </span>
-                        )}
-                      </div>
-                      {f.chefe_imediato_funcao && (
-                        <span
-                          className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-[#2563EB] border border-blue-100 shrink-0"
-                          title={`Chefe imediato: ${f.chefe_imediato_funcao}`}
-                        >
-                          Subordinado
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                        ) : null}
+                      </button>
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -858,7 +951,7 @@ export default function Rotinas() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs font-bold text-[#1F2937] truncate">
-                    {isConciliado ? 'Rotinas ativas:' : 'Modelo selecionado:'}{' '}
+                    {isConciliado ? 'Detalhamento de rotinas ativas:' : 'Modelo selecionado:'}{' '}
                     {modeloSelecionado.nome}
                   </span>
                   {modeloSelecionado.segmento && (
@@ -875,33 +968,60 @@ export default function Rotinas() {
                       Sem conciliação
                     </span>
                   )}
+                  {(selectedDepartamento !== 'Todos' || selectedFuncao !== 'Todas') && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#2563EB] text-white">
+                      Filtrado por:{' '}
+                      {[
+                        selectedDepartamento !== 'Todos' ? selectedDepartamento : null,
+                        selectedFuncao !== 'Todas' ? selectedFuncao : null,
+                      ]
+                        .filter(Boolean)
+                        .join(' → ')}
+                    </span>
+                  )}
                 </div>
                 <p className="text-[11px] text-[#4B5563] truncate">
                   {isConciliado
-                    ? `${filteredRotinas.length} rotinas operacionais conciliadas da sua loja.`
+                    ? `${filteredRotinas.length} rotinas operacionais detalhadas abaixo sob o agrupamento selecionado.`
                     : 'Nenhuma rotina conciliada na sua loja para este modelo de negócio.'}
                 </p>
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                setModeloSelecionado(null)
-                setSelectedArea('Todas')
-                setSelectedFreq('Todas')
-                setSearchTerm('')
-                try {
-                  localStorage.removeItem('vivavarejo_rotinas_modelo_ativo')
-                  localStorage.removeItem('vivavarejo_vitrine_segmento')
-                } catch {
-                  // noop
-                }
-              }}
-              className="inline-flex items-center gap-1 text-xs text-[#2563EB] hover:text-[#1D4ED8] font-semibold underline self-start sm:self-auto shrink-0"
-            >
-              <span>Escolher outro modelo</span>
-            </button>
+            <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0">
+              {(selectedDepartamento !== 'Todos' || selectedFuncao !== 'Todas') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedDepartamento('Todos')
+                    setSelectedFuncao('Todas')
+                  }}
+                  className="inline-flex items-center gap-1 text-xs text-[#6B7280] hover:text-[#1F2937] px-2 py-1 rounded border border-[#E5E7EB] bg-white"
+                >
+                  <X className="w-3 h-3" />
+                  <span>Limpar seleção do grupo</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setModeloSelecionado(null)
+                  setSelectedDepartamento('Todos')
+                  setSelectedFuncao('Todas')
+                  setSelectedFreq('Todas')
+                  setSearchTerm('')
+                  try {
+                    localStorage.removeItem('vivavarejo_rotinas_modelo_ativo')
+                    localStorage.removeItem('vivavarejo_vitrine_segmento')
+                  } catch {
+                    // noop
+                  }
+                }}
+                className="inline-flex items-center gap-1 text-xs text-[#2563EB] hover:text-[#1D4ED8] font-semibold underline"
+              >
+                <span>Escolher outro modelo</span>
+              </button>
+            </div>
           </div>
 
           {/* Filter and Search Bar */}
@@ -914,7 +1034,7 @@ export default function Rotinas() {
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Buscar por rotina, responsável, área..."
+                  placeholder="Buscar por rotina ou responsável..."
                   className="w-full pl-9 pr-8 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937] placeholder:text-gray-400"
                 />
                 {searchTerm && (
@@ -936,9 +1056,8 @@ export default function Rotinas() {
               </span>
             </div>
 
-            {/* Filter Chips Bar */}
+            {/* Filter Chips Bar (Apenas Frequência — Área foi removida) */}
             <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
-              {/* Frequency filters */}
               <div className="flex items-center gap-2 flex-wrap text-xs">
                 <span className="font-semibold text-[#4B5563] flex items-center gap-1 mr-1">
                   <Filter className="w-3.5 h-3.5" />
@@ -961,39 +1080,6 @@ export default function Rotinas() {
                   )
                 })}
               </div>
-
-              {/* Area filters */}
-              {availableAreas.length > 0 && (
-                <div className="flex items-center gap-1.5 flex-wrap text-xs pt-1">
-                  <span className="font-semibold text-[#4B5563] mr-1">Área:</span>
-                  <button
-                    onClick={() => setSelectedArea('Todas')}
-                    className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all duration-200 ${
-                      selectedArea === 'Todas'
-                        ? 'bg-[#2563EB] text-white border-[#2563EB]'
-                        : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:border-gray-400 hover:text-[#1F2937]'
-                    }`}
-                  >
-                    Todas
-                  </button>
-                  {availableAreas.map((area) => {
-                    const active = selectedArea === area
-                    return (
-                      <button
-                        key={area}
-                        onClick={() => setSelectedArea(area)}
-                        className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all duration-200 ${
-                          active
-                            ? 'bg-[#2563EB] text-white border-[#2563EB]'
-                            : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:border-gray-400 hover:text-[#1F2937]'
-                        }`}
-                      >
-                        {area}
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
             </div>
           </div>
 
@@ -1075,11 +1161,6 @@ export default function Rotinas() {
                           <span>Resp: {item.responsavel || item.funcao_nome || 'Operação'}</span>
                           {item.horario_limite && <span>• Até {item.horario_limite}</span>}
                         </div>
-                        {item.area && (
-                          <span className="inline-block text-[10px] px-1.5 py-0.2 rounded bg-blue-50 text-[#2563EB]">
-                            {item.area}
-                          </span>
-                        )}
                       </div>
                     ))}
                   </div>
@@ -1230,12 +1311,6 @@ export default function Rotinas() {
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#F7F7F5] border border-[#E5E7EB] text-[#4B5563]">
                           <span>{rotina.frequencia}</span>
                         </span>
-
-                        {rotina.area && (
-                          <span className="inline-block px-2 py-0.5 rounded bg-gray-100 text-[#4B5563] text-[11px]">
-                            {rotina.area}
-                          </span>
-                        )}
                       </div>
 
                       {/* Details Lines */}
@@ -1309,9 +1384,6 @@ export default function Rotinas() {
             {/* Header */}
             <div className="flex items-start justify-between gap-3 pb-3 border-b border-[#E5E7EB]">
               <div>
-                <span className="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-[#3B82F6]/10 text-[#2563EB] mb-1">
-                  {selectedRotina.area || 'Operação de Loja'}
-                </span>
                 <h2 className="text-lg sm:text-xl font-bold text-[#1F2937]">
                   {selectedRotina.nome}
                 </h2>

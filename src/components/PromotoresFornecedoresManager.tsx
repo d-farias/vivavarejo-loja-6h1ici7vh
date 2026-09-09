@@ -306,49 +306,6 @@ export function PromotoresFornecedoresManager({
 
   return (
     <div className="space-y-6">
-      {/* Banner de Demonstração / Modelo de Exemplo Funcional */}
-      {fornecedores.some((f) => f.is_exemplo) && (
-        <div className="p-3.5 sm:p-4 rounded-lg bg-blue-50 border border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-          <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-md bg-[#2563EB] text-white flex items-center justify-center shrink-0">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
-                  Modelo de Exemplo Funcional Ativo
-                </span>
-                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-[#2563EB] text-white">
-                  DEMONSTRAÇÃO
-                </span>
-              </div>
-              <p className="text-xs text-[#374151] mt-0.5">
-                Fornecedor modelo configurado com comprador responsável, layout de gôndola, política
-                de trocas e visita com checklist de abastecimento 100% e foto obrigatória.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={async () => {
-                if (
-                  confirm('Deseja remover os registros de exemplo do fornecedor e promotor modelo?')
-                ) {
-                  const exFornecedor = fornecedores.find((f) => f.is_exemplo)
-                  if (exFornecedor) {
-                    await onDeleteFornecedor(exFornecedor)
-                  }
-                }
-              }}
-              className="text-xs font-semibold text-gray-600 hover:text-red-700 px-3 py-1.5 rounded border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
-            >
-              Remover Exemplo
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Sub-navegação do Módulo Promotores & Fornecedores */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E7EB] pb-3">
         <div className="flex items-center gap-1.5 overflow-x-auto">
@@ -1081,21 +1038,13 @@ export function PromotoresFornecedoresManager({
                 <tbody className="divide-y divide-[#E5E7EB]">
                   {filteredFornecedores.map((f) => {
                     return (
-                      <tr
-                        key={f.id}
-                        className={`hover:bg-gray-50/80 transition-colors ${f.is_exemplo ? 'bg-blue-50/20' : ''}`}
-                      >
+                      <tr key={f.id} className="hover:bg-gray-50/80 transition-colors">
                         <td className="p-3.5 font-semibold text-[#1F2937]">
                           <div className="flex items-center gap-2">
                             <Building2 className="w-4 h-4 text-[#2563EB] shrink-0" />
                             <div>
                               <div className="flex items-center gap-1.5">
                                 <span>{f.nome}</span>
-                                {f.is_exemplo && (
-                                  <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#2563EB] text-white">
-                                    MODELO
-                                  </span>
-                                )}
                               </div>
                               <div className="text-xs text-[#6B7280] font-normal">
                                 {f.telefone || f.contato || 'Sem contato indústria'}

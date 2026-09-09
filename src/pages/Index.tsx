@@ -735,10 +735,10 @@ export default function Index() {
       .slice(0, 7) // Top 7 setores para caber com elegância em qualquer tela
   }, [rotinas, execucoesPeriodo, dateRange.daysCount, periodo, todayExecMap])
 
-  // Desvios Críticos e Alertas para WhatsApp Direto (Sem lista longa de rotinas)
-  const desviosCriticos = useMemo(() => {
-    // 1. Rotinas em atraso no momento
-    const atrasos = rotinas
+  // Seção Única Consolidada: Desvios e Alertas Imediatos (Deduplicada, máx ~4 itens com WhatsApp direto)
+  const desviosEAlertas = useMemo(() => {
+    // 1. Rotinas operacionais do dia em atraso
+    const atrasosRotinas = rotinas
       .filter((r) => {
         const isDone = todayExecMap.has(r.id)
         if (isDone) return false
@@ -749,38 +749,82 @@ export default function Index() {
         const status = getHorarioStatus(r.horario_limite, false)
         return {
           id: `rotina-${r.id}`,
-          tipo: 'Rotina Atrasada',
+          tipo: 'Rotina em Atraso',
           titulo: r.nome,
           setor: normalizarNomeCanonico(r.area || r.responsavel) || 'Operação Loja',
           horario: status.normalizedHorario || r.horario_limite,
           responsavel: normalizarNomeCanonico(r.responsavel),
           telefone: r.telefone_responsavel || r.expand?.funcao?.telefone,
           rotinaRef: r,
+          origem: 'rotina',
         }
       })
 
-    // 2. Chamados / Planos de ação com prioridade alta ou atrasados
-    const chamadosCriticos = planosAcao
+    // 2. Chamados e planos de ação urgentes (alta prioridade ou atrasados)
+    const chamadosUrgentes = planosAcao
       .filter(
         (p) =>
           p.status !== 'concluida' &&
           (p.prioridade === 'alta' || (p.prazo && new Date(p.prazo) < new Date())),
       )
-      .map((p) => ({
-        id: `plano-${p.id}`,
-        tipo: p.area_demandante
-          ? `Chamado (${normalizarNomeCanonico(p.area_demandante)})`
-          : 'Plano 5W2H',
-        titulo: p.descricao,
-        setor: normalizarNomeCanonico(p.area_demandante || p.expand?.rotina?.area) || 'Operações',
-        horario: p.prazo ? new Date(p.prazo).toLocaleDateString('pt-BR') : undefined,
-        responsavel: normalizarNomeCanonico(p.responsavel),
+      .map((p) => {
+        const atrasado = p.prazo && new Date(p.prazo) < new Date()
+        return {
+          id: `plano-${p.id}`,
+          tipo: atrasado
+            ? 'Chamado Atrasado'
+            : p.area_demandante
+              ? `Chamado Alta Prioridade`
+              : 'Plano 5W2H Crítico',
+          titulo: p.descricao,
+          setor: normalizarNomeCanonico(p.area_demandante || p.expand?.rotina?.area) || 'Operações',
+          horario: p.prazo ? new Date(p.prazo).toLocaleDateString('pt-BR') : undefined,
+          responsavel: normalizarNomeCanonico(p.responsavel),
+          telefone: undefined,
+          rotinaRef: null,
+          origem: 'plano',
+        }
+      })
+
+    // 3. Tarefas de Validade Críticas (vencimento hoje ou vencidas pendentes)
+    const validadesCriticas = tarefasValidade
+      .filter(
+        (t) =>
+          t.status !== 'aprovada' &&
+          t.status !== 'aguardando_validacao' &&
+          t.data_vencimento &&
+          new Date(t.data_vencimento) <= new Date(),
+      )
+      .map((t) => ({
+        id: `validade-${t.id}`,
+        tipo: 'Validade Crítica',
+        titulo: `${t.produto} ${t.lote ? `(Lote: ${t.lote})` : ''}`.trim(),
+        setor: normalizarNomeCanonico(t.setor) || 'Prevenção / Loja',
+        horario: t.data_vencimento
+          ? new Date(t.data_vencimento).toLocaleDateString('pt-BR')
+          : undefined,
+        responsavel: normalizarNomeCanonico(t.responsavel),
         telefone: undefined,
         rotinaRef: null,
+        origem: 'validade',
       }))
 
-    return [...atrasos, ...chamadosCriticos].slice(0, 4)
-  }, [rotinas, todayExecMap, planosAcao])
+    // Deduplicação defensiva por título/id e limitação estrita aos 4 itens mais prioritários
+    const todos = [...atrasosRotinas, ...chamadosUrgentes, ...validadesCriticas]
+    const seenTitulos = new Set<string>()
+    const deduplicados = []
+
+    for (const item of todos) {
+      const key = `${item.origem}-${item.titulo.toLowerCase().trim()}`
+      if (!seenTitulos.has(key)) {
+        seenTitulos.add(key)
+        deduplicados.push(item)
+      }
+      if (deduplicados.length >= 4) break
+    }
+
+    return deduplicados
+  }, [rotinas, todayExecMap, planosAcao, tarefasValidade])
 
   const firstName = user?.name ? user.name.trim().split(' ')[0] : 'Líder'
 
@@ -1524,18 +1568,18 @@ export default function Index() {
         </div>
       </div>
 
-      {/* Desvios Críticos e Notificações Rápidas WhatsApp (Sem carregar listas longas) */}
+      {/* Seção Consolidada: Desvios e Alertas (Sem redundância, enxuto, máx 4 itens com WhatsApp direto) */}
       <div className="bg-white border border-[#E5E7EB] rounded-xl p-5 shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
               <h3 className="text-sm font-bold text-[#1F2937] uppercase tracking-wider">
-                Desvios Críticos & Alertas Imediatos
+                Desvios e Alertas
               </h3>
             </div>
             <p className="text-xs text-[#6B7280]">
-              Disparo contextual para líderes e encarregados sem poluir o painel analítico
+              Itens críticos em atraso ou urgentes para acionamento direto via WhatsApp
             </p>
           </div>
 
@@ -1550,17 +1594,17 @@ export default function Index() {
           </div>
         </div>
 
-        {desviosCriticos.length === 0 ? (
+        {desviosEAlertas.length === 0 ? (
           <div className="p-4 rounded-lg bg-emerald-50/50 border border-emerald-200 text-xs text-emerald-800 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Check className="w-4 h-4 text-emerald-600" />
-              <span>Nenhum desvio crítico ou chamado pendente em atraso neste momento.</span>
+              <span>Nenhum desvio ou alerta crítico pendente neste momento.</span>
             </div>
             <span className="font-semibold text-emerald-700">Operação em Conformidade</span>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            {desviosCriticos.map((desvio) => (
+            {desviosEAlertas.map((desvio) => (
               <div
                 key={desvio.id}
                 className="p-3.5 rounded-lg border border-red-200 bg-red-50/20 flex items-center justify-between gap-3 shadow-2xs"
@@ -1585,7 +1629,7 @@ export default function Index() {
                       <>
                         <span>•</span>
                         <span className="text-[#B91C1C] font-semibold">
-                          Limite: {desvio.horario}
+                          Prazo: {desvio.horario}
                         </span>
                       </>
                     )}
