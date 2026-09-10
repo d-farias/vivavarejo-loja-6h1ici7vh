@@ -174,8 +174,11 @@ export default function ComercialPage() {
   // ==================== CÁLCULOS E RESUMO EXECUTIVO ====================
   const kpis = useMemo(() => {
     const totalProdutos = produtos.length
+    const temDadosProdutos = totalProdutos > 0
+    const temDadosCategorias = categorias.length > 0
+
     const produtosRuptura = produtos.filter((p) => p.em_ruptura || (p.estoque_fisico || 0) <= 0)
-    const taxaRuptura = totalProdutos > 0 ? (produtosRuptura.length / totalProdutos) * 100 : 0
+    const taxaRuptura = totalProdutos > 0 ? (produtosRuptura.length / totalProdutos) * 100 : null
 
     const produtosVirtuais = produtos.filter(
       (p) => (p.estoque_virtual || 0) > 0 && (p.estoque_fisico || 0) <= 0,
@@ -200,7 +203,11 @@ export default function ComercialPage() {
 
     const metaTotalVenda = categorias.reduce((acc, c) => acc + (c.meta_venda_valor || 0), 0)
     const atingimentoMetaGeral =
-      metaTotalVenda > 0 ? (vendaTotalRealizada / metaTotalVenda) * 100 : 100
+      metaTotalVenda > 0
+        ? (vendaTotalRealizada / metaTotalVenda) * 100
+        : temDadosProdutos || temDadosCategorias
+          ? 100
+          : 0
 
     const quebraTotalValor = categorias.reduce((acc, c) => acc + (c.quebra_valor || 0), 0)
     const quebraPercSobreVenda =
@@ -242,7 +249,7 @@ export default function ComercialPage() {
         ? Math.round(
             prodsComGiro.reduce((acc, p) => acc + (p.giro_dias || 0), 0) / prodsComGiro.length,
           )
-        : 0
+        : null
 
     // Margem média geral
     const prodsComMargem = produtos.filter((p) => (p.margem_perc || 0) > 0)
@@ -251,7 +258,7 @@ export default function ComercialPage() {
         ? (
             prodsComMargem.reduce((acc, p) => acc + (p.margem_perc || 0), 0) / prodsComMargem.length
           ).toFixed(1)
-        : '0'
+        : null
 
     // Rebaixas e Ações ativas
     const acoesAtivas = acoes.filter((a) => a.status === 'em_vigor' || a.status === 'planejada')
@@ -259,8 +266,10 @@ export default function ComercialPage() {
 
     return {
       totalProdutos,
+      temDadosProdutos,
+      temDadosCategorias,
       produtosRupturaCount: produtosRuptura.length,
-      taxaRuptura: taxaRuptura.toFixed(1),
+      taxaRuptura: taxaRuptura !== null ? taxaRuptura.toFixed(1) : null,
       produtosVirtuaisCount: produtosVirtuais.length,
       produtosNegativosCount: produtosNegativos.length,
       semVendas30Count: semVendas30.length,
@@ -269,9 +278,10 @@ export default function ComercialPage() {
       totalSemVendas,
       vendaTotalRealizada,
       metaTotalVenda,
-      atingimentoMetaGeral: atingimentoMetaGeral.toFixed(1),
+      atingimentoMetaGeral: atingimentoMetaGeral !== null ? atingimentoMetaGeral.toFixed(1) : null,
       quebraTotalValor,
-      quebraPercSobreVenda: quebraPercSobreVenda.toFixed(2),
+      quebraPercSobreVenda:
+        temDadosCategorias || temDadosProdutos ? quebraPercSobreVenda.toFixed(2) : null,
       giroMedioDias,
       margemMediaPerc,
       acoesAtivasCount: acoesAtivas.length,
@@ -556,55 +566,18 @@ export default function ComercialPage() {
         </div>
       </div>
 
-      {/* Conteúdo Dinâmico Baseado na Aba Ativa */}
+      {/* Conteúdo da Página Comercial */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <Skeleton key={i} className="h-28 bg-gray-200 rounded-xl" />
           ))}
         </div>
-      ) : produtos.length === 0 &&
-        categorias.length === 0 &&
-        acoes.length === 0 &&
-        implantacoes.length === 0 ? (
-        /* Estado Vazio Amigável Conforme Requisito 3 */
-        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 text-center max-w-md mx-auto shadow-2xs space-y-3">
-          <div className="w-12 h-12 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center mx-auto">
-            <TrendingUp className="w-6 h-6" />
-          </div>
-          <div>
-            <h2 className="text-sm sm:text-base font-bold text-[#1F2937]">
-              Nenhum dado comercial nesta competência
-            </h2>
-            <p className="text-xs text-[#6B7280] mt-1">
-              Importe sua planilha de sortimento, vendas ou rupturas para começar.
-            </p>
-          </div>
-
-          <div className="pt-1 flex flex-col sm:flex-row items-center justify-center gap-2">
-            <Button
-              size="sm"
-              onClick={() => setImportarModalOpen(true)}
-              className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs w-full sm:w-auto"
-            >
-              <UploadCloud className="w-4 h-4" />
-              <span>Importar Planilha</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setNovaAcaoModalOpen(true)}
-              className="text-xs rounded-xl w-full sm:w-auto"
-            >
-              <Plus className="w-4 h-4 mr-1 text-[#0F766E]" />
-              <span>Nova Ação</span>
-            </Button>
-          </div>
-        </div>
       ) : (
         <div className="space-y-6">
           {/* ==========================================================
               RESUMO EXECUTIVO (Topo Permanente - Requisito 2)
+              Renderiza sempre, com valores '—' ou '0' quando sem dados
              ========================================================== */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -615,7 +588,8 @@ export default function ComercialPage() {
                 </h2>
               </div>
               <span className="text-xs text-[#6B7280]">
-                {kpis.totalProdutos} SKUs • Competência {competencia}
+                {kpis.totalProdutos > 0 ? `${kpis.totalProdutos} SKUs` : 'Sem SKUs'} • Competência{' '}
+                {competencia}
               </span>
             </div>
 
@@ -633,20 +607,30 @@ export default function ComercialPage() {
                   </span>
                   <AlertTriangle
                     className={`w-4 h-4 ${
-                      Number(kpis.taxaRuptura) > 5 ? 'text-amber-500' : 'text-emerald-600'
+                      kpis.taxaRuptura !== null && Number(kpis.taxaRuptura) > 5
+                        ? 'text-amber-500'
+                        : 'text-emerald-600'
                     }`}
                   />
                 </div>
                 <div className="mt-2.5">
                   <div
                     className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${
-                      Number(kpis.taxaRuptura) > 5 ? 'text-amber-600' : 'text-emerald-700'
+                      kpis.taxaRuptura === null
+                        ? 'text-[#9CA3AF]'
+                        : Number(kpis.taxaRuptura) > 5
+                          ? 'text-amber-600'
+                          : 'text-emerald-700'
                     }`}
                   >
-                    {kpis.taxaRuptura}%
+                    {kpis.taxaRuptura !== null ? `${kpis.taxaRuptura}%` : '—'}
                   </div>
                   <p className="text-xs text-[#6B7280] mt-1 flex items-center justify-between">
-                    <span>{kpis.produtosRupturaCount} itens sem estoque</span>
+                    <span>
+                      {kpis.temDadosProdutos
+                        ? `${kpis.produtosRupturaCount} itens sem estoque`
+                        : 'Sem dados de ruptura'}
+                    </span>
                     <span className="text-[10px] font-semibold text-[#0F766E] group-hover:underline">
                       Ver seção ↓
                     </span>
@@ -668,12 +652,13 @@ export default function ComercialPage() {
                 </div>
                 <div className="mt-2.5">
                   <div className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
-                    {kpis.totalSemVendas}
+                    {kpis.temDadosProdutos ? kpis.totalSemVendas : '—'}
                   </div>
                   <p className="text-xs text-[#6B7280] mt-1 flex items-center justify-between">
                     <span>
-                      30d: {kpis.semVendas30Count} | 60d: {kpis.semVendas60Count} | 90d+:{' '}
-                      {kpis.semVendas90Count}
+                      {kpis.temDadosProdutos
+                        ? `30d: ${kpis.semVendas30Count} | 60d: ${kpis.semVendas60Count} | 90d+: ${kpis.semVendas90Count}`
+                        : 'Sem dados de giro'}
                     </span>
                     <span className="text-[10px] font-semibold text-[#0F766E] group-hover:underline">
                       Ver seção ↓
@@ -696,10 +681,16 @@ export default function ComercialPage() {
                 </div>
                 <div className="mt-2.5">
                   <div className="text-xl sm:text-2xl font-extrabold text-[#0F766E] tracking-tight truncate">
-                    {formatCurrency(kpis.vendaTotalRealizada)}
+                    {kpis.temDadosCategorias || kpis.temDadosProdutos
+                      ? formatCurrency(kpis.vendaTotalRealizada)
+                      : '—'}
                   </div>
                   <p className="text-xs text-[#6B7280] mt-1 flex items-center justify-between">
-                    <span>Meta: {kpis.atingimentoMetaGeral}% atingida</span>
+                    <span>
+                      {kpis.atingimentoMetaGeral !== null
+                        ? `Meta: ${kpis.atingimentoMetaGeral}% atingida`
+                        : 'Sem meta cadastrada'}
+                    </span>
                     <span className="text-[10px] font-semibold text-[#0F766E] group-hover:underline">
                       Ver seção ↓
                     </span>
@@ -720,13 +711,23 @@ export default function ComercialPage() {
                   <Layers className="w-4 h-4 text-[#0F766E]" />
                 </div>
                 <div className="mt-2.5">
-                  <div className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
-                    <span className="text-[#0F766E]">A: {kpis.curvas.A.percValor}%</span>
-                    <span className="text-blue-600">B: {kpis.curvas.B.percValor}%</span>
-                    <span className="text-gray-500">C: {kpis.curvas.C.percValor}%</span>
-                  </div>
+                  {kpis.temDadosProdutos ? (
+                    <div className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
+                      <span className="text-[#0F766E]">A: {kpis.curvas.A.percValor}%</span>
+                      <span className="text-blue-600">B: {kpis.curvas.B.percValor}%</span>
+                      <span className="text-gray-500">C: {kpis.curvas.C.percValor}%</span>
+                    </div>
+                  ) : (
+                    <div className="text-2xl sm:text-3xl font-extrabold text-[#9CA3AF] tracking-tight">
+                      —
+                    </div>
+                  )}
                   <p className="text-xs text-[#6B7280] mt-1 flex items-center justify-between">
-                    <span>{kpis.totalProdutos} SKUs cadastrados</span>
+                    <span>
+                      {kpis.temDadosProdutos
+                        ? `${kpis.totalProdutos} SKUs cadastrados`
+                        : 'Sem SKUs na competência'}
+                    </span>
                     <span className="text-[10px] font-semibold text-[#0F766E] group-hover:underline">
                       Ver seção ↓
                     </span>
@@ -746,7 +747,7 @@ export default function ComercialPage() {
                   Estoque Negativo
                 </span>
                 <div className="text-lg sm:text-xl font-extrabold text-red-600 mt-1">
-                  {kpis.produtosNegativosCount} itens
+                  {kpis.temDadosProdutos ? `${kpis.produtosNegativosCount} itens` : '0 itens'}
                 </div>
                 <p className="text-[11px] text-[#6B7280] mt-0.5">
                   Divergência física/virtual grave
@@ -762,7 +763,7 @@ export default function ComercialPage() {
                   Margem Média
                 </span>
                 <div className="text-lg sm:text-xl font-extrabold text-[#0F766E] mt-1">
-                  {kpis.margemMediaPerc}%
+                  {kpis.margemMediaPerc !== null ? `${kpis.margemMediaPerc}%` : '—'}
                 </div>
                 <p className="text-[11px] text-[#6B7280] mt-0.5">
                   Média ponderada de rentabilidade
@@ -778,7 +779,7 @@ export default function ComercialPage() {
                   Giro Médio (Cobertura)
                 </span>
                 <div className="text-lg sm:text-xl font-extrabold text-[#1F2937] mt-1">
-                  {kpis.giroMedioDias} dias
+                  {kpis.giroMedioDias !== null ? `${kpis.giroMedioDias} dias` : '—'}
                 </div>
                 <p className="text-[11px] text-[#6B7280] mt-0.5">Velocidade de renovação</p>
               </div>
@@ -792,7 +793,9 @@ export default function ComercialPage() {
                   Quebras Totais
                 </span>
                 <div className="text-lg sm:text-xl font-extrabold text-red-700 mt-1">
-                  {kpis.quebraPercSobreVenda}% ({formatCurrency(kpis.quebraTotalValor)})
+                  {kpis.quebraPercSobreVenda !== null
+                    ? `${kpis.quebraPercSobreVenda}% (${formatCurrency(kpis.quebraTotalValor)})`
+                    : '—'}
                 </div>
                 <p className="text-[11px] text-[#6B7280] mt-0.5">% Sobre a venda total</p>
               </div>
@@ -878,7 +881,7 @@ export default function ComercialPage() {
                     </span>
                   )}
                   <span className="hidden sm:inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white border border-[#E5E7EB] text-[#4B5563]">
-                    Taxa: {kpis.taxaRuptura}%
+                    Taxa: {kpis.taxaRuptura !== null ? `${kpis.taxaRuptura}%` : '—'}
                   </span>
                   <div
                     className={`p-1.5 rounded-md bg-white border border-[#E5E7EB] text-[#4B5563] transition-transform duration-200 ${
@@ -895,7 +898,7 @@ export default function ComercialPage() {
 
               {expandedSections.rupturas && (
                 <div className="p-4 sm:p-5 border-t border-[#E5E7EB] space-y-4 animate-in fade-in-50 duration-150">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <h4 className="text-sm font-bold text-[#1F2937]">
                         Itens em Ruptura & Estoque Virtual ({itensRuptura.length})
@@ -904,114 +907,147 @@ export default function ComercialPage() {
                         Prioridade de reposição para itens Curva A e B
                       </p>
                     </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setImportarModalOpen(true)}
+                      className="text-xs rounded-xl gap-1.5 self-start sm:self-auto hover:border-[#0F766E] hover:text-[#0F766E]"
+                    >
+                      <UploadCloud className="w-3.5 h-3.5 text-[#0F766E]" />
+                      <span>Importar Planilha</span>
+                    </Button>
                   </div>
 
-                  {/* Tabela no Desktop / Cards no Mobile */}
-                  <div className="hidden md:block bg-white border border-[#E5E7EB] rounded-xl shadow-2xs overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563]">
-                        <tr>
-                          <th className="p-3">Código</th>
-                          <th className="p-3">Descrição</th>
-                          <th className="p-3">Departamento / Categoria</th>
-                          <th className="p-3">Curva</th>
-                          <th className="p-3">Estoque Físico</th>
-                          <th className="p-3">Estoque Virtual</th>
-                          <th className="p-3">Tipo Ruptura</th>
-                          <th className="p-3">Venda Mês</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[#E5E7EB]">
-                        {itensRuptura.map((p) => (
-                          <tr key={p.id} className="hover:bg-gray-50/80">
-                            <td className="p-3 font-mono font-medium">{p.codigo}</td>
-                            <td className="p-3 font-semibold text-[#1F2937]">{p.descricao}</td>
-                            <td className="p-3 text-[#6B7280]">
-                              {p.departamento} • {p.categoria}
-                            </td>
-                            <td className="p-3">
-                              <span
-                                className={`px-2 py-0.5 rounded font-bold text-[10px] ${
-                                  p.curva === 'A'
-                                    ? 'bg-teal-50 text-[#0F766E] border border-teal-200'
-                                    : 'bg-gray-100 text-gray-700'
-                                }`}
-                              >
-                                Curva {p.curva || 'C'}
-                              </span>
-                            </td>
-                            <td className="p-3">
-                              <span
-                                className={
-                                  (p.estoque_fisico || 0) <= 0
-                                    ? 'text-red-600 font-bold'
-                                    : 'text-[#1F2937]'
-                                }
-                              >
-                                {p.estoque_fisico ?? 0}
-                              </span>
-                            </td>
-                            <td className="p-3 font-medium text-amber-600">
-                              {p.estoque_virtual ?? 0}
-                            </td>
-                            <td className="p-3">
-                              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200">
-                                {p.tipo_ruptura === 'virtual'
-                                  ? 'Estoque Virtual'
-                                  : p.tipo_ruptura === 'gondola'
-                                    ? 'Falta na Gôndola'
-                                    : 'Física'}
-                              </span>
-                            </td>
-                            <td className="p-3 font-medium">
-                              {formatCurrency(p.venda_valor_periodo || 0)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Cards no Mobile */}
-                  <div className="md:hidden space-y-3">
-                    {itensRuptura.map((p) => (
-                      <div
-                        key={p.id}
-                        className="bg-white border border-[#E5E7EB] rounded-xl p-3.5 shadow-2xs space-y-2"
+                  {itensRuptura.length === 0 ? (
+                    <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                      <span className="text-[#6B7280] text-center sm:text-left">
+                        Sem dados de ruptura nesta competência — importe sua planilha.
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => setImportarModalOpen(true)}
+                        className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs"
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <span className="text-[10px] font-mono text-[#6B7280]">{p.codigo}</span>
-                            <h4 className="text-xs font-bold text-[#1F2937] leading-tight">
-                              {p.descricao}
-                            </h4>
-                          </div>
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-[#0F766E] border border-teal-200">
-                            {p.curva || 'C'}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#F3F4F6]">
-                          <div>
-                            <span className="text-[#6B7280] block text-[10px]">
-                              Físico / Virtual:
-                            </span>
-                            <span className="font-bold text-red-600">{p.estoque_fisico ?? 0}</span>{' '}
-                            / {p.estoque_virtual ?? 0}
-                          </div>
-                          <div>
-                            <span className="text-[#6B7280] block text-[10px]">Tipo Ruptura:</span>
-                            <span className="font-semibold text-red-700 capitalize">
-                              {p.tipo_ruptura || 'Física'}
-                            </span>
-                          </div>
-                        </div>
+                        <UploadCloud className="w-3.5 h-3.5" />
+                        <span>Importar Planilha</span>
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Tabela no Desktop / Cards no Mobile */}
+                      <div className="hidden md:block bg-white border border-[#E5E7EB] rounded-xl shadow-2xs overflow-x-auto">
+                        {' '}
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563]">
+                            <tr>
+                              <th className="p-3">Código</th>
+                              <th className="p-3">Descrição</th>
+                              <th className="p-3">Departamento / Categoria</th>
+                              <th className="p-3">Curva</th>
+                              <th className="p-3">Estoque Físico</th>
+                              <th className="p-3">Estoque Virtual</th>
+                              <th className="p-3">Tipo Ruptura</th>
+                              <th className="p-3">Venda Mês</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#E5E7EB]">
+                            {itensRuptura.map((p) => (
+                              <tr key={p.id} className="hover:bg-gray-50/80">
+                                <td className="p-3 font-mono font-medium">{p.codigo}</td>
+                                <td className="p-3 font-semibold text-[#1F2937]">{p.descricao}</td>
+                                <td className="p-3 text-[#6B7280]">
+                                  {p.departamento} • {p.categoria}
+                                </td>
+                                <td className="p-3">
+                                  <span
+                                    className={`px-2 py-0.5 rounded font-bold text-[10px] ${
+                                      p.curva === 'A'
+                                        ? 'bg-teal-50 text-[#0F766E] border border-teal-200'
+                                        : 'bg-gray-100 text-gray-700'
+                                    }`}
+                                  >
+                                    Curva {p.curva || 'C'}
+                                  </span>
+                                </td>
+                                <td className="p-3">
+                                  <span
+                                    className={
+                                      (p.estoque_fisico || 0) <= 0
+                                        ? 'text-red-600 font-bold'
+                                        : 'text-[#1F2937]'
+                                    }
+                                  >
+                                    {p.estoque_fisico ?? 0}
+                                  </span>
+                                </td>
+                                <td className="p-3 font-medium text-amber-600">
+                                  {p.estoque_virtual ?? 0}
+                                </td>
+                                <td className="p-3">
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200">
+                                    {p.tipo_ruptura === 'virtual'
+                                      ? 'Estoque Virtual'
+                                      : p.tipo_ruptura === 'gondola'
+                                        ? 'Falta na Gôndola'
+                                        : 'Física'}
+                                  </span>
+                                </td>
+                                <td className="p-3 font-medium">
+                                  {formatCurrency(p.venda_valor_periodo || 0)}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
-                    ))}
-                  </div>
+
+                      {/* Cards no Mobile */}
+                      <div className="md:hidden space-y-3">
+                        {itensRuptura.map((p) => (
+                          <div
+                            key={p.id}
+                            className="bg-white border border-[#E5E7EB] rounded-xl p-3.5 shadow-2xs space-y-2"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <span className="text-[10px] font-mono text-[#6B7280]">
+                                  {p.codigo}
+                                </span>
+                                <h4 className="text-xs font-bold text-[#1F2937] leading-tight">
+                                  {p.descricao}
+                                </h4>
+                              </div>
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-[#0F766E] border border-teal-200">
+                                {p.curva || 'C'}
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#F3F4F6]">
+                              <div>
+                                <span className="text-[#6B7280] block text-[10px]">
+                                  Físico / Virtual:
+                                </span>
+                                <span className="font-bold text-red-600">
+                                  {p.estoque_fisico ?? 0}
+                                </span>{' '}
+                                / {p.estoque_virtual ?? 0}
+                              </div>
+                              <div>
+                                <span className="text-[#6B7280] block text-[10px]">
+                                  Tipo Ruptura:
+                                </span>
+                                <span className="font-semibold text-red-700 capitalize">
+                                  {p.tipo_ruptura || 'Física'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
-
             {/* --------------------------------------------------------
                 SEÇÃO 2: SORTIMENTO & MIX
                -------------------------------------------------------- */}
@@ -1048,7 +1084,7 @@ export default function ComercialPage() {
                     {produtosFiltrados.length} SKUs
                   </span>
                   <span className="hidden sm:inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-[#0F766E] border border-teal-200">
-                    Giro médio: {kpis.giroMedioDias}d
+                    Giro médio: {kpis.giroMedioDias !== null ? `${kpis.giroMedioDias}d` : '—'}
                   </span>
                   <div
                     className={`p-1.5 rounded-md bg-white border border-[#E5E7EB] text-[#4B5563] transition-transform duration-200 ${
@@ -1065,7 +1101,7 @@ export default function ComercialPage() {
 
               {expandedSections.sortimento && (
                 <div className="p-4 sm:p-5 border-t border-[#E5E7EB] space-y-4 animate-in fade-in-50 duration-150">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <h4 className="text-sm font-bold text-[#1F2937]">
                         Mix de Sortimento Ativo ({produtosFiltrados.length} itens)
@@ -1074,83 +1110,114 @@ export default function ComercialPage() {
                         Cobertura de estoque e giro em dias por produto
                       </p>
                     </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setImportarModalOpen(true)}
+                      className="text-xs rounded-xl gap-1.5 self-start sm:self-auto hover:border-[#0F766E] hover:text-[#0F766E]"
+                    >
+                      <UploadCloud className="w-3.5 h-3.5 text-[#0F766E]" />
+                      <span>Importar Planilha</span>
+                    </Button>
                   </div>
 
-                  <div className="hidden md:block bg-white border border-[#E5E7EB] rounded-xl shadow-2xs overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563]">
-                        <tr>
-                          <th className="p-3">Código</th>
-                          <th className="p-3">Produto</th>
-                          <th className="p-3">Departamento</th>
-                          <th className="p-3">Categoria</th>
-                          <th className="p-3">Preço Venda</th>
-                          <th className="p-3">Margem %</th>
-                          <th className="p-3">Giro (Dias)</th>
-                          <th className="p-3">Estoque</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[#E5E7EB]">
-                        {produtosFiltrados.map((p) => (
-                          <tr key={p.id} className="hover:bg-gray-50/80">
-                            <td className="p-3 font-mono text-[#6B7280]">{p.codigo}</td>
-                            <td className="p-3 font-semibold text-[#1F2937]">{p.descricao}</td>
-                            <td className="p-3 text-[#4B5563]">{p.departamento}</td>
-                            <td className="p-3 text-[#4B5563]">{p.categoria}</td>
-                            <td className="p-3 font-medium">
-                              {formatCurrency(p.preco_venda || 0)}
-                            </td>
-                            <td className="p-3 font-bold text-[#0F766E]">
-                              {(p.margem_perc || 0).toFixed(1)}%
-                            </td>
-                            <td className="p-3 font-medium">{p.giro_dias || 0} dias</td>
-                            <td className="p-3 font-medium">{p.estoque_fisico ?? 0}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Cards no Mobile */}
-                  <div className="md:hidden space-y-3">
-                    {produtosFiltrados.map((p) => (
-                      <div
-                        key={p.id}
-                        className="bg-white border border-[#E5E7EB] rounded-xl p-3.5 shadow-2xs space-y-2"
+                  {produtosFiltrados.length === 0 ? (
+                    <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                      <span className="text-[#6B7280] text-center sm:text-left">
+                        Sem dados de sortimento e mix nesta competência — importe sua planilha.
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => setImportarModalOpen(true)}
+                        className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs"
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <span className="text-[10px] font-mono text-[#6B7280]">{p.codigo}</span>
-                            <h4 className="text-xs font-bold text-[#1F2937] leading-tight">
-                              {p.descricao}
-                            </h4>
-                          </div>
-                          <span className="text-xs font-bold text-[#0F766E]">
-                            {(p.margem_perc || 0).toFixed(1)}% margem
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#F3F4F6]">
-                          <div>
-                            <span className="text-[#6B7280] block text-[10px]">
-                              Preço / Estoque:
-                            </span>
-                            <span className="font-semibold">
-                              {formatCurrency(p.preco_venda || 0)}
-                            </span>{' '}
-                            ({p.estoque_fisico ?? 0} un)
-                          </div>
-                          <div>
-                            <span className="text-[#6B7280] block text-[10px]">Giro em Dias:</span>
-                            <span className="font-semibold">{p.giro_dias || 0} dias</span>
-                          </div>
-                        </div>
+                        <UploadCloud className="w-3.5 h-3.5" />
+                        <span>Importar Planilha</span>
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="hidden md:block bg-white border border-[#E5E7EB] rounded-xl shadow-2xs overflow-x-auto">
+                        {' '}
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563]">
+                            <tr>
+                              <th className="p-3">Código</th>
+                              <th className="p-3">Produto</th>
+                              <th className="p-3">Departamento</th>
+                              <th className="p-3">Categoria</th>
+                              <th className="p-3">Preço Venda</th>
+                              <th className="p-3">Margem %</th>
+                              <th className="p-3">Giro (Dias)</th>
+                              <th className="p-3">Estoque</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#E5E7EB]">
+                            {produtosFiltrados.map((p) => (
+                              <tr key={p.id} className="hover:bg-gray-50/80">
+                                <td className="p-3 font-mono text-[#6B7280]">{p.codigo}</td>
+                                <td className="p-3 font-semibold text-[#1F2937]">{p.descricao}</td>
+                                <td className="p-3 text-[#4B5563]">{p.departamento}</td>
+                                <td className="p-3 text-[#4B5563]">{p.categoria}</td>
+                                <td className="p-3 font-medium">
+                                  {formatCurrency(p.preco_venda || 0)}
+                                </td>
+                                <td className="p-3 font-bold text-[#0F766E]">
+                                  {(p.margem_perc || 0).toFixed(1)}%
+                                </td>
+                                <td className="p-3 font-medium">{p.giro_dias || 0} dias</td>
+                                <td className="p-3 font-medium">{p.estoque_fisico ?? 0}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
-                    ))}
-                  </div>
+
+                      {/* Cards no Mobile */}
+                      <div className="md:hidden space-y-3">
+                        {produtosFiltrados.map((p) => (
+                          <div
+                            key={p.id}
+                            className="bg-white border border-[#E5E7EB] rounded-xl p-3.5 shadow-2xs space-y-2"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <span className="text-[10px] font-mono text-[#6B7280]">
+                                  {p.codigo}
+                                </span>
+                                <h4 className="text-xs font-bold text-[#1F2937] leading-tight">
+                                  {p.descricao}
+                                </h4>
+                              </div>
+                              <span className="text-xs font-bold text-[#0F766E]">
+                                {(p.margem_perc || 0).toFixed(1)}% margem
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#F3F4F6]">
+                              <div>
+                                <span className="text-[#6B7280] block text-[10px]">
+                                  Preço / Estoque:
+                                </span>
+                                <span className="font-semibold">
+                                  {formatCurrency(p.preco_venda || 0)}
+                                </span>{' '}
+                                ({p.estoque_fisico ?? 0} un)
+                              </div>
+                              <div>
+                                <span className="text-[#6B7280] block text-[10px]">
+                                  Giro em Dias:
+                                </span>
+                                <span className="font-semibold">{p.giro_dias || 0} dias</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
-
             {/* --------------------------------------------------------
                 SEÇÃO 3: VENDAS & MARGENS
                -------------------------------------------------------- */}
@@ -1184,10 +1251,14 @@ export default function ComercialPage() {
 
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-50 text-[#0F766E] border border-teal-200">
-                    {formatCurrency(kpis.vendaTotalRealizada)}
+                    {kpis.temDadosCategorias || kpis.temDadosProdutos
+                      ? formatCurrency(kpis.vendaTotalRealizada)
+                      : '—'}
                   </span>
                   <span className="hidden sm:inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white border border-[#E5E7EB] text-[#4B5563]">
-                    {kpis.atingimentoMetaGeral}% da meta
+                    {kpis.atingimentoMetaGeral !== null
+                      ? `${kpis.atingimentoMetaGeral}% da meta`
+                      : 'Sem meta'}
                   </span>
                   <div
                     className={`p-1.5 rounded-md bg-white border border-[#E5E7EB] text-[#4B5563] transition-transform duration-200 ${
@@ -1202,7 +1273,7 @@ export default function ComercialPage() {
 
               {expandedSections.vendas && (
                 <div className="p-4 sm:p-5 border-t border-[#E5E7EB] space-y-4 animate-in fade-in-50 duration-150">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <h4 className="text-sm font-bold text-[#1F2937]">
                         Vendas, Metas & Margens por Categoria
@@ -1211,99 +1282,132 @@ export default function ComercialPage() {
                         Desempenho financeiro e atingimento de metas do período
                       </p>
                     </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setImportarModalOpen(true)}
+                      className="text-xs rounded-xl gap-1.5 self-start sm:self-auto hover:border-[#0F766E] hover:text-[#0F766E]"
+                    >
+                      <UploadCloud className="w-3.5 h-3.5 text-[#0F766E]" />
+                      <span>Importar Planilha</span>
+                    </Button>
                   </div>
 
-                  <div className="hidden md:block bg-white border border-[#E5E7EB] rounded-xl shadow-2xs overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563]">
-                        <tr>
-                          <th className="p-3">Departamento</th>
-                          <th className="p-3">Categoria</th>
-                          <th className="p-3">Venda Realizada</th>
-                          <th className="p-3">Meta Prevista</th>
-                          <th className="p-3">Atingimento %</th>
-                          <th className="p-3">% Participação</th>
-                          <th className="p-3">Margem Bruta %</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[#E5E7EB]">
-                        {categorias.map((c) => {
-                          const atingimento = c.atingimento_meta_perc || 100
-                          return (
-                            <tr key={c.id} className="hover:bg-gray-50/80">
-                              <td className="p-3 font-semibold text-[#1F2937]">{c.departamento}</td>
-                              <td className="p-3 font-medium text-[#4B5563]">{c.categoria}</td>
-                              <td className="p-3 font-bold text-[#0F766E]">
-                                {formatCurrency(c.venda_valor || 0)}
-                              </td>
-                              <td className="p-3 text-[#6B7280]">
-                                {formatCurrency(c.meta_venda_valor || 0)}
-                              </td>
-                              <td className="p-3">
-                                <span
-                                  className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                    atingimento >= 100
-                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                      : 'bg-amber-50 text-amber-700 border border-amber-200'
-                                  }`}
-                                >
-                                  {atingimento.toFixed(1)}%
-                                </span>
-                              </td>
-                              <td className="p-3 font-medium">
-                                {(c.participacao_vendas_perc || 0).toFixed(1)}%
-                              </td>
-                              <td className="p-3 font-bold text-[#0F766E]">
-                                {(c.margem_lucro_perc || 0).toFixed(1)}%
-                              </td>
-                            </tr>
-                          )
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Cards no Mobile */}
-                  <div className="md:hidden space-y-3">
-                    {categorias.map((c) => (
-                      <div
-                        key={c.id}
-                        className="bg-white border border-[#E5E7EB] rounded-xl p-3.5 shadow-2xs space-y-2"
+                  {categorias.length === 0 ? (
+                    <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                      <span className="text-[#6B7280] text-center sm:text-left">
+                        Sem dados de vendas e margens nesta competência — importe sua planilha.
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => setImportarModalOpen(true)}
+                        className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs"
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <span className="text-[10px] font-semibold text-[#6B7280] uppercase">
-                              {c.departamento}
-                            </span>
-                            <h4 className="text-xs font-bold text-[#1F2937] leading-tight">
-                              {c.categoria}
-                            </h4>
-                          </div>
-                          <span className="text-xs font-bold text-[#0F766E]">
-                            {formatCurrency(c.venda_valor || 0)}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#F3F4F6]">
-                          <div>
-                            <span className="text-[#6B7280] block text-[10px]">
-                              Meta / Atingimento:
-                            </span>
-                            <span className="font-semibold">{c.atingimento_meta_perc || 100}%</span>
-                          </div>
-                          <div>
-                            <span className="text-[#6B7280] block text-[10px]">Margem Lucro:</span>
-                            <span className="font-bold text-[#0F766E]">
-                              {(c.margem_lucro_perc || 0).toFixed(1)}%
-                            </span>
-                          </div>
-                        </div>
+                        <UploadCloud className="w-3.5 h-3.5" />
+                        <span>Importar Planilha</span>
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="hidden md:block bg-white border border-[#E5E7EB] rounded-xl shadow-2xs overflow-x-auto">
+                        {' '}
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563]">
+                            <tr>
+                              <th className="p-3">Departamento</th>
+                              <th className="p-3">Categoria</th>
+                              <th className="p-3">Venda Realizada</th>
+                              <th className="p-3">Meta Prevista</th>
+                              <th className="p-3">Atingimento %</th>
+                              <th className="p-3">% Participação</th>
+                              <th className="p-3">Margem Bruta %</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#E5E7EB]">
+                            {categorias.map((c) => {
+                              const atingimento = c.atingimento_meta_perc || 100
+                              return (
+                                <tr key={c.id} className="hover:bg-gray-50/80">
+                                  <td className="p-3 font-semibold text-[#1F2937]">
+                                    {c.departamento}
+                                  </td>
+                                  <td className="p-3 font-medium text-[#4B5563]">{c.categoria}</td>
+                                  <td className="p-3 font-bold text-[#0F766E]">
+                                    {formatCurrency(c.venda_valor || 0)}
+                                  </td>
+                                  <td className="p-3 text-[#6B7280]">
+                                    {formatCurrency(c.meta_venda_valor || 0)}
+                                  </td>
+                                  <td className="p-3">
+                                    <span
+                                      className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                        atingimento >= 100
+                                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                          : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                      }`}
+                                    >
+                                      {atingimento.toFixed(1)}%
+                                    </span>
+                                  </td>
+                                  <td className="p-3 font-medium">
+                                    {(c.participacao_vendas_perc || 0).toFixed(1)}%
+                                  </td>
+                                  <td className="p-3 font-bold text-[#0F766E]">
+                                    {(c.margem_lucro_perc || 0).toFixed(1)}%
+                                  </td>
+                                </tr>
+                              )
+                            })}
+                          </tbody>
+                        </table>
                       </div>
-                    ))}
-                  </div>
+
+                      {/* Cards no Mobile */}
+                      <div className="md:hidden space-y-3">
+                        {categorias.map((c) => (
+                          <div
+                            key={c.id}
+                            className="bg-white border border-[#E5E7EB] rounded-xl p-3.5 shadow-2xs space-y-2"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <span className="text-[10px] font-semibold text-[#6B7280] uppercase">
+                                  {c.departamento}
+                                </span>
+                                <h4 className="text-xs font-bold text-[#1F2937] leading-tight">
+                                  {c.categoria}
+                                </h4>
+                              </div>
+                              <span className="text-xs font-bold text-[#0F766E]">
+                                {formatCurrency(c.venda_valor || 0)}
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#F3F4F6]">
+                              <div>
+                                <span className="text-[#6B7280] block text-[10px]">
+                                  Meta / Atingimento:
+                                </span>
+                                <span className="font-semibold">
+                                  {c.atingimento_meta_perc || 100}%
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-[#6B7280] block text-[10px]">
+                                  Margem Lucro:
+                                </span>
+                                <span className="font-bold text-[#0F766E]">
+                                  {(c.margem_lucro_perc || 0).toFixed(1)}%
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
-
             {/* --------------------------------------------------------
                 SEÇÃO 4: NEGATIVOS & SEM VENDAS (30/60/90+ dias)
                -------------------------------------------------------- */}
@@ -1372,162 +1476,196 @@ export default function ComercialPage() {
                         Identificação de capital parado e divergências físicas de estoque
                       </p>
                     </div>
-                    {/* Seletor rápido de faixa */}
-                    <div className="flex items-center gap-1.5 p-1 bg-[#F7F7F5] rounded-lg border border-[#E5E7EB] w-fit">
-                      <button
-                        type="button"
-                        onClick={() => setFiltroFaixaSemVenda('todas')}
-                        className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
-                          filtroFaixaSemVenda === 'todas'
-                            ? 'bg-white text-[#0F766E] shadow-2xs'
-                            : 'text-[#6B7280]'
-                        }`}
+                    <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setImportarModalOpen(true)}
+                        className="text-xs rounded-xl gap-1.5 hover:border-[#0F766E] hover:text-[#0F766E]"
                       >
-                        Todos
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFiltroFaixaSemVenda('30_dias')}
-                        className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
-                          filtroFaixaSemVenda === '30_dias'
-                            ? 'bg-white text-[#0F766E] shadow-2xs'
-                            : 'text-[#6B7280]'
-                        }`}
-                      >
-                        30 dias
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFiltroFaixaSemVenda('60_dias')}
-                        className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
-                          filtroFaixaSemVenda === '60_dias'
-                            ? 'bg-white text-[#0F766E] shadow-2xs'
-                            : 'text-[#6B7280]'
-                        }`}
-                      >
-                        60 dias
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFiltroFaixaSemVenda('acima_90_dias')}
-                        className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
-                          filtroFaixaSemVenda === 'acima_90_dias'
-                            ? 'bg-white text-[#0F766E] shadow-2xs'
-                            : 'text-[#6B7280]'
-                        }`}
-                      >
-                        90+ dias
-                      </button>
+                        <UploadCloud className="w-3.5 h-3.5 text-[#0F766E]" />
+                        <span>Importar Planilha</span>
+                      </Button>
+                      {/* Seletor rápido de faixa */}
+                      <div className="flex items-center gap-1.5 p-1 bg-[#F7F7F5] rounded-lg border border-[#E5E7EB] w-fit">
+                        <button
+                          type="button"
+                          onClick={() => setFiltroFaixaSemVenda('todas')}
+                          className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
+                            filtroFaixaSemVenda === 'todas'
+                              ? 'bg-white text-[#0F766E] shadow-2xs'
+                              : 'text-[#6B7280]'
+                          }`}
+                        >
+                          Todos
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFiltroFaixaSemVenda('30_dias')}
+                          className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
+                            filtroFaixaSemVenda === '30_dias'
+                              ? 'bg-white text-[#0F766E] shadow-2xs'
+                              : 'text-[#6B7280]'
+                          }`}
+                        >
+                          30 dias
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFiltroFaixaSemVenda('60_dias')}
+                          className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
+                            filtroFaixaSemVenda === '60_dias'
+                              ? 'bg-white text-[#0F766E] shadow-2xs'
+                              : 'text-[#6B7280]'
+                          }`}
+                        >
+                          60 dias
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFiltroFaixaSemVenda('acima_90_dias')}
+                          className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
+                            filtroFaixaSemVenda === 'acima_90_dias'
+                              ? 'bg-white text-[#0F766E] shadow-2xs'
+                              : 'text-[#6B7280]'
+                          }`}
+                        >
+                          90+ dias
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="hidden md:block bg-white border border-[#E5E7EB] rounded-xl shadow-2xs overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563]">
-                        <tr>
-                          <th className="p-3">Código</th>
-                          <th className="p-3">Produto</th>
-                          <th className="p-3">Categoria</th>
-                          <th className="p-3">Estoque Físico</th>
-                          <th className="p-3">Dias Sem Venda</th>
-                          <th className="p-3">Faixa</th>
-                          <th className="p-3">Preço</th>
-                          <th className="p-3">Ação Sugerida</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[#E5E7EB]">
-                        {itensNegativosSemVenda.map((p) => {
-                          const isNegativo = (p.estoque_fisico || 0) < 0
-                          return (
-                            <tr key={p.id} className="hover:bg-gray-50/80">
-                              <td className="p-3 font-mono text-[#6B7280]">{p.codigo}</td>
-                              <td className="p-3 font-semibold text-[#1F2937]">{p.descricao}</td>
-                              <td className="p-3 text-[#4B5563]">{p.categoria}</td>
-                              <td className="p-3 font-bold">
+                  {itensNegativosSemVenda.length === 0 ? (
+                    <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                      <span className="text-[#6B7280] text-center sm:text-left">
+                        Sem dados de negativos ou itens sem vendas nesta competência — importe sua
+                        planilha.
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => setImportarModalOpen(true)}
+                        className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs"
+                      >
+                        <UploadCloud className="w-3.5 h-3.5" />
+                        <span>Importar Planilha</span>
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="hidden md:block bg-white border border-[#E5E7EB] rounded-xl shadow-2xs overflow-x-auto">
+                        {' '}
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563]">
+                            <tr>
+                              <th className="p-3">Código</th>
+                              <th className="p-3">Produto</th>
+                              <th className="p-3">Categoria</th>
+                              <th className="p-3">Estoque Físico</th>
+                              <th className="p-3">Dias Sem Venda</th>
+                              <th className="p-3">Faixa</th>
+                              <th className="p-3">Preço</th>
+                              <th className="p-3">Ação Sugerida</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#E5E7EB]">
+                            {itensNegativosSemVenda.map((p) => {
+                              const isNegativo = (p.estoque_fisico || 0) < 0
+                              return (
+                                <tr key={p.id} className="hover:bg-gray-50/80">
+                                  <td className="p-3 font-mono text-[#6B7280]">{p.codigo}</td>
+                                  <td className="p-3 font-semibold text-[#1F2937]">
+                                    {p.descricao}
+                                  </td>
+                                  <td className="p-3 text-[#4B5563]">{p.categoria}</td>
+                                  <td className="p-3 font-bold">
+                                    <span
+                                      className={
+                                        isNegativo
+                                          ? 'text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-200'
+                                          : 'text-[#1F2937]'
+                                      }
+                                    >
+                                      {p.estoque_fisico ?? 0}
+                                    </span>
+                                  </td>
+                                  <td className="p-3 font-semibold text-amber-600">
+                                    {p.dias_sem_venda || 0} dias
+                                  </td>
+                                  <td className="p-3">
+                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                      {p.faixa_sem_venda === 'acima_90_dias'
+                                        ? '90+ Dias'
+                                        : p.faixa_sem_venda === '60_dias'
+                                          ? '60 Dias'
+                                          : '30 Dias'}
+                                    </span>
+                                  </td>
+                                  <td className="p-3 font-medium">
+                                    {formatCurrency(p.preco_venda || 0)}
+                                  </td>
+                                  <td className="p-3">
+                                    <span className="text-xs text-[#0F766E] font-medium">
+                                      {isNegativo ? 'Ajustar Inventário' : 'Rebaixa / Tabloide'}
+                                    </span>
+                                  </td>
+                                </tr>
+                              )
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Cards no Mobile */}
+                      <div className="md:hidden space-y-3">
+                        {itensNegativosSemVenda.map((p) => (
+                          <div
+                            key={p.id}
+                            className="bg-white border border-[#E5E7EB] rounded-xl p-3.5 shadow-2xs space-y-2"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <span className="text-[10px] font-mono text-[#6B7280]">
+                                  {p.codigo}
+                                </span>
+                                <h4 className="text-xs font-bold text-[#1F2937] leading-tight">
+                                  {p.descricao}
+                                </h4>
+                              </div>
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                {p.dias_sem_venda || 0} dias sem giro
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#F3F4F6]">
+                              <div>
+                                <span className="text-[#6B7280] block text-[10px]">
+                                  Estoque Físico:
+                                </span>
                                 <span
                                   className={
-                                    isNegativo
-                                      ? 'text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-200'
-                                      : 'text-[#1F2937]'
+                                    (p.estoque_fisico || 0) < 0
+                                      ? 'font-bold text-red-600'
+                                      : 'font-semibold'
                                   }
                                 >
                                   {p.estoque_fisico ?? 0}
                                 </span>
-                              </td>
-                              <td className="p-3 font-semibold text-amber-600">
-                                {p.dias_sem_venda || 0} dias
-                              </td>
-                              <td className="p-3">
-                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                                  {p.faixa_sem_venda === 'acima_90_dias'
-                                    ? '90+ Dias'
-                                    : p.faixa_sem_venda === '60_dias'
-                                      ? '60 Dias'
-                                      : '30 Dias'}
+                              </div>
+                              <div>
+                                <span className="text-[#6B7280] block text-[10px]">Preço:</span>
+                                <span className="font-semibold">
+                                  {formatCurrency(p.preco_venda || 0)}
                                 </span>
-                              </td>
-                              <td className="p-3 font-medium">
-                                {formatCurrency(p.preco_venda || 0)}
-                              </td>
-                              <td className="p-3">
-                                <span className="text-xs text-[#0F766E] font-medium">
-                                  {isNegativo ? 'Ajustar Inventário' : 'Rebaixa / Tabloide'}
-                                </span>
-                              </td>
-                            </tr>
-                          )
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Cards no Mobile */}
-                  <div className="md:hidden space-y-3">
-                    {itensNegativosSemVenda.map((p) => (
-                      <div
-                        key={p.id}
-                        className="bg-white border border-[#E5E7EB] rounded-xl p-3.5 shadow-2xs space-y-2"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <span className="text-[10px] font-mono text-[#6B7280]">{p.codigo}</span>
-                            <h4 className="text-xs font-bold text-[#1F2937] leading-tight">
-                              {p.descricao}
-                            </h4>
+                              </div>
+                            </div>
                           </div>
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                            {p.dias_sem_venda || 0} dias sem giro
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#F3F4F6]">
-                          <div>
-                            <span className="text-[#6B7280] block text-[10px]">
-                              Estoque Físico:
-                            </span>
-                            <span
-                              className={
-                                (p.estoque_fisico || 0) < 0
-                                  ? 'font-bold text-red-600'
-                                  : 'font-semibold'
-                              }
-                            >
-                              {p.estoque_fisico ?? 0}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-[#6B7280] block text-[10px]">Preço:</span>
-                            <span className="font-semibold">
-                              {formatCurrency(p.preco_venda || 0)}
-                            </span>
-                          </div>
-                        </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
-
             {/* --------------------------------------------------------
                 SEÇÃO 5: CURVAS A / B / C+
                -------------------------------------------------------- */}
@@ -1561,7 +1699,7 @@ export default function ComercialPage() {
 
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-50 text-[#0F766E] border border-teal-200">
-                    Curva A: {kpis.curvas.A.percValor}% R$
+                    Curva A: {kpis.temDadosProdutos ? `${kpis.curvas.A.percValor}% R$` : '—'}
                   </span>
                   <div
                     className={`p-1.5 rounded-md bg-white border border-[#E5E7EB] text-[#4B5563] transition-transform duration-200 ${
@@ -1576,7 +1714,7 @@ export default function ComercialPage() {
 
               {expandedSections.curvas && (
                 <div className="p-4 sm:p-5 border-t border-[#E5E7EB] space-y-4 animate-in fade-in-50 duration-150">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <h4 className="text-sm font-bold text-[#1F2937]">
                         Curvas A, B, C e C+ (% em Valor e em Quantidade)
@@ -1585,125 +1723,158 @@ export default function ComercialPage() {
                         Concentração de faturamento e volume físico de vendas
                       </p>
                     </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setImportarModalOpen(true)}
+                      className="text-xs rounded-xl gap-1.5 self-start sm:self-auto hover:border-[#0F766E] hover:text-[#0F766E]"
+                    >
+                      <UploadCloud className="w-3.5 h-3.5 text-[#0F766E]" />
+                      <span>Importar Planilha</span>
+                    </Button>
                   </div>
 
-                  {/* Cards de Distribuição por Curva */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                    {(['A', 'B', 'C', 'C+'] as const).map((letra) => {
-                      const key = letra === 'C+' ? 'CPlus' : letra
-                      const dados = kpis.curvas[key]
-                      return (
-                        <div
-                          key={letra}
-                          className="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-2xs space-y-2"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
-                              Curva {letra}
-                            </span>
-                            <span className="text-xs text-[#6B7280] font-semibold">
-                              {dados.count} SKUs
-                            </span>
-                          </div>
-                          <div>
-                            <div className="text-xl font-extrabold text-[#1F2937]">
-                              {dados.percValor}%{' '}
-                              <span className="text-xs font-normal text-[#6B7280]">
-                                do faturamento
-                              </span>
-                            </div>
-                            <div className="text-sm font-semibold text-[#0F766E] mt-0.5">
-                              {dados.percQtd}%{' '}
-                              <span className="text-xs font-normal text-[#6B7280]">
-                                da quantidade
-                              </span>
-                            </div>
-                            <p className="text-xs text-[#6B7280] mt-1">
-                              Total: {formatCurrency(dados.valor)}
-                            </p>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-
-                  {/* Tabela dos Produtos com Curva */}
-                  <div className="hidden md:block bg-white border border-[#E5E7EB] rounded-xl shadow-2xs overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563]">
-                        <tr>
-                          <th className="p-3">Curva</th>
-                          <th className="p-3">Código</th>
-                          <th className="p-3">Descrição</th>
-                          <th className="p-3">Venda Valor</th>
-                          <th className="p-3">% Share Valor</th>
-                          <th className="p-3">Venda Qtd</th>
-                          <th className="p-3">Giro (Dias)</th>
-                          <th className="p-3">Estoque</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[#E5E7EB]">
-                        {produtosFiltrados.map((p) => (
-                          <tr key={p.id} className="hover:bg-gray-50/80">
-                            <td className="p-3">
-                              <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-teal-50 text-[#0F766E] border border-teal-200">
-                                {p.curva || 'C'}
-                              </span>
-                            </td>
-                            <td className="p-3 font-mono text-[#6B7280]">{p.codigo}</td>
-                            <td className="p-3 font-semibold text-[#1F2937]">{p.descricao}</td>
-                            <td className="p-3 font-bold text-[#0F766E]">
-                              {formatCurrency(p.venda_valor_periodo || 0)}
-                            </td>
-                            <td className="p-3 font-medium">
-                              {(p.participacao_valor_perc || 0).toFixed(1)}%
-                            </td>
-                            <td className="p-3 font-medium">{p.venda_qtd_periodo ?? 0} un</td>
-                            <td className="p-3">{p.giro_dias || 0} dias</td>
-                            <td className="p-3 font-medium">{p.estoque_fisico ?? 0}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Mobile */}
-                  <div className="md:hidden space-y-3">
-                    {produtosFiltrados.map((p) => (
-                      <div
-                        key={p.id}
-                        className="bg-white border border-[#E5E7EB] rounded-xl p-3.5 shadow-2xs space-y-2"
+                  {produtosFiltrados.length === 0 ? (
+                    <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                      <span className="text-[#6B7280] text-center sm:text-left">
+                        Sem dados de curvas A/B/C+ nesta competência — importe sua planilha.
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => setImportarModalOpen(true)}
+                        className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs"
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <span className="text-[10px] font-mono text-[#6B7280]">{p.codigo}</span>
-                            <h4 className="text-xs font-bold text-[#1F2937] leading-tight">
-                              {p.descricao}
-                            </h4>
-                          </div>
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-[#0F766E] border border-teal-200">
-                            Curva {p.curva || 'C'}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#F3F4F6]">
-                          <div>
-                            <span className="text-[#6B7280] block text-[10px]">Venda / Share:</span>
-                            <span className="font-semibold text-[#0F766E]">
-                              {formatCurrency(p.venda_valor_periodo || 0)}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-[#6B7280] block text-[10px]">Giro em Dias:</span>
-                            <span className="font-semibold">{p.giro_dias || 0} dias</span>
-                          </div>
-                        </div>
+                        <UploadCloud className="w-3.5 h-3.5" />
+                        <span>Importar Planilha</span>
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Cards de Distribuição por Curva */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                        {' '}
+                        {(['A', 'B', 'C', 'C+'] as const).map((letra) => {
+                          const key = letra === 'C+' ? 'CPlus' : letra
+                          const dados = kpis.curvas[key]
+                          return (
+                            <div
+                              key={letra}
+                              className="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-2xs space-y-2"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
+                                  Curva {letra}
+                                </span>
+                                <span className="text-xs text-[#6B7280] font-semibold">
+                                  {dados.count} SKUs
+                                </span>
+                              </div>
+                              <div>
+                                <div className="text-xl font-extrabold text-[#1F2937]">
+                                  {dados.percValor}%{' '}
+                                  <span className="text-xs font-normal text-[#6B7280]">
+                                    do faturamento
+                                  </span>
+                                </div>
+                                <div className="text-sm font-semibold text-[#0F766E] mt-0.5">
+                                  {dados.percQtd}%{' '}
+                                  <span className="text-xs font-normal text-[#6B7280]">
+                                    da quantidade
+                                  </span>
+                                </div>
+                                <p className="text-xs text-[#6B7280] mt-1">
+                                  Total: {formatCurrency(dados.valor)}
+                                </p>
+                              </div>
+                            </div>
+                          )
+                        })}
                       </div>
-                    ))}
-                  </div>
+
+                      {/* Tabela dos Produtos com Curva */}
+                      <div className="hidden md:block bg-white border border-[#E5E7EB] rounded-xl shadow-2xs overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563]">
+                            <tr>
+                              <th className="p-3">Curva</th>
+                              <th className="p-3">Código</th>
+                              <th className="p-3">Descrição</th>
+                              <th className="p-3">Venda Valor</th>
+                              <th className="p-3">% Share Valor</th>
+                              <th className="p-3">Venda Qtd</th>
+                              <th className="p-3">Giro (Dias)</th>
+                              <th className="p-3">Estoque</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#E5E7EB]">
+                            {produtosFiltrados.map((p) => (
+                              <tr key={p.id} className="hover:bg-gray-50/80">
+                                <td className="p-3">
+                                  <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-teal-50 text-[#0F766E] border border-teal-200">
+                                    {p.curva || 'C'}
+                                  </span>
+                                </td>
+                                <td className="p-3 font-mono text-[#6B7280]">{p.codigo}</td>
+                                <td className="p-3 font-semibold text-[#1F2937]">{p.descricao}</td>
+                                <td className="p-3 font-bold text-[#0F766E]">
+                                  {formatCurrency(p.venda_valor_periodo || 0)}
+                                </td>
+                                <td className="p-3 font-medium">
+                                  {(p.participacao_valor_perc || 0).toFixed(1)}%
+                                </td>
+                                <td className="p-3 font-medium">{p.venda_qtd_periodo ?? 0} un</td>
+                                <td className="p-3">{p.giro_dias || 0} dias</td>
+                                <td className="p-3 font-medium">{p.estoque_fisico ?? 0}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Mobile */}
+                      <div className="md:hidden space-y-3">
+                        {produtosFiltrados.map((p) => (
+                          <div
+                            key={p.id}
+                            className="bg-white border border-[#E5E7EB] rounded-xl p-3.5 shadow-2xs space-y-2"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <span className="text-[10px] font-mono text-[#6B7280]">
+                                  {p.codigo}
+                                </span>
+                                <h4 className="text-xs font-bold text-[#1F2937] leading-tight">
+                                  {p.descricao}
+                                </h4>
+                              </div>
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-[#0F766E] border border-teal-200">
+                                Curva {p.curva || 'C'}
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#F3F4F6]">
+                              <div>
+                                <span className="text-[#6B7280] block text-[10px]">
+                                  Venda / Share:
+                                </span>
+                                <span className="font-semibold text-[#0F766E]">
+                                  {formatCurrency(p.venda_valor_periodo || 0)}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-[#6B7280] block text-[10px]">
+                                  Giro em Dias:
+                                </span>
+                                <span className="font-semibold">{p.giro_dias || 0} dias</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
-
             {/* --------------------------------------------------------
                 SEÇÃO 6: % QUEBRAS POR CATEGORIA
                -------------------------------------------------------- */}
@@ -1737,7 +1908,9 @@ export default function ComercialPage() {
 
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
-                    {kpis.quebraPercSobreVenda}% ({formatCurrency(kpis.quebraTotalValor)})
+                    {kpis.quebraPercSobreVenda !== null
+                      ? `${kpis.quebraPercSobreVenda}% (${formatCurrency(kpis.quebraTotalValor)})`
+                      : '—'}
                   </span>
                   <div
                     className={`p-1.5 rounded-md bg-white border border-[#E5E7EB] text-[#4B5563] transition-transform duration-200 ${
@@ -1752,7 +1925,7 @@ export default function ComercialPage() {
 
               {expandedSections.quebras && (
                 <div className="p-4 sm:p-5 border-t border-[#E5E7EB] space-y-4 animate-in fade-in-50 duration-150">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <h4 className="text-sm font-bold text-[#1F2937]">
                         % Vendas e Quebras por Categoria e Departamento
@@ -1761,98 +1934,127 @@ export default function ComercialPage() {
                         Impacto percentual de perdas e quebras sobre o faturamento do setor
                       </p>
                     </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setImportarModalOpen(true)}
+                      className="text-xs rounded-xl gap-1.5 self-start sm:self-auto hover:border-[#0F766E] hover:text-[#0F766E]"
+                    >
+                      <UploadCloud className="w-3.5 h-3.5 text-[#0F766E]" />
+                      <span>Importar Planilha</span>
+                    </Button>
                   </div>
 
-                  <div className="hidden md:block bg-white border border-[#E5E7EB] rounded-xl shadow-2xs overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563]">
-                        <tr>
-                          <th className="p-3">Departamento</th>
-                          <th className="p-3">Categoria</th>
-                          <th className="p-3">Vendas (R$)</th>
-                          <th className="p-3">% Share Vendas</th>
-                          <th className="p-3">Quebra Estimada (R$)</th>
-                          <th className="p-3">% Quebra s/ Venda</th>
-                          <th className="p-3">Taxa Ruptura %</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[#E5E7EB]">
-                        {categorias.map((c) => (
-                          <tr key={c.id} className="hover:bg-gray-50/80">
-                            <td className="p-3 font-semibold text-[#1F2937]">{c.departamento}</td>
-                            <td className="p-3 text-[#4B5563]">{c.categoria}</td>
-                            <td className="p-3 font-bold text-[#0F766E]">
-                              {formatCurrency(c.venda_valor || 0)}
-                            </td>
-                            <td className="p-3 font-medium">
-                              {(c.participacao_vendas_perc || 0).toFixed(1)}%
-                            </td>
-                            <td className="p-3 font-bold text-red-600">
-                              {formatCurrency(c.quebra_valor || 0)}
-                            </td>
-                            <td className="p-3">
-                              <span
-                                className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                  (c.quebra_perc_sobre_venda || 0) > 2
-                                    ? 'bg-red-50 text-red-700 border border-red-200'
-                                    : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                }`}
-                              >
-                                {(c.quebra_perc_sobre_venda || 0).toFixed(2)}%
-                              </span>
-                            </td>
-                            <td className="p-3 font-medium">
-                              {(c.taxa_ruptura_perc || 0).toFixed(1)}%
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Mobile */}
-                  <div className="md:hidden space-y-3">
-                    {categorias.map((c) => (
-                      <div
-                        key={c.id}
-                        className="bg-white border border-[#E5E7EB] rounded-xl p-3.5 shadow-2xs space-y-2"
+                  {categorias.length === 0 ? (
+                    <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                      <span className="text-[#6B7280] text-center sm:text-left">
+                        Sem dados de quebras por categoria nesta competência — importe sua planilha.
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => setImportarModalOpen(true)}
+                        className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs"
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <span className="text-[10px] font-semibold text-[#6B7280] uppercase">
-                              {c.departamento}
-                            </span>
-                            <h4 className="text-xs font-bold text-[#1F2937] leading-tight">
-                              {c.categoria}
-                            </h4>
-                          </div>
-                          <span className="text-xs font-bold text-red-600">
-                            Quebra: {(c.quebra_perc_sobre_venda || 0).toFixed(2)}%
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#F3F4F6]">
-                          <div>
-                            <span className="text-[#6B7280] block text-[10px]">Vendas:</span>
-                            <span className="font-semibold text-[#0F766E]">
-                              {formatCurrency(c.venda_valor || 0)}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-[#6B7280] block text-[10px]">
-                              Perda Estimada:
-                            </span>
-                            <span className="font-semibold text-red-600">
-                              {formatCurrency(c.quebra_valor || 0)}
-                            </span>
-                          </div>
-                        </div>
+                        <UploadCloud className="w-3.5 h-3.5" />
+                        <span>Importar Planilha</span>
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="hidden md:block bg-white border border-[#E5E7EB] rounded-xl shadow-2xs overflow-x-auto">
+                        {' '}
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563]">
+                            <tr>
+                              <th className="p-3">Departamento</th>
+                              <th className="p-3">Categoria</th>
+                              <th className="p-3">Vendas (R$)</th>
+                              <th className="p-3">% Share Vendas</th>
+                              <th className="p-3">Quebra Estimada (R$)</th>
+                              <th className="p-3">% Quebra s/ Venda</th>
+                              <th className="p-3">Taxa Ruptura %</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#E5E7EB]">
+                            {categorias.map((c) => (
+                              <tr key={c.id} className="hover:bg-gray-50/80">
+                                <td className="p-3 font-semibold text-[#1F2937]">
+                                  {c.departamento}
+                                </td>
+                                <td className="p-3 text-[#4B5563]">{c.categoria}</td>
+                                <td className="p-3 font-bold text-[#0F766E]">
+                                  {formatCurrency(c.venda_valor || 0)}
+                                </td>
+                                <td className="p-3 font-medium">
+                                  {(c.participacao_vendas_perc || 0).toFixed(1)}%
+                                </td>
+                                <td className="p-3 font-bold text-red-600">
+                                  {formatCurrency(c.quebra_valor || 0)}
+                                </td>
+                                <td className="p-3">
+                                  <span
+                                    className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                      (c.quebra_perc_sobre_venda || 0) > 2
+                                        ? 'bg-red-50 text-red-700 border border-red-200'
+                                        : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                    }`}
+                                  >
+                                    {(c.quebra_perc_sobre_venda || 0).toFixed(2)}%
+                                  </span>
+                                </td>
+                                <td className="p-3 font-medium">
+                                  {(c.taxa_ruptura_perc || 0).toFixed(1)}%
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
-                    ))}
-                  </div>
+
+                      {/* Mobile */}
+                      <div className="md:hidden space-y-3">
+                        {categorias.map((c) => (
+                          <div
+                            key={c.id}
+                            className="bg-white border border-[#E5E7EB] rounded-xl p-3.5 shadow-2xs space-y-2"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <span className="text-[10px] font-semibold text-[#6B7280] uppercase">
+                                  {c.departamento}
+                                </span>
+                                <h4 className="text-xs font-bold text-[#1F2937] leading-tight">
+                                  {c.categoria}
+                                </h4>
+                              </div>
+                              <span className="text-xs font-bold text-red-600">
+                                Quebra: {(c.quebra_perc_sobre_venda || 0).toFixed(2)}%
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#F3F4F6]">
+                              <div>
+                                <span className="text-[#6B7280] block text-[10px]">Vendas:</span>
+                                <span className="font-semibold text-[#0F766E]">
+                                  {formatCurrency(c.venda_valor || 0)}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-[#6B7280] block text-[10px]">
+                                  Perda Estimada:
+                                </span>
+                                <span className="font-semibold text-red-600">
+                                  {formatCurrency(c.quebra_valor || 0)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
-
             {/* --------------------------------------------------------
                 SEÇÃO 7: AÇÕES COMERCIAIS, PRICING & REBAIXAS
                -------------------------------------------------------- */}
@@ -1921,9 +2123,18 @@ export default function ComercialPage() {
                   </div>
 
                   {acoes.length === 0 ? (
-                    <div className="bg-white border border-[#E5E7EB] rounded-xl p-8 text-center text-xs text-[#6B7280]">
-                      Nenhuma ação comercial ou rebaixa cadastrada. Clique no botão acima para
-                      adicionar.
+                    <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                      <span className="text-[#6B7280] text-center sm:text-left">
+                        Sem ações comerciais ou rebaixas nesta competência — cadastre uma nova ação.
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => setNovaAcaoModalOpen(true)}
+                        className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Nova Ação</span>
+                      </Button>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -2109,9 +2320,18 @@ export default function ComercialPage() {
                   </div>
 
                   {implantacoes.length === 0 ? (
-                    <div className="bg-white border border-[#E5E7EB] rounded-xl p-8 text-center text-xs text-[#6B7280]">
-                      Nenhum cronograma de implantação cadastrado. Clique no botão acima para
-                      adicionar a primeira etapa.
+                    <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                      <span className="text-[#6B7280] text-center sm:text-left">
+                        Sem cronograma de implantação nesta competência — cadastre um novo projeto.
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => setNovaImplantacaoModalOpen(true)}
+                        className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Novo Projeto</span>
+                      </Button>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -2440,9 +2660,21 @@ export default function ComercialPage() {
                   </div>
 
                   {negociacoes.length === 0 ? (
-                    <div className="bg-white border border-[#E5E7EB] rounded-xl p-8 text-center text-xs text-[#6B7280]">
-                      Nenhuma negociação cadastrada. Clique em &ldquo;Nova Negociação&rdquo; para
-                      registrar acordos com o comprador.
+                    <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                      <span className="text-[#6B7280] text-center sm:text-left">
+                        Sem negociações cadastradas nesta competência — registre um novo acordo.
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setNegociacaoParaEditar(null)
+                          setNovaNegociacaoModalOpen(true)
+                        }}
+                        className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Nova Negociação</span>
+                      </Button>
                     </div>
                   ) : (
                     <div className="space-y-4">
