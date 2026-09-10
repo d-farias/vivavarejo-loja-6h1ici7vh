@@ -30,7 +30,9 @@ import {
 import { ChangePasswordModal } from '@/components/ChangePasswordModal'
 import { FalarEspecialistaModal } from '@/components/FalarEspecialistaModal'
 import { PwaInstallModal } from '@/components/PwaInstallModal'
+import { InactivityWarningModal } from '@/components/InactivityWarningModal'
 import { usePwaInstall } from '@/hooks/use-pwa-install'
+import { useAutoLogout } from '@/hooks/use-auto-logout'
 
 export default function Layout() {
   const { user, logout } = useAuth()
@@ -42,6 +44,22 @@ export default function Layout() {
   const [pwaModalOpen, setPwaModalOpen] = useState(false)
 
   const { isInstallable, isInstalled, isIOS, promptInstall } = usePwaInstall()
+
+  const handleInactivityLogout = React.useCallback(() => {
+    logout()
+    navigate('/login', {
+      replace: true,
+      state: {
+        expiredMessage:
+          'Sua sessão expirou por inatividade para sua segurança. Faça login novamente.',
+      },
+    })
+  }, [logout, navigate])
+
+  const { showWarning, secondsRemaining, extendSession } = useAutoLogout({
+    enabled: Boolean(user),
+    onLogout: handleInactivityLogout,
+  })
 
   const handleOpenInstall = async () => {
     if (isIOS) {
@@ -423,12 +441,22 @@ export default function Layout() {
         }}
       />
 
+      {/* Modal de Aviso de Inatividade (Logout Automático aos 30min / Aviso aos 28min) */}
+      <InactivityWarningModal
+        open={showWarning}
+        secondsRemaining={secondsRemaining}
+        onExtend={extendSession}
+        onLogoutNow={() => {
+          handleInactivityLogout()
+        }}
+      />
+
       {/* Footer */}
       <footer className="w-full border-t border-[#E5E7EB] bg-white py-4 mt-auto">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#6B7280]">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-[#1F2937]">VivaVarejo</span>
-            <span className="text-xs text-[#6B7280] font-mono">v0.0.87</span>
+            <span className="text-xs text-[#6B7280] font-mono">v0.0.89</span>
           </div>
           <div>
             <span>© {new Date().getFullYear()} VivaVarejo. Todos os direitos reservados.</span>

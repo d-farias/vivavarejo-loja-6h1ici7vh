@@ -60,7 +60,12 @@ export default function PerdasPage() {
   const [registroPerdaOpen, setRegistroPerdaOpen] = useState(false)
   const [registroInventarioOpen, setRegistroInventarioOpen] = useState(false)
   const [setorPreSelecionado, setSetorPreSelecionado] = useState<string>('')
-  const [fotoModal, setFotoModal] = useState<{ url: string; titulo: string } | null>(null)
+  const [fotoModal, setFotoModal] = useState<{
+    url: string
+    titulo: string
+    subtitulo?: string
+    dataHora?: string
+  } | null>(null)
 
   // Atualizar filtro de loja ao mudar lojaSelecionada globalmente
   useEffect(() => {
@@ -923,17 +928,24 @@ export default function PerdasPage() {
                         {formatCurrency(p.valor_estimado)}
                       </td>
                       <td className="p-3 text-center">
-                        {fotoUrl ? (
+                        {p.foto ? (
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={async () => {
+                              const protectedUrl = await perdasService.getProtectedFotoUrl(p)
                               setFotoModal({
-                                url: fotoUrl,
-                                titulo: `Perda: ${p.setor_categoria} (${p.data})`,
+                                url: protectedUrl || fotoUrl || '',
+                                titulo: `Perda: ${p.setor_categoria}`,
+                                subtitulo: p.item_descricao
+                                  ? `${p.item_descricao} • ${p.quantidade} un • ${formatCurrency(p.valor_estimado)}`
+                                  : `Motivo: ${p.motivo} • ${p.quantidade} un`,
+                                dataHora: p.data
+                                  ? p.data.split('-').reverse().join('/')
+                                  : undefined,
                               })
-                            }
+                            }}
                             className="p-1 rounded text-[#2563EB] hover:bg-blue-50 transition-colors"
-                            title="Visualizar foto da comprovação"
+                            title="Visualizar foto da comprovação com zoom seguro"
                           >
                             <Camera className="w-4 h-4" />
                           </button>
@@ -1060,44 +1072,15 @@ export default function PerdasPage() {
         }}
       />
 
-      {/* Visualizador de Foto Modal */}
-      {fotoModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative bg-white rounded-xl shadow-2xl border border-[#E5E7EB] w-full max-w-2xl overflow-hidden flex flex-col max-h-[92vh]">
-            <div className="px-5 py-3.5 border-b border-[#E5E7EB] flex items-center justify-between bg-white">
-              <div>
-                <h3 className="text-sm font-bold text-[#1F2937] leading-tight">
-                  {fotoModal.titulo}
-                </h3>
-                <p className="text-[11px] text-[#6B7280]">Comprovação de perda apontada</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setFotoModal(null)}
-                className="p-1.5 text-[#6B7280] hover:text-[#1F2937] hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-3 bg-neutral-900 flex items-center justify-center overflow-hidden max-h-[65vh]">
-              <img
-                src={fotoModal.url}
-                alt={fotoModal.titulo}
-                className="max-h-[60vh] max-w-full object-contain rounded-md"
-              />
-            </div>
-            <div className="px-5 py-3 bg-[#F7F7F5] border-t border-[#E5E7EB] flex items-center justify-end">
-              <button
-                type="button"
-                onClick={() => setFotoModal(null)}
-                className="px-4 py-1.5 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] font-semibold text-xs rounded-md shadow-xs transition-colors"
-              >
-                Fechar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Visualizador de Foto Modal Seguro com Token e Zoom */}
+      <FotoVisualizadorModal
+        isOpen={Boolean(fotoModal)}
+        fotoUrl={fotoModal?.url}
+        titulo={fotoModal?.titulo}
+        subtitulo={fotoModal?.subtitulo || 'Comprovação de perda apontada'}
+        dataHora={fotoModal?.dataHora}
+        onClose={() => setFotoModal(null)}
+      />
     </div>
   )
 }

@@ -10,7 +10,10 @@ export default function Login() {
   const location = useLocation()
   // Destino pós-login padrão é a Agenda (/agenda), conforme solicitação do usuário.
   // Se o usuário foi interceptado de uma rota específica (que não seja a raiz ou a própria agenda), preserva o destino pretendido.
-  const stateFrom = (location.state as { from?: { pathname: string } })?.from?.pathname
+  const stateData =
+    (location.state as { from?: { pathname: string }; expiredMessage?: string }) || {}
+  const stateFrom = stateData.from?.pathname
+  const expiredMessage = stateData.expiredMessage
   const from = stateFrom && stateFrom !== '/' && stateFrom !== '/login' ? stateFrom : '/agenda'
 
   const [email, setEmail] = useState('')
@@ -106,6 +109,14 @@ export default function Login() {
             Acompanhamento operacional e gestão de rotinas
           </p>
         </div>
+
+        {/* Banner de Expiração de Sessão por Inatividade */}
+        {expiredMessage && !fieldErrors.general && (
+          <div className="mb-5 p-3 rounded bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+            <span className="font-medium">{expiredMessage}</span>
+          </div>
+        )}
 
         {/* General Error Banner */}
         {fieldErrors.general && (

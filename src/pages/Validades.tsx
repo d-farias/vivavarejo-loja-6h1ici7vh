@@ -28,6 +28,7 @@ import { BotaoAvisoWhatsApp } from '@/components/BotaoAvisoWhatsApp'
 import { TarefaValidadeFormModal } from '@/components/TarefaValidadeFormModal'
 import { ConcluirValidadeModal } from '@/components/ConcluirValidadeModal'
 import { ValidarValidadeModal } from '@/components/ValidarValidadeModal'
+import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
 import { tarefasValidadeService } from '@/services/tarefasValidade'
 import { parseHorarioLimiteToMinutes } from '@/lib/time-utils'
 import type { TarefaValidade, StatusTarefaValidade } from '@/types'
@@ -58,6 +59,8 @@ export default function ValidadesPage() {
   const [editingTarefa, setEditingTarefa] = useState<TarefaValidade | null>(null)
   const [concluirModalTarefa, setConcluirModalTarefa] = useState<TarefaValidade | null>(null)
   const [validarModalTarefa, setValidarModalTarefa] = useState<TarefaValidade | null>(null)
+  const [visualizarFotoTarefa, setVisualizarFotoTarefa] = useState<TarefaValidade | null>(null)
+  const [fotoUrlVisualizacao, setFotoUrlVisualizacao] = useState<string | null>(null)
 
   const perfil = user?.perfil || 'lider'
   const podeGerenciar = perfil === 'admin' || perfil === 'adm_rede' || perfil === 'lider'
@@ -691,15 +694,22 @@ export default function ValidadesPage() {
                   <div className="flex items-center gap-2 shrink-0 pt-2 lg:pt-0">
                     {/* Botão de Foto (se já anexada) */}
                     {tarefa.foto && (
-                      <a
-                        href={tarefasValidadeService.getFotoUrl(tarefa) || '#'}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-blue-50 text-[#2563EB] border border-blue-200 text-xs font-semibold hover:bg-blue-100"
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setVisualizarFotoTarefa(tarefa)
+                          const protectedUrl =
+                            await tarefasValidadeService.getProtectedFotoUrl(tarefa)
+                          setFotoUrlVisualizacao(
+                            protectedUrl || tarefasValidadeService.getFotoUrl(tarefa),
+                          )
+                        }}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-blue-50 text-[#2563EB] border border-blue-200 text-xs font-semibold hover:bg-blue-100 transition-colors"
+                        title="Visualizar foto comprobatória protegida"
                       >
                         <Camera className="w-3.5 h-3.5" />
                         <span>Ver Foto</span>
-                      </a>
+                      </button>
                     )}
 
                     {/* Botão WhatsApp para aviso quando pendente/atrasada */}
@@ -853,6 +863,23 @@ export default function ValidadesPage() {
           if (!user) return
           await tarefasValidadeService.devolverTarefa(tId, user.id, motivo)
           loadData()
+        }}
+      />
+
+      {/* Modal de Foto Segura com Token e Zoom */}
+      <FotoVisualizadorModal
+        isOpen={Boolean(visualizarFotoTarefa)}
+        fotoUrl={fotoUrlVisualizacao}
+        titulo={visualizarFotoTarefa ? `Validade: ${visualizarFotoTarefa.setor_categoria}` : ''}
+        subtitulo={visualizarFotoTarefa?.descricao || 'Comprovação de validade auditada'}
+        dataHora={
+          visualizarFotoTarefa?.concluida_em
+            ? new Date(visualizarFotoTarefa.concluida_em).toLocaleString('pt-BR')
+            : undefined
+        }
+        onClose={() => {
+          setVisualizarFotoTarefa(null)
+          setFotoUrlVisualizacao(null)
         }}
       />
     </div>

@@ -409,8 +409,12 @@ export const tarefasValidadeService = {
   async getProtectedFotoUrl(tarefa: TarefaValidade, thumb?: string): Promise<string | null> {
     if (!tarefa.foto) return null
     try {
-      const token = await pb.files.getToken()
-      return pb.files.getURL(tarefa, tarefa.foto, { thumb, token })
+      const { getFileToken } = await import('@/lib/pocketbase/files')
+      const token = await getFileToken()
+      if (token) {
+        return pb.files.getURL(tarefa, tarefa.foto, { thumb, token })
+      }
+      return pb.files.getURL(tarefa, tarefa.foto, { thumb })
     } catch (_) {
       return pb.files.getURL(tarefa, tarefa.foto, { thumb })
     }

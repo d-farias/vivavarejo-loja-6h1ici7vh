@@ -14,6 +14,11 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { VAREJO_SEGMENTOS } from '@/components/EnquadramentoClienteCard'
+import {
+  PasswordStrengthMeter,
+  evaluatePasswordStrength,
+  MSG_SENHA_REQUISITOS,
+} from '@/components/PasswordStrengthMeter'
 
 export default function Signup() {
   const { signup } = useAuth()
@@ -435,7 +440,7 @@ export default function Signup() {
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-              Senha (mínimo 8 caracteres)
+              Senha (mínimo 8 caracteres, maiúscula, minúscula e número)
             </label>
             <div className="relative">
               <Lock className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -452,6 +457,7 @@ export default function Signup() {
                 disabled={loading}
               />
             </div>
+            <PasswordStrengthMeter password={password} />
             {fieldErrors.password && (
               <p className="text-[11px] text-[#B91C1C] mt-1 font-medium">{fieldErrors.password}</p>
             )}
