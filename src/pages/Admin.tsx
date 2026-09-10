@@ -928,7 +928,7 @@ export default function Admin() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
         <div>
           <div className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-[#2563EB]" />
+            <Shield className="w-5 h-5 text-[#0F766E]" />
             <div>
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F2937]">
                 {isAdmRede ? 'Painel de Gestão da Minha Rede' : 'Painel Administrativo & Gerencial'}
@@ -944,8 +944,8 @@ export default function Admin() {
           </div>
 
           {/* Destaque discreto: Da informação à execução */}
-          <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 bg-blue-50/70 border border-blue-200/60 rounded-lg text-xs text-[#1F2937] max-w-lg">
-            <span className="font-bold text-[#2563EB] shrink-0">Da informação à execução:</span>
+          <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 bg-teal-50/70 border border-teal-200/60 rounded-lg text-xs text-[#1F2937] max-w-lg">
+            <span className="font-bold text-[#0F766E] shrink-0">Da informação à execução:</span>
             <span className="text-[#4B5563] text-[11px] leading-tight">
               O VivaVarejo conecta dados de ERP e BI à ponta — transformando indicadores em rotinas
               com dono, prazo e checagem real.
@@ -967,10 +967,10 @@ export default function Admin() {
             <button
               onClick={loadAll}
               disabled={loading}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] rounded-md shadow-xs transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] rounded-md shadow-xs transition-colors"
             >
               <RefreshCw
-                className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-[#2563EB]' : ''}`}
+                className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-[#0F766E]' : ''}`}
               />
               <span>Atualizar dados</span>
             </button>
@@ -982,13 +982,13 @@ export default function Admin() {
           <div
             className={`p-3.5 rounded-lg border text-xs sm:text-sm font-medium flex items-center justify-between ${
               feedbackMsg.type === 'success'
-                ? 'bg-blue-50 border-blue-200 text-[#2563EB]'
+                ? 'bg-teal-50 border-teal-200 text-[#0F766E]'
                 : 'bg-red-50 border-red-200 text-[#B91C1C]'
             }`}
           >
             <div className="flex items-center gap-2">
               {feedbackMsg.type === 'success' ? (
-                <CheckCircle2 className="w-4 h-4 shrink-0 text-[#2563EB]" />
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-[#0F766E]" />
               ) : (
                 <AlertTriangle className="w-4 h-4 shrink-0 text-[#B91C1C]" />
               )}
@@ -1011,7 +1011,7 @@ export default function Admin() {
           }}
           className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'painel'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#0F766E] text-[#0F766E]'
               : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
           }`}
         >
@@ -1027,7 +1027,7 @@ export default function Admin() {
           }}
           className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'relatorios'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#0F766E] text-[#0F766E]'
               : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
           }`}
         >
@@ -1043,7 +1043,7 @@ export default function Admin() {
           }}
           className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'material_venda'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#0F766E] text-[#0F766E]'
               : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
           }`}
         >
@@ -1059,7 +1059,7 @@ export default function Admin() {
           }}
           className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'planos'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#0F766E] text-[#0F766E]'
               : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
           }`}
         >
@@ -1074,7 +1074,7 @@ export default function Admin() {
           }}
           className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'modelos'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#0F766E] text-[#0F766E]'
               : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
           }`}
         >
@@ -1090,7 +1090,7 @@ export default function Admin() {
           }}
           className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'clientes'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#0F766E] text-[#0F766E]'
               : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
           }`}
         >
@@ -1105,7 +1105,7 @@ export default function Admin() {
           }}
           className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'lojas'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#0F766E] text-[#0F766E]'
               : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
           }`}
         >
@@ -1120,7 +1120,7 @@ export default function Admin() {
           }}
           className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'funcoes'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#0F766E] text-[#0F766E]'
               : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
           }`}
         >
@@ -1135,7 +1135,7 @@ export default function Admin() {
           }}
           className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'funcionarios'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#0F766E] text-[#0F766E]'
               : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
           }`}
         >
@@ -1150,7 +1150,7 @@ export default function Admin() {
           }}
           className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'promotores'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#0F766E] text-[#0F766E]'
               : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
           }`}
         >
@@ -1167,7 +1167,7 @@ export default function Admin() {
             }}
             className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
               activeTab === 'usuarios'
-                ? 'border-[#2563EB] text-[#2563EB]'
+                ? 'border-[#0F766E] text-[#0F766E]'
                 : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
             }`}
           >
@@ -1185,7 +1185,7 @@ export default function Admin() {
             }}
             className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
               activeTab === 'auditoria'
-                ? 'border-[#2563EB] text-[#2563EB]'
+                ? 'border-[#0F766E] text-[#0F766E]'
                 : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
             }`}
           >
@@ -1202,11 +1202,11 @@ export default function Admin() {
           }}
           className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'protecao_dados'
-              ? 'border-[#2563EB] text-[#2563EB]'
+              ? 'border-[#0F766E] text-[#0F766E]'
               : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
           }`}
         >
-          <ShieldCheck className="w-4 h-4 text-[#2563EB]" />
+          <ShieldCheck className="w-4 h-4 text-[#0F766E]" />
           <span>Proteção de Dados</span>
         </button>
       </div>
@@ -1325,7 +1325,7 @@ export default function Admin() {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Buscar modelos de rotinas..."
-                      className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                      className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                     />
                   </div>
 
@@ -1335,7 +1335,7 @@ export default function Admin() {
                     <select
                       value={selectedClienteFilter}
                       onChange={(e) => setSelectedClienteFilter(e.target.value)}
-                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
+                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E]"
                     >
                       <option value="todos">Todos os Modelos (Gerais e Redes)</option>
                       {clientes.map((c) => (
@@ -1350,7 +1350,7 @@ export default function Admin() {
                 <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
                   <button
                     onClick={() => setGerarModeloIaModal(true)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
                     title="Descreva a operação da loja e deixe a IA gerar o modelo com as rotinas"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
@@ -1360,10 +1360,10 @@ export default function Admin() {
                   {lojas.length > 0 && (
                     <button
                       onClick={() => setSalvarLojaComoModeloModal({ open: true })}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] text-xs font-semibold rounded-md shadow-xs transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-md shadow-xs transition-colors"
                       title="Salvar todas as rotinas de uma loja como novo modelo reutilizável"
                     >
-                      <Store className="w-3.5 h-3.5 text-[#2563EB]" />
+                      <Store className="w-3.5 h-3.5 text-[#0F766E]" />
                       <span>Salvar loja como modelo</span>
                     </button>
                   )}
@@ -1371,17 +1371,17 @@ export default function Admin() {
                   {modelos.length > 0 && lojas.length > 0 && (
                     <button
                       onClick={() => setAplicarModeloModal({ open: true })}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] text-xs font-semibold rounded-md shadow-xs transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-md shadow-xs transition-colors"
                       title="Replicar modelo de rotinas em uma loja de destino"
                     >
-                      <ArrowRight className="w-3.5 h-3.5 text-[#2563EB]" />
+                      <ArrowRight className="w-3.5 h-3.5 text-[#0F766E]" />
                       <span>Aplicar modelo em loja</span>
                     </button>
                   )}
 
                   <button
                     onClick={() => setModeloModal({ open: true, data: null })}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#2563EB] text-[#2563EB] hover:bg-blue-50 text-xs font-semibold rounded-md shadow-xs transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#0F766E] text-[#0F766E] hover:bg-teal-50 text-xs font-semibold rounded-md shadow-xs transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Novo modelo</span>
@@ -1402,7 +1402,7 @@ export default function Admin() {
                   <div className="mt-4 flex justify-center flex-wrap gap-2">
                     <button
                       onClick={() => setGerarModeloIaModal(true)}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>Gerar modelo com IA</span>
@@ -1410,15 +1410,15 @@ export default function Admin() {
                     {lojas.length > 0 && (
                       <button
                         onClick={() => setSalvarLojaComoModeloModal({ open: true })}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] text-xs font-semibold rounded-md shadow-xs"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-md shadow-xs"
                       >
-                        <Store className="w-3.5 h-3.5 text-[#2563EB]" />
+                        <Store className="w-3.5 h-3.5 text-[#0F766E]" />
                         <span>Salvar Loja como Modelo</span>
                       </button>
                     )}
                     <button
                       onClick={() => setModeloModal({ open: true, data: null })}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#2563EB] text-[#2563EB] hover:bg-blue-50 text-xs font-semibold rounded-md shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#0F766E] text-[#0F766E] hover:bg-teal-50 text-xs font-semibold rounded-md shadow-xs"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Criar Modelo Manual</span>
@@ -1442,7 +1442,7 @@ export default function Admin() {
                         <tr key={m.id} className="hover:bg-gray-50/80 transition-colors">
                           <td className="p-3.5 font-semibold text-[#1F2937]">
                             <div className="flex items-center gap-2">
-                              <Layers className="w-4 h-4 text-[#2563EB] shrink-0" />
+                              <Layers className="w-4 h-4 text-[#0F766E] shrink-0" />
                               <span>{m.nome}</span>
                             </div>
                           </td>
@@ -1453,13 +1453,13 @@ export default function Admin() {
                                 <span>{m.expand.cliente.nome}</span>
                               </span>
                             ) : (
-                              <span className="text-[11px] font-medium text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                              <span className="text-[11px] font-medium text-[#0F766E] bg-teal-50 px-2 py-0.5 rounded border border-teal-100">
                                 Padrão Geral
                               </span>
                             )}
                           </td>
                           <td className="p-3.5 text-center">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#3B82F6]/10 text-[#2563EB]">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-500/10 text-[#0F766E]">
                               {m.totalItens || 0} rotinas
                             </span>
                           </td>
@@ -1470,7 +1470,7 @@ export default function Admin() {
                             <div className="inline-flex items-center gap-1">
                               <button
                                 onClick={() => setModeloDetalhesModal({ open: true, data: m })}
-                                className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                className="p-1.5 text-[#4B5563] hover:text-[#0F766E] rounded hover:bg-gray-100"
                                 title="Ver rotinas deste modelo"
                               >
                                 <Eye className="w-4 h-4" />
@@ -1483,7 +1483,7 @@ export default function Admin() {
                                       initialModeloId: m.id,
                                     })
                                   }
-                                  className="p-1.5 text-[#2563EB] hover:text-[#1D4ED8] rounded hover:bg-blue-50"
+                                  className="p-1.5 text-[#0F766E] hover:text-[#115E59] rounded hover:bg-teal-50"
                                   title="Aplicar este modelo em uma loja"
                                 >
                                   <ArrowRight className="w-4 h-4" />
@@ -1491,7 +1491,7 @@ export default function Admin() {
                               )}
                               <button
                                 onClick={() => setModeloModal({ open: true, data: m })}
-                                className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                className="p-1.5 text-[#4B5563] hover:text-[#0F766E] rounded hover:bg-gray-100"
                                 title="Editar dados do modelo"
                               >
                                 <Edit2 className="w-4 h-4" />
@@ -1525,7 +1525,7 @@ export default function Admin() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Buscar clientes por nome..."
-                    className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                    className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                   />
                   {searchTerm && (
                     <button
@@ -1539,7 +1539,7 @@ export default function Admin() {
 
                 <button
                   onClick={() => setClienteModal({ open: true, data: null })}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors self-start sm:self-auto"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs transition-colors self-start sm:self-auto"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Novo Cliente</span>
@@ -1580,7 +1580,7 @@ export default function Admin() {
                                 className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${
                                   cliente.tipo_pessoa === 'PF'
                                     ? 'bg-amber-100 text-amber-800'
-                                    : 'bg-blue-100 text-[#2563EB]'
+                                    : 'bg-teal-100 text-[#0F766E]'
                                 }`}
                               >
                                 {cliente.tipo_pessoa || 'PJ'}
@@ -1609,7 +1609,7 @@ export default function Admin() {
                             <div className="inline-flex items-center gap-1">
                               <button
                                 onClick={() => setClienteModal({ open: true, data: cliente })}
-                                className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                className="p-1.5 text-[#4B5563] hover:text-[#0F766E] rounded hover:bg-gray-100"
                                 title="Editar cliente"
                               >
                                 <Edit2 className="w-4 h-4" />
@@ -1644,7 +1644,7 @@ export default function Admin() {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Buscar lojas..."
-                      className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                      className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                     />
                   </div>
 
@@ -1654,7 +1654,7 @@ export default function Admin() {
                     <select
                       value={selectedClienteFilter}
                       onChange={(e) => setSelectedClienteFilter(e.target.value)}
-                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
+                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E]"
                     >
                       <option value="todos">Todos os Clientes</option>
                       {clientes.map((c) => (
@@ -1674,7 +1674,7 @@ export default function Admin() {
                     }
                     setLojaModal({ open: true, data: null })
                   }}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors self-start sm:self-auto"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs transition-colors self-start sm:self-auto"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Nova Loja</span>
@@ -1713,12 +1713,12 @@ export default function Admin() {
                               <span>{loja.expand?.cliente?.nome || 'Cliente não vinculado'}</span>
                             </span>
                           </td>
-                          <td className="p-3.5 font-mono text-xs text-[#2563EB]">
+                          <td className="p-3.5 font-mono text-xs text-[#0F766E]">
                             {loja.codigo || '-'}
                           </td>
                           <td className="p-3.5 text-xs text-[#4B5563]">
                             {loja.email_regional ? (
-                              <span className="font-mono text-[11px] text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                              <span className="font-mono text-[11px] text-[#0F766E] bg-teal-50 px-2 py-0.5 rounded border border-teal-100">
                                 {loja.email_regional}
                               </span>
                             ) : (
@@ -1729,8 +1729,8 @@ export default function Admin() {
                           </td>
                           <td className="p-3.5">
                             {loja.alertas_ativos !== false ? (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#3B82F6]/10 text-[#2563EB]">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-teal-500/10 text-[#0F766E]">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#0F766E]" />
                                 Ativos
                               </span>
                             ) : (
@@ -1751,7 +1751,7 @@ export default function Admin() {
                                     initialLojaId: loja.id,
                                   })
                                 }
-                                className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                className="p-1.5 text-[#4B5563] hover:text-[#0F766E] rounded hover:bg-gray-100"
                                 title="Salvar rotinas desta loja como Modelo"
                               >
                                 <Layers className="w-4 h-4" />
@@ -1764,7 +1764,7 @@ export default function Admin() {
                                       initialLojaId: loja.id,
                                     })
                                   }
-                                  className="p-1.5 text-[#2563EB] hover:text-[#1D4ED8] rounded hover:bg-blue-50"
+                                  className="p-1.5 text-[#0F766E] hover:text-[#115E59] rounded hover:bg-teal-50"
                                   title="Aplicar um Modelo nesta loja"
                                 >
                                   <ArrowRight className="w-4 h-4" />
@@ -1772,7 +1772,7 @@ export default function Admin() {
                               )}
                               <button
                                 onClick={() => setLojaModal({ open: true, data: loja })}
-                                className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                className="p-1.5 text-[#4B5563] hover:text-[#0F766E] rounded hover:bg-gray-100"
                                 title="Editar loja"
                               >
                                 <Edit2 className="w-4 h-4" />
@@ -1807,7 +1807,7 @@ export default function Admin() {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Buscar função..."
-                      className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                      className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                     />
                   </div>
 
@@ -1817,7 +1817,7 @@ export default function Admin() {
                     <select
                       value={selectedLojaFilter}
                       onChange={(e) => setSelectedLojaFilter(e.target.value)}
-                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
+                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E]"
                     >
                       <option value="todas">Todas as Lojas</option>
                       {lojas.map((l) => (
@@ -1837,7 +1837,7 @@ export default function Admin() {
                     }
                     handleOpenFuncaoModal(null)
                   }}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors self-start sm:self-auto"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs transition-colors self-start sm:self-auto"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Nova Função</span>
@@ -1885,7 +1885,7 @@ export default function Admin() {
                           </td>
                           <td className="p-3.5 text-[#4B5563]">
                             {fn.expand?.chefe_imediato_funcao ? (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 text-[11px] font-medium text-blue-700 border border-blue-200">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-teal-50 text-[11px] font-medium text-teal-700 border border-teal-200">
                                 <span>
                                   {normalizarNomeCanonico(fn.expand.chefe_imediato_funcao.nome)}
                                 </span>
@@ -1908,7 +1908,7 @@ export default function Admin() {
                             <div className="inline-flex items-center gap-1">
                               <button
                                 onClick={() => handleOpenFuncaoModal(fn)}
-                                className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                className="p-1.5 text-[#4B5563] hover:text-[#0F766E] rounded hover:bg-gray-100"
                                 title="Editar função"
                               >
                                 <Edit2 className="w-4 h-4" />
@@ -1943,7 +1943,7 @@ export default function Admin() {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Buscar funcionário..."
-                      className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                      className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                     />
                   </div>
 
@@ -1953,7 +1953,7 @@ export default function Admin() {
                     <select
                       value={selectedLojaFilter}
                       onChange={(e) => setSelectedLojaFilter(e.target.value)}
-                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
+                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E]"
                     >
                       <option value="todas">Todas as Lojas</option>
                       {lojas.map((l) => (
@@ -1970,7 +1970,7 @@ export default function Admin() {
                     <select
                       value={selectedFuncaoFilter}
                       onChange={(e) => setSelectedFuncaoFilter(e.target.value)}
-                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
+                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E]"
                     >
                       <option value="todas">Todas as Funções</option>
                       {funcoes.map((fn) => (
@@ -1993,7 +1993,7 @@ export default function Admin() {
                     }
                     handleOpenFuncionarioModal(null)
                   }}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors self-start lg:self-auto"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs transition-colors self-start lg:self-auto"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Novo Funcionário</span>
@@ -2032,7 +2032,7 @@ export default function Admin() {
                               <span>{fc.nome}</span>
                               {fc.usuario && (
                                 <span
-                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#3B82F6]/10 text-[#2563EB] border border-blue-200"
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-500/10 text-[#0F766E] border border-teal-200"
                                   title="Funcionário possui login de usuário vinculado"
                                 >
                                   <UserCheck className="w-3 h-3" />
@@ -2083,7 +2083,7 @@ export default function Admin() {
                                 <span className="text-xs font-mono text-[#1F2937]">
                                   {fc.expand.usuario.email}
                                 </span>
-                                <span className="text-[10px] text-[#2563EB] font-semibold uppercase">
+                                <span className="text-[10px] text-[#0F766E] font-semibold uppercase">
                                   Perfil: {fc.expand.usuario.perfil || 'lider'}
                                 </span>
                               </div>
@@ -2093,8 +2093,8 @@ export default function Admin() {
                           </td>
                           <td className="p-3.5">
                             {fc.ativo !== false ? (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#3B82F6]/10 text-[#2563EB]">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-teal-500/10 text-[#0F766E]">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#0F766E]" />
                                 Ativo
                               </span>
                             ) : (
@@ -2107,7 +2107,7 @@ export default function Admin() {
                             <div className="inline-flex items-center gap-1">
                               <button
                                 onClick={() => handleOpenFuncionarioModal(fc)}
-                                className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                className="p-1.5 text-[#4B5563] hover:text-[#0F766E] rounded hover:bg-gray-100"
                                 title="Editar funcionário"
                               >
                                 <Edit2 className="w-4 h-4" />
@@ -2250,7 +2250,7 @@ export default function Admin() {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Buscar por nome, e-mail ou cargo..."
-                      className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                      className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                     />
                     {searchTerm && (
                       <button
@@ -2268,7 +2268,7 @@ export default function Admin() {
                     <select
                       value={selectedPerfilFilter}
                       onChange={(e) => setSelectedPerfilFilter(e.target.value)}
-                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
+                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E]"
                     >
                       <option value="todos">Todos os Perfis</option>
                       <option value="admin">ADM Geral</option>
@@ -2284,7 +2284,7 @@ export default function Admin() {
                     <select
                       value={selectedUsuarioLojaFilter}
                       onChange={(e) => setSelectedUsuarioLojaFilter(e.target.value)}
-                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
+                      className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E]"
                     >
                       <option value="todas">Todas as Lojas</option>
                       {lojas.map((l) => (
@@ -2298,7 +2298,7 @@ export default function Admin() {
 
                 <button
                   onClick={() => handleOpenUserModal('create', null)}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors self-start lg:self-auto"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs transition-colors self-start lg:self-auto"
                 >
                   <UserPlus className="w-4 h-4" />
                   <span>Novo Usuário</span>
@@ -2340,7 +2340,7 @@ export default function Admin() {
                             {/* Nome / Email */}
                             <td className="p-3.5">
                               <div className="flex items-center gap-2.5">
-                                <div className="w-8 h-8 rounded-full bg-[#3B82F6]/10 text-[#2563EB] flex items-center justify-center font-bold text-xs shrink-0">
+                                <div className="w-8 h-8 rounded-full bg-teal-500/10 text-[#0F766E] flex items-center justify-center font-bold text-xs shrink-0">
                                   {(u.name || u.email).slice(0, 2).toUpperCase()}
                                 </div>
                                 <div>
@@ -2372,7 +2372,7 @@ export default function Admin() {
                             {/* Badge do Perfil com Cores */}
                             <td className="p-3.5">
                               {userPerfil === 'admin' && (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-[#2563EB] border border-blue-200">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-teal-100 text-[#0F766E] border border-teal-200">
                                   <Shield className="w-3.5 h-3.5" />
                                   <span>ADM Geral</span>
                                 </span>
@@ -2400,13 +2400,13 @@ export default function Admin() {
                             {/* Cargo / Loja / Rede Vinculados */}
                             <td className="p-3.5 text-xs text-[#4B5563]">
                               {userPerfil === 'admin' ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 text-[#2563EB] font-medium text-[11px] border border-blue-100">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-teal-50 text-[#0F766E] font-medium text-[11px] border border-teal-100">
                                   Superusuário (Todas as Redes e Lojas)
                                 </span>
                               ) : userPerfil === 'adm_rede' ? (
                                 <div className="space-y-1">
                                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-purple-50 text-purple-700 font-semibold text-[11px] border border-purple-200">
-                                    <Building2 className="w-3 h-3 text-purple-600" />
+                                    <Building2 className="w-3.5 h-3.5 text-purple-600" />
                                     <span>
                                       Rede:{' '}
                                       {clientes.find((c) => c.id === u.cliente)?.nome ||
@@ -2427,8 +2427,8 @@ export default function Admin() {
                                             : 'Função não definida'}
                                         </span>
                                       </span>
-                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 text-[#2563EB] text-[11px]">
-                                        <Store className="w-3 h-3 text-[#2563EB]" />
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-teal-50 text-[#0F766E] text-[11px]">
+                                        <Store className="w-3 h-3 text-[#0F766E]" />
                                         <span>{f.expand?.loja?.nome || 'Loja não definida'}</span>
                                       </span>
                                     </div>
@@ -2440,7 +2440,6 @@ export default function Admin() {
                                 </span>
                               )}
                             </td>
-
                             {/* Status Ativo / Inativo */}
                             <td className="p-3.5">
                               {isAtivo ? (
@@ -2462,7 +2461,7 @@ export default function Admin() {
                                 {/* Botão Redefinir Senha */}
                                 <button
                                   onClick={() => handleGenerateTemporaryPassword(u)}
-                                  className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                  className="p-1.5 text-[#4B5563] hover:text-[#0F766E] rounded hover:bg-gray-100"
                                   title="Redefinir senha de acesso"
                                 >
                                   <KeyRound className="w-4 h-4" />
@@ -2471,7 +2470,7 @@ export default function Admin() {
                                 {/* Botão Editar Usuário */}
                                 <button
                                   onClick={() => handleOpenUserModal('edit', u)}
-                                  className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                  className="p-1.5 text-[#4B5563] hover:text-[#0F766E] rounded hover:bg-gray-100"
                                   title="Editar perfil e vínculo"
                                 >
                                   <Edit2 className="w-4 h-4" />
@@ -2549,7 +2548,7 @@ export default function Admin() {
                   defaultValue={clienteModal.data?.nome || ''}
                   required
                   placeholder="Ex: Supermercados Estrela"
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -2561,7 +2560,7 @@ export default function Admin() {
                   <select
                     name="tipo_pessoa"
                     defaultValue={clienteModal.data?.tipo_pessoa || 'PJ'}
-                    className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                    className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                   >
                     <option value="PJ">Pessoa Jurídica (PJ)</option>
                     <option value="PF">Pessoa Física (PF)</option>
@@ -2575,7 +2574,7 @@ export default function Admin() {
                   <select
                     name="segmento"
                     defaultValue={clienteModal.data?.segmento || 'Moda e Vestuário'}
-                    className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                    className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                   >
                     <option value="Moda e Vestuário">Moda e Vestuário</option>
                     <option value="Supermercado/Food">Supermercado/Food</option>
@@ -2597,14 +2596,14 @@ export default function Admin() {
                   name="contato"
                   defaultValue={clienteModal.data?.contato || ''}
                   placeholder="Ex: (11) 98765-4321 / contato@cliente.com"
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
               </div>
 
               {/* Seção de Contatos de Atendimento / Especialista para os Usuários da Rede */}
-              <div className="p-3 bg-blue-50/50 border border-blue-100 rounded-lg space-y-2.5">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#1E40AF]">
-                  <Headphones className="w-4 h-4 text-[#2563EB]" />
+              <div className="p-3 bg-teal-50/50 border border-teal-100 rounded-lg space-y-2.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-teal-900">
+                  <Headphones className="w-4 h-4 text-[#0F766E]" />
                   <span>Contatos de Suporte e Atendimento da Rede</span>
                 </div>
                 <p className="text-[11px] text-[#4B5563] leading-relaxed">
@@ -2622,7 +2621,7 @@ export default function Admin() {
                       name="whatsapp_suporte"
                       defaultValue={clienteModal.data?.whatsapp_suporte || ''}
                       placeholder="(00) 00000-0000"
-                      className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded text-xs outline-none focus:border-[#2563EB]"
+                      className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded text-xs outline-none focus:border-[#0F766E]"
                     />
                   </div>
 
@@ -2635,7 +2634,7 @@ export default function Admin() {
                       name="email_suporte"
                       defaultValue={clienteModal.data?.email_suporte || ''}
                       placeholder="suporte@rede.com"
-                      className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded text-xs outline-none focus:border-[#2563EB]"
+                      className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded text-xs outline-none focus:border-[#0F766E]"
                     />
                   </div>
                 </div>
@@ -2648,7 +2647,7 @@ export default function Admin() {
                     name="nome_atendimento"
                     defaultValue={clienteModal.data?.nome_atendimento || ''}
                     placeholder="Ex: Suporte Operacional / Dalvani Farias"
-                    className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded text-xs outline-none focus:border-[#2563EB]"
+                    className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded text-xs outline-none focus:border-[#0F766E]"
                   />
                 </div>
               </div>
@@ -2661,7 +2660,7 @@ export default function Admin() {
                   name="info_negocio"
                   defaultValue={clienteModal.data?.info_negocio || ''}
                   placeholder="Ex: 2 lojas, 15 colaboradores, Curitiba - PR"
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -2674,7 +2673,7 @@ export default function Admin() {
                   rows={2}
                   defaultValue={clienteModal.data?.gargalos || ''}
                   placeholder="Ex: perdas recorrentes, equipe desorganizada, falta de padrão..."
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -2685,7 +2684,7 @@ export default function Admin() {
                 <select
                   name="inventario_situacao"
                   defaultValue={clienteModal.data?.inventario_situacao || ''}
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   <option value="">Não informado</option>
                   <option value="rotativo">Inventário rotativo frequente</option>
@@ -2703,7 +2702,7 @@ export default function Admin() {
                   rows={2}
                   defaultValue={clienteModal.data?.observacoes || ''}
                   placeholder="Informações adicionais da consultoria..."
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -2717,7 +2716,7 @@ export default function Admin() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors"
+                  className="px-4 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md shadow-xs transition-colors"
                 >
                   Salvar Cliente
                 </button>
@@ -2756,7 +2755,7 @@ export default function Admin() {
                   name="cliente"
                   defaultValue={lojaModal.data?.cliente || (clientes[0]?.id ?? '')}
                   required
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   {clientes.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -2775,7 +2774,7 @@ export default function Admin() {
                   defaultValue={lojaModal.data?.nome || ''}
                   required
                   placeholder="Ex: Loja 01 - Centro"
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -2787,7 +2786,7 @@ export default function Admin() {
                   name="codigo"
                   defaultValue={lojaModal.data?.codigo || ''}
                   placeholder="Ex: LJ-01"
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -2800,7 +2799,7 @@ export default function Admin() {
                   name="email_regional"
                   defaultValue={lojaModal.data?.email_regional || ''}
                   placeholder="Ex: regional@vivavarejo.com.br"
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
                 <p className="text-[11px] text-[#6B7280] mt-0.5">
                   Recebe alertas automáticos imediatos caso rotinas não sejam realizadas no horário.
@@ -2814,7 +2813,7 @@ export default function Admin() {
                 <select
                   name="alertas_ativos"
                   defaultValue={lojaModal.data?.alertas_ativos !== false ? 'true' : 'false'}
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   <option value="true">Ativos (envio automático a cada 5 min)</option>
                   <option value="false">Desativados para esta loja</option>
@@ -2830,7 +2829,7 @@ export default function Admin() {
                   rows={2}
                   defaultValue={lojaModal.data?.observacoes || ''}
                   placeholder="Endereço, formato de loja, etc..."
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -2844,7 +2843,7 @@ export default function Admin() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors"
+                  className="px-4 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md shadow-xs transition-colors"
                 >
                   Salvar Loja
                 </button>
@@ -2884,7 +2883,7 @@ export default function Admin() {
                   value={funcaoFormLojaId}
                   onChange={(e) => setFuncaoFormLojaId(e.target.value)}
                   required
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   {lojas.map((l) => (
                     <option key={l.id} value={l.id}>
@@ -2903,7 +2902,7 @@ export default function Admin() {
                   defaultValue={funcaoModal.data?.nome || ''}
                   required
                   placeholder="Ex: Gerente Geral, Cartazista, Analista"
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -2916,7 +2915,7 @@ export default function Admin() {
                   value={funcaoTelefoneVal}
                   onChange={(e) => setFuncaoTelefoneVal(formatPhoneBR(e.target.value))}
                   placeholder="(00) 00000-0000"
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
                 <p className="text-[11px] text-[#6B7280] mt-0.5">
                   Número de contato da função ou setor para envio de avisos.
@@ -2931,7 +2930,7 @@ export default function Admin() {
                   name="chefe_imediato_funcao"
                   value={funcaoChefeImediatoVal}
                   onChange={(e) => setFuncaoChefeImediatoVal(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   <option value="">Nenhum chefe imediato direto</option>
                   {funcoes
@@ -2961,7 +2960,7 @@ export default function Admin() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors"
+                  className="px-4 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md shadow-xs transition-colors"
                 >
                   Salvar Função
                 </button>
@@ -3001,7 +3000,7 @@ export default function Admin() {
                   defaultValue={funcionarioModal.data?.nome || ''}
                   required
                   placeholder="Ex: Carlos Eduardo"
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -3014,7 +3013,7 @@ export default function Admin() {
                   value={formLojaId}
                   onChange={(e) => setFormLojaId(e.target.value)}
                   required
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   {lojas.map((l) => (
                     <option key={l.id} value={l.id}>
@@ -3032,7 +3031,7 @@ export default function Admin() {
                   name="funcao"
                   defaultValue={funcionarioModal.data?.funcao || ''}
                   required
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   <option value="">Selecione a função...</option>
                   {funcoes
@@ -3054,7 +3053,7 @@ export default function Admin() {
                   value={funcTelefoneVal}
                   onChange={(e) => setFuncTelefoneVal(formatPhoneBR(e.target.value))}
                   placeholder="(00) 00000-0000"
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -3065,7 +3064,7 @@ export default function Admin() {
                 <select
                   name="usuario"
                   defaultValue={funcionarioModal.data?.usuario || ''}
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   <option value="">Nenhum (apenas registro operacional)</option>
                   {usuarios.map((u) => (
@@ -3081,7 +3080,7 @@ export default function Admin() {
                 <select
                   name="ativo"
                   defaultValue={funcionarioModal.data?.ativo !== false ? 'true' : 'false'}
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   <option value="true">Ativo na loja</option>
                   <option value="false">Inativo</option>
@@ -3098,7 +3097,7 @@ export default function Admin() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors"
+                  className="px-4 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md shadow-xs transition-colors"
                 >
                   Salvar Funcionário
                 </button>
@@ -3118,7 +3117,7 @@ export default function Admin() {
           <div className="relative w-full max-w-md bg-white rounded-lg shadow-xl border border-[#E5E7EB] p-5 z-10 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB]">
               <div className="flex items-center gap-2">
-                <UserCheck className="w-5 h-5 text-[#2563EB]" />
+                <UserCheck className="w-5 h-5 text-[#0F766E]" />
                 <h2 className="text-base font-bold text-[#1F2937]">
                   {userModal.mode === 'create' ? 'Novo Usuário do Sistema' : 'Editar Usuário'}
                 </h2>
@@ -3141,7 +3140,7 @@ export default function Admin() {
                   defaultValue={userModal.user?.name || ''}
                   required
                   placeholder="Ex: João da Silva"
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -3156,7 +3155,7 @@ export default function Admin() {
                   required
                   disabled={userModal.mode === 'edit'}
                   placeholder="usuario@email.com"
-                  className={`w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] ${
+                  className={`w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] ${
                     userModal.mode === 'edit' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                   }`}
                 />
@@ -3171,7 +3170,7 @@ export default function Admin() {
                   value={userTelefoneVal}
                   onChange={(e) => setUserTelefoneVal(formatPhoneBR(e.target.value))}
                   placeholder="(00) 00000-0000"
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -3186,7 +3185,7 @@ export default function Admin() {
                     required
                     minLength={8}
                     placeholder="Mínimo 8 caracteres"
-                    className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                    className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                   />
                   <p className="text-[11px] text-[#6B7280] mt-0.5">
                     O usuário poderá alterar sua senha após o primeiro acesso.
@@ -3206,7 +3205,7 @@ export default function Admin() {
                       ? funcionarios.find((f) => f.usuario === userModal.user?.id)?.id || ''
                       : ''
                   }
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   <option value="">Nenhum vínculo direto</option>
                   {funcionarios.map((f) => {
@@ -3234,7 +3233,7 @@ export default function Admin() {
                   name="perfil"
                   defaultValue={userModal.user?.perfil || 'funcionario'}
                   required
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   <option value="funcionario">
                     Funcionário (Acesso operacional: visualiza e conclui rotinas)
@@ -3260,7 +3259,7 @@ export default function Admin() {
                 <select
                   name="cliente"
                   defaultValue={userModal.user?.cliente || ''}
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   <option value="">Nenhuma rede vinculada</option>
                   {clientes.map((cli) => (
@@ -3283,7 +3282,7 @@ export default function Admin() {
                 <select
                   name="ativo"
                   defaultValue={userModal.user?.ativo !== false ? 'true' : 'false'}
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   <option value="true">Ativo (Pode efetuar login)</option>
                   <option value="false">Desativado (Acesso bloqueado)</option>
@@ -3300,7 +3299,7 @@ export default function Admin() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors"
+                  className="px-4 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md shadow-xs transition-colors"
                 >
                   {userModal.mode === 'create' ? 'Cadastrar Usuário' : 'Salvar Alterações'}
                 </button>
@@ -3320,7 +3319,7 @@ export default function Admin() {
           <div className="relative w-full max-w-md bg-white rounded-lg shadow-xl border border-[#E5E7EB] p-6 z-10 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB]">
               <div className="flex items-center gap-2">
-                <KeyRound className="w-5 h-5 text-[#2563EB]" />
+                <KeyRound className="w-5 h-5 text-[#0F766E]" />
                 <h2 className="text-base font-bold text-[#1F2937]">Redefinir Senha de Usuário</h2>
               </div>
               <button
@@ -3348,16 +3347,16 @@ export default function Admin() {
 
             {/* Nova Senha Temporária Gerada */}
             {resetModal.generatedPassword && (
-              <div className="p-4 rounded-lg bg-blue-50 border border-blue-200 space-y-2">
+              <div className="p-4 rounded-lg bg-teal-50 border border-teal-200 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-[#2563EB] uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-[#0F766E] uppercase tracking-wider">
                     Nova Senha Temporária
                   </span>
                   <span className="text-[11px] text-[#6B7280]">Copie e envie ao usuário</span>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-white border border-blue-200 rounded px-3 py-2 font-mono text-base font-bold text-[#1F2937] tracking-wider select-all">
+                  <div className="flex-1 bg-white border border-teal-200 rounded px-3 py-2 font-mono text-base font-bold text-[#1F2937] tracking-wider select-all">
                     {resetModal.generatedPassword}
                   </div>
                   <button
@@ -3370,7 +3369,7 @@ export default function Admin() {
                         }, 2500)
                       }
                     }}
-                    className="px-3 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded font-medium text-xs flex items-center gap-1.5 shadow-xs transition-colors"
+                    className="px-3 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white rounded font-medium text-xs flex items-center gap-1.5 shadow-xs transition-colors"
                   >
                     {resetModal.copied ? (
                       <>
@@ -3401,7 +3400,7 @@ export default function Admin() {
                   type="button"
                   disabled={resetModal.loading}
                   onClick={() => resetModal.user && handleSendResetEmail(resetModal.user)}
-                  className="px-3 py-1.5 text-xs font-medium border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] rounded transition-colors disabled:opacity-50"
+                  className="px-3.5 py-1.5 text-xs font-medium border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] rounded transition-colors disabled:opacity-50"
                 >
                   {resetModal.loading ? 'Enviando...' : 'Enviar Link por E-mail'}
                 </button>
@@ -3417,7 +3416,7 @@ export default function Admin() {
               <button
                 type="button"
                 onClick={() => setResetModal({ ...resetModal, open: false })}
-                className="px-4 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors"
+                className="px-4 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md shadow-xs transition-colors"
               >
                 Concluído
               </button>
@@ -3425,7 +3424,6 @@ export default function Admin() {
           </div>
         </div>
       )}
-
       {/* ==================== MODAIS DE MODELOS DE ROTINAS ==================== */}
       <ModeloFormModal
         isOpen={modeloModal.open}

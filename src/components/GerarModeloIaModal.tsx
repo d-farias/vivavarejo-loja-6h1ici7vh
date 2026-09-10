@@ -44,7 +44,7 @@ export function GerarModeloIaModal({
         success: boolean
         modelo: { id: string; nome: string; descricao: string; totalItens: number }
         message: string
-      }>('/api/vivavarejo/gerar-modelo-ia', {
+      }>('/backend/v1/vivavarejo/gerar-modelo-ia', {
         method: 'POST',
         body: {
           descricao: descricao.trim(),
@@ -81,7 +81,7 @@ export function GerarModeloIaModal({
         {/* Header */}
         <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center justify-between bg-white">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded bg-[#3B82F6]/10 text-[#2563EB] flex items-center justify-center">
+            <div className="w-8 h-8 rounded bg-teal-500/10 text-[#0F766E] flex items-center justify-center">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
@@ -124,7 +124,7 @@ export function GerarModeloIaModal({
               onChange={(e) => setNomeSugerido(e.target.value)}
               placeholder="Ex: Padrão Loja de Moda / Shopping"
               disabled={loading}
-              className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+              className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
             />
           </div>
 
@@ -137,7 +137,7 @@ export function GerarModeloIaModal({
               value={clienteId}
               onChange={(e) => setClienteId(e.target.value)}
               disabled={loading}
-              className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+              className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
             >
               <option value="">Modelo Geral (Disponível para qualquer rede)</option>
               {clientes.map((c) => (
@@ -163,7 +163,7 @@ export function GerarModeloIaModal({
               required
               disabled={loading}
               placeholder="Ex: Loja de moda feminina com 12 colaboradores, abertura às 09h e fechamento às 22h. Possui frente de caixa, estoque no mezanino, visual merchandising e recebimento diário de novas peças. Precisa de rotinas para abertura de caixa, arrumação de araras, conferência de estoque e fechamento."
-              className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937] leading-relaxed"
+              className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937] leading-relaxed"
             />
           </div>
 
@@ -182,7 +182,7 @@ export function GerarModeloIaModal({
                     'Modelo Operacional — Supermercado Compacto',
                   )
                 }
-                className="text-[11px] px-2.5 py-1 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] rounded hover:text-[#2563EB] transition-colors"
+                className="text-[11px] px-2.5 py-1 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] rounded hover:text-[#0F766E] transition-colors"
               >
                 Supermercado de Vizinhança
               </button>
@@ -195,7 +195,7 @@ export function GerarModeloIaModal({
                     'Modelo Operacional — Varejo Moda Shopping',
                   )
                 }
-                className="text-[11px] px-2.5 py-1 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] rounded hover:text-[#2563EB] transition-colors"
+                className="text-[11px] px-2.5 py-1 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] rounded hover:text-[#0F766E] transition-colors"
               >
                 Loja de Moda / Shopping
               </button>
@@ -208,7 +208,7 @@ export function GerarModeloIaModal({
                     'Modelo Operacional — Drogaria & Farmácia',
                   )
                 }
-                className="text-[11px] px-2.5 py-1 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] rounded hover:text-[#2563EB] transition-colors"
+                className="text-[11px] px-2.5 py-1 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] rounded hover:text-[#0F766E] transition-colors"
               >
                 Drogaria & Perfumaria
               </button>
@@ -227,7 +227,7 @@ export function GerarModeloIaModal({
             <button
               type="submit"
               disabled={loading || !descricao.trim()}
-              className="px-5 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md shadow-xs transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               {loading ? (
                 <>

@@ -107,7 +107,7 @@ export function ExecucaoGuiadaModal({
         {/* Cabeçalho com indicador de etapas */}
         <DialogHeader className="px-5 py-4 border-b border-[#E5E7EB] bg-[#F7F7F5] shrink-0 text-left">
           <div className="flex items-center justify-between gap-2 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#0F766E] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
               Execução Guiada Passo a Passo
             </span>
             <span className="text-xs font-mono font-semibold text-[#6B7280]">
@@ -123,7 +123,7 @@ export function ExecucaoGuiadaModal({
           {/* Barra de Progresso */}
           <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mt-3">
             <div
-              className="bg-[#2563EB] h-full transition-all duration-300 rounded-full"
+              className="bg-[#0F766E] h-full transition-all duration-300 rounded-full"
               style={{ width: `${(etapa / 4) * 100}%` }}
             />
           </div>
@@ -149,7 +149,7 @@ export function ExecucaoGuiadaModal({
                 <div className="p-3 bg-[#F7F7F5] rounded-lg border border-[#E5E7EB] text-xs space-y-1 text-[#4B5563]">
                   {horarioLimite && (
                     <div className="flex items-center gap-1.5 font-medium text-[#1F2937]">
-                      <Clock className="w-3.5 h-3.5 text-[#2563EB]" />
+                      <Clock className="w-3.5 h-3.5 text-[#0F766E]" />
                       <span>Horário limite: {horarioLimite}</span>
                     </div>
                   )}
@@ -220,7 +220,7 @@ export function ExecucaoGuiadaModal({
                 </p>
               </div>
 
-              <div className="border-2 border-dashed border-[#D1D5DB] hover:border-[#2563EB] rounded-xl p-4 text-center bg-[#F7F7F5]/50 transition-colors">
+              <div className="border-2 border-dashed border-[#D1D5DB] hover:border-[#0F766E] rounded-xl p-4 text-center bg-[#F7F7F5]/50 transition-colors">
                 {fotoPreview ? (
                   <div className="space-y-3">
                     <img
@@ -229,7 +229,7 @@ export function ExecucaoGuiadaModal({
                       className="max-h-48 mx-auto rounded-lg object-contain shadow-xs border border-[#E5E7EB]"
                     />
                     <div className="flex items-center justify-center gap-2">
-                      <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#2563EB] text-xs font-semibold rounded-md shadow-2xs">
+                      <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#0F766E] text-xs font-semibold rounded-md shadow-2xs">
                         <Camera className="w-3.5 h-3.5" />
                         <span>Trocar foto</span>
                         <input
@@ -254,7 +254,7 @@ export function ExecucaoGuiadaModal({
                   </div>
                 ) : (
                   <label className="cursor-pointer flex flex-col items-center justify-center gap-2 py-4">
-                    <div className="w-12 h-12 rounded-full bg-blue-50 text-[#2563EB] flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full bg-teal-50 text-[#0F766E] flex items-center justify-center">
                       <Camera className="w-6 h-6" />
                     </div>
                     <div className="text-xs font-semibold text-[#1F2937]">
@@ -297,7 +297,7 @@ export function ExecucaoGuiadaModal({
                     ? 'Ex: Faltou produto X na gôndola, estoque em depósito divergente...'
                     : 'Ex: Reposição realizada 100%, gôndola limpa e precificada.'
                 }
-                className="w-full text-xs sm:text-sm bg-white border border-[#E5E7EB] focus:border-[#2563EB]"
+                className="w-full text-xs sm:text-sm bg-white border border-[#E5E7EB] focus:border-[#0F766E]"
               />
 
               {conforme === false && !observacao.trim() && (
@@ -394,7 +394,7 @@ export function ExecucaoGuiadaModal({
                   }
                   setEtapa((prev) => (prev + 1) as EtapaFluxo)
                 }}
-                className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold"
+                className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold"
               >
                 <span>Avançar</span>
                 <ArrowRight className="w-3.5 h-3.5 ml-1" />

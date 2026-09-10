@@ -61,7 +61,7 @@ export function CardTarefaEnxuto({
           ? 'border-emerald-200 bg-emerald-50/20 opacity-80'
           : atrasada
             ? 'border-red-300 bg-red-50/20 ring-1 ring-red-200'
-            : 'border-[#E5E7EB] hover:border-[#2563EB]/40'
+            : 'border-[#E5E7EB] hover:border-[#0F766E]/40'
       }`}
     >
       {/* Linha 1: Horário — Título da Tarefa + Badges enxutos */}
@@ -140,7 +140,7 @@ export function CardTarefaEnxuto({
               type="button"
               size="sm"
               onClick={() => onExecutar(rotina)}
-              className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold h-8 px-3 shadow-xs"
+              className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold h-8 px-3 shadow-xs"
             >
               <PlayCircle className="w-3.5 h-3.5 mr-1.5" />
               Executar tarefa
@@ -185,7 +185,7 @@ export function CardTarefaEnxuto({
               <button
                 type="button"
                 onClick={() => onPlanoAcao(rotina)}
-                className="text-[11px] font-medium text-blue-700 hover:underline"
+                className="text-[11px] font-medium text-teal-700 hover:underline"
               >
                 Criar Plano 5W2H
               </button>
@@ -203,7 +203,7 @@ export function CardTarefaEnxuto({
               <button
                 type="button"
                 onClick={() => onVerDetalhes(rotina)}
-                className="text-[11px] font-medium text-[#2563EB] hover:underline ml-auto"
+                className="text-[11px] font-medium text-[#0F766E] hover:underline ml-auto"
               >
                 Ver ficha completa →
               </button>

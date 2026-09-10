@@ -106,7 +106,7 @@ export function PromotorModal({
                 required
                 value={fornecedor}
                 onChange={(e) => setFornecedor(e.target.value)}
-                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
               >
                 <option value="" disabled>
                   Selecione a empresa fornecedora
@@ -148,7 +148,7 @@ export function PromotorModal({
               <select
                 value={usuario}
                 onChange={(e) => setUsuario(e.target.value)}
-                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
               >
                 <option value="">Sem vínculo direto de login</option>
                 {usuarios.map((u) => (
@@ -168,7 +168,7 @@ export function PromotorModal({
                 id="promotor-ativo"
                 checked={ativo}
                 onChange={(e) => setAtivo(e.target.checked)}
-                className="w-4 h-4 text-[#2563EB] rounded border-gray-300"
+                className="w-4 h-4 text-[#0F766E] rounded border-gray-300"
               />
               <label
                 htmlFor="promotor-ativo"
@@ -193,7 +193,7 @@ export function PromotorModal({
           <Button
             form="promotor-form"
             type="submit"
-            className="w-full sm:w-auto h-10 sm:h-9 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold shadow-xs"
+            className="w-full sm:w-auto h-10 sm:h-9 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold shadow-xs"
             disabled={submitting || !nome.trim() || !fornecedor}
           >
             {submitting ? 'Salvando...' : 'Salvar Promotor'}

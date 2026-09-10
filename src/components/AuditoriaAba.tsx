@@ -116,7 +116,7 @@ export function AuditoriaAba({ lojas, usuarios, clienteId }: AuditoriaAbaProps) 
         )
       case 'criacao':
         return (
-          <Badge className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1 font-medium">
+          <Badge className="bg-teal-700 hover:bg-teal-800 text-white flex items-center gap-1 font-medium">
             <PlusCircle className="w-3 h-3" />
             Criação
           </Badge>
@@ -422,7 +422,7 @@ export function AuditoriaAba({ lojas, usuarios, clienteId }: AuditoriaAbaProps) 
                   <tr>
                     <td colSpan={6} className="py-12 text-center text-neutral-500">
                       <div className="flex flex-col items-center justify-center gap-2">
-                        <RefreshCw className="w-6 h-6 animate-spin text-[#2563EB]" />
+                        <RefreshCw className="w-6 h-6 animate-spin text-[#0F766E]" />
                         <span>Carregando trilha de auditoria...</span>
                       </div>
                     </td>

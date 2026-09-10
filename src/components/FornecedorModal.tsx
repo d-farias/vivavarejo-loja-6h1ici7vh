@@ -178,9 +178,9 @@ export function FornecedorModal({
           </div>
 
           {/* Seção Comprador / Gestor de Categoria (Pedido expresso do usuário) */}
-          <div className="p-3 bg-blue-50/50 border border-blue-200/80 rounded-lg space-y-3">
+          <div className="p-3 bg-teal-50/50 border border-teal-200/80 rounded-lg space-y-3">
             <div className="flex items-center gap-2">
-              <UserCheck className="w-4 h-4 text-[#2563EB]" />
+              <UserCheck className="w-4 h-4 text-[#0F766E]" />
               <div className="text-xs font-bold text-[#1F2937] uppercase tracking-wider">
                 Comprador / Gestor de Categoria
               </div>
@@ -269,7 +269,7 @@ export function FornecedorModal({
                 <select
                   value={politicaQuebras}
                   onChange={(e) => setPoliticaQuebras(e.target.value as PoliticaQuebras)}
-                  className="w-full px-2.5 py-1 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] h-8"
+                  className="w-full px-2.5 py-1 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] h-8"
                 >
                   <option value="troca_total">Troca Total (100% recolhido pelo promotor)</option>
                   <option value="troca_parcial">Troca Parcial (mediante nota / bonificação)</option>
@@ -304,7 +304,7 @@ export function FornecedorModal({
                   const file = e.target.files?.[0]
                   if (file) setLayoutFotoFile(file)
                 }}
-                className="text-xs bg-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-[#2563EB]/10 file:text-[#2563EB]"
+                className="text-xs bg-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-teal-500/10 file:text-[#0F766E]"
               />
             </div>
           </div>
@@ -316,7 +316,7 @@ export function FornecedorModal({
             <select
               value={cliente}
               onChange={(e) => setCliente(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+              className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
             >
               <option value="">Atendimento Multicliente (Geral em todas as redes)</option>
               {clientes.map((c) => (
@@ -347,7 +347,7 @@ export function FornecedorModal({
               id="fornecedor-ativo"
               checked={ativo}
               onChange={(e) => setAtivo(e.target.checked)}
-              className="w-4 h-4 text-[#2563EB] rounded border-gray-300"
+              className="w-4 h-4 text-[#0F766E] rounded border-gray-300"
             />
             <label
               htmlFor="fornecedor-ativo"
@@ -368,7 +368,7 @@ export function FornecedorModal({
             </Button>
             <Button
               type="submit"
-              className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white"
+              className="bg-[#0F766E] hover:bg-[#115E59] text-white"
               disabled={submitting || !nome.trim()}
             >
               {submitting ? 'Salvando...' : 'Salvar Fornecedor'}

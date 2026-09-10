@@ -2,7 +2,7 @@
 
 routerAdd(
   'POST',
-  '/api/vivavarejo/gerar-modelo-ia',
+  '/backend/v1/vivavarejo/gerar-modelo-ia',
   (e) => {
     const authRecord = e.auth
     if (!authRecord) {

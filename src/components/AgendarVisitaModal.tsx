@@ -100,7 +100,7 @@ export function AgendarVisitaModal({
                 required
                 value={promotor}
                 onChange={(e) => setPromotor(e.target.value)}
-                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
               >
                 <option value="" disabled>
                   Selecione o promotor
@@ -121,7 +121,7 @@ export function AgendarVisitaModal({
                 required
                 value={loja}
                 onChange={(e) => setLoja(e.target.value)}
-                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
               >
                 <option value="" disabled>
                   Selecione a loja
@@ -164,7 +164,7 @@ export function AgendarVisitaModal({
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as any)}
-                  className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   <option value="agendada">Agendada</option>
                   <option value="realizada">Realizada</option>
@@ -202,7 +202,7 @@ export function AgendarVisitaModal({
           <Button
             form="agendar-visita-form"
             type="submit"
-            className="w-full sm:w-auto h-10 sm:h-9 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold shadow-xs"
+            className="w-full sm:w-auto h-10 sm:h-9 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold shadow-xs"
             disabled={submitting || !promotor || !loja || !dataVisita}
           >
             {submitting ? 'Salvando...' : 'Salvar Visita'}

@@ -122,7 +122,7 @@ export function AplicarModeloModal({
         {/* Header */}
         <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center justify-between bg-white">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded bg-[#3B82F6]/10 text-[#2563EB] flex items-center justify-center">
+            <div className="w-8 h-8 rounded bg-teal-500/10 text-[#0F766E] flex items-center justify-center">
               <Layers className="w-4 h-4" />
             </div>
             <div>
@@ -162,7 +162,7 @@ export function AplicarModeloModal({
               value={selectedModeloId}
               onChange={(e) => setSelectedModeloId(e.target.value)}
               disabled={loading}
-              className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+              className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
             >
               {modelos.length === 0 && <option value="">Nenhum modelo cadastrado</option>}
               {modelos.map((m) => (
@@ -182,7 +182,7 @@ export function AplicarModeloModal({
           {/* 2. Seleção de Cliente e Loja de Destino */}
           <div className="space-y-3 p-3.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-lg">
             <span className="block text-xs font-semibold uppercase tracking-wider text-[#374151] flex items-center gap-1.5">
-              <Store className="w-3.5 h-3.5 text-[#2563EB]" />
+              <Store className="w-3.5 h-3.5 text-[#0F766E]" />
               <span>2. Selecione a Loja de Destino</span>
             </span>
 
@@ -195,7 +195,7 @@ export function AplicarModeloModal({
                 value={selectedClienteId}
                 onChange={(e) => handleClienteChange(e.target.value)}
                 disabled={loading}
-                className="w-full px-3 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+                className="w-full px-3 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
               >
                 <option value="todos">Todos os Clientes</option>
                 {clientes.map((c) => (
@@ -215,7 +215,7 @@ export function AplicarModeloModal({
                 value={selectedLojaId}
                 onChange={(e) => setSelectedLojaId(e.target.value)}
                 disabled={loading}
-                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+                className="w-full px-3 py-2 text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
               >
                 {lojasDisponiveis.length === 0 && (
                   <option value="">Nenhuma loja disponível para o cliente selecionado</option>
@@ -239,7 +239,7 @@ export function AplicarModeloModal({
               <label
                 className={`flex items-start gap-2.5 p-3 rounded-md border cursor-pointer transition-colors ${
                   modo === 'append'
-                    ? 'border-[#2563EB] bg-[#3B82F6]/5 font-semibold text-[#2563EB]'
+                    ? 'border-[#0F766E] bg-teal-500/5 font-semibold text-[#0F766E]'
                     : 'border-[#E5E7EB] text-[#4B5563] hover:bg-gray-50'
                 }`}
               >
@@ -294,7 +294,7 @@ export function AplicarModeloModal({
                     type="checkbox"
                     checked={deduplicar}
                     onChange={(e) => setDeduplicar(e.target.checked)}
-                    className="mt-0.5 text-[#2563EB] focus:ring-[#2563EB]"
+                    className="mt-0.5 text-[#0F766E] focus:ring-[#0F766E]"
                     disabled={loading}
                   />
                   <span>
@@ -326,14 +326,14 @@ export function AplicarModeloModal({
             )}
           </div>
 
-          <div className="p-3 rounded-md bg-blue-50/70 border border-blue-100 text-[11px] text-[#1E40AF]">
+          <div className="p-3 rounded-md bg-teal-50/70 border border-teal-100 text-[11px] text-teal-900">
             💡 <strong>Resolução automática de funções:</strong> As funções responsáveis (ex:
             Cartazista, Gerente, Balconista) serão mapeadas automaticamente para as funções da loja
             de destino; caso não existam, serão criadas para preservar a governança da loja.
           </div>
 
           {loading && (
-            <div className="p-3 bg-[#3B82F6]/10 border border-[#3B82F6]/25 rounded-md text-xs text-[#2563EB] flex items-center gap-2">
+            <div className="p-3 bg-teal-500/10 border border-teal-500/25 rounded-md text-xs text-[#0F766E] flex items-center gap-2">
               <RefreshCw className="w-4 h-4 animate-spin shrink-0" />
               <span>{progressMsg || 'Processando clonagem de rotinas...'}</span>
             </div>
@@ -355,7 +355,7 @@ export function AplicarModeloModal({
             type="button"
             onClick={handleConfirm}
             disabled={loading || !selectedModeloId || !selectedLojaId}
-            className="px-5 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors disabled:opacity-50 flex items-center gap-2"
+            className="px-5 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md shadow-xs transition-colors disabled:opacity-50 flex items-center gap-2"
           >
             {loading ? (
               <>

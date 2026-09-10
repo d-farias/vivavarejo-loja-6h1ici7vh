@@ -351,7 +351,7 @@ export function PromotoresFornecedoresManager({
             }}
             className={`px-3 py-2 text-xs sm:text-sm font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
               subTab === 'visitas'
-                ? 'bg-[#2563EB] text-white shadow-xs'
+                ? 'bg-[#0F766E] text-white shadow-xs'
                 : 'bg-white border border-[#E5E7EB] text-[#4B5563] hover:text-[#1F2937]'
             }`}
           >
@@ -366,7 +366,7 @@ export function PromotoresFornecedoresManager({
             }}
             className={`px-3 py-2 text-xs sm:text-sm font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
               subTab === 'promotores'
-                ? 'bg-[#2563EB] text-white shadow-xs'
+                ? 'bg-[#0F766E] text-white shadow-xs'
                 : 'bg-white border border-[#E5E7EB] text-[#4B5563] hover:text-[#1F2937]'
             }`}
           >
@@ -381,7 +381,7 @@ export function PromotoresFornecedoresManager({
             }}
             className={`px-3 py-2 text-xs sm:text-sm font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
               subTab === 'fornecedores'
-                ? 'bg-[#2563EB] text-white shadow-xs'
+                ? 'bg-[#0F766E] text-white shadow-xs'
                 : 'bg-white border border-[#E5E7EB] text-[#4B5563] hover:text-[#1F2937]'
             }`}
           >
@@ -396,7 +396,7 @@ export function PromotoresFornecedoresManager({
             }}
             className={`px-3 py-2 text-xs sm:text-sm font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
               subTab === 'rotinas'
-                ? 'bg-[#2563EB] text-white shadow-xs'
+                ? 'bg-[#0F766E] text-white shadow-xs'
                 : 'bg-white border border-[#E5E7EB] text-[#4B5563] hover:text-[#1F2937]'
             }`}
           >
@@ -414,7 +414,7 @@ export function PromotoresFornecedoresManager({
                 setAgendarModalOpen(true)
               }}
               disabled={promotores.length === 0 || lojas.length === 0}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] disabled:opacity-50 text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Agendar Visita</span>
@@ -428,7 +428,7 @@ export function PromotoresFornecedoresManager({
                 setPromotorModalOpen(true)
               }}
               disabled={fornecedores.length === 0}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] disabled:opacity-50 text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Novo Promotor</span>
@@ -441,7 +441,7 @@ export function PromotoresFornecedoresManager({
                 setEditingFornecedor(null)
                 setFornecedorModalOpen(true)
               }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Novo Fornecedor</span>
@@ -454,7 +454,7 @@ export function PromotoresFornecedoresManager({
                 setEditingRotina(null)
                 setRotinaModalOpen(true)
               }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Nova Rotina de Promotor</span>
@@ -471,7 +471,7 @@ export function PromotoresFornecedoresManager({
             <div className="p-3.5 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-xs">
               <div className="flex items-center justify-between text-xs text-[#6B7280]">
                 <span>Visitas da Semana</span>
-                <Calendar className="w-4 h-4 text-[#2563EB]" />
+                <Calendar className="w-4 h-4 text-[#0F766E]" />
               </div>
               <div className="mt-1 text-2xl sm:text-3xl font-bold text-[#1F2937] leading-none">
                 {kpis.daSemana}
@@ -534,9 +534,9 @@ export function PromotoresFornecedoresManager({
             <div className="p-3.5 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-xs">
               <div className="flex items-center justify-between text-xs text-[#6B7280]">
                 <span>Agendadas</span>
-                <Clock className="w-4 h-4 text-[#2563EB]" />
+                <Clock className="w-4 h-4 text-[#0F766E]" />
               </div>
-              <div className="mt-1 text-2xl sm:text-3xl font-bold text-[#2563EB] leading-none">
+              <div className="mt-1 text-2xl sm:text-3xl font-bold text-[#0F766E] leading-none">
                 {kpis.agendadas}
               </div>
               <div className="text-xs text-[#6B7280] mt-1">Aguardando atendimento</div>
@@ -552,7 +552,7 @@ export function PromotoresFornecedoresManager({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar por promotor, fornecedor, loja ou observações..."
-                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-[#F7F7F5] border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:bg-white"
+                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-[#F7F7F5] border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] focus:bg-white"
               />
             </div>
 
@@ -562,7 +562,7 @@ export function PromotoresFornecedoresManager({
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-2.5 py-1.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
+                className="px-2.5 py-1.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E]"
               >
                 <option value="todos">Todos os status</option>
                 <option value="agendada">Agendadas</option>
@@ -574,7 +574,7 @@ export function PromotoresFornecedoresManager({
               <select
                 value={filterLoja}
                 onChange={(e) => setFilterLoja(e.target.value)}
-                className="px-2.5 py-1.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
+                className="px-2.5 py-1.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E]"
               >
                 <option value="todas">Todas as lojas</option>
                 {lojas.map((l) => (
@@ -587,7 +587,7 @@ export function PromotoresFornecedoresManager({
               <select
                 value={filterFornecedor}
                 onChange={(e) => setFilterFornecedor(e.target.value)}
-                className="px-2.5 py-1.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
+                className="px-2.5 py-1.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E]"
               >
                 <option value="todos">Todos os fornecedores</option>
                 {fornecedores.map((f) => (
@@ -600,7 +600,7 @@ export function PromotoresFornecedoresManager({
               <select
                 value={filterPeriodo}
                 onChange={(e) => setFilterPeriodo(e.target.value)}
-                className="px-2.5 py-1.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
+                className="px-2.5 py-1.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E]"
               >
                 <option value="todos">Todo o período</option>
                 <option value="hoje">Hoje</option>
@@ -625,7 +625,7 @@ export function PromotoresFornecedoresManager({
                     setEditingVisita(null)
                     setAgendarModalOpen(true)
                   }}
-                  className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs"
+                  className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Agendar primeira visita</span>
@@ -678,7 +678,7 @@ export function PromotoresFornecedoresManager({
                             Atrasada
                           </span>
                         ) : (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800">
                             Agendada
                           </span>
                         )}
@@ -710,7 +710,7 @@ export function PromotoresFornecedoresManager({
                               setEditingVisita(v)
                               setAgendarModalOpen(true)
                             }}
-                            className="text-xs font-semibold text-[#2563EB] hover:underline"
+                            className="text-xs font-semibold text-[#0F766E] hover:underline"
                           >
                             Ver agenda
                           </button>
@@ -722,7 +722,7 @@ export function PromotoresFornecedoresManager({
                                 setFocoCriterio('geral')
                                 setConcluirModalOpen(true)
                               }}
-                              className="px-2.5 py-1 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded text-xs font-semibold"
+                              className="px-2.5 py-1 bg-[#0F766E] hover:bg-[#115E59] text-white rounded text-xs font-semibold"
                             >
                               Concluir
                             </button>
@@ -797,7 +797,7 @@ export function PromotoresFornecedoresManager({
                                   <span>ATRASADA</span>
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#2563EB] border border-blue-200">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-teal-50 text-[#0F766E] border border-teal-200">
                                   <Clock className="w-3.5 h-3.5" />
                                   <span>AGENDADA</span>
                                 </span>
@@ -901,7 +901,7 @@ export function PromotoresFornecedoresManager({
                                         setFocoCriterio('layout')
                                         setConcluirModalOpen(true)
                                       }}
-                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-gray-200 bg-gray-50 text-gray-600 font-normal hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 transition-colors"
+                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-gray-200 bg-gray-50 text-gray-600 font-normal hover:bg-teal-50 hover:text-teal-700 hover:border-teal-300 transition-colors"
                                       title="Não feito: toque para preencher critério e anexar foto"
                                     >
                                       <span>+ Gôndola</span>
@@ -952,7 +952,7 @@ export function PromotoresFornecedoresManager({
                                         setFocoCriterio('abastecimento')
                                         setConcluirModalOpen(true)
                                       }}
-                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-gray-200 bg-gray-50 text-gray-600 font-normal hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 transition-colors"
+                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-gray-200 bg-gray-50 text-gray-600 font-normal hover:bg-teal-50 hover:text-teal-700 hover:border-teal-300 transition-colors"
                                       title="Não feito: toque para preencher critério e anexar foto"
                                     >
                                       <span>+ Abastecimento</span>
@@ -981,8 +981,8 @@ export function PromotoresFornecedoresManager({
                                       }}
                                       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded border transition-colors shadow-2xs ${
                                         fotoValidadesUrl
-                                          ? 'border-blue-300 bg-blue-50 text-blue-900 font-bold hover:bg-blue-100'
-                                          : 'border-blue-200 bg-blue-50/60 text-blue-800 font-medium hover:bg-blue-100'
+                                          ? 'border-teal-300 bg-teal-50 text-teal-900 font-bold hover:bg-teal-100'
+                                          : 'border-teal-200 bg-teal-50/60 text-teal-800 font-medium hover:bg-teal-100'
                                       }`}
                                       title={
                                         fotoValidadesUrl
@@ -991,7 +991,7 @@ export function PromotoresFornecedoresManager({
                                       }
                                     >
                                       {fotoValidadesUrl && (
-                                        <Camera className="w-3 h-3 text-blue-700" />
+                                        <Camera className="w-3 h-3 text-teal-700" />
                                       )}
                                       <span>Validades OK</span>
                                     </button>
@@ -1003,7 +1003,7 @@ export function PromotoresFornecedoresManager({
                                         setFocoCriterio('validades')
                                         setConcluirModalOpen(true)
                                       }}
-                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-gray-200 bg-gray-50 text-gray-600 font-normal hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 transition-colors"
+                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-gray-200 bg-gray-50 text-gray-600 font-normal hover:bg-teal-50 hover:text-teal-700 hover:border-teal-300 transition-colors"
                                       title="Não feito: toque para preencher critério e anexar foto"
                                     >
                                       <span>+ Validades</span>
@@ -1046,7 +1046,7 @@ export function PromotoresFornecedoresManager({
                                         v.data_visita ? v.data_visita.substring(0, 10) : undefined,
                                       )
                                     }}
-                                    className="inline-flex items-center gap-1 text-[11px] text-[#2563EB] hover:underline font-semibold mt-0.5"
+                                    className="inline-flex items-center gap-1 text-[11px] text-[#0F766E] hover:underline font-semibold mt-0.5"
                                   >
                                     <Camera className="w-3 h-3" />
                                     <span>Ver foto do trabalho em tela cheia</span>
@@ -1094,7 +1094,7 @@ export function PromotoresFornecedoresManager({
                                     setEditingVisita(v)
                                     setAgendarModalOpen(true)
                                   }}
-                                  className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                  className="p-1.5 text-[#4B5563] hover:text-[#0F766E] rounded hover:bg-gray-100"
                                   title="Editar visita"
                                 >
                                   <Edit2 className="w-4 h-4" />
@@ -1151,7 +1151,7 @@ export function PromotoresFornecedoresManager({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar por nome, email, telefone ou fornecedor..."
-                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-[#F7F7F5] border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:bg-white"
+                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-[#F7F7F5] border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] focus:bg-white"
               />
             </div>
 
@@ -1160,7 +1160,7 @@ export function PromotoresFornecedoresManager({
               <select
                 value={filterFornecedor}
                 onChange={(e) => setFilterFornecedor(e.target.value)}
-                className="px-2.5 py-1.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB]"
+                className="px-2.5 py-1.5 bg-[#F7F7F5] border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E]"
               >
                 <option value="todos">Todos Fornecedores</option>
                 {fornecedores.map((f) => (
@@ -1186,7 +1186,7 @@ export function PromotoresFornecedoresManager({
                     setEditingPromotor(null)
                     setPromotorModalOpen(true)
                   }}
-                  className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs"
+                  className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Cadastrar Promotor</span>
@@ -1196,7 +1196,7 @@ export function PromotoresFornecedoresManager({
           ) : (
             <div className="space-y-1.5">
               <div className="sm:hidden flex items-center justify-between text-[11px] text-[#6B7280] px-1">
-                <span className="flex items-center gap-1 font-medium text-[#2563EB]">
+                <span className="flex items-center gap-1 font-medium text-[#0F766E]">
                   <MoveHorizontal className="w-3.5 h-3.5 animate-pulse" />
                   <span>Deslize a tabela para o lado</span>
                 </span>
@@ -1239,7 +1239,7 @@ export function PromotoresFornecedoresManager({
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2 text-xs text-[#4B5563] pt-1">
-                        <span className="bg-blue-50 text-[#2563EB] px-2 py-0.5 rounded font-medium">
+                        <span className="bg-teal-50 text-[#0F766E] px-2 py-0.5 rounded font-medium">
                           {vRealizadas} de {vTotal || 0} visitas realizadas
                         </span>
                         {p.telefone && <span className="text-[#6B7280]">Tel: {p.telefone}</span>}
@@ -1252,7 +1252,7 @@ export function PromotoresFornecedoresManager({
                             setEditingPromotor(p)
                             setPromotorModalOpen(true)
                           }}
-                          className="text-xs font-semibold text-[#2563EB] hover:underline"
+                          className="text-xs font-semibold text-[#0F766E] hover:underline"
                         >
                           Ver agenda & dados
                         </button>
@@ -1263,7 +1263,7 @@ export function PromotoresFornecedoresManager({
                               setEditingPromotor(p)
                               setPromotorModalOpen(true)
                             }}
-                            className="p-1 text-gray-500 hover:text-[#2563EB]"
+                            className="p-1 text-gray-500 hover:text-[#0F766E]"
                             title="Editar"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
@@ -1295,7 +1295,7 @@ export function PromotoresFornecedoresManager({
                           <tr key={p.id} className="hover:bg-gray-50/80 transition-colors">
                             <td className="p-3.5 font-semibold text-[#1F2937]">
                               <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-full bg-[#2563EB]/10 text-[#2563EB] font-bold text-xs flex items-center justify-center shrink-0">
+                                <div className="w-7 h-7 rounded-full bg-teal-500/10 text-[#0F766E] font-bold text-xs flex items-center justify-center shrink-0">
                                   {p.nome.slice(0, 2).toUpperCase()}
                                 </div>
                                 <span>{p.nome}</span>
@@ -1348,7 +1348,7 @@ export function PromotoresFornecedoresManager({
                                     setEditingPromotor(p)
                                     setPromotorModalOpen(true)
                                   }}
-                                  className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                  className="p-1.5 text-[#4B5563] hover:text-[#0F766E] rounded hover:bg-gray-100"
                                   title="Editar promotor"
                                 >
                                   <Edit2 className="w-4 h-4" />
@@ -1385,7 +1385,7 @@ export function PromotoresFornecedoresManager({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar fornecedores por razão social ou contato..."
-                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-[#F7F7F5] border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:bg-white"
+                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-[#F7F7F5] border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] focus:bg-white"
               />
             </div>
           </div>
@@ -1399,7 +1399,7 @@ export function PromotoresFornecedoresManager({
                   setEditingFornecedor(null)
                   setFornecedorModalOpen(true)
                 }}
-                className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs"
+                className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Novo Fornecedor</span>
@@ -1408,7 +1408,7 @@ export function PromotoresFornecedoresManager({
           ) : (
             <div className="space-y-1.5">
               <div className="sm:hidden flex items-center justify-between text-[11px] text-[#6B7280] px-1">
-                <span className="flex items-center gap-1 font-medium text-[#2563EB]">
+                <span className="flex items-center gap-1 font-medium text-[#0F766E]">
                   <MoveHorizontal className="w-3.5 h-3.5 animate-pulse" />
                   <span>Deslize a tabela para o lado</span>
                 </span>
@@ -1454,7 +1454,7 @@ export function PromotoresFornecedoresManager({
                           </span>
                         )}
                         {f.politica_quebras && (
-                          <span className="bg-blue-50 text-[#2563EB] px-2 py-0.5 rounded font-medium">
+                          <span className="bg-teal-50 text-[#0F766E] px-2 py-0.5 rounded font-medium">
                             {f.politica_quebras === 'troca_total'
                               ? 'Troca Total'
                               : f.politica_quebras === 'troca_parcial'
@@ -1474,7 +1474,7 @@ export function PromotoresFornecedoresManager({
                             setEditingFornecedor(f)
                             setFornecedorModalOpen(true)
                           }}
-                          className="text-xs font-semibold text-[#2563EB] hover:underline"
+                          className="text-xs font-semibold text-[#0F766E] hover:underline"
                         >
                           Editar fornecedor
                         </button>
@@ -1504,7 +1504,7 @@ export function PromotoresFornecedoresManager({
                           <tr key={f.id} className="hover:bg-gray-50/80 transition-colors">
                             <td className="p-3.5 font-semibold text-[#1F2937]">
                               <div className="flex items-center gap-2">
-                                <Building2 className="w-4 h-4 text-[#2563EB] shrink-0" />
+                                <Building2 className="w-4 h-4 text-[#0F766E] shrink-0" />
                                 <div>
                                   <div className="flex items-center gap-1.5">
                                     <span>{f.nome}</span>
@@ -1521,11 +1521,11 @@ export function PromotoresFornecedoresManager({
                               {f.comprador_nome ? (
                                 <div className="space-y-0.5">
                                   <div className="font-semibold text-xs text-[#1F2937] flex items-center gap-1">
-                                    <UserCheck className="w-3.5 h-3.5 text-[#2563EB]" />
+                                    <UserCheck className="w-3.5 h-3.5 text-[#0F766E]" />
                                     <span>{f.comprador_nome}</span>
                                   </div>
                                   {f.comprador_categoria && (
-                                    <div className="text-[11px] text-[#2563EB]">
+                                    <div className="text-[11px] text-[#0F766E]">
                                       {f.comprador_categoria}
                                     </div>
                                   )}
@@ -1611,7 +1611,7 @@ export function PromotoresFornecedoresManager({
                                     setEditingFornecedor(f)
                                     setFornecedorModalOpen(true)
                                   }}
-                                  className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                  className="p-1.5 text-[#4B5563] hover:text-[#0F766E] rounded hover:bg-gray-100"
                                   title="Editar fornecedor"
                                 >
                                   <Edit2 className="w-4 h-4" />
@@ -1648,7 +1648,7 @@ export function PromotoresFornecedoresManager({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar rotinas de trabalho dos promotores..."
-                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-[#F7F7F5] border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:bg-white"
+                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-[#F7F7F5] border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] focus:bg-white"
               />
             </div>
           </div>
@@ -1668,7 +1668,7 @@ export function PromotoresFornecedoresManager({
                   setEditingRotina(null)
                   setRotinaModalOpen(true)
                 }}
-                className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs"
+                className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Nova Rotina de Promotor</span>
@@ -1677,7 +1677,7 @@ export function PromotoresFornecedoresManager({
           ) : (
             <div className="space-y-1.5">
               <div className="sm:hidden flex items-center justify-between text-[11px] text-[#6B7280] px-1">
-                <span className="flex items-center gap-1 font-medium text-[#2563EB]">
+                <span className="flex items-center gap-1 font-medium text-[#0F766E]">
                   <MoveHorizontal className="w-3.5 h-3.5 animate-pulse" />
                   <span>Deslize a tabela para o lado</span>
                 </span>
@@ -1717,7 +1717,7 @@ export function PromotoresFornecedoresManager({
                             - sem foto/não feito -> SEM NEGRITO e toque abre o campo para preencher/anexar */}
                           <td className="p-3.5 text-[#1F2937]">
                             <div className="flex items-center gap-2">
-                              <Layers className="w-4 h-4 text-[#2563EB] shrink-0" />
+                              <Layers className="w-4 h-4 text-[#0F766E] shrink-0" />
 
                               {hasFoto ? (
                                 <button
@@ -1731,11 +1731,11 @@ export function PromotoresFornecedoresManager({
                                       )
                                     }
                                   }}
-                                  className="font-bold text-[#1F2937] hover:text-[#2563EB] inline-flex items-center gap-1.5 transition-colors text-left"
+                                  className="font-bold text-[#1F2937] hover:text-[#0F766E] inline-flex items-center gap-1.5 transition-colors text-left"
                                   title="Rotina com foto de trabalho: toque para ver em tela cheia com zoom"
                                 >
                                   <span>{r.titulo}</span>
-                                  <Camera className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
+                                  <Camera className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
                                 </button>
                               ) : (
                                 <button
@@ -1744,12 +1744,12 @@ export function PromotoresFornecedoresManager({
                                     setEditingRotina(r)
                                     setRotinaModalOpen(true)
                                   }}
-                                  className="font-normal text-[#4B5563] hover:text-[#2563EB] text-left transition-colors"
+                                  className="font-normal text-[#4B5563] hover:text-[#0F766E] text-left transition-colors"
                                   title="Sem foto de trabalho: toque para editar e anexar a foto do trabalho"
                                 >
                                   <span>{r.titulo}</span>
                                   {isPrimeiroItem && (
-                                    <span className="ml-1 text-[10px] text-[#2563EB] font-medium bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200">
+                                    <span className="ml-1 text-[10px] text-[#0F766E] font-medium bg-teal-50 px-1.5 py-0.2 rounded border border-teal-200">
                                       + Anexar Foto
                                     </span>
                                   )}
@@ -1797,7 +1797,7 @@ export function PromotoresFornecedoresManager({
                                   setEditingRotina(r)
                                   setRotinaModalOpen(true)
                                 }}
-                                className="p-1.5 text-[#4B5563] hover:text-[#2563EB] rounded hover:bg-gray-100"
+                                className="p-1.5 text-[#4B5563] hover:text-[#0F766E] rounded hover:bg-gray-100"
                                 title="Editar rotina"
                               >
                                 <Edit2 className="w-4 h-4" />
