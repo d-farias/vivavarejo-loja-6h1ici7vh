@@ -142,7 +142,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
         {/* Header */}
         <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center justify-between bg-[#F7F7F5]/50">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-teal-50 text-[#0F766E] border border-teal-200 flex items-center justify-center">
               <CheckSquare className="w-4 h-4" />
             </div>
             <div>
@@ -189,7 +189,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
               <select
                 value={areaDemandante}
                 onChange={(e) => setAreaDemandante(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-lg outline-none text-[#1F2937] font-medium"
+                className="w-full pl-8 pr-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-lg outline-none text-[#1F2937] font-medium"
               >
                 {AREAS_DEMANDANTES_CHAMADO.map((area) => (
                   <option key={area} value={area}>
@@ -213,7 +213,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
                     'alta',
                   )
                 }
-                className="text-[11px] px-2 py-0.5 rounded bg-gray-100 hover:bg-blue-50 hover:text-[#2563EB] text-[#4B5563] transition-colors"
+                className="text-[11px] px-2 py-0.5 rounded bg-gray-100 hover:bg-teal-50 hover:text-[#0F766E] text-[#4B5563] transition-colors"
               >
                 Caminhão atrasado (Logística)
               </button>
@@ -226,7 +226,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
                     'alta',
                   )
                 }
-                className="text-[11px] px-2 py-0.5 rounded bg-gray-100 hover:bg-blue-50 hover:text-[#2563EB] text-[#4B5563] transition-colors"
+                className="text-[11px] px-2 py-0.5 rounded bg-gray-100 hover:bg-teal-50 hover:text-[#0F766E] text-[#4B5563] transition-colors"
               >
                 Câmara fria (Manutenção)
               </button>
@@ -239,7 +239,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
                     'alta',
                   )
                 }
-                className="text-[11px] px-2 py-0.5 rounded bg-gray-100 hover:bg-blue-50 hover:text-[#2563EB] text-[#4B5563] transition-colors"
+                className="text-[11px] px-2 py-0.5 rounded bg-gray-100 hover:bg-teal-50 hover:text-[#0F766E] text-[#4B5563] transition-colors"
               >
                 Ruptura de Curva A (Abastecimento)
               </button>
@@ -257,7 +257,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
               placeholder="Ex: Troca de vedação da porta da câmara frigorífica ou cobrança de caminhão atrasado"
               rows={2}
               required
-              className="w-full px-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-lg outline-none focus:ring-2 focus:ring-[#3B82F6]/20 text-[#1F2937] resize-none"
+              className="w-full px-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-lg outline-none focus:ring-2 focus:ring-teal-500/20 text-[#1F2937] resize-none"
             />
           </div>
 
@@ -273,7 +273,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
                   value={lojaId}
                   onChange={(e) => setLojaId(e.target.value)}
                   required
-                  className="w-full pl-8 pr-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-lg outline-none text-[#1F2937]"
+                  className="w-full pl-8 pr-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-lg outline-none text-[#1F2937]"
                 >
                   <option value="" disabled>
                     Selecione a loja
@@ -298,7 +298,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
                   value={responsavel}
                   onChange={(e) => setResponsavel(e.target.value)}
                   placeholder="Ex: Gerente Carlos ou Operador"
-                  className="w-full pl-8 pr-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-lg outline-none focus:ring-2 focus:ring-[#3B82F6]/20 text-[#1F2937]"
+                  className="w-full pl-8 pr-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-lg outline-none focus:ring-2 focus:ring-teal-500/20 text-[#1F2937]"
                 />
               </div>
             </div>
@@ -316,7 +316,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
                   type="date"
                   value={prazo}
                   onChange={(e) => setPrazo(e.target.value)}
-                  className="w-full pl-8 pr-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-lg outline-none text-[#1F2937]"
+                  className="w-full pl-8 pr-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-lg outline-none text-[#1F2937]"
                 />
               </div>
             </div>
@@ -328,7 +328,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
               <select
                 value={prioridade}
                 onChange={(e) => setPrioridade(e.target.value as PrioridadePlanoAcao)}
-                className="w-full px-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-lg outline-none text-[#1F2937]"
+                className="w-full px-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-lg outline-none text-[#1F2937]"
               >
                 <option value="baixa">Baixa</option>
                 <option value="media">Média</option>
@@ -346,7 +346,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as StatusPlanoAcao)}
-                className="w-full px-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-lg outline-none text-[#1F2937]"
+                className="w-full px-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-lg outline-none text-[#1F2937]"
               >
                 <option value="aberta">Aberta</option>
                 <option value="em_andamento">Em Andamento</option>
@@ -362,7 +362,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
               <select
                 value={rotinaId}
                 onChange={(e) => setRotinaId(e.target.value)}
-                className="w-full px-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-lg outline-none text-[#1F2937]"
+                className="w-full px-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-lg outline-none text-[#1F2937]"
               >
                 <option value="">Nenhuma (Ação avulsa / melhoria)</option>
                 {rotinas.map((r) => (
@@ -384,7 +384,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
               onChange={(e) => setObservacoes(e.target.value)}
               placeholder="Descreva detalhes operacionais, causa-raiz identificada ou resultado obtido..."
               rows={2}
-              className="w-full px-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-lg outline-none focus:ring-2 focus:ring-[#3B82F6]/20 text-[#1F2937] resize-none"
+              className="w-full px-3 py-2 bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-lg outline-none focus:ring-2 focus:ring-teal-500/20 text-[#1F2937] resize-none"
             />
           </div>
 
@@ -401,7 +401,7 @@ export const PlanoAcaoModal: React.FC<PlanoAcaoModalProps> = ({
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-lg shadow-xs transition-colors disabled:opacity-60"
+              className="px-5 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-lg shadow-xs transition-colors disabled:opacity-60"
             >
               {saving ? 'Salvando...' : plano ? 'Salvar Alterações' : 'Criar Ação'}
             </button>

@@ -56,10 +56,10 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({ className = '' }) 
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className={`inline-flex items-center justify-between gap-2 px-3 py-2 text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#2563EB] rounded-md shadow-xs text-[#1F2937] transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]/30 min-w-[200px] max-w-[320px] ${className}`}
+          className={`inline-flex items-center justify-between gap-2 px-3 py-2 text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] rounded-md shadow-xs text-[#1F2937] transition-all outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 min-w-[200px] max-w-[320px] ${className}`}
         >
           <div className="flex items-center gap-2 min-w-0">
-            <Store className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
+            <Store className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
             <span className="truncate">{labelSelecionado}</span>
           </div>
           <ChevronDown className="w-3.5 h-3.5 text-[#9CA3AF] shrink-0 ml-1" />
@@ -81,7 +81,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({ className = '' }) 
             onClick={() => selecionarLoja('todas')}
             className={`px-2.5 py-2 cursor-pointer rounded flex items-center justify-between ${
               lojaSelecionadaId === 'todas'
-                ? 'bg-[#3B82F6]/10 text-[#2563EB] font-semibold'
+                ? 'bg-teal-50 text-[#0F766E] font-semibold'
                 : 'text-[#1F2937] hover:bg-gray-100'
             }`}
           >
@@ -89,7 +89,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({ className = '' }) 
               <Building2 className="w-3.5 h-3.5" />
               <span>Todas as lojas (Visão Geral)</span>
             </div>
-            {lojaSelecionadaId === 'todas' && <Check className="w-4 h-4 text-[#2563EB]" />}
+            {lojaSelecionadaId === 'todas' && <Check className="w-4 h-4 text-[#0F766E]" />}
           </DropdownMenuItem>
         )}
 
@@ -105,7 +105,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({ className = '' }) 
               onClick={() => selecionarLoja(loja.id)}
               className={`px-2.5 py-2 cursor-pointer rounded flex items-center justify-between ${
                 isSelected
-                  ? 'bg-[#3B82F6]/10 text-[#2563EB] font-semibold'
+                  ? 'bg-teal-50 text-[#0F766E] font-semibold'
                   : 'text-[#1F2937] hover:bg-gray-100'
               }`}
             >
@@ -117,7 +117,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({ className = '' }) 
                   </span>
                 )}
               </div>
-              {isSelected && <Check className="w-4 h-4 text-[#2563EB] shrink-0" />}
+              {isSelected && <Check className="w-4 h-4 text-[#0F766E] shrink-0" />}
             </DropdownMenuItem>
           )
         })}

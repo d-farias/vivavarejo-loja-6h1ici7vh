@@ -128,7 +128,7 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E7EB] pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-teal-50 text-[#0F766E] border border-teal-200 flex items-center justify-center">
               <CheckSquare className="w-4 h-4" />
             </div>
             <div>
@@ -147,7 +147,7 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
 
         <button
           onClick={onNewPlano}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors self-start sm:self-auto"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors self-start sm:self-auto"
         >
           <Plus className="w-3.5 h-3.5" />
           <span>Nova Ação</span>
@@ -161,13 +161,13 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
           onClick={() => setStatusFilter((prev) => (prev === 'abertas' ? 'todos' : 'abertas'))}
           className={`p-3 rounded-lg border text-left transition-all ${
             statusFilter === 'abertas'
-              ? 'border-[#2563EB] bg-[#3B82F6]/5 ring-1 ring-[#2563EB]'
+              ? 'border-[#0F766E] bg-teal-50/40 ring-1 ring-[#0F766E]'
               : 'border-[#E5E7EB] bg-[#F7F7F5]/50 hover:bg-white'
           }`}
         >
           <div className="text-xs text-[#6B7280] font-medium flex items-center justify-between">
             <span>Abertas</span>
-            <Clock className="w-3.5 h-3.5 text-[#2563EB]" />
+            <Clock className="w-3.5 h-3.5 text-[#0F766E]" />
           </div>
           <div className="text-xl sm:text-2xl font-bold text-[#1F2937] mt-1">{kpis.abertas}</div>
         </button>
@@ -228,7 +228,7 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar por ação, responsável, loja..."
-            className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+            className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
           />
         </div>
 
@@ -237,7 +237,7 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
             <select
               value={localLojaFilter}
               onChange={(e) => setLocalLojaFilter(e.target.value)}
-              className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+              className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
             >
               <option value="todas">Todas as Lojas</option>
               {lojas.map((l) => (
@@ -251,7 +251,7 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
           <select
             value={areaFilter}
             onChange={(e) => setAreaFilter(e.target.value)}
-            className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+            className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
             title="Filtrar por Área Demandante"
           >
             <option value="todas">Todas as Áreas</option>
@@ -269,7 +269,7 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+            className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
           >
             <option value="todos">Todos os Status</option>
             <option value="abertas">Abertas / Em Andamento</option>
@@ -288,7 +288,7 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
                 setAreaFilter('todas')
                 setLocalLojaFilter('todas')
               }}
-              className="text-xs text-[#2563EB] hover:underline whitespace-nowrap"
+              className="text-xs text-[#0F766E] hover:underline whitespace-nowrap"
             >
               Limpar
             </button>
@@ -335,7 +335,7 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
 
                     {/* Área Demandante Badge */}
                     {plano.area_demandante && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-50 text-[#2563EB] border border-blue-200">
+                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-teal-50 text-[#0F766E] border border-teal-200">
                         {normalizarNomeCanonico(plano.area_demandante)}
                       </span>
                     )}
@@ -365,7 +365,7 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
                         ATRASADA
                       </span>
                     ) : plano.status === 'em_andamento' ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#0F766E] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
                         <Clock className="w-3 h-3" />
                         Em andamento
                       </span>
@@ -404,7 +404,7 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
                     )}
 
                     {plano.expand?.rotina && (
-                      <span className="flex items-center gap-1 text-[11px] bg-blue-50/70 text-[#2563EB] px-1.5 py-0.5 rounded border border-blue-100">
+                      <span className="flex items-center gap-1 text-[11px] bg-teal-50 text-[#0F766E] px-1.5 py-0.5 rounded border border-teal-200">
                         <Layers className="w-3 h-3" />
                         <span>Rotina: {plano.expand.rotina.nome}</span>
                       </span>
@@ -435,7 +435,7 @@ export const PlanosAcaoCard: React.FC<PlanosAcaoCardProps> = ({
 
                   <button
                     onClick={() => onEditPlano(plano)}
-                    className="p-1.5 text-[#4B5563] hover:text-[#2563EB] hover:bg-gray-100 rounded-md transition-colors"
+                    className="p-1.5 text-[#4B5563] hover:text-[#0F766E] hover:bg-gray-100 rounded-md transition-colors"
                     title="Editar ação"
                   >
                     <Edit2 className="w-3.5 h-3.5" />

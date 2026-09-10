@@ -204,7 +204,7 @@ export function ImportarValidadeModal({
         {/* Header */}
         <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center justify-between bg-[#F7F7F5]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-teal-50 text-[#0F766E] border border-teal-200 flex items-center justify-center">
               <FileSpreadsheet className="w-5 h-5" />
             </div>
             <div>
@@ -213,7 +213,7 @@ export function ImportarValidadeModal({
                   Importar Cronograma de Validades
                 </h2>
                 {hasRodizio && (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-[#2563EB]">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-[#0F766E]">
                     Rodízio Mensal (4 Semanas)
                   </span>
                 )}
@@ -238,7 +238,7 @@ export function ImportarValidadeModal({
           {!file ? (
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-[#D1D5DB] hover:border-[#2563EB] rounded-xl p-8 sm:p-10 text-center cursor-pointer transition-colors bg-[#F7F7F5]/50 hover:bg-[#3B82F6]/5 group"
+              className="border-2 border-dashed border-[#D1D5DB] hover:border-[#0F766E] rounded-xl p-8 sm:p-10 text-center cursor-pointer transition-colors bg-[#F7F7F5]/50 hover:bg-teal-50/20 group"
             >
               <input
                 ref={fileInputRef}
@@ -247,7 +247,7 @@ export function ImportarValidadeModal({
                 onChange={handleFileChange}
                 className="hidden"
               />
-              <UploadCloud className="w-12 h-12 text-[#9CA3AF] group-hover:text-[#2563EB] mx-auto mb-3 transition-colors" />
+              <UploadCloud className="w-12 h-12 text-[#9CA3AF] group-hover:text-[#0F766E] mx-auto mb-3 transition-colors" />
               <p className="text-sm sm:text-base font-semibold text-[#1F2937]">
                 Selecione o arquivo do Cronograma de Validades
               </p>
@@ -258,7 +258,7 @@ export function ImportarValidadeModal({
 
               <div className="mt-5 max-w-xl mx-auto p-3.5 rounded-lg bg-white border border-[#E5E7EB] text-left text-xs text-[#4B5563] space-y-1.5 shadow-2xs">
                 <div className="flex items-center gap-1.5 font-bold text-[#1F2937]">
-                  <Info className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <Info className="w-3.5 h-3.5 text-[#0F766E]" />
                   <span>Layout inteligente suportado:</span>
                 </div>
                 <p>
@@ -281,8 +281,8 @@ export function ImportarValidadeModal({
                 </p>
               </div>
 
-              <div className="mt-4 p-2.5 rounded bg-blue-50/70 border border-blue-200/60 text-[11px] text-[#1F2937] max-w-xl mx-auto text-left leading-relaxed">
-                <span className="font-bold text-[#2563EB]">A ponte da informação à execução: </span>
+              <div className="mt-4 p-2.5 rounded bg-teal-50 border border-teal-200 text-[11px] text-[#1F2937] max-w-xl mx-auto text-left leading-relaxed">
+                <span className="font-bold text-[#0F766E]">A ponte da informação à execução: </span>
                 O VivaVarejo transforma as planilhas e relatórios do seu ERP/BI em checagens diárias
                 com setor, horário, responsável e comprovação por foto.
               </div>
@@ -318,7 +318,7 @@ export function ImportarValidadeModal({
 
               {parsing && (
                 <div className="p-4 text-center text-xs text-[#6B7280] flex items-center justify-center gap-2">
-                  <RefreshCw className="w-4 h-4 animate-spin text-[#2563EB]" />
+                  <RefreshCw className="w-4 h-4 animate-spin text-[#0F766E]" />
                   <span>Processando estrutura do cronograma e ciclos semanais...</span>
                 </div>
               )}
@@ -332,33 +332,33 @@ export function ImportarValidadeModal({
 
               {/* Bloco de Configurações Globais Sugeridas (Tarefa, Janela Horária, Loja, Validador) */}
               {parsedRows.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3.5 rounded-lg bg-blue-50/50 border border-blue-100">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3.5 rounded-lg bg-teal-50/50 border border-teal-200">
                   {/* Nome da Tarefa */}
                   <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-[#1E3A8A] uppercase tracking-wider flex items-center gap-1">
-                      <FileText className="w-3 h-3 text-[#2563EB]" />
+                    <label className="text-[11px] font-bold text-[#115E59] uppercase tracking-wider flex items-center gap-1">
+                      <FileText className="w-3 h-3 text-[#0F766E]" />
                       <span>Nome da Tarefa</span>
                     </label>
                     <input
                       type="text"
                       value={tarefaNome}
                       onChange={(e) => setTarefaNome(e.target.value)}
-                      className="w-full px-2.5 py-1.5 text-xs bg-white border border-[#BFDBFE] rounded text-[#1F2937] outline-none focus:border-[#2563EB]"
+                      className="w-full px-2.5 py-1.5 text-xs bg-white border border-teal-200 rounded text-[#1F2937] outline-none focus:border-[#0F766E]"
                       placeholder="Ex: Auditoria Validades até 15hs"
                     />
                   </div>
 
                   {/* Janela Horária Configurável */}
                   <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-[#1E3A8A] uppercase tracking-wider flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-[#115E59] uppercase tracking-wider flex items-center justify-between">
                       <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-[#2563EB]" />
+                        <Clock className="w-3 h-3 text-[#0F766E]" />
                         <span>Janela Horária (Início - Fim)</span>
                       </span>
                       <button
                         type="button"
                         onClick={handleAplicarHorarioGlobal}
-                        className="text-[10px] text-[#2563EB] hover:underline font-bold"
+                        className="text-[10px] text-[#0F766E] hover:underline font-bold"
                         title="Aplicar para todas as tarefas abaixo"
                       >
                         Aplicar a todas
@@ -369,28 +369,28 @@ export function ImportarValidadeModal({
                         type="time"
                         value={horarioInicioGlobal}
                         onChange={(e) => setHorarioInicioGlobal(e.target.value)}
-                        className="w-full px-2 py-1.5 text-xs bg-white border border-[#BFDBFE] rounded text-[#1F2937] outline-none font-mono"
+                        className="w-full px-2 py-1.5 text-xs bg-white border border-teal-200 rounded text-[#1F2937] outline-none font-mono"
                       />
                       <span className="text-xs text-[#6B7280]">às</span>
                       <input
                         type="time"
                         value={horarioFimGlobal}
                         onChange={(e) => setHorarioFimGlobal(e.target.value)}
-                        className="w-full px-2 py-1.5 text-xs bg-white border border-[#BFDBFE] rounded text-[#1F2937] outline-none font-mono"
+                        className="w-full px-2 py-1.5 text-xs bg-white border border-teal-200 rounded text-[#1F2937] outline-none font-mono"
                       />
                     </div>
                   </div>
 
                   {/* Loja de Destino */}
                   <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-[#1E3A8A] uppercase tracking-wider flex items-center gap-1">
-                      <Store className="w-3 h-3 text-[#2563EB]" />
+                    <label className="text-[11px] font-bold text-[#115E59] uppercase tracking-wider flex items-center gap-1">
+                      <Store className="w-3 h-3 text-[#0F766E]" />
                       <span>Loja de Destino</span>
                     </label>
                     <select
                       value={targetLojaId}
                       onChange={(e) => setTargetLojaId(e.target.value)}
-                      className="w-full px-2.5 py-1.5 text-xs bg-white border border-[#BFDBFE] rounded text-[#1F2937] outline-none focus:border-[#2563EB]"
+                      className="w-full px-2.5 py-1.5 text-xs bg-white border border-teal-200 rounded text-[#1F2937] outline-none focus:border-[#0F766E]"
                     >
                       <option value="">Aplicar para todas as lojas</option>
                       {lojas.map((l) => (
@@ -403,8 +403,8 @@ export function ImportarValidadeModal({
 
                   {/* Validador Padrão */}
                   <div className="space-y-1 md:col-span-1">
-                    <label className="text-[11px] font-bold text-[#1E3A8A] uppercase tracking-wider flex items-center gap-1">
-                      <Shield className="w-3 h-3 text-[#2563EB]" />
+                    <label className="text-[11px] font-bold text-[#115E59] uppercase tracking-wider flex items-center gap-1">
+                      <Shield className="w-3 h-3 text-[#0F766E]" />
                       <span>Validador Padrão</span>
                     </label>
                     <div className="flex items-center gap-1.5">
@@ -412,13 +412,13 @@ export function ImportarValidadeModal({
                         type="text"
                         value={validadorPadrao}
                         onChange={(e) => setValidadorPadrao(e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs bg-white border border-[#BFDBFE] rounded text-[#1F2937] outline-none"
+                        className="w-full px-2.5 py-1.5 text-xs bg-white border border-teal-200 rounded text-[#1F2937] outline-none"
                         placeholder="Ex: Gerente"
                       />
                       <button
                         type="button"
                         onClick={() => handleAplicarValidadorGlobal(validadorPadrao)}
-                        className="px-2 py-1.5 text-[10px] font-bold text-white bg-[#2563EB] hover:bg-[#1D4ED8] rounded shrink-0"
+                        className="px-2 py-1.5 text-[10px] font-bold text-white bg-[#0F766E] hover:bg-[#115E59] rounded shrink-0"
                       >
                         Aplicar
                       </button>
@@ -427,15 +427,15 @@ export function ImportarValidadeModal({
 
                   {/* Observações da Loja Detectadas */}
                   <div className="space-y-1 md:col-span-2">
-                    <label className="text-[11px] font-bold text-[#1E3A8A] uppercase tracking-wider flex items-center gap-1">
-                      <Info className="w-3 h-3 text-[#2563EB]" />
+                    <label className="text-[11px] font-bold text-[#115E59] uppercase tracking-wider flex items-center gap-1">
+                      <Info className="w-3 h-3 text-[#0F766E]" />
                       <span>Nota/Observação da Loja (sugerida do rodapé)</span>
                     </label>
                     <input
                       type="text"
                       value={observacaoGeral}
                       onChange={(e) => setObservacaoGeral(e.target.value)}
-                      className="w-full px-2.5 py-1.5 text-xs bg-white border border-[#BFDBFE] rounded text-[#1F2937] outline-none italic"
+                      className="w-full px-2.5 py-1.5 text-xs bg-white border border-teal-200 rounded text-[#1F2937] outline-none italic"
                       placeholder="Ex: Equipe fixa com GO e Líder Prevenção acompanhando..."
                     />
                   </div>
@@ -465,7 +465,7 @@ export function ImportarValidadeModal({
                             onClick={() => setFiltroSemana('todas')}
                             className={`px-2 py-1 text-[11px] font-semibold transition-colors ${
                               filtroSemana === 'todas'
-                                ? 'bg-[#2563EB] text-white'
+                                ? 'bg-[#0F766E] text-white'
                                 : 'text-[#4B5563] hover:bg-gray-50'
                             }`}
                           >
@@ -478,7 +478,7 @@ export function ImportarValidadeModal({
                               onClick={() => setFiltroSemana(String(sem))}
                               className={`px-2 py-1 text-[11px] font-semibold border-l border-[#E5E7EB] transition-colors ${
                                 filtroSemana === String(sem)
-                                  ? 'bg-[#2563EB] text-white'
+                                  ? 'bg-[#0F766E] text-white'
                                   : 'text-[#4B5563] hover:bg-gray-50'
                               }`}
                             >
@@ -509,12 +509,12 @@ export function ImportarValidadeModal({
                           const isEditing = editingIndex === realIdx
 
                           return (
-                            <tr key={idx} className="hover:bg-blue-50/20">
+                            <tr key={idx} className="hover:bg-teal-50/20">
                               {/* Semana */}
                               <td className="p-2.5">
                                 {row.semana_mes ? (
-                                  <span className="inline-flex items-center gap-1 font-bold text-[10px] px-2 py-0.5 rounded bg-blue-100 text-[#1E40AF]">
-                                    <Calendar className="w-3 h-3 text-[#2563EB]" />
+                                  <span className="inline-flex items-center gap-1 font-bold text-[10px] px-2 py-0.5 rounded bg-teal-100 text-[#115E59]">
+                                    <Calendar className="w-3 h-3 text-[#0F766E]" />
                                     <span>Semana {row.semana_mes}</span>
                                   </span>
                                 ) : (
@@ -536,7 +536,7 @@ export function ImportarValidadeModal({
                                     onChange={(e) =>
                                       handleUpdateRow(realIdx, { setor_categoria: e.target.value })
                                     }
-                                    className="w-full px-2 py-1 text-xs border border-[#2563EB] rounded bg-white"
+                                    className="w-full px-2 py-1 text-xs border border-[#0F766E] rounded bg-white"
                                   />
                                 ) : (
                                   <span className="font-medium text-[#1F2937] leading-tight block">
@@ -568,7 +568,7 @@ export function ImportarValidadeModal({
                                     />
                                   </div>
                                 ) : (
-                                  <span className="font-mono text-[11px] font-bold text-[#2563EB] px-1.5 py-0.5 rounded bg-blue-50 border border-blue-200">
+                                  <span className="font-mono text-[11px] font-bold text-[#0F766E] px-1.5 py-0.5 rounded bg-teal-50 border border-teal-200">
                                     {row.horario_inicio}{' '}
                                     {row.horario_fim ? `– ${row.horario_fim}` : ''}
                                   </span>
@@ -621,7 +621,7 @@ export function ImportarValidadeModal({
                                 <button
                                   type="button"
                                   onClick={() => setEditingIndex(isEditing ? null : realIdx)}
-                                  className="p-1 text-[#9CA3AF] hover:text-[#2563EB] rounded transition-colors"
+                                  className="p-1 text-[#9CA3AF] hover:text-[#0F766E] rounded transition-colors"
                                   title={isEditing ? 'Salvar ajuste' : 'Ajustar linha'}
                                 >
                                   <Edit3 className="w-3.5 h-3.5" />
@@ -637,7 +637,7 @@ export function ImportarValidadeModal({
               )}
 
               {importing && (
-                <div className="p-3 bg-[#3B82F6]/10 border border-[#3B82F6]/25 rounded-md text-xs text-[#2563EB] flex items-center gap-2">
+                <div className="p-3 bg-teal-50 border border-teal-200 rounded-md text-xs text-[#0F766E] flex items-center gap-2">
                   <RefreshCw className="w-4 h-4 animate-spin" />
                   <span>{progressMsg}</span>
                 </div>
@@ -662,7 +662,7 @@ export function ImportarValidadeModal({
               type="button"
               onClick={handleConfirmImport}
               disabled={importing}
-              className="px-5 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors disabled:opacity-60 flex items-center gap-2"
+              className="px-5 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md shadow-xs transition-colors disabled:opacity-60 flex items-center gap-2"
             >
               {importing ? (
                 <>

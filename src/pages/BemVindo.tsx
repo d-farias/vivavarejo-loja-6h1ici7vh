@@ -21,6 +21,14 @@ import {
 } from 'lucide-react'
 import { TipoPessoaCliente } from '@/types'
 import { useContatosAtendimento } from '@/hooks/use-contatos-atendimento'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
+import { ProtecaoDadosSecao } from '@/components/ProtecaoDadosSecao'
 
 /**
  * Endereços de redes sociais do rodapé da landing page.
@@ -198,6 +206,9 @@ const SEGMENT_OPTIONS: SegmentOption[] = [
 export default function BemVindo() {
   const navigate = useNavigate()
   const { contatos } = useContatosAtendimento()
+
+  // Modal de Proteção de Dados
+  const [modalProtecaoOpen, setModalProtecaoOpen] = useState(false)
 
   // Funil de interesse em 2 passos
   const [tipoPessoa, setTipoPessoa] = useState<TipoPessoaCliente | null>(null)
@@ -896,26 +907,42 @@ export default function BemVindo() {
             </div>
           </div>
 
-          {/* Resumo de Segurança e Proteção de Dados VivaVarejo */}
-          <div className="p-4 rounded-2xl bg-[#F7F7F5] border border-[#E5E7EB] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-            <div className="flex items-start gap-2.5">
-              <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-              <div>
-                <div className="font-semibold text-[#1F2937]">
-                  Plataforma Blindada & Dados Isolados por Rede
-                </div>
-                <p className="text-[#6B7280] text-[11px] mt-0.5">
-                  Arquitetura multi-inquilino com sigilo absoluto entre redes, trilha de auditoria
-                  contínua, tráfego criptografado e fotos de gôndola com links protegidos.
-                </p>
-              </div>
-            </div>
-            <div className="shrink-0 flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-medium text-[10px] border border-emerald-200">
-                100% Conforme LGPD
+          {/* Acionador discreto: Sobre proteção */}
+          <div className="flex items-center justify-between py-1 text-xs">
+            <button
+              type="button"
+              onClick={() => setModalProtecaoOpen(true)}
+              className="inline-flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#0F766E] transition-colors group cursor-pointer focus:outline-none"
+            >
+              <ShieldCheck className="w-4 h-4 text-[#0F766E] group-hover:scale-105 transition-transform shrink-0" />
+              <span className="underline decoration-dotted underline-offset-4 group-hover:decoration-solid">
+                Sobre proteção
               </span>
-            </div>
+            </button>
+            <span className="text-[11px] text-[#9CA3AF]">
+              Sigilo corporativo e isolamento de dados
+            </span>
           </div>
+
+          {/* Diálogo / Modal com os 6 pilares de proteção de dados */}
+          <Dialog open={modalProtecaoOpen} onOpenChange={setModalProtecaoOpen}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-6 sm:p-8">
+              <DialogHeader className="space-y-1">
+                <DialogTitle className="text-xl font-bold text-[#1F2937] flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-[#0F766E]" />
+                  Sobre a Proteção e Sigilo de Dados no VivaVarejo
+                </DialogTitle>
+                <DialogDescription className="text-xs text-[#6B7280]">
+                  Garantias de conformidade com LGPD, isolamento estrito entre redes e segurança
+                  técnica
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="pt-2">
+                <ProtecaoDadosSecao />
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Linha de contato e redes sociais */}
           <div className="pt-4 border-t border-[#E5E7EB] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-[#6B7280]">

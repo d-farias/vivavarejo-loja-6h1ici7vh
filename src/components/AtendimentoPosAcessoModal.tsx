@@ -106,12 +106,12 @@ export function AtendimentoPosAcessoModal({
         {/* Header Sóbrio institucional */}
         <div className="bg-white border-b border-[#E5E7EB] p-4 sm:p-5 flex items-start justify-between gap-3">
           <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-md bg-blue-50 border border-blue-100 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
+            <div className="w-9 h-9 rounded-md bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0 mt-0.5">
               <MessageSquare className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#0F766E]">
                   VivaVarejo Consultoria
                 </span>
                 <span className="text-[11px] text-[#6B7280]">•</span>
@@ -158,7 +158,7 @@ export function AtendimentoPosAcessoModal({
               {/* Pergunta 1: Encontrou a solução que procura? */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-[#1F2937] flex items-center gap-1.5">
-                  <HelpCircle className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <HelpCircle className="w-3.5 h-3.5 text-[#0F766E]" />
                   <span>Encontrou a solução que procura?</span>
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -175,7 +175,7 @@ export function AtendimentoPosAcessoModal({
                         onClick={() => setEncontrouSolucao(opt.id as EncontrouSolucao)}
                         className={`py-2 px-2.5 rounded-md border text-xs font-medium text-center transition-all ${
                           isSelected
-                            ? 'border-[#2563EB] bg-blue-50/80 text-[#2563EB] ring-1 ring-[#2563EB]'
+                            ? 'border-[#0F766E] bg-teal-50 text-[#0F766E] ring-1 ring-[#0F766E]'
                             : 'border-[#E5E7EB] bg-white hover:border-gray-300 text-[#374151]'
                         }`}
                       >
@@ -196,14 +196,14 @@ export function AtendimentoPosAcessoModal({
                   onChange={(e) => setNoQueAjudar(e.target.value)}
                   rows={2}
                   placeholder="Ex: estruturar rotinas do gerente, auditoria de preços, modelo de rotinas para minha equipe..."
-                  className="w-full px-3 py-2 text-xs bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-md outline-none focus:ring-2 focus:ring-[#3B82F6]/20 text-[#1F2937] placeholder:text-gray-400 resize-none"
+                  className="w-full px-3 py-2 text-xs bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-md outline-none focus:ring-2 focus:ring-teal-500/20 text-[#1F2937] placeholder:text-gray-400 resize-none"
                 />
               </div>
 
               {/* Pergunta 3: Em qual prazo você gostaria de contato? */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-[#1F2937] flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <Clock className="w-3.5 h-3.5 text-[#0F766E]" />
                   <span>Em qual prazo você gostaria de contato?</span>
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -220,7 +220,7 @@ export function AtendimentoPosAcessoModal({
                         onClick={() => setPrazoContato(opt.id as PrazoContato)}
                         className={`py-2 px-2.5 rounded-md border text-xs font-medium text-center transition-all ${
                           isSelected
-                            ? 'border-[#2563EB] bg-blue-50/80 text-[#2563EB] ring-1 ring-[#2563EB]'
+                            ? 'border-[#0F766E] bg-teal-50 text-[#0F766E] ring-1 ring-[#0F766E]'
                             : 'border-[#E5E7EB] bg-white hover:border-gray-300 text-[#374151]'
                         }`}
                       >
@@ -242,7 +242,7 @@ export function AtendimentoPosAcessoModal({
                   onChange={(e) => setMaioresDores(e.target.value)}
                   rows={2}
                   placeholder="Ex: controle de perdas, rupturas de estoque, falta de engajamento da equipe..."
-                  className="w-full px-3 py-2 text-xs bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-md outline-none focus:ring-2 focus:ring-[#3B82F6]/20 text-[#1F2937] placeholder:text-gray-400 resize-none"
+                  className="w-full px-3 py-2 text-xs bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-md outline-none focus:ring-2 focus:ring-teal-500/20 text-[#1F2937] placeholder:text-gray-400 resize-none"
                 />
                 <p className="text-[11px] text-[#6B7280]">
                   Pré-preenchido com seus dados do diagnóstico inicial. Você pode complementar.
@@ -263,7 +263,7 @@ export function AtendimentoPosAcessoModal({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-xs transition-colors disabled:opacity-60"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs transition-colors disabled:opacity-60"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>{loading ? 'Enviando...' : 'Enviar respostas'}</span>

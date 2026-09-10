@@ -117,7 +117,7 @@ export function ConcluirValidadeModal({
                 placeholder="Ex: Auditoria realizada em 100% dos itens da gôndola. Nenhum item vencido encontrado; 3 itens etiquetados com 30% de desconto por vencer amanhã."
                 value={observacao}
                 onChange={(e) => setObservacao(e.target.value)}
-                className="w-full p-2.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                className="w-full p-2.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
               />
             </div>
 
@@ -125,7 +125,7 @@ export function ConcluirValidadeModal({
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-[#374151] flex items-center justify-between">
                 <span className="flex items-center gap-1.5">
-                  <Camera className="w-4 h-4 text-[#2563EB] shrink-0" />
+                  <Camera className="w-4 h-4 text-[#0F766E] shrink-0" />
                   <span>Foto de Prova da Execução</span>
                 </span>
                 <span className="text-[11px] font-normal text-[#6B7280]">
@@ -136,7 +136,7 @@ export function ConcluirValidadeModal({
               {!fotoPreview ? (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-[#D1D5DB] hover:border-[#2563EB] rounded-lg p-4 text-center cursor-pointer transition-colors bg-[#F7F7F5]/50 hover:bg-[#3B82F6]/5"
+                  className="border-2 border-dashed border-[#D1D5DB] hover:border-[#0F766E] rounded-lg p-4 text-center cursor-pointer transition-colors bg-[#F7F7F5]/50 hover:bg-teal-50/20"
                 >
                   <input
                     ref={fileInputRef}
@@ -174,7 +174,7 @@ export function ConcluirValidadeModal({
             </div>
 
             {/* Workflow Info */}
-            <div className="p-2.5 bg-blue-50/70 border border-blue-100 rounded-md text-[11px] text-[#2563EB] flex items-start gap-2">
+            <div className="p-2.5 bg-teal-50 border border-teal-200 rounded-md text-[11px] text-[#0F766E] flex items-start gap-2">
               <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5" />
               <span>
                 Ao concluir, a tarefa será encaminhada para validação de{' '}
@@ -200,7 +200,7 @@ export function ConcluirValidadeModal({
             form="concluir-validade-form"
             type="submit"
             disabled={saving}
-            className="w-full sm:w-auto h-10 sm:h-9 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md text-xs font-semibold shadow-xs flex items-center justify-center gap-1.5"
+            className="w-full sm:w-auto h-10 sm:h-9 px-4 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md text-xs font-semibold shadow-xs flex items-center justify-center gap-1.5"
           >
             {saving ? 'Enviando...' : 'Enviar para Validação'}
           </button>

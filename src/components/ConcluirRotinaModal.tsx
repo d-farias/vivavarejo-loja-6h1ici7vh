@@ -59,7 +59,7 @@ export const ConcluirRotinaModal: React.FC<ConcluirRotinaModalProps> = ({
         {/* Header */}
         <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-b border-[#E5E7EB] flex items-center justify-between bg-[#F7F7F5]/50 shrink-0">
           <div className="flex items-center gap-2 min-w-0 pr-2">
-            <div className="w-8 h-8 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-teal-50 text-[#0F766E] border border-teal-200 flex items-center justify-center shrink-0">
               <Camera className="w-4 h-4" />
             </div>
             <div className="min-w-0">
@@ -111,7 +111,7 @@ export const ConcluirRotinaModal: React.FC<ConcluirRotinaModalProps> = ({
           <div className="space-y-2 pt-2 border-t border-[#E5E7EB]">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-[#374151] flex items-center gap-1.5">
-                <Camera className="w-3.5 h-3.5 text-[#2563EB]" />
+                <Camera className="w-3.5 h-3.5 text-[#0F766E]" />
                 <span>Foto de Comprovação</span>
                 <span className="text-[10px] text-[#6B7280] font-normal lowercase">(opcional)</span>
               </span>
@@ -135,12 +135,12 @@ export const ConcluirRotinaModal: React.FC<ConcluirRotinaModalProps> = ({
                 />
               </div>
             ) : (
-              <label className="border-2 border-dashed border-[#E5E7EB] hover:border-[#2563EB] rounded-lg p-4 flex flex-col items-center justify-center gap-2 cursor-pointer bg-[#F7F7F5]/50 hover:bg-blue-50/20 transition-colors">
-                <div className="w-10 h-10 rounded-full bg-blue-50 text-[#2563EB] flex items-center justify-center">
+              <label className="border-2 border-dashed border-[#E5E7EB] hover:border-[#0F766E] rounded-lg p-4 flex flex-col items-center justify-center gap-2 cursor-pointer bg-[#F7F7F5]/50 hover:bg-teal-50/20 transition-colors">
+                <div className="w-10 h-10 rounded-full bg-teal-50 text-[#0F766E] flex items-center justify-center">
                   <Upload className="w-5 h-5" />
                 </div>
                 <div className="text-center">
-                  <span className="text-xs font-semibold text-[#2563EB]">Tirar ou anexar foto</span>
+                  <span className="text-xs font-semibold text-[#0F766E]">Tirar ou anexar foto</span>
                   <p className="text-[11px] text-[#6B7280] mt-0.5">JPG, PNG ou WebP até 10MB</p>
                 </div>
                 <input
@@ -171,7 +171,7 @@ export const ConcluirRotinaModal: React.FC<ConcluirRotinaModalProps> = ({
             type="button"
             disabled={submitting}
             onClick={() => handleConfirmAction(Boolean(fotoFile))}
-            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-lg shadow-xs transition-colors disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-lg shadow-xs transition-colors disabled:opacity-60"
           >
             <Check className="w-4 h-4" />
             <span>

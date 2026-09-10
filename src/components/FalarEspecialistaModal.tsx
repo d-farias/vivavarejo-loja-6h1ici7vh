@@ -69,7 +69,7 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
       <div className="relative w-full max-w-md bg-white rounded-xl shadow-xl border border-[#E5E7EB] p-5 sm:p-6 z-10 space-y-5 animate-in fade-in zoom-in-95 duration-150">
         <div className="flex items-start justify-between pb-3 border-b border-[#E5E7EB]">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-lg bg-teal-50 text-[#0F766E] border border-teal-200 flex items-center justify-center shrink-0">
               <MessageSquare className="w-5 h-5" />
             </div>
             <div>
@@ -102,8 +102,8 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
         )}
 
         {assuntoContexto && (
-          <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-xs text-[#1E40AF] flex items-start gap-2">
-            <Sparkles className="w-4 h-4 shrink-0 text-[#2563EB] mt-0.5" />
+          <div className="p-3 rounded-lg bg-teal-50 border border-teal-200 text-xs text-[#115E59] flex items-start gap-2">
+            <Sparkles className="w-4 h-4 shrink-0 text-[#0F766E] mt-0.5" />
             <div>
               <span className="font-semibold block">Interesse em modelo ou liberação:</span>
               <span>{assuntoContexto}</span>
@@ -151,7 +151,7 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
           <div className="p-3.5 rounded-lg bg-[#F7F7F5] border border-[#E5E7EB] space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center shrink-0 shadow-xs">
+                <div className="w-8 h-8 rounded-full bg-[#0F766E] text-white flex items-center justify-center shrink-0 shadow-xs">
                   <Mail className="w-4 h-4" />
                 </div>
                 <div>
@@ -164,14 +164,14 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
             <div className="flex items-center gap-2 pt-1">
               <a
                 href={mailtoLink}
-                className="flex-1 text-center py-1.5 px-3 bg-white border border-[#E5E7EB] hover:border-[#2563EB] hover:text-[#2563EB] text-xs font-semibold rounded text-[#1F2937] transition-colors"
+                className="flex-1 text-center py-1.5 px-3 bg-white border border-[#E5E7EB] hover:border-[#0F766E] hover:text-[#0F766E] text-xs font-semibold rounded text-[#1F2937] transition-colors"
               >
                 Abrir no seu E-mail
               </a>
               <button
                 type="button"
                 onClick={handleCopyEmail}
-                className="py-1.5 px-3 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-xs font-semibold rounded text-[#1F2937] transition-colors flex items-center gap-1 shrink-0"
+                className="py-1.5 px-3 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-xs font-semibold rounded text-[#1F2937] transition-colors flex items-center gap-1 shrink-0"
               >
                 {copiedEmail ? (
                   <>

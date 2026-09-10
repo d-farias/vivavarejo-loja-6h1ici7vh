@@ -57,9 +57,9 @@ export function ProtecaoDadosSecao() {
   return (
     <div className="space-y-6">
       {/* Banner de Apresentação Comercial e Corporativa */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-slate-900 to-blue-950 text-white p-8 border border-neutral-800 shadow-sm">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-slate-900 to-teal-950 text-white p-8 border border-neutral-800 shadow-sm">
         <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/30 text-blue-300 text-xs font-semibold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-400/30 text-teal-300 text-xs font-semibold">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
             Conformidade VivaVarejo & Segurança Corporativa
           </div>
@@ -84,7 +84,7 @@ export function ProtecaoDadosSecao() {
               className="border border-neutral-200 dark:border-neutral-800 hover:shadow-md transition-shadow flex flex-col justify-between"
             >
               <CardHeader className="space-y-3 pb-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center text-[#2563EB]">
+                <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/50 flex items-center justify-center text-[#0F766E]">
                   <Icon className="w-5 h-5" />
                 </div>
                 <div>

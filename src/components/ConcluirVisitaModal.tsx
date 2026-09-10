@@ -245,7 +245,7 @@ export function ConcluirVisitaModal({
         {/* Cabeçalho fixo no topo do modal */}
         <DialogHeader className="px-4 py-3 sm:px-6 sm:py-3.5 border-b border-[#E5E7EB] bg-white shrink-0 text-left">
           <DialogTitle className="text-base font-bold text-[#1F2937] flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5 text-[#2563EB] shrink-0" />
+            <CheckCircle2 className="w-5 h-5 text-[#0F766E] shrink-0" />
             <span className="truncate">Avaliação & Conclusão de Visita</span>
           </DialogTitle>
         </DialogHeader>
@@ -258,7 +258,7 @@ export function ConcluirVisitaModal({
           {/* Card resumo da visita */}
           <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-lg p-3 space-y-1.5 text-xs text-[#4B5563]">
             <div className="flex items-center gap-2 font-semibold text-[#1F2937] flex-wrap">
-              <UserCheck className="w-4 h-4 text-[#2563EB] shrink-0" />
+              <UserCheck className="w-4 h-4 text-[#0F766E] shrink-0" />
               <span className="break-words">{promotorNome}</span>
               {fornecedorNome && <span className="text-[#6B7280]">({fornecedorNome})</span>}
             </div>
@@ -296,8 +296,8 @@ export function ConcluirVisitaModal({
           </div>
 
           {focoInicial !== 'geral' && (
-            <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-md text-xs text-[#1E40AF] flex items-start sm:items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5 sm:mt-0" />
+            <div className="p-2.5 bg-teal-50 border border-teal-200 rounded-md text-xs text-[#115E59] flex items-start sm:items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#0F766E] shrink-0 mt-0.5 sm:mt-0" />
               <span className="break-words">
                 Preenchimento rápido para o critério:{' '}
                 <b>
@@ -318,7 +318,7 @@ export function ConcluirVisitaModal({
               ref={checklistRef}
               className={`p-3 rounded-lg space-y-2 border ${
                 focoInicial !== 'geral'
-                  ? 'bg-blue-50/50 border-blue-300 ring-2 ring-blue-100'
+                  ? 'bg-teal-50/50 border-teal-300 ring-2 ring-teal-100'
                   : 'bg-emerald-50/50 border-emerald-200'
               }`}
             >
@@ -329,7 +329,7 @@ export function ConcluirVisitaModal({
                     Checklist Operacional da Visita
                   </div>
                 </div>
-                <span className="text-[10px] text-[#2563EB] font-semibold bg-white px-2 py-0.5 rounded border border-blue-200 shrink-0">
+                <span className="text-[10px] text-[#0F766E] font-semibold bg-white px-2 py-0.5 rounded border border-teal-200 shrink-0">
                   Toque para marcar
                 </span>
               </div>
@@ -338,7 +338,7 @@ export function ConcluirVisitaModal({
                 <label
                   className={`flex items-start sm:items-center gap-2 cursor-pointer p-1.5 rounded transition-colors ${
                     focoInicial === 'abastecimento'
-                      ? 'bg-blue-100/60 font-bold text-[#1E3A8A]'
+                      ? 'bg-teal-100/60 font-bold text-[#115E59]'
                       : 'font-medium text-[#1F2937] hover:bg-white/60'
                   }`}
                 >
@@ -346,7 +346,7 @@ export function ConcluirVisitaModal({
                     type="checkbox"
                     checked={checklistAbastecimento}
                     onChange={(e) => setChecklistAbastecimento(e.target.checked)}
-                    className="w-4 h-4 mt-0.5 sm:mt-0 text-[#2563EB] rounded border-gray-300 shrink-0"
+                    className="w-4 h-4 mt-0.5 sm:mt-0 text-[#0F766E] rounded border-gray-300 shrink-0"
                   />
                   <span className="break-words">
                     Abastecimento 100% com base no estoque em loja (critério reposição)
@@ -356,7 +356,7 @@ export function ConcluirVisitaModal({
                 <label
                   className={`flex items-start sm:items-center gap-2 cursor-pointer p-1.5 rounded transition-colors ${
                     focoInicial === 'validades'
-                      ? 'bg-blue-100/60 font-bold text-[#1E3A8A]'
+                      ? 'bg-teal-100/60 font-bold text-[#115E59]'
                       : 'font-medium text-[#1F2937] hover:bg-white/60'
                   }`}
                 >
@@ -364,7 +364,7 @@ export function ConcluirVisitaModal({
                     type="checkbox"
                     checked={checklistValidades}
                     onChange={(e) => setChecklistValidades(e.target.checked)}
-                    className="w-4 h-4 mt-0.5 sm:mt-0 text-[#2563EB] rounded border-gray-300 shrink-0"
+                    className="w-4 h-4 mt-0.5 sm:mt-0 text-[#0F766E] rounded border-gray-300 shrink-0"
                   />
                   <span className="break-words">
                     Validades auditadas (FIFO aplicado e separação de trocas/quebras)
@@ -374,7 +374,7 @@ export function ConcluirVisitaModal({
                 <label
                   className={`flex items-start sm:items-center gap-2 cursor-pointer p-1.5 rounded transition-colors ${
                     focoInicial === 'layout'
-                      ? 'bg-blue-100/60 font-bold text-[#1E3A8A]'
+                      ? 'bg-teal-100/60 font-bold text-[#115E59]'
                       : 'font-medium text-[#1F2937] hover:bg-white/60'
                   }`}
                 >
@@ -382,7 +382,7 @@ export function ConcluirVisitaModal({
                     type="checkbox"
                     checked={checklistLayout}
                     onChange={(e) => setChecklistLayout(e.target.checked)}
-                    className="w-4 h-4 mt-0.5 sm:mt-0 text-[#2563EB] rounded border-gray-300 shrink-0"
+                    className="w-4 h-4 mt-0.5 sm:mt-0 text-[#0F766E] rounded border-gray-300 shrink-0"
                   />
                   <span className="break-words">
                     Implantação conforme layout (espaço contratado em gôndola respeitado)
@@ -392,15 +392,15 @@ export function ConcluirVisitaModal({
             </div>
 
             {/* Foto de Abastecido / Trabalho Realizado (Mandatória) */}
-            <div className="p-3 bg-blue-50/40 border border-blue-200 rounded-lg space-y-2">
+            <div className="p-3 bg-teal-50/40 border border-teal-200 rounded-lg space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5 min-w-0">
-                  <Camera className="w-4 h-4 text-[#2563EB] shrink-0" />
+                  <Camera className="w-4 h-4 text-[#0F766E] shrink-0" />
                   <Label className="text-xs font-bold text-[#1F2937] uppercase tracking-wider truncate">
                     Foto do Trabalho / Gôndola <span className="text-red-500">*</span>
                   </Label>
                 </div>
-                <span className="text-[10px] text-[#2563EB] font-semibold bg-white px-2 py-0.5 rounded border border-blue-200 shrink-0">
+                <span className="text-[10px] text-[#0F766E] font-semibold bg-white px-2 py-0.5 rounded border border-teal-200 shrink-0">
                   Obrigatório
                 </span>
               </div>
@@ -418,7 +418,7 @@ export function ConcluirVisitaModal({
                   const file = e.target.files?.[0]
                   if (file) setFotoFile(file)
                 }}
-                className="text-xs bg-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-[#2563EB]/10 file:text-[#2563EB]"
+                className="text-xs bg-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-teal-50 file:text-[#0F766E]"
               />
               {fotoFile && (
                 <div className="text-[11px] text-emerald-700 font-medium break-all">
@@ -569,7 +569,7 @@ export function ConcluirVisitaModal({
                           type="checkbox"
                           checked={checked}
                           onChange={() => toggleRotina(rot.titulo)}
-                          className="w-4 h-4 mt-0.5 text-[#2563EB] rounded border-gray-300 shrink-0"
+                          className="w-4 h-4 mt-0.5 text-[#0F766E] rounded border-gray-300 shrink-0"
                         />
                         <div className="text-xs min-w-0">
                           <div className="font-medium text-[#1F2937] break-words">{rot.titulo}</div>
@@ -618,7 +618,7 @@ export function ConcluirVisitaModal({
           <Button
             form="concluir-visita-form"
             type="submit"
-            className="w-full sm:w-auto h-10 sm:h-9 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold shadow-xs"
+            className="w-full sm:w-auto h-10 sm:h-9 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold shadow-xs"
             disabled={submitting || !conclusaoCheck.trim()}
           >
             {submitting ? 'Salvando...' : 'Confirmar e Salvar'}

@@ -101,14 +101,14 @@ export const EnquadramentoClienteCard: React.FC<EnquadramentoClienteCardProps> =
   const isEnquadrado = Boolean(currentCliente?.tipo_pessoa && currentCliente?.segmento)
 
   return (
-    <div className="bg-white border border-blue-200 rounded-xl p-4 sm:p-5 shadow-xs relative overflow-hidden">
-      {/* Faixa decorativa azul */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2563EB] to-blue-400" />
+    <div className="bg-white border border-teal-200 rounded-xl p-4 sm:p-5 shadow-xs relative overflow-hidden">
+      {/* Faixa decorativa teal */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0F766E] to-teal-400" />
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div className="flex items-start gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5">
+          <div className="w-8 h-8 rounded-lg bg-teal-50 text-[#0F766E] border border-teal-200 flex items-center justify-center shrink-0 mt-0.5">
             <Building2 className="w-4 h-4" />
           </div>
           <div>
@@ -116,7 +116,7 @@ export const EnquadramentoClienteCard: React.FC<EnquadramentoClienteCardProps> =
               <h3 className="text-sm sm:text-base font-bold text-[#1F2937]">
                 Enquadramento do Cliente
               </h3>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-[#2563EB] uppercase tracking-wider">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-100 text-[#0F766E] uppercase tracking-wider">
                 Exclusivo Consultor Admin
               </span>
               {isEnquadrado && (
@@ -137,7 +137,7 @@ export const EnquadramentoClienteCard: React.FC<EnquadramentoClienteCardProps> =
             <select
               value={selectedClienteId}
               onChange={(e) => setSelectedClienteId(e.target.value)}
-              className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937] font-semibold"
+              className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937] font-semibold"
             >
               {clientes.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -158,7 +158,7 @@ export const EnquadramentoClienteCard: React.FC<EnquadramentoClienteCardProps> =
       </div>
 
       {feedback && (
-        <div className="mb-4 p-2.5 rounded-lg bg-blue-50 border border-blue-200 text-xs text-[#1D4ED8] font-medium flex items-center gap-2">
+        <div className="mb-4 p-2.5 rounded-lg bg-teal-50 border border-teal-200 text-xs text-[#115E59] font-medium flex items-center gap-2">
           <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
           <span>{feedback}</span>
         </div>
@@ -172,12 +172,12 @@ export const EnquadramentoClienteCard: React.FC<EnquadramentoClienteCardProps> =
             type="button"
             onClick={() => setStep(1)}
             className={`text-left p-2 rounded-lg transition-colors flex items-center gap-2 ${
-              step === 1 ? 'bg-blue-50/80 text-[#2563EB]' : 'text-[#6B7280] hover:bg-gray-50'
+              step === 1 ? 'bg-teal-50 text-[#0F766E]' : 'text-[#6B7280] hover:bg-gray-50'
             }`}
           >
             <span
               className={`w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center shrink-0 ${
-                step === 1 ? 'bg-[#2563EB] text-white' : 'bg-gray-200 text-[#4B5563]'
+                step === 1 ? 'bg-[#0F766E] text-white' : 'bg-gray-200 text-[#4B5563]'
               }`}
             >
               1
@@ -194,12 +194,12 @@ export const EnquadramentoClienteCard: React.FC<EnquadramentoClienteCardProps> =
             type="button"
             onClick={() => setStep(2)}
             className={`text-left p-2 rounded-lg transition-colors flex items-center gap-2 ${
-              step === 2 ? 'bg-blue-50/80 text-[#2563EB]' : 'text-[#6B7280] hover:bg-gray-50'
+              step === 2 ? 'bg-teal-50 text-[#0F766E]' : 'text-[#6B7280] hover:bg-gray-50'
             }`}
           >
             <span
               className={`w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center shrink-0 ${
-                step === 2 ? 'bg-[#2563EB] text-white' : 'bg-gray-200 text-[#4B5563]'
+                step === 2 ? 'bg-[#0F766E] text-white' : 'bg-gray-200 text-[#4B5563]'
               }`}
             >
               2
@@ -225,13 +225,13 @@ export const EnquadramentoClienteCard: React.FC<EnquadramentoClienteCardProps> =
                 onClick={() => setTipoPessoa('PJ')}
                 className={`p-3.5 rounded-lg border text-left transition-all ${
                   tipoPessoa === 'PJ'
-                    ? 'border-[#2563EB] bg-[#3B82F6]/10 ring-1 ring-[#2563EB]'
+                    ? 'border-[#0F766E] bg-teal-50 ring-1 ring-[#0F766E]'
                     : 'border-[#E5E7EB] bg-[#F7F7F5]/50 hover:bg-white'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-bold text-[#1F2937]">Pessoa Jurídica (CNPJ)</span>
-                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-[#2563EB]">
+                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-teal-100 text-[#0F766E]">
                     PJ
                   </span>
                 </div>
@@ -245,7 +245,7 @@ export const EnquadramentoClienteCard: React.FC<EnquadramentoClienteCardProps> =
                 onClick={() => setTipoPessoa('PF')}
                 className={`p-3.5 rounded-lg border text-left transition-all ${
                   tipoPessoa === 'PF'
-                    ? 'border-[#2563EB] bg-[#3B82F6]/10 ring-1 ring-[#2563EB]'
+                    ? 'border-[#0F766E] bg-teal-50 ring-1 ring-[#0F766E]'
                     : 'border-[#E5E7EB] bg-[#F7F7F5]/50 hover:bg-white'
                 }`}
               >
@@ -265,7 +265,7 @@ export const EnquadramentoClienteCard: React.FC<EnquadramentoClienteCardProps> =
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors"
               >
                 <span>Avançar para Segmento</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -290,7 +290,7 @@ export const EnquadramentoClienteCard: React.FC<EnquadramentoClienteCardProps> =
                     onClick={() => setSegmento(seg)}
                     className={`p-2.5 rounded-lg border text-left text-xs font-semibold transition-all ${
                       isSelected
-                        ? 'border-[#2563EB] bg-[#3B82F6]/10 text-[#2563EB] ring-1 ring-[#2563EB]'
+                        ? 'border-[#0F766E] bg-teal-50 text-[#0F766E] ring-1 ring-[#0F766E]'
                         : 'border-[#E5E7EB] bg-[#F7F7F5]/50 text-[#1F2937] hover:bg-white hover:border-gray-300'
                     }`}
                   >
@@ -313,7 +313,7 @@ export const EnquadramentoClienteCard: React.FC<EnquadramentoClienteCardProps> =
                   value={outroSegmento}
                   onChange={(e) => setOutroSegmento(e.target.value)}
                   placeholder="Ex: Ótica, Joalheria, Materiais Esportivos..."
-                  className="w-full px-3 py-2 text-xs bg-white border border-[#E5E7EB] focus:border-[#2563EB] rounded-lg outline-none text-[#1F2937]"
+                  className="w-full px-3 py-2 text-xs bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-lg outline-none text-[#1F2937]"
                 />
               </div>
             )}
@@ -331,7 +331,7 @@ export const EnquadramentoClienteCard: React.FC<EnquadramentoClienteCardProps> =
                 type="button"
                 onClick={handleSalvar}
                 disabled={saving}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors disabled:opacity-60"
               >
                 <Save className="w-3.5 h-3.5" />
                 <span>{saving ? 'Salvando...' : 'Salvar Enquadramento'}</span>

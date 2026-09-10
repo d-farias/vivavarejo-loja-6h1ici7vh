@@ -83,7 +83,7 @@ export function ValidarValidadeModal({
         <DialogContent className="max-w-lg bg-white border border-[#E5E7EB] text-[#1F2937]">
           <DialogHeader>
             <DialogTitle className="text-base font-bold flex items-center gap-2 text-[#1F2937]">
-              <ShieldCheck className="w-5 h-5 text-[#2563EB]" />
+              <ShieldCheck className="w-5 h-5 text-[#0F766E]" />
               <span>
                 Validação de Tarefa —{' '}
                 {normalizarNomeCanonico(tarefa.validador_funcao_nome || 'Prevenção de Perdas')}
@@ -142,7 +142,7 @@ export function ValidarValidadeModal({
                     <button
                       type="button"
                       onClick={() => setVisualizadorOpen(true)}
-                      className="inline-flex items-center gap-1 text-[11px] text-[#2563EB] hover:underline font-semibold"
+                      className="inline-flex items-center gap-1 text-[11px] text-[#0F766E] hover:underline font-semibold"
                     >
                       <Eye className="w-3 h-3" />
                       <span>Abrir com zoom</span>
@@ -151,14 +151,14 @@ export function ValidarValidadeModal({
                 </div>
                 {loadingFoto && !fotoUrl ? (
                   <div className="h-32 flex flex-col items-center justify-center gap-2 border border-[#E5E7EB] rounded-lg bg-gray-50 text-xs text-[#6B7280]">
-                    <Loader2 className="w-4 h-4 animate-spin text-[#2563EB]" />
+                    <Loader2 className="w-4 h-4 animate-spin text-[#0F766E]" />
                     <span>Carregando foto segura...</span>
                   </div>
                 ) : fotoUrl ? (
                   <button
                     type="button"
                     onClick={() => setVisualizadorOpen(true)}
-                    className="w-full block border border-[#E5E7EB] rounded-lg overflow-hidden group relative hover:opacity-95 text-left focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40"
+                    className="w-full block border border-[#E5E7EB] rounded-lg overflow-hidden group relative hover:opacity-95 text-left focus:outline-none focus:ring-2 focus:ring-[#0F766E]/40"
                     title="Clique para abrir foto em tela cheia com zoom"
                   >
                     <img

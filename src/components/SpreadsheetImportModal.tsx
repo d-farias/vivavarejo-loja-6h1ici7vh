@@ -249,7 +249,7 @@ export function SpreadsheetImportModal({
         {/* Header */}
         <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center justify-between bg-white">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded bg-[#3B82F6]/10 text-[#2563EB] flex items-center justify-center">
+            <div className="w-8 h-8 rounded bg-teal-50 text-[#0F766E] border border-teal-200 flex items-center justify-center">
               <FileSpreadsheet className="w-4 h-4" />
             </div>
             <div>
@@ -284,7 +284,7 @@ export function SpreadsheetImportModal({
                   }}
                   className={`px-4 py-2 text-xs font-semibold border-b-2 transition-colors ${
                     importTab === 'file'
-                      ? 'border-[#2563EB] text-[#2563EB]'
+                      ? 'border-[#0F766E] text-[#0F766E]'
                       : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
                   }`}
                 >
@@ -298,7 +298,7 @@ export function SpreadsheetImportModal({
                   }}
                   className={`px-4 py-2 text-xs font-semibold border-b-2 transition-colors ${
                     importTab === 'paste'
-                      ? 'border-[#2563EB] text-[#2563EB]'
+                      ? 'border-[#0F766E] text-[#0F766E]'
                       : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
                   }`}
                 >
@@ -316,7 +316,7 @@ export function SpreadsheetImportModal({
               {importTab === 'file' ? (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-[#D1D5DB] hover:border-[#2563EB] rounded-lg p-8 text-center cursor-pointer transition-colors bg-[#F7F7F5]/50 hover:bg-[#3B82F6]/5 group"
+                  className="border-2 border-dashed border-[#D1D5DB] hover:border-[#0F766E] rounded-lg p-8 text-center cursor-pointer transition-colors bg-[#F7F7F5]/50 hover:bg-teal-50/20 group"
                 >
                   <input
                     ref={fileInputRef}
@@ -325,7 +325,7 @@ export function SpreadsheetImportModal({
                     onChange={handleFileChange}
                     className="hidden"
                   />
-                  <UploadCloud className="w-10 h-10 text-[#9CA3AF] group-hover:text-[#2563EB] mx-auto mb-3 transition-colors" />
+                  <UploadCloud className="w-10 h-10 text-[#9CA3AF] group-hover:text-[#0F766E] mx-auto mb-3 transition-colors" />
                   <p className="text-sm font-semibold text-[#1F2937]">
                     Clique aqui para selecionar a planilha
                   </p>
@@ -339,8 +339,8 @@ export function SpreadsheetImportModal({
                     <strong>Ferramenta</strong>, <strong>Validação</strong>, <strong>Área</strong>
                   </div>
 
-                  <div className="mt-3 p-2.5 rounded bg-blue-50/70 border border-blue-200/60 text-[11px] text-[#1F2937] max-w-lg mx-auto text-left leading-relaxed">
-                    <span className="font-bold text-[#2563EB]">
+                  <div className="mt-3 p-2.5 rounded bg-teal-50 border border-teal-200 text-[11px] text-[#1F2937] max-w-lg mx-auto text-left leading-relaxed">
+                    <span className="font-bold text-[#0F766E]">
                       A ponte da informação à execução:{' '}
                     </span>
                     O VivaVarejo é a camada entre a informação (ERP/BI) e a execução na loja —
@@ -358,7 +358,7 @@ export function SpreadsheetImportModal({
                     onChange={(e) => setPastedText(e.target.value)}
                     placeholder="Cole aqui (exemplo: Rotina;Responsavel;Horario;Frequencia...)"
                     rows={8}
-                    className="w-full p-2.5 text-xs font-mono bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+                    className="w-full p-2.5 text-xs font-mono bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
                   />
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] text-[#6B7280]">
@@ -368,7 +368,7 @@ export function SpreadsheetImportModal({
                       type="button"
                       onClick={handleProcessPastedText}
                       disabled={parsing || !pastedText.trim()}
-                      className="px-4 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors disabled:opacity-50"
+                      className="px-4 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md shadow-xs transition-colors disabled:opacity-50"
                     >
                       Processar Dados Colados
                     </button>
@@ -381,7 +381,7 @@ export function SpreadsheetImportModal({
               {/* Selected File Bar */}
               <div className="flex items-center justify-between p-3 rounded-lg bg-[#F7F7F5] border border-[#E5E7EB]">
                 <div className="flex items-center gap-2.5">
-                  <FileSpreadsheet className="w-5 h-5 text-[#2563EB]" />
+                  <FileSpreadsheet className="w-5 h-5 text-[#0F766E]" />
                   <div>
                     <span className="text-xs font-bold text-[#1F2937] block">{file.name}</span>
                     <span className="text-[11px] text-[#6B7280]">
@@ -403,7 +403,7 @@ export function SpreadsheetImportModal({
               {/* Parsing Indicator */}
               {parsing && (
                 <div className="p-4 text-center text-xs text-[#6B7280] flex items-center justify-center gap-2">
-                  <RefreshCw className="w-4 h-4 animate-spin text-[#2563EB]" />
+                  <RefreshCw className="w-4 h-4 animate-spin text-[#0F766E]" />
                   <span>Processando e estruturando dados da planilha no navegador...</span>
                 </div>
               )}
@@ -420,14 +420,15 @@ export function SpreadsheetImportModal({
               {lojas.length > 0 && (
                 <div className="p-3.5 rounded-lg bg-[#F7F7F5] border border-[#E5E7EB] space-y-1.5">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] flex items-center gap-1.5">
-                    <Store className="w-3.5 h-3.5 text-[#2563EB]" />
-                    <span>Loja de Destino das Rotinas</span>
+                    <Store className="w-3.5 h-3.5 text-[#0F766E]" />
+                    <span>Loja de Destino (Obrigatória)</span>
                   </label>
                   <select
                     value={targetLojaId}
                     onChange={(e) => setTargetLojaId(e.target.value)}
-                    className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+                    className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
                   >
+                    {' '}
                     <option value="">Nenhuma loja específica (Visível em todas)</option>
                     {lojas.map((l) => (
                       <option key={l.id} value={l.id}>
@@ -451,7 +452,7 @@ export function SpreadsheetImportModal({
                     <label
                       className={`flex items-start gap-2.5 p-2.5 rounded-md border cursor-pointer transition-colors ${
                         importMode === 'append'
-                          ? 'border-[#2563EB] bg-[#3B82F6]/5 font-semibold text-[#2563EB]'
+                          ? 'border-[#0F766E] bg-teal-50 font-semibold text-[#0F766E]'
                           : 'border-[#E5E7EB] text-[#4B5563] hover:bg-gray-50'
                       }`}
                     >
@@ -500,7 +501,7 @@ export function SpreadsheetImportModal({
                           type="checkbox"
                           checked={deduplicateOnImport}
                           onChange={(e) => setDeduplicateOnImport(e.target.checked)}
-                          className="rounded text-[#2563EB] focus:ring-[#2563EB]"
+                          className="rounded text-[#0F766E] focus:ring-[#0F766E]"
                         />
                         <span>
                           Ignorar rotinas com mesmo nome e horário já cadastradas na loja (evita
@@ -520,11 +521,11 @@ export function SpreadsheetImportModal({
                       type="checkbox"
                       checked={saveAsModelo}
                       onChange={(e) => setSaveAsModelo(e.target.checked)}
-                      className="mt-0.5 rounded text-[#2563EB] focus:ring-[#2563EB]"
+                      className="mt-0.5 rounded text-[#0F766E] focus:ring-[#0F766E]"
                     />
                     <div>
                       <span className="text-xs font-semibold text-[#1F2937] flex items-center gap-1.5">
-                        <Layers className="w-3.5 h-3.5 text-[#2563EB]" />
+                        <Layers className="w-3.5 h-3.5 text-[#0F766E]" />
                         <span>Salvar esta importação como modelo reutilizável</span>
                       </span>
                       <p className="text-[11px] text-[#6B7280]">
@@ -544,7 +545,7 @@ export function SpreadsheetImportModal({
                         value={modeloNome}
                         onChange={(e) => setModeloNome(e.target.value)}
                         placeholder="Ex: Modelo Padrão - Hipermercados"
-                        className="w-full px-3 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+                        className="w-full px-3 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
                       />
                     </div>
                   )}
@@ -584,7 +585,7 @@ export function SpreadsheetImportModal({
                             <td className="p-2 text-[#4B5563] whitespace-nowrap">
                               {row.responsavel}
                             </td>
-                            <td className="p-2 font-mono text-[11px] text-[#2563EB] whitespace-nowrap">
+                            <td className="p-2 font-mono text-[11px] text-[#0F766E] whitespace-nowrap">
                               {row.horario_limite || 'Integral'}
                             </td>
                             <td className="p-2 text-[#4B5563] whitespace-nowrap">
@@ -609,7 +610,7 @@ export function SpreadsheetImportModal({
 
               {/* Progress message during write */}
               {importing && (
-                <div className="p-3 bg-[#3B82F6]/10 border border-[#3B82F6]/25 rounded-md text-xs text-[#2563EB] flex items-center gap-2">
+                <div className="p-3 bg-teal-50 border border-teal-200 rounded-md text-xs text-[#0F766E] flex items-center gap-2">
                   <RefreshCw className="w-4 h-4 animate-spin" />
                   <span>{progressMsg}</span>
                 </div>
@@ -634,7 +635,7 @@ export function SpreadsheetImportModal({
               type="button"
               onClick={handleConfirmImport}
               disabled={importing}
-              className="px-5 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors disabled:opacity-60 flex items-center gap-2"
+              className="px-5 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md shadow-xs transition-colors disabled:opacity-60 flex items-center gap-2"
             >
               {importing ? (
                 <>
