@@ -98,41 +98,57 @@ export const visitasPromotorService = {
         },
   ): Promise<VisitaPromotor> {
     const nowIso = new Date().toISOString()
+    let rec: VisitaPromotor
     if (params instanceof FormData) {
       if (!params.has('status')) params.append('status', 'realizada')
       if (!params.has('realizada_em')) params.append('realizada_em', nowIso)
-      return await pb.collection('visitas_promotor').update<VisitaPromotor>(id, params, {
+      rec = await pb.collection('visitas_promotor').update<VisitaPromotor>(id, params, {
         expand: 'promotor,promotor.fornecedor,loja',
       })
+    } else {
+      rec = await pb.collection('visitas_promotor').update<VisitaPromotor>(
+        id,
+        {
+          status: 'realizada',
+          conclusao_check: params.conclusao_check,
+          rotinas_executadas: params.rotinas_executadas,
+          registrado_por: params.registrado_por,
+          realizada_em: nowIso,
+          checklist_abastecimento_100: params.checklist_abastecimento_100,
+          checklist_validades_ok: params.checklist_validades_ok,
+          checklist_layout_conforme: params.checklist_layout_conforme,
+          quantidade_sortimento: params.quantidade_sortimento,
+          perc_vendas: params.perc_vendas,
+          qtd_rupturas: params.qtd_rupturas,
+          itens_sem_vendas: params.itens_sem_vendas,
+          responsavel_execucao: params.responsavel_execucao,
+          validador_fiscalizacao: params.validador_fiscalizacao,
+          status_fiscalizacao: params.status_fiscalizacao || 'pendente',
+          foto_trabalho: params.foto_trabalho,
+          foto_gondola: params.foto_gondola,
+          foto_abastecimento: params.foto_abastecimento,
+          foto_validades: params.foto_validades,
+        },
+        {
+          expand: 'promotor,promotor.fornecedor,loja',
+        },
+      )
     }
 
-    return await pb.collection('visitas_promotor').update<VisitaPromotor>(
-      id,
-      {
-        status: 'realizada',
-        conclusao_check: params.conclusao_check,
-        rotinas_executadas: params.rotinas_executadas,
-        registrado_por: params.registrado_por,
-        realizada_em: nowIso,
-        checklist_abastecimento_100: params.checklist_abastecimento_100,
-        checklist_validades_ok: params.checklist_validades_ok,
-        checklist_layout_conforme: params.checklist_layout_conforme,
-        quantidade_sortimento: params.quantidade_sortimento,
-        perc_vendas: params.perc_vendas,
-        qtd_rupturas: params.qtd_rupturas,
-        itens_sem_vendas: params.itens_sem_vendas,
-        responsavel_execucao: params.responsavel_execucao,
-        validador_fiscalizacao: params.validador_fiscalizacao,
-        status_fiscalizacao: params.status_fiscalizacao || 'pendente',
-        foto_trabalho: params.foto_trabalho,
-        foto_gondola: params.foto_gondola,
-        foto_abastecimento: params.foto_abastecimento,
-        foto_validades: params.foto_validades,
-      },
-      {
-        expand: 'promotor,promotor.fornecedor,loja',
-      },
-    )
+    try {
+      const { auditoriaService } = await import('@/services/auditoria')
+      auditoriaService.registrar({
+        acao: 'conclusao',
+        modulo: 'visitas',
+        lojaId: rec.loja,
+        registro_id: id,
+        detalhes: `Visita de promotor concluída com checklist (Fornecedor: ${rec.expand?.promotor?.expand?.fornecedor?.nome || 'Fornecedor'})`,
+      })
+    } catch {
+      /* intentionally ignored */
+    }
+
+    return rec
   },
 
   async cancelarVisita(id: string, motivo?: string): Promise<VisitaPromotor> {

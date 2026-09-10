@@ -75,9 +75,13 @@ export default function Signup() {
     }
     if (!password) {
       errors.password = 'A senha é obrigatória'
-    } else if (password.length < 8) {
-      errors.password = 'A senha deve ter no mínimo 8 caracteres'
+    } else {
+      const strength = evaluatePasswordStrength(password)
+      if (!strength.isValid) {
+        errors.password = MSG_SENHA_REQUISITOS
+      }
     }
+
     if (password !== confirmPassword) {
       errors.confirmPassword = 'As senhas não coincidem'
     }

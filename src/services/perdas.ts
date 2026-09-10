@@ -49,9 +49,22 @@ export const perdasService = {
       if (data.registrado_por) formData.append('registrado_por', data.registrado_por)
       formData.append('foto', data.fotoFile)
 
-      return await pb.collection('perdas').create<Perda>(formData, {
+      const rec = await pb.collection('perdas').create<Perda>(formData, {
         expand: 'loja,registrado_por',
       })
+      try {
+        const { auditoriaService } = await import('@/services/auditoria')
+        auditoriaService.registrar({
+          acao: 'criacao',
+          modulo: 'perdas',
+          lojaId: data.loja,
+          registro_id: rec.id,
+          detalhes: `Perda registrada com foto: ${data.item_descricao || data.setor_categoria} (R$ ${data.valor_estimado})`,
+        })
+      } catch {
+        /* intentionally ignored */
+      }
+      return rec
     }
 
     const payload: Record<string, unknown> = {
@@ -66,12 +79,26 @@ export const perdasService = {
       registrado_por: data.registrado_por || '',
     }
 
-    return await pb.collection('perdas').create<Perda>(payload, {
+    const rec = await pb.collection('perdas').create<Perda>(payload, {
       expand: 'loja,registrado_por',
     })
+    try {
+      const { auditoriaService } = await import('@/services/auditoria')
+      auditoriaService.registrar({
+        acao: 'criacao',
+        modulo: 'perdas',
+        lojaId: data.loja,
+        registro_id: rec.id,
+        detalhes: `Perda registrada: ${data.item_descricao || data.setor_categoria} (R$ ${data.valor_estimado})`,
+      })
+    } catch {
+      /* intentionally ignored */
+    }
+    return rec
   },
 
   async update(id: string, data: Partial<Perda>, fotoFile?: File | null): Promise<Perda> {
+    let rec: Perda
     if (fotoFile) {
       const formData = new FormData()
       Object.entries(data).forEach(([k, v]) => {
@@ -80,22 +107,56 @@ export const perdasService = {
         }
       })
       formData.append('foto', fotoFile)
-      return await pb.collection('perdas').update<Perda>(id, formData, {
+      rec = await pb.collection('perdas').update<Perda>(id, formData, {
+        expand: 'loja,registrado_por',
+      })
+    } else {
+      rec = await pb.collection('perdas').update<Perda>(id, data, {
         expand: 'loja,registrado_por',
       })
     }
-
-    return await pb.collection('perdas').update<Perda>(id, data, {
-      expand: 'loja,registrado_por',
-    })
+    try {
+      const { auditoriaService } = await import('@/services/auditoria')
+      auditoriaService.registrar({
+        acao: 'alteracao',
+        modulo: 'perdas',
+        lojaId: rec.loja,
+        registro_id: id,
+        detalhes: `Perda atualizada: ${rec.item_descricao || id}`,
+      })
+    } catch {
+      /* intentionally ignored */
+    }
+    return rec
   },
 
   async delete(id: string): Promise<boolean> {
+    try {
+      const { auditoriaService } = await import('@/services/auditoria')
+      auditoriaService.registrar({
+        acao: 'exclusao',
+        modulo: 'perdas',
+        registro_id: id,
+        detalhes: `Perda excluída (ID: ${id})`,
+      })
+    } catch {
+      /* intentionally ignored */
+    }
     return await pb.collection('perdas').delete(id)
   },
 
   getFotoUrl(perda: Perda, thumb?: string): string | null {
     if (!perda.foto) return null
     return pb.files.getURL(perda, perda.foto, { thumb })
+  },
+
+  async getProtectedFotoUrl(perda: Perda, thumb?: string): Promise<string | null> {
+    if (!perda.foto) return null
+    try {
+      const token = await pb.files.getToken()
+      return pb.files.getURL(perda, perda.foto, { thumb, token })
+    } catch (_) {
+      return pb.files.getURL(perda, perda.foto, { thumb })
+    }
   },
 }

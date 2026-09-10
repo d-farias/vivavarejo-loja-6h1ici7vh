@@ -73,6 +73,9 @@ import { rotinasService, execucoesService } from '../services/rotinas'
 import type { Rotina, ExecucaoRotina } from '../types'
 import { Presentation, Headphones } from 'lucide-react'
 import { ContatosAtendimentoModal } from '../components/ContatosAtendimentoModal'
+import { AuditoriaAba } from '../components/AuditoriaAba'
+import { ProtecaoDadosSecao } from '../components/ProtecaoDadosSecao'
+import { ShieldCheck, History } from 'lucide-react'
 
 type TabType =
   | 'painel'
@@ -86,6 +89,8 @@ type TabType =
   | 'funcionarios'
   | 'promotores'
   | 'usuarios'
+  | 'auditoria'
+  | 'protecao_dados'
 
 export default function Admin() {
   const { user } = useAuth()
@@ -1170,6 +1175,40 @@ export default function Admin() {
             <span>Usuários & Perfis ({usuarios.length})</span>
           </button>
         )}
+
+        {/* Trilha de Auditoria: Visível para Admin Geral e Adm de Rede */}
+        {(isAdminGeral || isAdmRede) && (
+          <button
+            onClick={() => {
+              setActiveTab('auditoria')
+              setSearchTerm('')
+            }}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+              activeTab === 'auditoria'
+                ? 'border-[#2563EB] text-[#2563EB]'
+                : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
+            }`}
+          >
+            <History className="w-4 h-4 text-emerald-600" />
+            <span>Auditoria</span>
+          </button>
+        )}
+
+        {/* Proteção de Dados: Acessível na área Admin */}
+        <button
+          onClick={() => {
+            setActiveTab('protecao_dados')
+            setSearchTerm('')
+          }}
+          className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+            activeTab === 'protecao_dados'
+              ? 'border-[#2563EB] text-[#2563EB]'
+              : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
+          }`}
+        >
+          <ShieldCheck className="w-4 h-4 text-[#2563EB]" />
+          <span>Proteção de Dados</span>
+        </button>
       </div>
       {/* Skeletons on loading */}
       {loading ? (
@@ -2465,6 +2504,18 @@ export default function Admin() {
               )}
             </div>
           )}
+
+          {/* ======================= ABA AUDITORIA ======================= */}
+          {activeTab === 'auditoria' && (isAdminGeral || isAdmRede) && (
+            <AuditoriaAba
+              lojas={lojas}
+              usuarios={usuarios}
+              clienteId={isAdmRede ? user?.cliente : undefined}
+            />
+          )}
+
+          {/* ======================= ABA PROTEÇÃO DE DADOS ======================= */}
+          {activeTab === 'protecao_dados' && <ProtecaoDadosSecao />}
         </>
       )}
 

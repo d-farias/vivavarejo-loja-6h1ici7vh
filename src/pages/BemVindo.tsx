@@ -864,6 +864,26 @@ export default function BemVindo() {
             </div>
           </div>
 
+          {/* Resumo de Segurança e Proteção de Dados VivaVarejo */}
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-start gap-2.5">
+              <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+              <div>
+                <div className="font-semibold text-slate-800">
+                  Plataforma Blindada & Dados Isolados por Rede
+                </div>
+                <p className="text-slate-600 text-[11px] mt-0.5">
+                  Arquitetura multi-inquilino com sigilo absoluto entre redes, trilha de auditoria
+                  contínua, tráfego criptografado e fotos de gôndola com links protegidos.
+                </p>
+              </div>
+            </div>
+            <div className="shrink-0 flex items-center gap-2">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-medium text-[10px]">
+                100% Conforme LGPD
+              </span>
+            </div>
+          </div>
           {/* Linha de contato e redes sociais: Instagram, LinkedIn, WhatsApp e E-mail de dúvidas */}
           <div className="pt-4 border-t border-[#E5E7EB] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-[#4B5563]">
             {/* Redes Sociais: Instagram, LinkedIn, WhatsApp (nesta ordem) */}

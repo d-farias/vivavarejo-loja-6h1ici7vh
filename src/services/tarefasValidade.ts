@@ -165,6 +165,8 @@ export const tarefasValidadeService = {
     },
   ): Promise<TarefaValidade> {
     const concluidaEm = new Date().toISOString()
+    let rec: TarefaValidade
+
     if (params.fotoFile) {
       const formData = new FormData()
       formData.append('status', 'aguardando_validacao')
@@ -172,32 +174,47 @@ export const tarefasValidadeService = {
       formData.append('concluida_por', params.userId)
       formData.append('concluida_em', concluidaEm)
       formData.append('foto', params.fotoFile)
-      return await pb.collection('tarefas_validade').update<TarefaValidade>(id, formData, {
+      rec = await pb.collection('tarefas_validade').update<TarefaValidade>(id, formData, {
         expand:
           'loja,executor_usuario,validador_funcao,validador_usuario,concluida_por,validado_por',
       })
+    } else {
+      rec = await pb.collection('tarefas_validade').update<TarefaValidade>(
+        id,
+        {
+          status: 'aguardando_validacao',
+          observacao_execucao: params.observacao || '',
+          concluida_por: params.userId,
+          concluida_em: concluidaEm,
+        },
+        {
+          expand:
+            'loja,executor_usuario,validador_funcao,validador_usuario,concluida_por,validado_por',
+        },
+      )
     }
 
-    return await pb.collection('tarefas_validade').update<TarefaValidade>(
-      id,
-      {
-        status: 'aguardando_validacao',
-        observacao_execucao: params.observacao || '',
-        concluida_por: params.userId,
-        concluida_em: concluidaEm,
-      },
-      {
-        expand:
-          'loja,executor_usuario,validador_funcao,validador_usuario,concluida_por,validado_por',
-      },
-    )
+    try {
+      const { auditoriaService } = await import('@/services/auditoria')
+      auditoriaService.registrar({
+        acao: 'conclusao',
+        modulo: 'validades',
+        lojaId: rec.loja,
+        registro_id: id,
+        detalhes: `Auditoria de validade enviada para validação: ${rec.setor_categoria || rec.descricao}`,
+      })
+    } catch {
+      /* intentionally ignored */
+    }
+
+    return rec
   },
 
   /**
    * Validação pelo Líder Prevenção: Aprovar tarefa
    */
   async aprovarTarefa(id: string, validadorId: string): Promise<TarefaValidade> {
-    return await pb.collection('tarefas_validade').update<TarefaValidade>(
+    const rec = await pb.collection('tarefas_validade').update<TarefaValidade>(
       id,
       {
         status: 'aprovada',
@@ -209,6 +226,21 @@ export const tarefasValidadeService = {
           'loja,executor_usuario,validador_funcao,validador_usuario,concluida_por,validado_por',
       },
     )
+
+    try {
+      const { auditoriaService } = await import('@/services/auditoria')
+      auditoriaService.registrar({
+        acao: 'validacao',
+        modulo: 'validades',
+        lojaId: rec.loja,
+        registro_id: id,
+        detalhes: `Tarefa de validade aprovada pelo líder: ${rec.setor_categoria || rec.descricao}`,
+      })
+    } catch {
+      /* intentionally ignored */
+    }
+
+    return rec
   },
 
   /**
@@ -219,7 +251,7 @@ export const tarefasValidadeService = {
     validadorId: string,
     comentario: string,
   ): Promise<TarefaValidade> {
-    return await pb.collection('tarefas_validade').update<TarefaValidade>(
+    const rec = await pb.collection('tarefas_validade').update<TarefaValidade>(
       id,
       {
         status: 'devolvida',
@@ -232,6 +264,21 @@ export const tarefasValidadeService = {
           'loja,executor_usuario,validador_funcao,validador_usuario,concluida_por,validado_por',
       },
     )
+
+    try {
+      const { auditoriaService } = await import('@/services/auditoria')
+      auditoriaService.registrar({
+        acao: 'validacao',
+        modulo: 'validades',
+        lojaId: rec.loja,
+        registro_id: id,
+        detalhes: `Tarefa de validade devolvida com observação: "${comentario}"`,
+      })
+    } catch {
+      /* intentionally ignored */
+    }
+
+    return rec
   },
 
   /**
@@ -357,5 +404,15 @@ export const tarefasValidadeService = {
   getFotoUrl(tarefa: TarefaValidade, thumb?: string): string | null {
     if (!tarefa.foto) return null
     return pb.files.getURL(tarefa, tarefa.foto, { thumb })
+  },
+
+  async getProtectedFotoUrl(tarefa: TarefaValidade, thumb?: string): Promise<string | null> {
+    if (!tarefa.foto) return null
+    try {
+      const token = await pb.files.getToken()
+      return pb.files.getURL(tarefa, tarefa.foto, { thumb, token })
+    } catch (_) {
+      return pb.files.getURL(tarefa, tarefa.foto, { thumb })
+    }
   },
 }

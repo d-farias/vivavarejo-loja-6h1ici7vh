@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-09-09T14:03:18.495Z",
+  "generatedAt": "2026-09-10T00:14:08.953Z",
   "collections": [
     {
       "name": "users",
       "type": "auth",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "",
-        "update": "@request.auth.id != '' && (id = @request.auth.id || @request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
-        "delete": "@request.auth.id != '' && (id = @request.auth.id || @request.auth.perfil = 'admin')"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || cliente = @request.auth.cliente || id = @request.auth.id)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || cliente = @request.auth.cliente || id = @request.auth.id)",
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
+        "update": "@request.auth.id != '' && (id = @request.auth.id || @request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && cliente = @request.auth.cliente))",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && cliente = @request.auth.cliente))"
       },
       "fields": [
         {
@@ -80,11 +80,11 @@
       "name": "rotinas",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede' || @request.auth.perfil = 'lider' || @request.auth.perfil = '')",
-        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede' || @request.auth.perfil = 'lider' || @request.auth.perfil = '')",
-        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede' || @request.auth.perfil = 'lider' || @request.auth.perfil = '')"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente || loja = null)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente || loja = null)",
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede' || @request.auth.perfil = 'lider')",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (loja = null || loja.cliente = @request.auth.cliente)) || @request.auth.perfil = 'lider')",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (loja = null || loja.cliente = @request.auth.cliente)))"
       },
       "fields": [
         {
@@ -213,18 +213,19 @@
         "CREATE INDEX idx_rotinas_area ON rotinas (area)",
         "CREATE INDEX idx_rotinas_created ON rotinas (created)",
         "CREATE INDEX `idx_rotinas_loja` ON `rotinas` (loja)",
-        "CREATE INDEX `idx_rotinas_funcao` ON `rotinas` (funcao)"
+        "CREATE INDEX `idx_rotinas_funcao` ON `rotinas` (funcao)",
+        "CREATE INDEX `idx_rotinas_loja_status` ON `rotinas` (loja, status)"
       ]
     },
     {
       "name": "execucoes_rotinas",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || rotina.loja.cliente = @request.auth.cliente || rotina.loja = null)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || rotina.loja.cliente = @request.auth.cliente || rotina.loja = null)",
         "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'regional' || @request.auth.id = usuario)"
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || rotina.loja.cliente = @request.auth.cliente || rotina.loja = null)",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (rotina.loja = null || rotina.loja.cliente = @request.auth.cliente)))"
       },
       "fields": [
         {
@@ -328,17 +329,18 @@
         "CREATE INDEX idx_execucoes_rotina ON execucoes_rotinas (rotina)",
         "CREATE INDEX idx_execucoes_usuario ON execucoes_rotinas (usuario)",
         "CREATE INDEX idx_execucoes_data ON execucoes_rotinas (data_execucao)",
-        "CREATE INDEX `idx_execs_status_validacao` ON `execucoes_rotinas` (status_validacao)"
+        "CREATE INDEX `idx_execs_status_validacao` ON `execucoes_rotinas` (status_validacao)",
+        "CREATE INDEX `idx_execucoes_rotina_data_concluida` ON `execucoes_rotinas` (rotina, data_execucao, concluida)"
       ]
     },
     {
       "name": "clientes",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && @request.auth.cliente = id))",
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || id = @request.auth.cliente)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || id = @request.auth.cliente)",
+        "create": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && id = @request.auth.cliente))",
         "delete": "@request.auth.id != '' && @request.auth.perfil = 'admin'"
       },
       "fields": [
@@ -436,11 +438,11 @@
       "name": "lojas",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
-        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
-        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || cliente = @request.auth.cliente)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || cliente = @request.auth.cliente)",
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && cliente = @request.auth.cliente))",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && cliente = @request.auth.cliente))",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && cliente = @request.auth.cliente))"
       },
       "fields": [
         {
@@ -504,11 +506,11 @@
       "name": "funcoes",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
-        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
-        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && loja.cliente = @request.auth.cliente))",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && loja.cliente = @request.auth.cliente))",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && loja.cliente = @request.auth.cliente))"
       },
       "fields": [
         {
@@ -561,11 +563,11 @@
       "name": "funcionarios",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
-        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
-        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && loja.cliente = @request.auth.cliente))",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && loja.cliente = @request.auth.cliente))",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && loja.cliente = @request.auth.cliente))"
       },
       "fields": [
         {
@@ -633,11 +635,11 @@
       "name": "modelos_rotinas",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || cliente = @request.auth.cliente || cliente = null)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || cliente = @request.auth.cliente || cliente = null)",
         "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
-        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
-        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')"
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (cliente = null || cliente = @request.auth.cliente)))",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (cliente = null || cliente = @request.auth.cliente)))"
       },
       "fields": [
         {
@@ -696,11 +698,11 @@
       "name": "modelos_rotinas_itens",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || modelo.cliente = @request.auth.cliente || modelo.cliente = null)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || modelo.cliente = @request.auth.cliente || modelo.cliente = null)",
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || @request.auth.perfil = 'adm_rede')",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (modelo.cliente = null || modelo.cliente = @request.auth.cliente)))",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (modelo.cliente = null || modelo.cliente = @request.auth.cliente)))"
       },
       "fields": [
         {
@@ -789,11 +791,11 @@
       "name": "planos_acao",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente || loja = null)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente || loja = null)",
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente || loja = null)",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente || loja = null)",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (loja = null || loja.cliente = @request.auth.cliente)))"
       },
       "fields": [
         {
@@ -889,11 +891,11 @@
       "name": "fornecedores",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || cliente = @request.auth.cliente || cliente = null)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || cliente = @request.auth.cliente || cliente = null)",
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && cliente = @request.auth.cliente))",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (cliente = null || cliente = @request.auth.cliente)))",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (cliente = null || cliente = @request.auth.cliente)))"
       },
       "fields": [
         {
@@ -1013,11 +1015,11 @@
       "name": "promotores",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || fornecedor.cliente = @request.auth.cliente || fornecedor.cliente = null)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || fornecedor.cliente = @request.auth.cliente || fornecedor.cliente = null)",
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (fornecedor.cliente = @request.auth.cliente || fornecedor.cliente = null)))",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (fornecedor.cliente = @request.auth.cliente || fornecedor.cliente = null)))",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (fornecedor.cliente = @request.auth.cliente || fornecedor.cliente = null)))"
       },
       "fields": [
         {
@@ -1084,11 +1086,11 @@
       "name": "rotinas_promotor",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente || loja = null)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente || loja = null)",
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (loja = null || loja.cliente = @request.auth.cliente)))",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (loja = null || loja.cliente = @request.auth.cliente)))",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && (loja = null || loja.cliente = @request.auth.cliente)))"
       },
       "fields": [
         {
@@ -1160,11 +1162,11 @@
       "name": "visitas_promotor",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && loja.cliente = @request.auth.cliente))"
       },
       "fields": [
         {
@@ -1347,17 +1349,18 @@
         "CREATE INDEX idx_visitas_promotor ON visitas_promotor (promotor)",
         "CREATE INDEX idx_visitas_loja ON visitas_promotor (loja)",
         "CREATE INDEX idx_visitas_data ON visitas_promotor (data_visita)",
-        "CREATE INDEX idx_visitas_status ON visitas_promotor (status)"
+        "CREATE INDEX idx_visitas_status ON visitas_promotor (status)",
+        "CREATE INDEX `idx_visitas_loja_data_status` ON `visitas_promotor` (loja, data_visita, status)"
       ]
     },
     {
       "name": "atendimentos",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || usuario = @request.auth.id)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || usuario = @request.auth.id)",
         "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != '' && (usuario = @request.auth.id || @request.auth.perfil = 'admin')",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || usuario = @request.auth.id)",
         "delete": "@request.auth.id != '' && @request.auth.perfil = 'admin'"
       },
       "fields": [
@@ -1442,11 +1445,11 @@
       "name": "tarefas_validade",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && loja.cliente = @request.auth.cliente))"
       },
       "fields": [
         {
@@ -1639,18 +1642,19 @@
         "CREATE INDEX idx_tv_setor ON tarefas_validade (setor_categoria)",
         "CREATE INDEX idx_tv_data ON tarefas_validade (data_especifica)",
         "CREATE INDEX idx_tv_horario_inicio ON tarefas_validade (horario_inicio)",
-        "CREATE INDEX `idx_tv_semana_mes` ON `tarefas_validade` (semana_mes)"
+        "CREATE INDEX `idx_tv_semana_mes` ON `tarefas_validade` (semana_mes)",
+        "CREATE INDEX `idx_tv_loja_status_data` ON `tarefas_validade` (loja, status, data_especifica)"
       ]
     },
     {
       "name": "inventarios",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && loja.cliente = @request.auth.cliente))"
       },
       "fields": [
         {
@@ -1750,11 +1754,11 @@
       "name": "perdas",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "create": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || loja.cliente = @request.auth.cliente)",
+        "delete": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && loja.cliente = @request.auth.cliente))"
       },
       "fields": [
         {
@@ -1840,7 +1844,8 @@
         "CREATE INDEX idx_perdas_data ON perdas (data)",
         "CREATE INDEX idx_perdas_setor ON perdas (setor_categoria)",
         "CREATE INDEX idx_perdas_motivo ON perdas (motivo)",
-        "CREATE INDEX idx_perdas_registrado_por ON perdas (registrado_por)"
+        "CREATE INDEX idx_perdas_registrado_por ON perdas (registrado_por)",
+        "CREATE INDEX `idx_perdas_loja_data` ON `perdas` (loja, data)"
       ]
     },
     {
@@ -1894,6 +1899,114 @@
         }
       ],
       "indexes": ["CREATE UNIQUE INDEX idx_config_chave ON configuracoes_sistema (chave)"]
+    },
+    {
+      "name": "auditoria_acoes",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && cliente = @request.auth.cliente))",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'admin' || (@request.auth.perfil = 'adm_rede' && cliente = @request.auth.cliente))",
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "usuario",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "usuario_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "usuario_perfil",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cliente",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "clientes"
+        },
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "acao",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "criacao",
+            "alteracao",
+            "exclusao",
+            "conclusao",
+            "validacao",
+            "login",
+            "troca_senha"
+          ]
+        },
+        {
+          "name": "modulo",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "rotinas",
+            "execucoes",
+            "validades",
+            "perdas",
+            "inventarios",
+            "promotores",
+            "visitas",
+            "usuarios",
+            "lojas",
+            "configuracoes"
+          ]
+        },
+        {
+          "name": "registro_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "detalhes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_auditoria_cliente_created ON auditoria_acoes (cliente, created DESC)"
+      ]
     }
   ]
 }

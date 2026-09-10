@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   X,
   Calendar,
@@ -9,9 +9,11 @@ import {
   RotateCcw,
   Maximize2,
   Download,
+  Loader2,
 } from 'lucide-react'
 import type { ExecucaoRotina, Rotina } from '@/types'
 import { execucoesService } from '@/services/rotinas'
+import { getFileToken } from '@/lib/pocketbase/files'
 
 interface FotoVisualizadorModalProps {
   isOpen: boolean
@@ -37,16 +39,60 @@ export const FotoVisualizadorModal: React.FC<FotoVisualizadorModalProps> = ({
 }) => {
   const [zoomLevel, setZoomLevel] = useState<number>(1)
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false)
+  const [authedUrl, setAuthedUrl] = useState<string | null>(null)
+  const [loadingToken, setLoadingToken] = useState(false)
+
+  // Resolver URL com token para arquivos protegidos
+  useEffect(() => {
+    if (!isOpen) {
+      setAuthedUrl(null)
+      return
+    }
+
+    let rawUrl: string | null = fotoUrl || null
+    if (!rawUrl && execucao && execucao.foto) {
+      rawUrl = execucoesService.getFotoUrl(execucao)
+    }
+
+    if (!rawUrl) {
+      setAuthedUrl(null)
+      return
+    }
+
+    // Se já tiver query param token, usa direto
+    if (rawUrl.includes('token=')) {
+      setAuthedUrl(rawUrl)
+      return
+    }
+
+    // Buscar token de arquivo protegido
+    setLoadingToken(true)
+    getFileToken()
+      .then((token) => {
+        if (!token) {
+          setAuthedUrl(rawUrl)
+          return
+        }
+        const separator = rawUrl.includes('?') ? '&' : '?'
+        setAuthedUrl(`${rawUrl}${separator}token=${encodeURIComponent(token)}`)
+      })
+      .catch(() => {
+        setAuthedUrl(rawUrl)
+      })
+      .finally(() => {
+        setLoadingToken(false)
+      })
+  }, [isOpen, fotoUrl, execucao])
 
   if (!isOpen) return null
 
-  // Resolver URL da foto
-  let resolvedUrl: string | null = fotoUrl || null
-  if (!resolvedUrl && execucao && execucao.foto) {
-    resolvedUrl = execucoesService.getFotoUrl(execucao)
+  let initialUrl: string | null = fotoUrl || null
+  if (!initialUrl && execucao && execucao.foto) {
+    initialUrl = execucoesService.getFotoUrl(execucao)
   }
+  if (!initialUrl && !authedUrl) return null
 
-  if (!resolvedUrl) return null
+  const resolvedUrl = authedUrl || initialUrl
 
   const rotinaNome =
     titulo || rotina?.nome || execucao?.expand?.rotina?.nome || 'Comprovação Visual'
@@ -158,16 +204,23 @@ export const FotoVisualizadorModal: React.FC<FotoVisualizadorModalProps> = ({
 
         {/* Imagem com suporte a zoom e scroll suave */}
         <div className="relative flex-1 bg-neutral-950 flex items-center justify-center overflow-auto p-2 select-none min-h-[240px] touch-pan-x touch-pan-y">
-          <img
-            src={resolvedUrl}
-            alt={rotinaNome}
-            style={{
-              transform: `scale(${zoomLevel})`,
-              transformOrigin: 'center center',
-              transition: 'transform 0.15s ease-out',
-            }}
-            className="max-h-[64vh] max-w-full object-contain rounded shadow-lg"
-          />
+          {loadingToken && !authedUrl ? (
+            <div className="flex flex-col items-center gap-2 text-gray-400 py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-[#2563EB]" />
+              <span className="text-xs">Carregando imagem segura...</span>
+            </div>
+          ) : resolvedUrl ? (
+            <img
+              src={resolvedUrl}
+              alt={rotinaNome}
+              style={{
+                transform: `scale(${zoomLevel})`,
+                transformOrigin: 'center center',
+                transition: 'transform 0.15s ease-out',
+              }}
+              className="max-h-[64vh] max-w-full object-contain rounded shadow-lg"
+            />
+          ) : null}
         </div>
 
         {/* Footer info e ações */}

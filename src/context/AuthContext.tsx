@@ -91,6 +91,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setUser(authData.record)
     setToken(authData.token)
+
+    // Registrar auditoria de login
+    try {
+      await pb.collection('auditoria_acoes').create({
+        usuario: authData.record.id,
+        usuario_nome: authData.record.name || authData.record.email,
+        usuario_perfil: authData.record.perfil || 'lider',
+        cliente: authData.record.cliente || undefined,
+        acao: 'login',
+        modulo: 'usuarios',
+        detalhes: `Login realizado por ${authData.record.email}`,
+      })
+    } catch {
+      /* intentionally ignored */
+    }
   }
 
   const signup = async (

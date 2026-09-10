@@ -30,6 +30,7 @@ import { ConcluirVisitaModal, type CriterioFoco } from '@/components/ConcluirVis
 import { RotinaPromotorModal } from '@/components/RotinaPromotorModal'
 import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
 import { buildWhatsAppLink, formatPhoneBR } from '@/lib/phone-utils'
+import { getFileToken } from '@/lib/pocketbase/files'
 
 interface PromotoresFornecedoresManagerProps {
   visitas: VisitaPromotor[]
@@ -112,6 +113,32 @@ export function PromotoresFornecedoresManager({
     fotoUrl: null,
     titulo: '',
   })
+
+  // Função auxiliar para abrir foto garantindo token de segurança
+  const handleOpenFotoSegura = async (
+    rawUrl: string,
+    titulo?: string,
+    subtitulo?: string,
+    dataHora?: string,
+  ) => {
+    let finalUrl = rawUrl
+    try {
+      const token = await getFileToken()
+      if (token && !finalUrl.includes('token=')) {
+        const sep = finalUrl.includes('?') ? '&' : '?'
+        finalUrl = `${finalUrl}${sep}token=${encodeURIComponent(token)}`
+      }
+    } catch {
+      /* intentionally ignored */
+    }
+    setFotoModalState({
+      isOpen: true,
+      fotoUrl: finalUrl,
+      titulo: titulo || '',
+      subtitulo,
+      dataHora,
+    })
+  }
 
   const pbBase = (import.meta as any).env.VITE_POCKETBASE_URL || ''
 
@@ -749,15 +776,14 @@ export function PromotoresFornecedoresManager({
                                     type="button"
                                     onClick={() => {
                                       if (fotoGondolaUrl) {
-                                        setFotoModalState({
-                                          isOpen: true,
-                                          fotoUrl: fotoGondolaUrl,
-                                          titulo: `Gôndola / Layout: ${fObj?.nome || 'Fornecedor'}`,
-                                          subtitulo: `Comprovação de exposição na loja ${lObj?.nome || 'Loja'}`,
-                                          dataHora: v.data_visita
+                                        handleOpenFotoSegura(
+                                          fotoGondolaUrl,
+                                          `Gôndola / Layout: ${fObj?.nome || 'Fornecedor'}`,
+                                          `Comprovação de exposição na loja ${lObj?.nome || 'Loja'}`,
+                                          v.data_visita
                                             ? v.data_visita.substring(0, 10)
                                             : undefined,
-                                        })
+                                        )
                                       } else {
                                         setVisitaParaConcluir(v)
                                         setFocoCriterio('layout')
@@ -797,15 +823,14 @@ export function PromotoresFornecedoresManager({
                                     type="button"
                                     onClick={() => {
                                       if (fotoAbastecimentoUrl) {
-                                        setFotoModalState({
-                                          isOpen: true,
-                                          fotoUrl: fotoAbastecimentoUrl,
-                                          titulo: `Abastecimento 100%: ${fObj?.nome || 'Fornecedor'}`,
-                                          subtitulo: `Comprovação de abastecimento na loja ${lObj?.nome || 'Loja'}`,
-                                          dataHora: v.data_visita
+                                        handleOpenFotoSegura(
+                                          fotoAbastecimentoUrl,
+                                          `Abastecimento 100%: ${fObj?.nome || 'Fornecedor'}`,
+                                          `Comprovação de abastecimento na loja ${lObj?.nome || 'Loja'}`,
+                                          v.data_visita
                                             ? v.data_visita.substring(0, 10)
                                             : undefined,
-                                        })
+                                        )
                                       } else {
                                         setVisitaParaConcluir(v)
                                         setFocoCriterio('abastecimento')
@@ -849,15 +874,14 @@ export function PromotoresFornecedoresManager({
                                     type="button"
                                     onClick={() => {
                                       if (fotoValidadesUrl) {
-                                        setFotoModalState({
-                                          isOpen: true,
-                                          fotoUrl: fotoValidadesUrl,
-                                          titulo: `Validades Auditadas: ${fObj?.nome || 'Fornecedor'}`,
-                                          subtitulo: `Auditoria de validades na loja ${lObj?.nome || 'Loja'}`,
-                                          dataHora: v.data_visita
+                                        handleOpenFotoSegura(
+                                          fotoValidadesUrl,
+                                          `Validades Auditadas: ${fObj?.nome || 'Fornecedor'}`,
+                                          `Auditoria de validades na loja ${lObj?.nome || 'Loja'}`,
+                                          v.data_visita
                                             ? v.data_visita.substring(0, 10)
                                             : undefined,
-                                        })
+                                        )
                                       } else {
                                         setVisitaParaConcluir(v)
                                         setFocoCriterio('validades')
@@ -924,15 +948,12 @@ export function PromotoresFornecedoresManager({
                                   type="button"
                                   onClick={() => {
                                     const url = `${pbBase}/api/files/visitas_promotor/${v.id}/${v.foto_trabalho}`
-                                    setFotoModalState({
-                                      isOpen: true,
-                                      fotoUrl: url,
-                                      titulo: `Foto da Visita: ${pObj?.nome || 'Promotor'}`,
-                                      subtitulo: `Loja ${lObj?.nome || 'Loja'} - ${v.data_visita ? v.data_visita.substring(0, 10) : ''}`,
-                                      dataHora: v.data_visita
-                                        ? v.data_visita.substring(0, 10)
-                                        : undefined,
-                                    })
+                                    handleOpenFotoSegura(
+                                      url,
+                                      `Foto da Visita: ${pObj?.nome || 'Promotor'}`,
+                                      `Loja ${lObj?.nome || 'Loja'} - ${v.data_visita ? v.data_visita.substring(0, 10) : ''}`,
+                                      v.data_visita ? v.data_visita.substring(0, 10) : undefined,
+                                    )
                                   }}
                                   className="inline-flex items-center gap-1 text-[11px] text-[#2563EB] hover:underline font-semibold mt-0.5"
                                 >
@@ -1464,12 +1485,11 @@ export function PromotoresFornecedoresManager({
                                   type="button"
                                   onClick={() => {
                                     if (rotinaFotoUrl) {
-                                      setFotoModalState({
-                                        isOpen: true,
-                                        fotoUrl: rotinaFotoUrl,
-                                        titulo: r.titulo,
-                                        subtitulo: `Foto de execução da rotina (${fObj?.nome || 'Fornecedor'})`,
-                                      })
+                                      handleOpenFotoSegura(
+                                        rotinaFotoUrl,
+                                        `Foto da Rotina: ${r.titulo}`,
+                                        `Foto de execução da rotina (${fObj?.nome || 'Fornecedor'})`,
+                                      )
                                     }
                                   }}
                                   className="font-bold text-[#1F2937] hover:text-[#2563EB] inline-flex items-center gap-1.5 transition-colors text-left"

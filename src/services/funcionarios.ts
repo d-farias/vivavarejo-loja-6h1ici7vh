@@ -67,7 +67,19 @@ export const usersService = {
   },
 
   async update(userId: string, data: Partial<User>): Promise<User> {
-    return await pb.collection('users').update<User>(userId, data)
+    const user = await pb.collection('users').update<User>(userId, data)
+    try {
+      const { auditoriaService } = await import('@/services/auditoria')
+      auditoriaService.registrar({
+        acao: 'alteracao',
+        modulo: 'usuarios',
+        registro_id: userId,
+        detalhes: `Usuário atualizado: ${user.name || user.email}`,
+      })
+    } catch {
+      /* intentionally ignored */
+    }
+    return user
   },
 
   async create(data: {
@@ -80,14 +92,39 @@ export const usersService = {
     telefone?: string
     ativo?: boolean
   }): Promise<User> {
-    return await pb.collection('users').create<User>(data)
+    const user = await pb.collection('users').create<User>(data)
+    try {
+      const { auditoriaService } = await import('@/services/auditoria')
+      auditoriaService.registrar({
+        acao: 'criacao',
+        modulo: 'usuarios',
+        registro_id: user.id,
+        clienteId: user.cliente,
+        detalhes: `Usuário criado: ${user.name} (${user.email}, perfil: ${user.perfil})`,
+      })
+    } catch {
+      /* intentionally ignored */
+    }
+    return user
   },
 
   async resetPassword(userId: string, novaSenha: string): Promise<User> {
-    return await pb.collection('users').update<User>(userId, {
+    const user = await pb.collection('users').update<User>(userId, {
       password: novaSenha,
       passwordConfirm: novaSenha,
     })
+    try {
+      const { auditoriaService } = await import('@/services/auditoria')
+      auditoriaService.registrar({
+        acao: 'troca_senha',
+        modulo: 'usuarios',
+        registro_id: userId,
+        detalhes: `Senha do usuário resetada pelo administrador (${user.email})`,
+      })
+    } catch {
+      /* intentionally ignored */
+    }
+    return user
   },
 
   async requestPasswordReset(email: string): Promise<boolean> {

@@ -8,6 +8,12 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { KeyRound, Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { auditoriaService } from '@/services/auditoria'
+import {
+  PasswordStrengthMeter,
+  evaluatePasswordStrength,
+  MSG_SENHA_REQUISITOS,
+} from '@/components/PasswordStrengthMeter'
 
 interface ChangePasswordModalProps {
   open: boolean
@@ -46,13 +52,9 @@ export function ChangePasswordModal({
     setErrorMsg(null)
     setSuccessMsg(null)
 
-    if (!oldPassword) {
-      setErrorMsg('Informe sua senha atual.')
-      return
-    }
-
-    if (password.length < 8) {
-      setErrorMsg('A nova senha deve ter no mínimo 8 caracteres.')
+    const strength = evaluatePasswordStrength(password)
+    if (!strength.isValid) {
+      setErrorMsg(MSG_SENHA_REQUISITOS)
       return
     }
 
@@ -81,6 +83,14 @@ export function ChangePasswordModal({
 
       // 3. Atualizar a sessão local com as novas credenciais
       await pb.collection('users').authWithPassword(userEmail, password)
+
+      // Registrar auditoria
+      auditoriaService.registrar({
+        acao: 'troca_senha',
+        modulo: 'usuarios',
+        registro_id: userId,
+        detalhes: `Troca de senha efetuada com sucesso pelo próprio usuário (${userEmail})`,
+      })
 
       setSuccessMsg('Senha alterada com sucesso!')
       setTimeout(() => {
@@ -174,7 +184,7 @@ export function ChangePasswordModal({
                 required
                 minLength={8}
                 disabled={loading}
-                placeholder="Mínimo 8 caracteres"
+                placeholder="Mínimo 8 caracteres (letras e números)"
                 className="w-full pr-10 pl-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/20 text-[#1F2937]"
               />
               <button
@@ -186,9 +196,7 @@ export function ChangePasswordModal({
                 {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            <p className="text-[11px] text-[#6B7280] mt-1">
-              Dica: misture letras maiúsculas, números e símbolos para mais segurança.
-            </p>
+            <PasswordStrengthMeter password={password} />
           </div>
 
           <div>

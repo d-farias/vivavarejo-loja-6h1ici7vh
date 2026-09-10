@@ -240,12 +240,24 @@ export const execucoesService = {
   },
 
   async aprovarExecucao(execucaoId: string, validadorId: string): Promise<ExecucaoRotina> {
-    return await pb.collection('execucoes_rotinas').update<ExecucaoRotina>(execucaoId, {
+    const updated = await pb.collection('execucoes_rotinas').update<ExecucaoRotina>(execucaoId, {
       status_validacao: 'aprovada',
       validado_por: validadorId,
       validado_em: new Date().toISOString(),
       concluida: true,
     })
+    try {
+      const { auditoriaService } = await import('@/services/auditoria')
+      auditoriaService.registrar({
+        acao: 'validacao',
+        modulo: 'execucoes',
+        registro_id: execucaoId,
+        detalhes: 'Execução de rotina validada e aprovada pelo líder',
+      })
+    } catch {
+      /* intentionally ignored */
+    }
+    return updated
   },
 
   async devolverExecucao(
@@ -253,13 +265,25 @@ export const execucoesService = {
     validadorId: string,
     comentario: string,
   ): Promise<ExecucaoRotina> {
-    return await pb.collection('execucoes_rotinas').update<ExecucaoRotina>(execucaoId, {
+    const updated = await pb.collection('execucoes_rotinas').update<ExecucaoRotina>(execucaoId, {
       status_validacao: 'devolvida',
       comentario_validacao: comentario,
       validado_por: validadorId,
       validado_em: new Date().toISOString(),
       concluida: false, // Ao devolver, volta como pendente para a rotina do dia
     })
+    try {
+      const { auditoriaService } = await import('@/services/auditoria')
+      auditoriaService.registrar({
+        acao: 'validacao',
+        modulo: 'execucoes',
+        registro_id: execucaoId,
+        detalhes: `Execução de rotina devolvida para correção: "${comentario}"`,
+      })
+    } catch {
+      /* intentionally ignored */
+    }
+    return updated
   },
 
   async aprovarTodas(execucoesIds: string[], validadorId: string): Promise<void> {
@@ -281,5 +305,15 @@ export const execucoesService = {
   getFotoUrl(execucao: ExecucaoRotina, thumb?: string): string | null {
     if (!execucao.foto) return null
     return pb.files.getURL(execucao, execucao.foto, { thumb })
+  },
+
+  async getProtectedFotoUrl(execucao: ExecucaoRotina, thumb?: string): Promise<string | null> {
+    if (!execucao.foto) return null
+    try {
+      const token = await pb.files.getToken()
+      return pb.files.getURL(execucao, execucao.foto, { thumb, token })
+    } catch (_) {
+      return pb.files.getURL(execucao, execucao.foto, { thumb })
+    }
   },
 }
