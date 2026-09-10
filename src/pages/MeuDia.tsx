@@ -27,7 +27,6 @@ import { CardTarefaEnxuto } from '@/components/CardTarefaEnxuto'
 import { ExecucaoGuiadaModal, ExecucaoGuiadaResult } from '@/components/ExecucaoGuiadaModal'
 import { ConcluirVisitaModal } from '@/components/ConcluirVisitaModal'
 import { StoreSelector } from '@/components/StoreSelector'
-import { QuickAccessTopBanner } from '@/components/QuickAccessTopBanner'
 import { useAuth } from '@/context/AuthContext'
 import { useStore } from '@/context/StoreContext'
 import { rotinasService, execucoesService, getTodayDateString } from '@/services/rotinas'
@@ -312,9 +311,6 @@ export function MeuDiaPage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-4 space-y-4">
-        {/* Hub de Atalhos Rápidos Operacionais */}
-        <QuickAccessTopBanner />
-
         {/* RESPOSTA IMEDIATA ÀS 3 PERGUNTAS DO PROMOTOR:
             1. Onde preciso ir? (Card Próxima Visita)
             2. O que preciso fazer? (Resumo e progresso)

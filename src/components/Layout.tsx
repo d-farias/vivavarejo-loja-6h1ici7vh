@@ -157,35 +157,6 @@ export default function Layout() {
             </NavLink>
           </div>
 
-          {/* Desktop Navigation */}
-          {!isAuthPage && user && (
-            <nav className="hidden md:flex items-center gap-1 sm:gap-2">
-              {navLinks.map((link) => (
-                <NavLink
-                  key={link.to}
-                  to={link.to}
-                  end={link.to === '/'}
-                  className={({ isActive }) =>
-                    `relative px-3.5 py-2 rounded-xl text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'text-[#0F766E] bg-teal-50 font-bold'
-                        : 'text-[#4B5563] hover:text-[#1F2937] hover:bg-gray-100/70'
-                    }`
-                  }
-                >
-                  {({ isActive }) => (
-                    <>
-                      <span>{link.label}</span>
-                      {isActive && (
-                        <span className="absolute bottom-[-6px] left-3 right-3 h-[2px] bg-[#0F766E] rounded-full transition-all duration-200" />
-                      )}
-                    </>
-                  )}
-                </NavLink>
-              ))}
-            </nav>
-          )}
-
           {/* Right Action / Avatar */}
           <div className="flex items-center gap-2">
             {!isAuthPage && user && (

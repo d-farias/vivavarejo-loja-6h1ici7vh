@@ -7,7 +7,6 @@ import { planosAcaoService } from '@/services/planosAcao'
 import { StoreSelector } from '@/components/StoreSelector'
 import { ConcluirVisitaModal } from '@/components/ConcluirVisitaModal'
 import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
-import { QuickAccessTopBanner } from '@/components/QuickAccessTopBanner'
 import { isPlanoAtrasado } from '@/components/PlanosAcaoCard'
 import { isVisitaAtrasada } from '@/services/visitasPromotor'
 import { getHorarioStatus } from '@/lib/time-utils'
@@ -319,9 +318,6 @@ export default function AgendaDefault() {
           <StoreSelector />
         </div>
       </div>
-
-      {/* Atalhos de Acesso Rápido para Direcionamento Imediato */}
-      <QuickAccessTopBanner />
 
       {/* Date Navigation Bar sóbrio tema claro */}
       <div className="bg-white border border-[#E5E7EB] rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
