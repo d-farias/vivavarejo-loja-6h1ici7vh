@@ -121,7 +121,6 @@ export default function Layout() {
         { to: '/rotinas', label: 'Rotinas', icon: ListChecks },
         { to: '/validades', label: 'Validade × Calendário', icon: CalendarCheck },
         { to: '/perdas', label: 'Perdas & Inventário', icon: ShieldAlert },
-        { to: '/equipe', label: 'Minha Equipe', icon: Users },
         ...(isLiderOrAdmin ? [{ to: '/promotores', label: 'Promotores', icon: Handshake }] : []),
         { to: '/', label: 'Dashboard', icon: LayoutDashboard },
         ...(hasAdminAccess
@@ -471,7 +470,7 @@ export default function Layout() {
           <div className="flex items-center gap-2">
             <span className="font-semibold text-[#1F2937]">VivaVarejo</span>
             <span className="text-xs text-[#6B7280] font-mono font-bold bg-blue-50 text-[#2563EB] px-1.5 py-0.5 rounded border border-blue-200">
-              v0.0.95
+              v0.0.96
             </span>
           </div>{' '}
           <div>
