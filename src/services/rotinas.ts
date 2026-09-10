@@ -146,27 +146,99 @@ export const rotinasService = {
 }
 
 export const execucoesService = {
+  /**
+   * Helper para verificar se um registro pertence ao dia local (YYYY-MM-DD)
+   * comparando tanto data_execucao quanto created em UTC e fuso local.
+   */
+  matchesDate(targetDateStr: string, dateField?: string, createdField?: string): boolean {
+    const target = targetDateStr.slice(0, 10)
+    if (!target) return false
+
+    // 1. Verificação direta por string prefix/substring
+    if (dateField && dateField.slice(0, 10) === target) return true
+    if (createdField && createdField.slice(0, 10) === target) return true
+
+    // 2. Verificação convertendo para data local (evita que UTC meia-noite mude de dia no Brasil UTC-3)
+    if (dateField) {
+      try {
+        const d = new Date(dateField)
+        if (!isNaN(d.getTime())) {
+          const y = d.getFullYear()
+          const m = String(d.getMonth() + 1).padStart(2, '0')
+          const day = String(d.getDate()).padStart(2, '0')
+          if (`${y}-${m}-${day}` === target) return true
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+
+    if (createdField) {
+      try {
+        const d = new Date(createdField)
+        if (!isNaN(d.getTime())) {
+          const y = d.getFullYear()
+          const m = String(d.getMonth() + 1).padStart(2, '0')
+          const day = String(d.getDate()).padStart(2, '0')
+          if (`${y}-${m}-${day}` === target) return true
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+
+    return false
+  },
+
   async getTodayExecutions(
     userId: string,
     dateStr = getTodayDateString(),
   ): Promise<ExecucaoRotina[]> {
     if (!userId) return []
-    return await pb.collection('execucoes_rotinas').getFullList<ExecucaoRotina>({
-      filter: `usuario = "${userId}" && data_execucao >= "${dateStr} 00:00:00" && data_execucao <= "${dateStr} 23:59:59"`,
+    const cleanDate = dateStr.slice(0, 10)
+    // Busca janela ampla (+/- 1 dia em UTC) para não perder execuções com offset de fuso local
+    const targetD = new Date(cleanDate + 'T12:00:00')
+    const prevD = new Date(targetD)
+    prevD.setDate(prevD.getDate() - 1)
+    const nextD = new Date(targetD)
+    nextD.setDate(nextD.getDate() + 1)
+    const prevStr = `${prevD.getFullYear()}-${String(prevD.getMonth() + 1).padStart(2, '0')}-${String(prevD.getDate()).padStart(2, '0')}`
+    const nextStr = `${nextD.getFullYear()}-${String(nextD.getMonth() + 1).padStart(2, '0')}-${String(nextD.getDate()).padStart(2, '0')}`
+
+    const list = await pb.collection('execucoes_rotinas').getFullList<ExecucaoRotina>({
+      filter: `usuario = "${userId}" && (data_execucao >= "${prevStr} 00:00:00" && data_execucao <= "${nextStr} 23:59:59" || created >= "${prevStr} 00:00:00" && created <= "${nextStr} 23:59:59")`,
       expand: 'rotina,usuario,validado_por',
+      sort: '-created',
     })
+
+    return list.filter((ex) => this.matchesDate(cleanDate, ex.data_execucao, ex.created))
   },
 
   async getExecutionsByDate(dateStr: string): Promise<ExecucaoRotina[]> {
-    return await pb.collection('execucoes_rotinas').getFullList<ExecucaoRotina>({
-      filter: `data_execucao >= "${dateStr} 00:00:00" && data_execucao <= "${dateStr} 23:59:59"`,
+    const cleanDate = dateStr.slice(0, 10)
+    // Janela de segurança de +/- 1 dia no backend para cobrir fusos UTC vs local (ex: UTC-3 Brasil)
+    const targetD = new Date(cleanDate + 'T12:00:00')
+    const prevD = new Date(targetD)
+    prevD.setDate(prevD.getDate() - 1)
+    const nextD = new Date(targetD)
+    nextD.setDate(nextD.getDate() + 1)
+    const prevStr = `${prevD.getFullYear()}-${String(prevD.getMonth() + 1).padStart(2, '0')}-${String(prevD.getDate()).padStart(2, '0')}`
+    const nextStr = `${nextD.getFullYear()}-${String(nextD.getMonth() + 1).padStart(2, '0')}-${String(nextD.getDate()).padStart(2, '0')}`
+
+    const list = await pb.collection('execucoes_rotinas').getFullList<ExecucaoRotina>({
+      filter: `(data_execucao >= "${prevStr} 00:00:00" && data_execucao <= "${nextStr} 23:59:59") || (created >= "${prevStr} 00:00:00" && created <= "${nextStr} 23:59:59")`,
       expand: 'rotina,usuario,validado_por',
+      sort: '-created',
     })
+
+    return list.filter((ex) => this.matchesDate(cleanDate, ex.data_execucao, ex.created))
   },
 
   async getExecutionsBetween(startDateStr: string, endDateStr: string): Promise<ExecucaoRotina[]> {
+    const cleanStart = startDateStr.slice(0, 10)
+    const cleanEnd = endDateStr.slice(0, 10)
     return await pb.collection('execucoes_rotinas').getFullList<ExecucaoRotina>({
-      filter: `data_execucao >= "${startDateStr} 00:00:00" && data_execucao <= "${endDateStr} 23:59:59"`,
+      filter: `(data_execucao >= "${cleanStart} 00:00:00" && data_execucao <= "${cleanEnd} 23:59:59") || (created >= "${cleanStart} 00:00:00" && created <= "${cleanEnd} 23:59:59")`,
       expand: 'rotina,usuario,validado_por',
     })
   },

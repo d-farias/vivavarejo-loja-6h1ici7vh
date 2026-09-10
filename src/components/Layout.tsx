@@ -470,7 +470,7 @@ export default function Layout() {
           <div className="flex items-center gap-2">
             <span className="font-semibold text-white">VivaVarejo</span>
             <span className="text-xs font-mono font-bold bg-blue-500/15 text-[#60A5FA] px-1.5 py-0.5 rounded border border-blue-500/30">
-              v0.0.98
+              v0.0.99
             </span>
           </div>{' '}
           <div>

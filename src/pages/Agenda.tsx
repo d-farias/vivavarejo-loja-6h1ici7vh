@@ -180,6 +180,7 @@ export default function AgendaDefault() {
   }, [itensAgenda])
 
   // Evidências fotográficas enviadas no dia (rotinas executadas com foto anexada)
+  // Robusto contra variações de fuso horário UTC vs data local do navegador
   const evidenciasDoDia = useMemo(() => {
     const list: Array<{
       execucao: ExecucaoRotina
@@ -190,7 +191,7 @@ export default function AgendaDefault() {
     }> = []
 
     for (const ex of execucoes) {
-      if (ex.foto) {
+      if (ex.foto && execucoesService.matchesDate(currentDateStr, ex.data_execucao, ex.created)) {
         const r = rotinas.find((item) => item.id === ex.rotina)
         list.push({
           execucao: ex,
@@ -207,7 +208,7 @@ export default function AgendaDefault() {
       }
     }
     return list
-  }, [execucoes, rotinas])
+  }, [execucoes, rotinas, currentDateStr])
 
   // Visitas de promotores na data
   const visitasDoDia = useMemo(() => {
@@ -374,13 +375,13 @@ export default function AgendaDefault() {
         </div>
       </div>
 
-      {/* 6 Cards de Indicadores Enriquecidos com tiles coloridos consistentes */}
+      {/* 6 Cards de Indicadores Enriquecidos com tiles coloridos consistentes e tons sóbrios */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        {/* Card 1: Rotinas do Dia - Tile Azul */}
+        {/* Card 1: Rotinas do Dia - Tile Azul Sóbrio */}
         <div className="p-3.5 sm:p-4 bg-[#151E30] border border-[#223049] rounded-2xl shadow-xs">
           <span className="text-xs text-[#94A3B8] font-medium flex items-center justify-between">
             <span>Rotinas do Dia</span>
-            <div className="w-7 h-7 rounded-lg bg-blue-500/15 border border-blue-500/30 text-[#60A5FA] flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[#93C5FD] flex items-center justify-center">
               <Layers className="w-3.5 h-3.5" />
             </div>
           </span>
@@ -392,21 +393,21 @@ export default function AgendaDefault() {
           </span>
         </div>
 
-        {/* Card 2: % Concluído - Tile Verde */}
+        {/* Card 2: % Concluído - Tile Verde Sóbrio */}
         <div className="p-3.5 sm:p-4 bg-[#151E30] border border-[#223049] rounded-2xl shadow-xs">
           <span className="text-xs text-[#94A3B8] font-medium flex items-center justify-between">
             <span>% Concluído</span>
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 flex items-center justify-center">
               <CheckCircle2 className="w-3.5 h-3.5" />
             </div>
           </span>
           <div
             className={`text-2xl sm:text-3xl font-bold mt-1 leading-none ${
               statsDia.taxa >= 90
-                ? 'text-emerald-400'
+                ? 'text-emerald-300'
                 : statsDia.taxa >= 70
-                  ? 'text-amber-400'
-                  : 'text-rose-400'
+                  ? 'text-amber-300'
+                  : 'text-rose-300'
             }`}
           >
             {statsDia.taxa}%
@@ -415,17 +416,17 @@ export default function AgendaDefault() {
             <div
               className={`h-1.5 rounded-full transition-all duration-300 ${
                 statsDia.taxa >= 90
-                  ? 'bg-emerald-500'
+                  ? 'bg-emerald-500/80'
                   : statsDia.taxa >= 70
-                    ? 'bg-amber-500'
-                    : 'bg-rose-500'
+                    ? 'bg-amber-500/80'
+                    : 'bg-rose-500/80'
               }`}
               style={{ width: `${statsDia.taxa}%` }}
             />
           </div>
         </div>
 
-        {/* Card 3: Atrasadas - Tile Vermelho */}
+        {/* Card 3: Atrasadas - Tile Vermelho Sóbrio */}
         <div
           className={`p-3.5 sm:p-4 rounded-2xl shadow-xs border ${
             statsDia.atrasadas > 0
@@ -434,17 +435,17 @@ export default function AgendaDefault() {
           }`}
         >
           <span className="text-xs font-medium flex items-center justify-between">
-            <span className={statsDia.atrasadas > 0 ? 'font-bold text-rose-400' : 'text-[#94A3B8]'}>
+            <span className={statsDia.atrasadas > 0 ? 'font-bold text-rose-300' : 'text-[#94A3B8]'}>
               Atrasadas
             </span>
-            <div className="w-7 h-7 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 flex items-center justify-center">
               <AlertTriangle className="w-3.5 h-3.5" />
             </div>
           </span>
           <div className="flex items-baseline gap-2 mt-1">
             <div
               className={`text-2xl sm:text-3xl font-bold leading-none ${
-                statsDia.atrasadas > 0 ? 'text-rose-400' : 'text-white'
+                statsDia.atrasadas > 0 ? 'text-rose-300' : 'text-white'
               }`}
             >
               {statsDia.atrasadas}
@@ -462,11 +463,11 @@ export default function AgendaDefault() {
           </span>
         </div>
 
-        {/* Card 4: Evidências/Fotos - Tile Roxo */}
+        {/* Card 4: Evidências/Fotos - Tile Roxo Sóbrio */}
         <div className="p-3.5 sm:p-4 bg-[#151E30] border border-[#223049] rounded-2xl shadow-xs">
           <span className="text-xs text-[#94A3B8] font-medium flex items-center justify-between">
             <span>Evidências / Fotos</span>
-            <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300 flex items-center justify-center">
               <Camera className="w-3.5 h-3.5" />
             </div>
           </span>
@@ -475,7 +476,7 @@ export default function AgendaDefault() {
               {statsDia.evidenciasCount}
             </div>
             {statsDia.evidenciasCount > 0 && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/25">
                 Hoje
               </span>
             )}
@@ -496,7 +497,7 @@ export default function AgendaDefault() {
                     })
                   }
                 }}
-                className="text-[11px] font-semibold text-[#60A5FA] hover:text-[#93C5FD] inline-flex items-center gap-0.5 hover:underline"
+                className="text-[11px] font-semibold text-[#93C5FD] hover:text-white inline-flex items-center gap-0.5 hover:underline"
                 title="Visualizar evidência fotográfica enviada"
               >
                 <Eye className="w-3 h-3" />
@@ -506,11 +507,11 @@ export default function AgendaDefault() {
           </div>
         </div>
 
-        {/* Card 5: Visitas Promotores - Tile Laranja/Âmbar */}
+        {/* Card 5: Visitas Promotores - Tile Laranja/Âmbar Sóbrio */}
         <div className="p-3.5 sm:p-4 bg-[#151E30] border border-[#223049] rounded-2xl shadow-xs">
           <span className="text-xs text-[#94A3B8] font-medium flex items-center justify-between">
             <span>Visitas Promotores</span>
-            <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 flex items-center justify-center">
               <Handshake className="w-3.5 h-3.5" />
             </div>
           </span>
@@ -522,7 +523,7 @@ export default function AgendaDefault() {
           </span>
         </div>
 
-        {/* Card 6: Status dos Planos de Ação 5W2H - Tile Ciano */}
+        {/* Card 6: Status dos Planos de Ação 5W2H - Tile Ciano Sóbrio */}
         <div
           className={`p-3.5 sm:p-4 rounded-2xl shadow-xs border ${
             planosHojeStatus.atrasadosGeral > 0
@@ -540,7 +541,7 @@ export default function AgendaDefault() {
             >
               Planos 5W2H (Hoje)
             </span>
-            <div className="w-7 h-7 rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 flex items-center justify-center">
               <CheckSquare className="w-3.5 h-3.5" />
             </div>
           </span>
@@ -549,7 +550,7 @@ export default function AgendaDefault() {
               {planosHojeStatus.totalHoje}
             </div>
             {planosHojeStatus.concluidosHoje > 0 && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300">
                 {planosHojeStatus.concluidosHoje} ok
               </span>
             )}
@@ -568,13 +569,13 @@ export default function AgendaDefault() {
       {evidenciasDoDia.length > 0 && (
         <div className="bg-[#151E30] border border-[#223049] rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 flex items-center justify-center shrink-0">
               <Camera className="w-4 h-4" />
             </div>
             <div className="min-w-0">
               <div className="text-xs font-bold text-white flex items-center gap-2">
                 <span>Evidências Fotográficas do Dia</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-[#60A5FA]">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-[#93C5FD]">
                   {evidenciasDoDia.length}
                 </span>
               </div>
@@ -600,18 +601,18 @@ export default function AgendaDefault() {
                 className="group flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#24344E] bg-[#0B1220] hover:bg-[#1E293B] hover:border-[#3B82F6]/50 transition-colors text-left shrink-0"
                 title={`Visualizar foto: ${ev.titulo}`}
               >
-                <div className="w-6 h-6 rounded-lg bg-blue-500/20 text-[#60A5FA] flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-lg bg-blue-500/15 text-[#93C5FD] flex items-center justify-center shrink-0">
                   <Camera className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0 max-w-[140px]">
-                  <div className="text-xs font-semibold text-white truncate group-hover:text-[#60A5FA]">
+                  <div className="text-xs font-semibold text-white truncate group-hover:text-[#93C5FD]">
                     {ev.titulo}
                   </div>
                   <div className="text-[10px] text-[#94A3B8] truncate">
                     {ev.responsavel} {ev.horario ? `• ${ev.horario}` : ''}
                   </div>
                 </div>
-                <Eye className="w-3.5 h-3.5 text-[#94A3B8] group-hover:text-[#60A5FA] shrink-0" />
+                <Eye className="w-3.5 h-3.5 text-[#94A3B8] group-hover:text-[#93C5FD] shrink-0" />
               </button>
             ))}
           </div>
@@ -661,7 +662,13 @@ export default function AgendaDefault() {
       )}
 
       {/* AGENDA MINHA EQUIPE: Unificação da visão Minha Equipe embutida diretamente na Agenda */}
-      <AgendaMinhaEquipeSecao embedded tituloCustomizado="Agenda Minha Equipe" />
+      <AgendaMinhaEquipeSecao
+        embedded
+        tituloCustomizado="Agenda Minha Equipe"
+        currentDateStr={currentDateStr}
+        execucoesExternas={execucoes}
+        onDataChange={loadData}
+      />
 
       {/* Seção Integrada: Visitas de Promotores Agendadas para o Dia */}
       {visitasDoDia.length > 0 && (

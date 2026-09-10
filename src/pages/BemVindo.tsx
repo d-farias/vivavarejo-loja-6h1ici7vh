@@ -359,15 +359,16 @@ export default function BemVindo() {
 
         {/* Banner de destaque tipo banner de referência (bloco azul vibrante com CTA) */}
         <section className="px-4 sm:px-6 py-6 bg-[#0B1220]">
-          <div className="max-w-5xl mx-auto rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 p-6 sm:p-8 text-white shadow-xl shadow-blue-600/20 flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div className="space-y-2 text-center sm:text-left">
-              <span className="text-xs uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-white/20">
+          <div className="max-w-5xl mx-auto rounded-2xl bg-[#151E30] border border-[#2B3B56] p-6 sm:p-8 text-white shadow-xl shadow-blue-950/40 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="space-y-2 text-center sm:text-left relative z-10">
+              <span className="text-[11px] uppercase font-bold tracking-wider px-3 py-1 rounded-full bg-blue-500/15 border border-blue-500/30 text-[#93C5FD]">
                 VivaVarejo em Campo
               </span>
-              <h3 className="text-xl sm:text-2xl font-extrabold leading-tight">
+              <h3 className="text-xl sm:text-2xl font-extrabold leading-tight text-white">
                 Tudo o que sua equipe precisa, em um só lugar.
               </h3>
-              <p className="text-xs sm:text-sm text-blue-100 max-w-xl">
+              <p className="text-xs sm:text-sm text-[#CBD5E1] max-w-xl leading-relaxed">
                 Agenda de rotinas, controle de validade, presença de promotores com fotos e chamados
                 5W2H no celular.
               </p>
@@ -375,7 +376,7 @@ export default function BemVindo() {
             <button
               type="button"
               onClick={handleScrollToInterest}
-              className="px-5 py-2.5 bg-white text-[#1D4ED8] hover:bg-blue-50 font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all shrink-0 hover:scale-105"
+              className="relative z-10 px-5 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-blue-600/30 transition-all shrink-0 hover:scale-105 border border-blue-400/30"
             >
               Começar agora
             </button>
@@ -579,7 +580,7 @@ export default function BemVindo() {
               </div>
 
               {/* Camada 3: Inteligência Operacional */}
-              <div className="bg-[#151E30] p-5 sm:p-6 rounded-2xl border-2 border-[#2563EB] shadow-lg shadow-blue-600/10 flex flex-col sm:flex-row sm:items-start gap-4">
+              <div className="bg-[#151E30] p-5 sm:p-6 rounded-2xl border border-blue-500/40 shadow-lg shadow-blue-950/30 flex flex-col sm:flex-row sm:items-start gap-4">
                 <div className="w-11 h-11 rounded-xl bg-[#2563EB] text-white font-bold text-base flex items-center justify-center shrink-0 shadow-md">
                   3
                 </div>
@@ -746,14 +747,14 @@ export default function BemVindo() {
                       const Icon = seg.icon
                       const isSelected = segmento === seg.id
                       const tileColors = [
-                        'bg-blue-500/15 border-blue-500/30 text-blue-400',
-                        'bg-rose-500/15 border-rose-500/30 text-rose-400',
-                        'bg-amber-500/15 border-amber-500/30 text-amber-400',
-                        'bg-emerald-500/15 border-emerald-500/30 text-emerald-400',
-                        'bg-purple-500/15 border-purple-500/30 text-purple-400',
-                        'bg-cyan-500/15 border-cyan-500/30 text-cyan-400',
-                        'bg-orange-500/15 border-orange-500/30 text-orange-400',
-                        'bg-indigo-500/15 border-indigo-500/30 text-indigo-400',
+                        'bg-blue-500/10 border-blue-500/20 text-blue-300',
+                        'bg-rose-500/10 border-rose-500/20 text-rose-300',
+                        'bg-amber-500/10 border-amber-500/20 text-amber-300',
+                        'bg-emerald-500/10 border-emerald-500/20 text-emerald-300',
+                        'bg-purple-500/10 border-purple-500/20 text-purple-300',
+                        'bg-cyan-500/10 border-cyan-500/20 text-cyan-300',
+                        'bg-orange-500/10 border-orange-500/20 text-orange-300',
+                        'bg-indigo-500/10 border-indigo-500/20 text-indigo-300',
                       ]
                       const colorClass = tileColors[idx % tileColors.length]
                       return (
@@ -997,7 +998,7 @@ export default function BemVindo() {
             <div className="flex items-center gap-2">
               <span>© {new Date().getFullYear()} VivaVarejo. Todos os direitos reservados.</span>
               <span className="font-mono font-bold bg-blue-500/15 text-[#60A5FA] px-1.5 py-0.5 rounded border border-blue-500/30 text-[10px]">
-                v0.0.98
+                v0.0.99
               </span>
             </div>
             <span>

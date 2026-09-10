@@ -33,7 +33,7 @@ import { rotinasService, execucoesService, getTodayDateString } from '@/services
 import { visitasPromotorService } from '@/services/visitasPromotor'
 import { parseHorarioLimiteToMinutes, isPastDue } from '@/lib/time-utils'
 import { toast } from '@/hooks/use-toast'
-import { pb } from '@/lib/pocketbase/client'
+import pb from '@/lib/pocketbase/client'
 import type { Rotina, ExecucaoRotina, VisitaPromotor } from '@/types'
 
 export function MeuDiaPage() {

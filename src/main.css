@@ -119,12 +119,37 @@
   }
 }
 
+/* Barras de rolagem globais e estilizadas (mantidas com contraste adequado e sóbrio) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2b3954 #0b1220;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b1220;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #2b3954;
+  border-radius: 9999px;
+  border: 1px solid #151e30;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #3e5277;
+}
+
 /* Indicador e barra de rolagem horizontal visível e fluida para mobile no tema escuro */
 .scrollbar-thin-horizontal {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  scrollbar-color: #2563eb #151e30;
+  scrollbar-color: #3b82f6 #151e30;
 }
 
 .scrollbar-thin-horizontal::-webkit-scrollbar {
@@ -137,12 +162,12 @@
 }
 
 .scrollbar-thin-horizontal::-webkit-scrollbar-thumb {
-  background-color: #3b82f6;
+  background-color: #334a6e;
   border-radius: 9999px;
 }
 
 .scrollbar-thin-horizontal::-webkit-scrollbar-thumb:hover {
-  background-color: #60a5fa;
+  background-color: #4a6694;
 }
 
 /* Barra de rolagem vertical visível para formulários e modais no celular */
@@ -150,11 +175,11 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  scrollbar-color: #334155 #0b1220;
+  scrollbar-color: #334a6e #0b1220;
 }
 
 .scrollbar-mobile-vertical::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 
 .scrollbar-mobile-vertical::-webkit-scrollbar-track {
@@ -163,8 +188,12 @@
 }
 
 .scrollbar-mobile-vertical::-webkit-scrollbar-thumb {
-  background-color: #334155;
+  background-color: #334a6e;
   border-radius: 9999px;
+}
+
+.scrollbar-mobile-vertical::-webkit-scrollbar-thumb:hover {
+  background-color: #4a6694;
 }
 
 /* OVERRIDES GLOBAIS DE TEMA ESCURO PREMIUM:
@@ -225,7 +254,7 @@
     color: #f8fafc !important;
   }
 
-  /* Textos secundários em cinza-azulado claro */
+  /* Textos secundários em cinza-azulado claro (garante contraste > 4.5:1 no escuro) */
   .text-\[\#4B5563\],
   .text-\[\#374151\],
   .text-gray-700,
@@ -241,7 +270,18 @@
 
   .text-\[\#9CA3AF\],
   .text-gray-400 {
-    color: #64748b !important;
+    color: #94a3b8 !important; /* Elevado de #64748b para #94a3b8 para WCAG AA legível */
+  }
+
+  /* Caixinhas mono de horário limite e chips claros de informação:
+     Garante fundo escuro elegante com texto claro e legível, sem cinza invisível */
+  .font-mono.border-\[\#E5E7EB\],
+  .bg-\[\#F7F7F5\].text-\[\#374151\],
+  span.bg-gray-100,
+  div.bg-gray-100 {
+    background-color: #0f172a !important;
+    border-color: #24344e !important;
+    color: #e2e8f0 !important;
   }
 
   /* Inputs, selects e textareas */
@@ -255,7 +295,7 @@
 
   input::placeholder,
   textarea::placeholder {
-    color: #64748b !important;
+    color: #94a3b8 !important; /* Contraste adequado para leitura no placeholder */
   }
 
   /* Hovers de linha e botões neutros */
@@ -265,38 +305,44 @@
     background-color: #1a253c !important;
   }
 
-  /* Elementos de destaque em azul com fundo sutil */
+  /* Elementos de destaque em azul com fundo sutil e sóbrio */
   .bg-blue-50,
   .bg-blue-50\/60,
   .bg-blue-50\/80,
   .bg-blue-50\/50 {
-    background-color: rgba(37, 99, 235, 0.15) !important;
-    border-color: rgba(59, 130, 246, 0.35) !important;
+    background-color: rgba(37, 99, 235, 0.12) !important;
+    border-color: rgba(59, 130, 246, 0.25) !important;
     color: #93c5fd !important;
   }
 
   .border-blue-200,
   .border-blue-100 {
-    border-color: rgba(59, 130, 246, 0.3) !important;
+    border-color: rgba(59, 130, 246, 0.25) !important;
   }
 
   .bg-emerald-50 {
-    background-color: rgba(16, 185, 129, 0.15) !important;
-    border-color: rgba(16, 185, 129, 0.3) !important;
+    background-color: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.25) !important;
     color: #6ee7b7 !important;
   }
 
   .bg-amber-50 {
-    background-color: rgba(245, 158, 11, 0.15) !important;
-    border-color: rgba(245, 158, 11, 0.3) !important;
+    background-color: rgba(245, 158, 11, 0.12) !important;
+    border-color: rgba(245, 158, 11, 0.25) !important;
     color: #fcd34d !important;
   }
 
   .bg-rose-50,
   .bg-red-50 {
-    background-color: rgba(239, 68, 68, 0.15) !important;
-    border-color: rgba(239, 68, 68, 0.3) !important;
+    background-color: rgba(239, 68, 68, 0.12) !important;
+    border-color: rgba(239, 68, 68, 0.25) !important;
     color: #fca5a5 !important;
+  }
+
+  .bg-purple-50 {
+    background-color: rgba(168, 85, 247, 0.12) !important;
+    border-color: rgba(168, 85, 247, 0.25) !important;
+    color: #d8b4fe !important;
   }
 
   /* Dropdown e popover menus */

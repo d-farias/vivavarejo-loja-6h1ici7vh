@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useStore } from '@/context/StoreContext'
-import { rotinasService } from '@/services/rotinas'
+import { rotinasService, execucoesService, getTodayDateString } from '@/services/rotinas'
 import { funcionariosService } from '@/services/funcionarios'
-import type { Rotina, Funcionario } from '@/types'
+import type { Rotina, Funcionario, ExecucaoRotina } from '@/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Users,
@@ -17,49 +17,167 @@ import {
   Store,
   Phone,
   Bookmark,
+  Camera,
+  CheckCircle2,
+  Eye,
+  AlertTriangle,
+  PlayCircle,
 } from 'lucide-react'
 import { formatPhoneBR } from '@/lib/phone-utils'
 import { normalizarNomeCanonico, getChaveCanonico } from '@/lib/cargos'
 import { Link } from 'react-router-dom'
+import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
+import { ConcluirRotinaModal } from '@/components/ConcluirRotinaModal'
+import { getFileToken } from '@/lib/pocketbase/files'
 
 interface AgendaMinhaEquipeSecaoProps {
   /** Se true, oculta o seletor de loja próprio e o título de cabeçalho h1 da página (usado quando embutido na Agenda) */
   embedded?: boolean
   /** Título customizado da seção quando embutido */
   tituloCustomizado?: string
+  /** Data de referência da visualização (padrão hoje) */
+  currentDateStr?: string
+  /** Mapa de execuções já carregadas na tela pai (evita refetch se fornecido) */
+  execucoesExternas?: ExecucaoRotina[]
+  /** Callback para recarregar dados na tela pai */
+  onDataChange?: () => void
+}
+
+/**
+ * Componente de Miniatura com abertura segura (token autenticado)
+ */
+function MiniaturaEvidencia({
+  execucao,
+  rotina,
+  onClick,
+}: {
+  execucao: ExecucaoRotina
+  rotina: Rotina
+  onClick: () => void
+}) {
+  const [thumbUrl, setThumbUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    let isMounted = true
+    const base = execucoesService.getFotoUrl(execucao, '100x100')
+    if (!base) return
+
+    getFileToken()
+      .then((token) => {
+        if (!isMounted) return
+        if (token) {
+          const sep = base.includes('?') ? '&' : '?'
+          setThumbUrl(`${base}${sep}token=${encodeURIComponent(token)}`)
+        } else {
+          setThumbUrl(base)
+        }
+      })
+      .catch(() => {
+        if (isMounted) setThumbUrl(base)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [execucao])
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group relative w-12 h-12 rounded-lg overflow-hidden border-2 border-purple-400/40 bg-purple-950/20 hover:border-purple-500 shadow-xs transition-all shrink-0 focus:outline-none focus:ring-2 focus:ring-purple-400"
+      title="Toque para ampliar a foto comprobatória"
+    >
+      {thumbUrl ? (
+        <img
+          src={thumbUrl}
+          alt={`Evidência de ${rotina.nome}`}
+          className="w-full h-full object-cover transition-transform group-hover:scale-110"
+          loading="lazy"
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center bg-purple-500/10 text-purple-600">
+          <Camera className="w-4 h-4" />
+        </div>
+      )}
+      <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+        <Eye className="w-3.5 h-3.5 text-white drop-shadow" />
+      </div>
+    </button>
+  )
 }
 
 export function AgendaMinhaEquipeSecao({
   embedded = false,
   tituloCustomizado = 'Agenda Minha Equipe',
+  currentDateStr,
+  execucoesExternas,
+  onDataChange,
 }: AgendaMinhaEquipeSecaoProps) {
   const { user } = useAuth()
   const { lojaSelecionadaId, lojaSelecionada } = useStore()
+  const activeDate = currentDateStr || getTodayDateString()
   const [rotinas, setRotinas] = useState<Rotina[]>([])
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
+  const [execucoesInternas, setExecucoesInternas] = useState<ExecucaoRotina[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   // Estado para acordeão: inicia RECOLHIDO por solicitação textual do dono do produto
   const [expandedKeys, setExpandedKeys] = useState<Record<string, boolean>>({})
 
+  // Estado para modal de foto e modal de conclusão de rotina
+  const [fotoModal, setFotoModal] = useState<{
+    execucao?: ExecucaoRotina
+    rotina?: Rotina
+    titulo?: string
+    subtitulo?: string
+  } | null>(null)
+  const [rotinaConcluirModal, setRotinaConcluirModal] = useState<Rotina | null>(null)
+
   const loadData = useCallback(async () => {
     if (!user) return
     setError(false)
     try {
-      const [allRoutines, allFuncs] = await Promise.all([
+      const promises: [Promise<Rotina[]>, Promise<Funcionario[]>, Promise<ExecucaoRotina[]>?] = [
         rotinasService.getAll(lojaSelecionadaId),
         lojaSelecionadaId && lojaSelecionadaId !== 'todas'
           ? funcionariosService.getByLoja(lojaSelecionadaId)
           : funcionariosService.getAll(),
-      ])
-      setRotinas(allRoutines)
-      setFuncionarios(allFuncs)
+      ]
+
+      // Se não foram passadas execuções externas, busca para a data ativa
+      if (!execucoesExternas) {
+        promises.push(
+          execucoesService.getExecutionsByDate(activeDate).catch(() => [] as ExecucaoRotina[]),
+        )
+      }
+
+      const results = await Promise.all(promises)
+      setRotinas(results[0])
+      setFuncionarios(results[1])
+      if (results[2]) {
+        setExecucoesInternas(results[2])
+      }
     } catch {
       setError(true)
     } finally {
       setLoading(false)
     }
-  }, [user, lojaSelecionadaId])
+  }, [user, lojaSelecionadaId, activeDate, execucoesExternas])
+
+  // Usar execuções externas se fornecidas, senão internas
+  const execucoesEfetivas = execucoesExternas || execucoesInternas
+
+  // Mapa de execuções por id da rotina com verificação robusta de data ativa
+  const execucoesMap = useMemo(() => {
+    const map = new Map<string, ExecucaoRotina>()
+    for (const ex of execucoesEfetivas) {
+      if (execucoesService.matchesDate(activeDate, ex.data_execucao, ex.created)) {
+        map.set(ex.rotina, ex)
+      }
+    }
+    return map
+  }, [execucoesEfetivas, activeDate])
 
   useEffect(() => {
     loadData()
@@ -148,6 +266,23 @@ export function AgendaMinhaEquipeSecao({
 
   const collapseAll = () => {
     setExpandedKeys({})
+  }
+
+  // Concluir rotina com ou sem foto
+  const handleConfirmarConclusao = async (fotoFile: File | null) => {
+    if (!rotinaConcluirModal || !user) return
+    const existing = execucoesMap.get(rotinaConcluirModal.id)
+    await execucoesService.toggleExecution(
+      rotinaConcluirModal.id,
+      user.id,
+      false,
+      existing?.id,
+      activeDate,
+      fotoFile,
+    )
+    setRotinaConcluirModal(null)
+    await loadData()
+    if (onDataChange) onDataChange()
   }
 
   if (loading) {
@@ -400,43 +535,152 @@ export function AgendaMinhaEquipeSecao({
                         Nenhuma rotina cadastrada para esta função.
                       </div>
                     ) : (
-                      items.map((routine) => (
-                        <div
-                          key={routine.id}
-                          className="p-3.5 sm:p-4 hover:bg-gray-50/70 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2"
-                        >
-                          <div className="min-w-0 flex-1">
-                            <div className="text-sm font-semibold text-[#1F2937]">
-                              {routine.nome}
+                      items.map((routine) => {
+                        const exec = execucoesMap.get(routine.id)
+                        const hasFoto = Boolean(exec?.foto)
+                        const isConcluida = Boolean(
+                          exec?.concluida && exec.status_validacao !== 'devolvida',
+                        )
+                        const horaEnvio = exec?.created
+                          ? new Date(exec.created).toLocaleTimeString('pt-BR', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
+                          : undefined
+
+                        return (
+                          <div
+                            key={routine.id}
+                            className={`p-3.5 sm:p-4 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                              hasFoto
+                                ? 'bg-purple-50/20 hover:bg-purple-50/35 border-l-4 border-l-purple-500'
+                                : isConcluida
+                                  ? 'bg-emerald-50/20 hover:bg-emerald-50/35 border-l-4 border-l-emerald-500'
+                                  : 'hover:bg-gray-50/70'
+                            }`}
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-sm font-semibold text-[#1F2937]">
+                                  {routine.nome}
+                                </span>
+
+                                {isConcluida && (
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    CONCLUÍDA
+                                  </span>
+                                )}
+
+                                {exec?.status_validacao === 'aguardando_validacao' && (
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                                    AGUARDANDO VALIDAÇÃO
+                                  </span>
+                                )}
+                              </div>
+
+                              {routine.observacoes && (
+                                <p className="text-xs text-[#6B7280] line-clamp-2 mt-0.5">
+                                  {routine.observacoes}
+                                </p>
+                              )}
+
+                              {/* Linha de Metadados: Frequência, Horário Limite, Validação */}
+                              <div className="flex items-center gap-2.5 text-xs text-[#6B7280] mt-1.5 flex-wrap">
+                                <span className="flex items-center gap-1">
+                                  <Clock className="w-3.5 h-3.5 text-[#9CA3AF]" />
+                                  <span>{routine.frequencia}</span>
+                                </span>
+
+                                {routine.horario_limite && (
+                                  <span className="font-mono text-[11px] px-1.5 py-0.5 rounded border border-[#E5E7EB] bg-[#F7F7F5] text-[#374151]">
+                                    Limite: {routine.horario_limite}
+                                  </span>
+                                )}
+
+                                {routine.validacao && (
+                                  <span className="flex items-center gap-1 text-[11px] text-[#4B5563]">
+                                    <ShieldCheck className="w-3.5 h-3.5 text-[#9CA3AF]" />
+                                    <span>
+                                      Validação: {normalizarNomeCanonico(routine.validacao)}
+                                    </span>
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                            {routine.observacoes && (
-                              <p className="text-xs text-[#6B7280] line-clamp-2 mt-0.5">
-                                {routine.observacoes}
-                              </p>
-                            )}
+
+                            {/* Bloco de Evidência Fotográfica na Tarefa: miniatura segura, contador e horário */}
+                            <div className="flex items-center gap-2.5 shrink-0 self-start sm:self-auto flex-wrap">
+                              {hasFoto && exec ? (
+                                <div className="flex items-center gap-2 bg-purple-500/10 border border-purple-500/25 rounded-xl p-1.5 pr-2.5">
+                                  <MiniaturaEvidencia
+                                    execucao={exec}
+                                    rotina={routine}
+                                    onClick={() =>
+                                      setFotoModal({
+                                        execucao: exec,
+                                        rotina: routine,
+                                        titulo: routine.nome,
+                                        subtitulo: `Evidência fotográfica enviada${horaEnvio ? ` às ${horaEnvio}` : ''}`,
+                                      })
+                                    }
+                                  />
+                                  <div className="text-left">
+                                    <div className="text-[11px] font-bold text-purple-300 flex items-center gap-1">
+                                      <Camera className="w-3 h-3 text-purple-400" />
+                                      <span>1 foto anexada</span>
+                                    </div>
+                                    {horaEnvio && (
+                                      <div className="text-[10px] text-purple-200 font-mono">
+                                        Enviado às {horaEnvio}
+                                      </div>
+                                    )}
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setFotoModal({
+                                          execucao: exec,
+                                          rotina: routine,
+                                          titulo: routine.nome,
+                                          subtitulo: `Evidência fotográfica enviada${horaEnvio ? ` às ${horaEnvio}` : ''}`,
+                                        })
+                                      }
+                                      className="text-[10px] font-semibold text-[#93C5FD] hover:text-white hover:underline block mt-0.5"
+                                    >
+                                      Ampliar foto →
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                /* Marcador discreto quando a tarefa não possui evidência fotográfica */
+                                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0B1220]/70 border border-[#223049] text-[#94A3B8] text-[11px]">
+                                  <Camera className="w-3.5 h-3.5 text-[#64748B]" />
+                                  <span>sem evidência</span>
+                                </div>
+                              )}
+
+                              {/* Botão para registrar/comprovar execução direto da Agenda Minha Equipe */}
+                              <button
+                                type="button"
+                                onClick={() => setRotinaConcluirModal(routine)}
+                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-xs transition-colors ${
+                                  isConcluida
+                                    ? 'bg-[#1E293B] hover:bg-[#27354E] text-[#93C5FD] border border-[#24344E]'
+                                    : 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white'
+                                }`}
+                                title={
+                                  isConcluida
+                                    ? 'Atualizar foto ou execução'
+                                    : 'Concluir e anexar evidência fotográfica'
+                                }
+                              >
+                                <Camera className="w-3.5 h-3.5" />
+                                <span>{isConcluida ? 'Reenviar foto' : 'Comprovar'}</span>
+                              </button>
+                            </div>
                           </div>
-
-                          <div className="flex items-center gap-3 text-xs text-[#6B7280] shrink-0 flex-wrap">
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3.5 h-3.5 text-[#9CA3AF]" />
-                              <span>{routine.frequencia}</span>
-                            </span>
-
-                            {routine.horario_limite && (
-                              <span className="font-mono text-[11px] px-1.5 py-0.5 rounded border border-[#E5E7EB] bg-[#F7F7F5] text-[#374151]">
-                                {routine.horario_limite}
-                              </span>
-                            )}
-
-                            {routine.validacao && (
-                              <span className="flex items-center gap-1 text-[11px] text-[#4B5563]">
-                                <ShieldCheck className="w-3.5 h-3.5 text-[#9CA3AF]" />
-                                <span>Validação: {normalizarNomeCanonico(routine.validacao)}</span>
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ))
+                        )
+                      })
                     )}
                   </div>
                 )}
@@ -445,6 +689,28 @@ export function AgendaMinhaEquipeSecao({
           },
         )}
       </div>
+
+      {/* Modal Visualizador Seguro de Foto */}
+      {fotoModal && (
+        <FotoVisualizadorModal
+          isOpen={Boolean(fotoModal)}
+          onClose={() => setFotoModal(null)}
+          execucao={fotoModal.execucao}
+          rotina={fotoModal.rotina}
+          titulo={fotoModal.titulo}
+          subtitulo={fotoModal.subtitulo}
+        />
+      )}
+
+      {/* Modal Concluir Rotina com Foto */}
+      {rotinaConcluirModal && (
+        <ConcluirRotinaModal
+          isOpen={Boolean(rotinaConcluirModal)}
+          rotina={rotinaConcluirModal}
+          onClose={() => setRotinaConcluirModal(null)}
+          onConfirm={handleConfirmarConclusao}
+        />
+      )}
     </div>
   )
 }
