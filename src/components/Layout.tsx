@@ -471,9 +471,9 @@ export default function Layout() {
           <div className="flex items-center gap-2">
             <span className="font-semibold text-[#1F2937]">VivaVarejo</span>
             <span className="text-xs text-[#6B7280] font-mono font-bold bg-blue-50 text-[#2563EB] px-1.5 py-0.5 rounded border border-blue-200">
-              v0.0.90
+              v0.0.92
             </span>
-          </div>
+          </div>{' '}
           <div>
             <span>© {new Date().getFullYear()} VivaVarejo. Todos os direitos reservados.</span>
           </div>

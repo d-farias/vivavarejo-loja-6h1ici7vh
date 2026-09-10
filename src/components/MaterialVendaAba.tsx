@@ -240,7 +240,7 @@ const SOLUCOES_PLATAFORMA: SolucaoPilar[] = [
     numero: 1,
     titulo: 'Controle de Promotores e Fornecedores',
     subtitulo:
-      'Gestão da categoria, comprador vinculado, aviso no WhatsApp ao faltar, layout e fotos com zoom',
+      'Gestão da categoria, comprador vinculado, aviso no WhatsApp ao faltar, layout, fotos com zoom, check-in/out e dupla governança',
     icone: Users,
     destaqueBadge: 'Novo Diferencial Exclusivo',
     beneficioPrincipal:
@@ -264,7 +264,7 @@ const SOLUCOES_PLATAFORMA: SolucaoPilar[] = [
       {
         titulo: 'Checklist Rígido por Visita & Indicadores de Sortimento',
         descricao:
-          'Conferência em 4 critérios objetivos: abastecimento 100% do estoque da loja, conferência de validades, implantação conforme layout oficial e quantidade de itens do sortimento ativo.',
+          'Conferência em critérios objetivos: abastecimento 100% do estoque da loja, conferência de validades, implantação conforme layout oficial e quantidade de itens do sortimento ativo.',
       },
       {
         titulo: 'Campos Prontos para Integração com ERP (% Vendas, Rupturas e Itens sem Vendas)',
@@ -272,9 +272,14 @@ const SOLUCOES_PLATAFORMA: SolucaoPilar[] = [
           'Registro da fatia de vendas do fornecedor, quantidade de rupturas identificadas e itens sem giro na loja, preparando a operação para a integração contínua de dados com a retaguarda comercial.',
       },
       {
+        titulo: 'Check-in/Check-out, Tempo de Permanência & Aderência ao Roteiro',
+        descricao:
+          'Registro do horário de entrada e saída do promotor, cálculo do tempo de permanência na loja e índice de aderência ao roteiro semanal acordado com o fornecedor.',
+      },
+      {
         titulo: 'Foto Obrigatória com Zoom por Critério e Dupla Governança',
         descricao:
-          'Comprovação fotográfica com zoom e tela cheia separada por foco (gôndola, abastecimento e validades). Governança em duas etapas: Encarregado e GO garantem a execução, e o Gerente de Loja fiscaliza e aprova.',
+          'Comprovação fotográfica com zoom e tela cheia separada por foco (gôndola, abastecimento e validades). Governança: &ldquo;Encarregado e GO garantem, Gerente fiscaliza e aprova&rdquo;.',
       },
     ],
     diferencialExclusivo:
@@ -359,21 +364,31 @@ const SOLUCOES_PLATAFORMA: SolucaoPilar[] = [
     numero: 4,
     titulo: 'Agenda com Motor de Prioridade & Workflow Seguro',
     subtitulo:
-      'Fila dinâmica por corte horário, 4 status, 5W2H em 1 toque, cadeia WhatsApp e login direto',
+      'Fila dinâmica por corte horário (&ldquo;Faça agora / Depois / Em seguida&rdquo;), fluxo guiado, Meu Dia, 5W2H e cadeia WhatsApp',
     icone: Workflow,
     destaqueBadge: 'Ritmo Diário de Loja',
     beneficioPrincipal:
       'A tela central de trabalho de todo líder: ordena as tarefas do dia pelo horário de corte, audita a qualidade e dispara correções imediatas.',
     itensDetalhados: [
       {
-        titulo: 'Motor de Prioridade por Horário de Corte e Criticidade',
+        titulo: 'Motor de Prioridade (&ldquo;Faça agora / Depois / Em seguida&rdquo;)',
         descricao:
-          'A Agenda reorganiza a fila de execução em tempo real: tarefas com horário de corte próximo ou em atraso sobem imediatamente para o topo da lista da equipe.',
+          'A Agenda reorganiza a fila de execução em tempo real pelo corte horário e criticidade, direcionando com precisão o que deve ser feito no momento presente.',
       },
       {
-        titulo: 'Workflow Gerencial com 4 Status Rigorosos',
+        titulo: 'Meu Dia: Interface Operacional Separada da Gestão',
         descricao:
-          'Acompanhamento transparente sem espaço para dúvidas: Atrasada (vermelho), Aguardando Validação (azul), Devolvida com justificativa formal (laranja) e Aprovada (verde).',
+          'Tela enxuta para quem está no chão de loja: próxima visita de promotor, pendências urgentes e prioridades imediatas sem poluição de telas gerenciais.',
+      },
+      {
+        titulo: 'Fluxo Guiado de Execução com Foto e Validação',
+        descricao:
+          'Roteiro passo a passo: Conforme/Não conforme → Foto obrigatória → Observação técnica → Revisão → Conclusão. Sem margem para preenchimento leviano.',
+      },
+      {
+        titulo: 'Workflow Gerencial com 4 Status Rigorosos e 5W2H',
+        descricao:
+          'Acompanhamento transparente sem espaço para dúvidas: Atrasada, Aguardando Validação, Devolvida com justificativa e Aprovada, com 5W2H em 1 toque.',
       },
       {
         titulo: 'Planos de Ação 5W2H Gerados em 1 Toque',
@@ -713,9 +728,10 @@ export function MaterialVendaAba() {
               <span>VivaVarejo: Todas as Ferramentas & Diferenciais Atualizados</span>
             </h2>
             <p className="text-xs text-[#6B7280] mt-0.5">
-              Material revisado: Promotores com comprador e WhatsApp, perdas multissetorial, rotinas
-              por segmento, Agenda com motor de prioridade, chamados corporativos e dashboard de
-              eficiência.
+              Material revisado: Rotinas operacionais com prioridade (&ldquo;Faça agora / Depois /
+              Em seguida&rdquo;), Meu Dia enxuto, Matriz × Loja 5W2H, Promotores com permanência e
+              governança dupla, Prevenção em 4 semanas, Dashboard de eficiência e 6 Pilares de
+              Segurança.
             </p>
           </div>
 
@@ -857,16 +873,16 @@ export function MaterialVendaAba() {
 
           <div className="text-left sm:text-right">
             <span className="inline-block px-3 py-1 print:px-2 print:py-0.5 rounded-full text-xs print:text-[10px] font-bold bg-blue-50 text-[#2563EB] border border-blue-100">
-              Apresentação de Soluções & Guia de Diferenciais
+              Proposta Comercial Oficial & Guia de Soluções
             </span>
             <div className="text-[11px] print:text-[9.5px] text-[#6B7280] mt-1 print:mt-0.5 flex items-center sm:justify-end gap-1.5">
-              <span>A camada de execução entre o ERP e o chão de loja</span>
+              <span>A camada de execução entre o ERP e o chão de loja • v0.0.92</span>
               {!isCliente && (
                 <span className="font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 text-[10px]">
                   [Uso Interno Confidencial]
                 </span>
               )}
-            </div>
+            </div>{' '}
           </div>
         </div>
 
@@ -875,7 +891,9 @@ export function MaterialVendaAba() {
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-900 flex items-start gap-2.5 print-break-inside-avoid">
             <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
             <div>
-              <div className="font-bold">Atenção: Visualizando Versão Interna da Equipe</div>
+              <div className="font-bold">
+                Atenção: Visualizando Versão Interna da Equipe Comercial
+              </div>
               <div className="text-[11px] text-amber-800 mt-0.5 leading-relaxed">
                 Este material inclui notas estratégicas de pitch, dados de inteligência competitiva,
                 argumentos para cada módulo e dicas de fechamento. Para enviar ou projetar ao
@@ -887,12 +905,12 @@ export function MaterialVendaAba() {
         )}
 
         {/* =========================================================================
-            ABERTURA E PILARES — VERSÃO CLIENTE (TEXTO APROVADO VERBATIM)
-            OU VERSÃO INTERNA (9 SOLUÇÕES COMPLETAS COM NOTAS DE PITCH CONFIDENCIAIS)
+            ABERTURA E PILARES — VERSÃO CLIENTE (TEXTO APROVADO + ESTÁGIO ATUAL)
+            OU VERSÃO INTERNA (SOLUÇÕES COMPLETAS COM NOTAS DE PITCH CONFIDENCIAIS)
            ========================================================================= */}
         {isCliente ? (
           <div className="space-y-6 print:space-y-3.5">
-            {/* Abertura Verbatim Versão Cliente */}
+            {/* Abertura Oficial Versão Cliente */}
             <div className="space-y-3 print:space-y-1.5 print-break-inside-avoid">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 print:px-2 print:py-0.5 rounded-full text-xs print:text-[10px] font-bold bg-blue-50 text-[#2563EB] border border-blue-200">
                 <Workflow className="w-3.5 h-3.5 print:w-3 print:h-3" />
@@ -900,12 +918,17 @@ export function MaterialVendaAba() {
               </div>
               <div>
                 <h1 className="text-xl sm:text-2xl print:text-lg font-extrabold text-[#1F2937] tracking-tight">
-                  VivaVarejo
+                  VivaVarejo: Plataforma de Execução Operacional no PDV
                 </h1>
                 <p className="text-base sm:text-lg print:text-sm font-semibold text-[#2563EB] mt-0.5">
-                  Da informação à execução no chão de loja.
+                  A camada de execução entre a retaguarda e o chão de loja.
                 </p>
               </div>
+              <p className="text-xs sm:text-sm print:text-xs text-[#374151] leading-relaxed max-w-3xl font-medium">
+                O VivaVarejo é uma plataforma de execução operacional no ponto de venda que organiza
+                a rotina das equipes, direciona prioridades, comprova a execução das atividades e
+                transforma o que acontece na loja em informação para gestão.
+              </p>
               <p className="text-xs sm:text-sm print:text-xs text-[#4B5563] leading-relaxed max-w-3xl">
                 A VivaVarejo transforma indicadores, demandas e problemas operacionais em ações
                 práticas — com responsável, prioridade, prazo e acompanhamento em tempo real.
@@ -938,6 +961,10 @@ export function MaterialVendaAba() {
                         O dia da loja organizado por prioridade e horário, com execução, atraso,
                         aprovação e plano de ação automático.
                       </p>
+                      <div className="mt-2 text-[11px] text-[#2563EB] font-medium">
+                        • Motor &ldquo;Faça agora / Depois / Em seguida&rdquo; e fluxo guiado com
+                        fotos.
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -957,6 +984,10 @@ export function MaterialVendaAba() {
                         direto na fila de execução da loja. Nada mais se perde em e-mails e grupos
                         de WhatsApp.
                       </p>
+                      <div className="mt-2 text-[11px] text-[#2563EB] font-medium">
+                        • Método 5W2H: problema → ação → responsável → prazo → acompanhamento →
+                        resultado.
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -975,6 +1006,9 @@ export function MaterialVendaAba() {
                         Presença, abastecimento, validade, layout e registro fotográfico de cada
                         visita — com alerta ao comprador quando algo sair do combinado.
                       </p>
+                      <div className="mt-2 text-[11px] text-[#2563EB] font-medium">
+                        • Check-in/check-out com tempo de permanência e fotos por critério com zoom.
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -993,6 +1027,9 @@ export function MaterialVendaAba() {
                         Quebras por motivo e valor, inventários rotativos, controle de validade e
                         acuracidade em acompanhamento contínuo.
                       </p>
+                      <div className="mt-2 text-[11px] text-[#2563EB] font-medium">
+                        • Ciclo de 4 semanas de validade cobrindo todo o sortimento da loja.
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1011,6 +1048,10 @@ export function MaterialVendaAba() {
                         Uma única visão: execução, pontualidade, validação, chamados, perdas,
                         rupturas e vendas.
                       </p>
+                      <div className="mt-2 text-[11px] text-[#2563EB] font-medium">
+                        • Eficiência por Setor, Líder e Loja com correlação direta de redução de
+                        quebras e rupturas.
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1020,7 +1061,7 @@ export function MaterialVendaAba() {
             {/* O grande diferencial Verbatim */}
             <div className="bg-blue-50/60 border border-blue-100 rounded-xl p-5 print:p-3 space-y-3 print:space-y-1.5 print-break-inside-avoid print:bg-white print:border-gray-300">
               <span className="text-[11px] print:text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
-                Posicionamento Estratégico
+                Tese de Venda & Posicionamento Estratégico
               </span>
               <h2 className="text-base sm:text-lg print:text-sm font-extrabold text-[#1F2937] tracking-tight">
                 O grande diferencial
@@ -1034,6 +1075,65 @@ export function MaterialVendaAba() {
                   Resultado: mais velocidade e disciplina operacional, com menos gerente atrás da
                   tela e mais foco na execução dentro da loja.
                 </p>
+              </div>
+            </div>
+
+            {/* Nova Seção: Funcionalidades Operacionais da v0.0.92 */}
+            <div className="space-y-3 pt-2 border-t border-[#E5E7EB] print-break-inside-avoid">
+              <span className="text-[11px] print:text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
+                Capacidades Reais da Plataforma (v0.0.92)
+              </span>
+              <h2 className="text-base sm:text-lg print:text-sm font-extrabold text-[#1F2937] tracking-tight">
+                Como a plataforma opera na prática do dia a dia
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 print:grid-cols-2 text-xs">
+                <div className="p-3.5 rounded-xl border border-[#E5E7EB] bg-white space-y-1.5 shadow-2xs">
+                  <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
+                    <Smartphone className="w-4 h-4 text-[#2563EB]" />
+                    <span>Meu Dia: Foco Operacional na Ponta</span>
+                  </div>
+                  <p className="text-[#4B5563] text-[11px] leading-relaxed">
+                    Tela enxuta dedicada ao operador de chão de loja com próxima visita de promotor,
+                    pendências urgentes e prioridades do turno. Experiência de campo separada e
+                    despoluída da complexidade de gestão.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl border border-[#E5E7EB] bg-white space-y-1.5 shadow-2xs">
+                  <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#2563EB]" />
+                    <span>Fluxo Guiado de Execução</span>
+                  </div>
+                  <p className="text-[#4B5563] text-[11px] leading-relaxed">
+                    Roteiro passo a passo rigoroso: Conforme/Não Conforme → Foto obrigatória com
+                    zoom → Observação técnica → Revisão → Conclusão. Sem margem para preenchimentos
+                    fakes.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl border border-[#E5E7EB] bg-white space-y-1.5 shadow-2xs">
+                  <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
+                    <Users className="w-4 h-4 text-[#2563EB]" />
+                    <span>Governança em Duas Etapas de Promotores</span>
+                  </div>
+                  <p className="text-[#4B5563] text-[11px] leading-relaxed">
+                    Encarregado de setor e GO garantem a execução do checklist e registro de
+                    permanência, e o Gerente de Loja fiscaliza e aprova. Fotos com zoom por critério
+                    (gôndola, abastecimento, validade).
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl border border-[#E5E7EB] bg-white space-y-1.5 shadow-2xs">
+                  <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
+                    <BarChart3 className="w-4 h-4 text-[#2563EB]" />
+                    <span>Dashboard de Eficiência & Indicadores Comerciais</span>
+                  </div>
+                  <p className="text-[#4B5563] text-[11px] leading-relaxed">
+                    Acompanhamento integrado por Setor, por Líder e por Loja: Vendas, Quebras,
+                    Rupturas, Itens sem Vendas, Estoque Virtual e Estoque Parado. Setores acima de
+                    90% de conclusão comprovam queda imediata de perdas.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -1328,6 +1428,108 @@ export function MaterialVendaAba() {
           </div>
         </div>
 
+        {/* Seção dos 6 Pilares de Segurança e Proteção de Dados (Argumento Comercial Oficial) */}
+        <div className="space-y-3 pt-4 border-t border-[#E5E7EB] print-break-inside-avoid">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <span className="text-[11px] print:text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
+                Segurança Corporativa & LGPD
+              </span>
+              <h3 className="text-base sm:text-lg print:text-sm font-extrabold text-[#1F2937] tracking-tight mt-0.5">
+                Segurança & Proteção de Dados em Nível Empresarial
+              </h3>
+            </div>
+            <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              6 Pilares Implantados • 100% Conforme LGPD
+            </span>
+          </div>
+
+          <p className="text-xs text-[#4B5563] leading-relaxed">
+            Sua rede e seus dados comerciais protegidos por arquitetura blindada. A segurança é um
+            pilar nativo do VivaVarejo e um forte diferencial competitivo:
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 print:grid-cols-3 text-xs">
+            <div className="p-3 rounded-lg border border-[#E5E7EB] bg-[#F7F7F5] space-y-1">
+              <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
+                <span className="w-5 h-5 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center text-[11px] font-extrabold">
+                  1
+                </span>
+                <span>Dados Isolados por Rede</span>
+              </div>
+              <p className="text-[11px] text-[#6B7280] leading-snug">
+                Isolamento estrito multi-inquilino. Uma rede ou filial jamais acessa informações ou
+                rotinas de outra.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-lg border border-[#E5E7EB] bg-[#F7F7F5] space-y-1">
+              <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
+                <span className="w-5 h-5 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center text-[11px] font-extrabold">
+                  2
+                </span>
+                <span>Acesso por Perfil & Permissões</span>
+              </div>
+              <p className="text-[11px] text-[#6B7280] leading-snug">
+                Regras de perfil (Operador, Encarregado, Gerente, GO e Diretor). Cada colaborador vê
+                apenas o necessário.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-lg border border-[#E5E7EB] bg-[#F7F7F5] space-y-1">
+              <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
+                <span className="w-5 h-5 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center text-[11px] font-extrabold">
+                  3
+                </span>
+                <span>Fotos e Arquivos Privados</span>
+              </div>
+              <p className="text-[11px] text-[#6B7280] leading-snug">
+                Registros fotográficos e relatórios protegidos por token temporário assinado, sem
+                URLs públicas expostas.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-lg border border-[#E5E7EB] bg-[#F7F7F5] space-y-1">
+              <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
+                <span className="w-5 h-5 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center text-[11px] font-extrabold">
+                  4
+                </span>
+                <span>Trilha de Auditoria Imutável</span>
+              </div>
+              <p className="text-[11px] text-[#6B7280] leading-snug">
+                Log permanente de acessos, aprovações, devoluções e alterações com carimbo de data,
+                hora e responsável.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-lg border border-[#E5E7EB] bg-[#F7F7F5] space-y-1">
+              <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
+                <span className="w-5 h-5 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center text-[11px] font-extrabold">
+                  5
+                </span>
+                <span>Logout Automático por Inatividade</span>
+              </div>
+              <p className="text-[11px] text-[#6B7280] leading-snug">
+                Encerramento de sessão automático com aviso prévio em celulares ou computadores
+                compartilhados no balcão.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-lg border border-[#E5E7EB] bg-[#F7F7F5] space-y-1">
+              <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
+                <span className="w-5 h-5 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center text-[11px] font-extrabold">
+                  6
+                </span>
+                <span>Política de Senha Forte & Criptografia</span>
+              </div>
+              <p className="text-[11px] text-[#6B7280] leading-snug">
+                Validação de complexidade de credenciais e comunicação cifrada ponta a ponta
+                (HTTPS/TLS moderno).
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Assinatura Final de Fechamento em Destaque */}
         {isCliente && (
           <div className="bg-[#2563EB]/5 border-2 border-[#2563EB]/30 rounded-2xl p-6 sm:p-7 print:p-3 text-center space-y-3 print:space-y-1.5 print-break-inside-avoid print:bg-white print:border-[#2563EB]">
@@ -1337,9 +1539,9 @@ export function MaterialVendaAba() {
             <div className="inline-block px-4 py-2 print:px-3 print:py-1 rounded-xl bg-[#2563EB] text-white font-extrabold text-sm sm:text-base print:text-xs tracking-wide shadow-xs print:bg-white print:text-[#2563EB] print:border print:border-[#2563EB]">
               Informação → Prioridade → Ação → Acompanhamento → Resultado.
             </div>
-            <p className="text-xs print:text-[11px] text-[#4B5563] max-w-xl mx-auto pt-1 print:pt-0">
-              A camada de execução definitiva que transforma números e metas em disciplina no chão
-              de loja.
+            <p className="text-xs print:text-[11px] text-[#4B5563] max-w-xl mx-auto pt-1 print:pt-0 font-medium">
+              &ldquo;ERP e BI mostram o que aconteceu. A VivaVarejo garante que o que precisa ser
+              feito seja feito — camada operacional entre a retaguarda e o chão de loja.&rdquo;
             </p>
           </div>
         )}

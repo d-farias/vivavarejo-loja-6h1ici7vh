@@ -1035,7 +1035,7 @@ export default function Admin() {
           <span>Relatórios Loja a Loja</span>
         </button>
 
-        {/* Nova aba: Material de Venda */}
+        {/* Nova aba: Proposta Comercial & Material de Venda */}
         <button
           onClick={() => {
             setActiveTab('material_venda')
@@ -1048,7 +1048,7 @@ export default function Admin() {
           }`}
         >
           <Presentation className="w-4 h-4" />
-          <span>Material de Venda</span>
+          <span>Proposta Comercial</span>
         </button>
 
         {/* Nova aba: Modelos de Rotinas */}

@@ -280,11 +280,12 @@ export default function BemVindo() {
             {/* Título grande em negrito + Descrição de apoio */}
             <div className="space-y-4">
               <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[#1F2937] tracking-tight leading-tight sm:leading-tight">
-                Organize as rotinas da sua loja e lidere com clareza
+                A camada de execução entre o ERP e o chão de loja
               </h1>
-              <p className="text-sm sm:text-base text-[#6B7280] max-w-2xl mx-auto leading-relaxed">
-                Elimine o improviso no chão de loja. Defina responsáveis, horários limite, validação
-                com fotos e acompanhe a execução em tempo real na palma da mão ou no painel.
+              <p className="text-sm sm:text-base text-[#4B5563] max-w-2xl mx-auto leading-relaxed">
+                O VivaVarejo é a plataforma de execução operacional no ponto de venda que organiza a
+                rotina das equipes, direciona prioridades, comprova a execução com fotos e
+                transforma o que acontece na loja em informação para gestão.
               </p>
             </div>
 
@@ -343,10 +344,11 @@ export default function BemVindo() {
               </p>
             </div>
 
-            <div className="pt-2">
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2">
               <div className="inline-block px-4 py-2 rounded-lg bg-[#F7F7F5] border border-[#E5E7EB] text-xs sm:text-sm font-bold text-[#1F2937]">
-                <span className="text-[#2563EB]">Da informação à execução.</span> Menos relatório.
-                Mais execução.
+                <span className="text-[#2563EB]">
+                  Informação → Prioridade → Ação → Acompanhamento → Resultado.
+                </span>
               </div>
             </div>
           </div>
@@ -950,10 +952,17 @@ export default function BemVindo() {
             </div>
           </div>
 
-          {/* Linha de copyright */}
+          {/* Linha de copyright e versão */}
           <div className="pt-3 border-t border-[#F3F4F6] flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-[#9CA3AF]">
-            <span>© {new Date().getFullYear()} VivaVarejo. Todos os direitos reservados.</span>
-            <span>Plataforma de gestão operacional, processos e inventários para o varejo.</span>
+            <div className="flex items-center gap-2">
+              <span>© {new Date().getFullYear()} VivaVarejo. Todos os direitos reservados.</span>
+              <span className="font-mono font-bold bg-blue-50 text-[#2563EB] px-1.5 py-0.5 rounded border border-blue-200 text-[10px]">
+                v0.0.92
+              </span>
+            </div>
+            <span>
+              Plataforma de execução operacional, processos e prevenção de perdas no varejo físico.
+            </span>
           </div>
         </div>
       </footer>
