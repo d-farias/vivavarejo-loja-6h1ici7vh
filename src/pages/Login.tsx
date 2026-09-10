@@ -58,7 +58,14 @@ export default function Login() {
 
     try {
       await login(email, password)
-      navigate(from, { replace: true })
+      // Direcionamento inteligente: se a rota de origem era '/', decide por perfil
+      if (from === '/') {
+        const emailLower = email.toLowerCase()
+        const isOperacional = emailLower.includes('promotor') || emailLower.includes('repositor')
+        navigate(isOperacional ? '/meu-dia' : '/agenda', { replace: true })
+      } else {
+        navigate(from, { replace: true })
+      }
     } catch (err: unknown) {
       const errorObj = err as {
         data?: { data?: Record<string, { message: string }> }

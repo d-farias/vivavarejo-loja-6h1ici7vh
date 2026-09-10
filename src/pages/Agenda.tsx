@@ -11,6 +11,7 @@ import { StoreSelector } from '@/components/StoreSelector'
 import { ReadequarTarefaModal } from '@/components/ReadequarTarefaModal'
 import { ConcluirRotinaModal } from '@/components/ConcluirRotinaModal'
 import { ConcluirVisitaModal } from '@/components/ConcluirVisitaModal'
+import { ExecucaoGuiadaModal, ExecucaoGuiadaResult } from '@/components/ExecucaoGuiadaModal'
 import { PlanoAcaoModal } from '@/components/PlanoAcaoModal'
 import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
 import { BotaoAvisoWhatsApp } from '@/components/BotaoAvisoWhatsApp'
@@ -50,7 +51,9 @@ import {
   Store,
   User,
   Plus,
+  PlayCircle,
 } from 'lucide-react'
+import { pb } from '@/lib/pocketbase/client'
 
 export default function AgendaPage() {
   const { user } = useAuth()
@@ -82,6 +85,7 @@ export default function AgendaPage() {
   }>({ open: false, rotina: null })
 
   const [concluirModalRotina, setConcluirModalRotina] = useState<Rotina | null>(null)
+  const [execucaoGuiadaRotina, setExecucaoGuiadaRotina] = useState<Rotina | null>(null)
   const [concluirVisitaModal, setConcluirVisitaModal] = useState<VisitaPromotor | null>(null)
   const [concluirValidadeModal, setConcluirValidadeModal] = useState<TarefaValidade | null>(null)
   const [planoAcaoModal, setPlanoAcaoModal] = useState<{ open: boolean; rotina?: Rotina | null }>({
@@ -790,6 +794,35 @@ export default function AgendaPage() {
   }
 
   const dataInfo = formatarDataCabecalho(currentDateStr)
+
+  const handleConcluirExecucaoGuiadaAgenda = async (result: ExecucaoGuiadaResult) => {
+    if (!execucaoGuiadaRotina || !user) return
+    const existingExec = execucoesMap.get(execucaoGuiadaRotina.id)
+    const isCurrentlyDone = Boolean(
+      existingExec?.concluida && existingExec.status_validacao !== 'devolvida',
+    )
+    await execucoesService.toggleExecution(
+      execucaoGuiadaRotina.id,
+      user.id,
+      isCurrentlyDone,
+      existingExec?.id,
+      currentDateStr,
+      result.fotoFile,
+    )
+    if (result.observacao || !result.conforme) {
+      // Atualiza observação / status se necessário
+      const updatedList = await execucoesService.getExecutionsByDate(currentDateStr)
+      const thisExec = updatedList.find((e) => e.rotina === execucaoGuiadaRotina.id)
+      if (thisExec) {
+        await pb.collection('execucoes_rotinas').update(thisExec.id, {
+          observacao: result.observacao,
+          status_validacao: result.conforme ? 'aprovada' : 'aguardando_validacao',
+        })
+      }
+    }
+    setExecucaoGuiadaRotina(null)
+    loadData()
+  }
 
   return (
     <div className="space-y-6">
@@ -1659,15 +1692,15 @@ export default function AgendaPage() {
                       </button>
                     )}
 
-                    {/* Botão Concluir com Foto com tap target confortável */}
+                    {/* Botão Execução Guiada / Concluir */}
                     {!concluida && (
                       <button
-                        onClick={() => setConcluirModalRotina(rotina)}
-                        className="inline-flex items-center gap-1 px-3 py-2 min-h-[38px] rounded-md text-xs font-semibold bg-white border border-[#2563EB] text-[#2563EB] hover:bg-blue-50 transition-colors"
-                        title="Concluir rotina anexando foto"
+                        onClick={() => setExecucaoGuiadaRotina(rotina)}
+                        className="inline-flex items-center gap-1 px-3 py-2 min-h-[38px] rounded-md text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-xs transition-colors"
+                        title="Executar tarefa com fluxo guiado"
                       >
-                        <Camera className="w-3.5 h-3.5" />
-                        <span>Com foto</span>
+                        <PlayCircle className="w-3.5 h-3.5" />
+                        <span>Executar tarefa</span>
                       </button>
                     )}
 
@@ -1729,6 +1762,22 @@ export default function AgendaPage() {
         currentDateStr={currentDateStr}
         onSave={handleSaveReadequacao}
       />
+
+      {/* Modal Execução Guiada Passo a Passo (Item 4) */}
+      {execucaoGuiadaRotina && user && (
+        <ExecucaoGuiadaModal
+          open={!!execucaoGuiadaRotina}
+          onOpenChange={(op) => !op && setExecucaoGuiadaRotina(null)}
+          titulo={execucaoGuiadaRotina.nome}
+          subtitulo={`Responsável: ${execucaoGuiadaRotina.responsavel || 'Operador'} • Loja: ${lojaSelecionada?.nome || ''}`}
+          horarioLimite={execucaoGuiadaRotina.horario_limite}
+          responsavel={execucaoGuiadaRotina.responsavel}
+          ferramenta={execucaoGuiadaRotina.ferramenta}
+          validacao={execucaoGuiadaRotina.validacao}
+          observacoesOriginais={execucaoGuiadaRotina.observacoes}
+          onConcluir={handleConcluirExecucaoGuiadaAgenda}
+        />
+      )}
 
       {/* Modal Concluir Rotina com Foto */}
       {concluirModalRotina && user && (

@@ -313,6 +313,10 @@ export interface VisitaPromotor extends RecordModel {
   realizada_em?: string
   registrado_por?: string
   alerta_enviado_em?: string
+  // Campos de fluxo e check-in/check-out
+  check_in?: string
+  check_out?: string
+  tempo_permanencia_minutos?: number
   // Novos campos exigidos pelo usuário (Frente 2)
   foto_trabalho?: string
   foto_gondola?: string

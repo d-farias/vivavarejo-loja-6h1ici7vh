@@ -275,6 +275,18 @@ export function ConcluirVisitaModal({
                   {visita.hora_prevista ? `às ${visita.hora_prevista}` : ''}
                 </span>
               </span>
+              {visita.check_in && (
+                <>
+                  <span className="text-gray-300">•</span>
+                  <span className="text-emerald-700 font-medium">
+                    Check-in:{' '}
+                    {new Date(visita.check_in).toLocaleTimeString('pt-BR', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                </>
+              )}
             </div>
             {visita.observacoes && (
               <div className="pt-1 border-t border-[#E5E7EB] text-[#6B7280] italic break-words">

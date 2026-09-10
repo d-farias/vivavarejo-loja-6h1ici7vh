@@ -124,6 +124,8 @@ export const visitasPromotorService = {
           responsavel_execucao: params.responsavel_execucao,
           validador_fiscalizacao: params.validador_fiscalizacao,
           status_fiscalizacao: params.status_fiscalizacao || 'pendente',
+          check_out: (params as any).check_out || nowIso,
+          tempo_permanencia_minutos: (params as any).tempo_permanencia_minutos,
           foto_trabalho: params.foto_trabalho,
           foto_gondola: params.foto_gondola,
           foto_abastecimento: params.foto_abastecimento,
@@ -148,6 +150,47 @@ export const visitasPromotorService = {
       /* intentionally ignored */
     }
 
+    return rec
+  },
+
+  async registrarCheckIn(id: string, horaStr?: string): Promise<VisitaPromotor> {
+    const nowIso = new Date().toISOString()
+    const hora =
+      horaStr ||
+      `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`
+    const rec = await pb.collection('visitas_promotor').update<VisitaPromotor>(
+      id,
+      {
+        check_in: nowIso,
+        observacoes: `Check-in realizado às ${hora}`,
+      },
+      {
+        expand: 'promotor,promotor.fornecedor,loja',
+      },
+    )
+    return rec
+  },
+
+  async registrarCheckOut(id: string): Promise<VisitaPromotor> {
+    const current = await this.getById(id)
+    const nowIso = new Date().toISOString()
+    let permanencia: number | undefined
+    if (current.check_in) {
+      const entrada = new Date(current.check_in).getTime()
+      const saida = new Date(nowIso).getTime()
+      const diffMin = Math.round((saida - entrada) / (1000 * 60))
+      if (diffMin > 0) permanencia = diffMin
+    }
+    const rec = await pb.collection('visitas_promotor').update<VisitaPromotor>(
+      id,
+      {
+        check_out: nowIso,
+        tempo_permanencia_minutos: permanencia,
+      },
+      {
+        expand: 'promotor,promotor.fornecedor,loja',
+      },
+    )
     return rec
   },
 

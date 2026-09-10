@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-10T00:25:30.383Z",
+  "generatedAt": "2026-09-10T00:44:18.294Z",
   "collections": [
     {
       "name": "users",
@@ -1341,6 +1341,24 @@
         {
           "name": "foto_validades",
           "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "check_in",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "check_out",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tempo_permanencia_minutos",
+          "type": "number",
           "required": false,
           "system": false
         }

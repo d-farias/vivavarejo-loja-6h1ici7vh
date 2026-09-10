@@ -31,18 +31,21 @@ import { ChangePasswordModal } from '@/components/ChangePasswordModal'
 import { FalarEspecialistaModal } from '@/components/FalarEspecialistaModal'
 import { PwaInstallModal } from '@/components/PwaInstallModal'
 import { InactivityWarningModal } from '@/components/InactivityWarningModal'
+import { BottomNavMobile } from '@/components/BottomNavMobile'
 import { usePwaInstall } from '@/hooks/use-pwa-install'
 import { useAutoLogout } from '@/hooks/use-auto-logout'
 
 export default function Layout() {
   const { user, logout } = useAuth()
-  const navigate = useNavigate()
   const location = useLocation()
+  const navigate = useNavigate()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
   const [falarEspecialistaOpen, setFalarEspecialistaOpen] = useState(false)
   const [pwaModalOpen, setPwaModalOpen] = useState(false)
 
+  // Perfil operacional x gestão
+  const emailLower = (user?.email || '').toLowerCase()
   const { isInstallable, isInstalled, isIOS, promptInstall } = usePwaInstall()
 
   const handleInactivityLogout = React.useCallback(() => {
@@ -97,29 +100,40 @@ export default function Layout() {
   }
 
   const perfil = user?.perfil || (user?.email === 'dfarias53@gmail.com' ? 'admin' : 'lider')
+  const isCampo =
+    perfil === 'funcionario' || emailLower.includes('promotor') || emailLower.includes('repositor')
   const isAdminGeral = perfil === 'admin'
   const isAdmRede = perfil === 'adm_rede'
   const hasAdminAccess = isAdminGeral || isAdmRede
   const isLiderOrAdmin = perfil === 'admin' || perfil === 'adm_rede' || perfil === 'lider'
 
-  const navLinks = [
-    { to: '/agenda', label: 'Agenda', icon: Calendar },
-    { to: '/rotinas', label: 'Rotinas', icon: ListChecks },
-    { to: '/validades', label: 'Validade × Calendário', icon: CalendarCheck },
-    { to: '/perdas', label: 'Perdas & Inventário', icon: ShieldAlert },
-    { to: '/equipe', label: 'Minha Equipe', icon: Users },
-    ...(isLiderOrAdmin ? [{ to: '/promotores', label: 'Promotores', icon: Handshake }] : []),
-    { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-    ...(hasAdminAccess
-      ? [
-          {
-            to: '/admin',
-            label: isAdmRede ? 'Workflow Rede' : 'Workflow Geral',
-            icon: GitBranch,
-          },
-        ]
-      : []),
-  ]
+  // Se for perfil campo, exibe navegação simples e operacional focada em execução.
+  // Se for gestão, exibe navegação analítica completa.
+  const navLinks = isCampo
+    ? [
+        { to: '/meu-dia', label: 'Meu Dia', icon: Calendar },
+        { to: '/promotores', label: 'Visitas', icon: Handshake },
+        { to: '/agenda', label: 'Tarefas', icon: ListChecks },
+        { to: '/validades', label: 'Validades', icon: CalendarCheck },
+      ]
+    : [
+        { to: '/agenda', label: 'Agenda', icon: Calendar },
+        { to: '/rotinas', label: 'Rotinas', icon: ListChecks },
+        { to: '/validades', label: 'Validade × Calendário', icon: CalendarCheck },
+        { to: '/perdas', label: 'Perdas & Inventário', icon: ShieldAlert },
+        { to: '/equipe', label: 'Minha Equipe', icon: Users },
+        ...(isLiderOrAdmin ? [{ to: '/promotores', label: 'Promotores', icon: Handshake }] : []),
+        { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+        ...(hasAdminAccess
+          ? [
+              {
+                to: '/admin',
+                label: isAdmRede ? 'Workflow Rede' : 'Workflow Geral',
+                icon: GitBranch,
+              },
+            ]
+          : []),
+      ]
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F7F7F5] text-[#1F2937]">
@@ -452,17 +466,24 @@ export default function Layout() {
       />
 
       {/* Footer */}
-      <footer className="w-full border-t border-[#E5E7EB] bg-white py-4 mt-auto">
+      <footer className="w-full border-t border-[#E5E7EB] bg-white py-4 mt-auto pb-20 md:pb-4">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#6B7280]">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-[#1F2937]">VivaVarejo</span>
-            <span className="text-xs text-[#6B7280] font-mono">v0.0.89</span>
+            <span className="text-xs text-[#6B7280] font-mono font-bold bg-blue-50 text-[#2563EB] px-1.5 py-0.5 rounded border border-blue-200">
+              v0.0.90
+            </span>
           </div>
           <div>
             <span>© {new Date().getFullYear()} VivaVarejo. Todos os direitos reservados.</span>
           </div>
         </div>
       </footer>
+
+      {/* Navegação inferior fixa no mobile (Item 5 da especificação) */}
+      {!isAuthPage && user && (
+        <BottomNavMobile isCampo={isCampo} onOpenMais={() => setMobileMenuOpen(true)} />
+      )}
     </div>
   )
 }

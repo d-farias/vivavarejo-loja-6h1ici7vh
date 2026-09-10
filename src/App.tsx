@@ -10,6 +10,7 @@ import Layout from './components/Layout'
 import Index from './pages/Index'
 import Rotinas from './pages/Rotinas'
 import Agenda from './pages/Agenda'
+import { MeuDiaPage } from './pages/MeuDia'
 import Equipe from './pages/Equipe'
 import Admin from './pages/Admin'
 import Promotores from './pages/Promotores'
@@ -65,6 +66,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Index />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/meu-dia"
+                element={
+                  <ProtectedRoute>
+                    <MeuDiaPage />
                   </ProtectedRoute>
                 }
               />
