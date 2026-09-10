@@ -27,11 +27,19 @@ import { CardTarefaEnxuto } from '@/components/CardTarefaEnxuto'
 import { ExecucaoGuiadaModal, ExecucaoGuiadaResult } from '@/components/ExecucaoGuiadaModal'
 import { ConcluirVisitaModal } from '@/components/ConcluirVisitaModal'
 import { StoreSelector } from '@/components/StoreSelector'
+import { OfflineStatusIndicator } from '@/components/OfflineStatusIndicator'
 import { useAuth } from '@/context/AuthContext'
 import { useStore } from '@/context/StoreContext'
 import { rotinasService, execucoesService, getTodayDateString } from '@/services/rotinas'
 import { visitasPromotorService } from '@/services/visitasPromotor'
 import { parseHorarioLimiteToMinutes, isPastDue } from '@/lib/time-utils'
+import {
+  saveLocalCache,
+  getLocalCache,
+  enqueueOfflineItem,
+  getPendingQueue,
+} from '@/lib/offline/db'
+import { triggerQueueSync } from '@/lib/offline/syncEngine'
 import { toast } from '@/hooks/use-toast'
 import pb from '@/lib/pocketbase/client'
 import type { Rotina, ExecucaoRotina, VisitaPromotor } from '@/types'
@@ -61,26 +69,64 @@ export function MeuDiaPage() {
 
   const hojeStr = useMemo(() => getTodayDateString(), [])
 
-  // Carregamento de dados com tolerância a sinal ruim e cache local simples
+  // Carregamento de dados com tolerância a sinal ruim e cache local robusto (IndexedDB)
   const carregarDados = async () => {
+    const lojaId = lojaSelecionadaId !== 'todas' ? lojaSelecionadaId : undefined
+    const cacheKey = `vivavarejo_meudia_${lojaId || 'all'}_${hojeStr}`
+
     try {
       setLoading(true)
-      const lojaId = lojaSelecionadaId !== 'todas' ? lojaSelecionadaId : undefined
 
-      // Chave de cache do dia
-      const cacheKey = `vivavarejo_meudia_${lojaId || 'all'}_${hojeStr}`
-      const cached = sessionStorage.getItem(cacheKey)
+      // 1. Carrega imediatamente o cache offline do IndexedDB para renderização instantânea
+      const cached = await getLocalCache<{
+        rotinas: Rotina[]
+        execucoes: ExecucaoRotina[]
+        visitas: VisitaPromotor[]
+      }>(cacheKey)
+
       if (cached) {
-        try {
-          const parsed = JSON.parse(cached)
-          setRotinas(parsed.rotinas || [])
-          setExecucoes(parsed.execucoes || [])
-          setVisitas(parsed.visitas || [])
-        } catch {
-          /* intentionally ignored */
+        setRotinas(cached.rotinas || [])
+        setExecucoes(cached.execucoes || [])
+        setVisitas(cached.visitas || [])
+      }
+
+      // Incorpora itens pendentes da fila local para que tarefas executadas offline apareçam concluídas na UI
+      const pendingQueue = await getPendingQueue()
+      if (pendingQueue.length > 0) {
+        const localExecs: ExecucaoRotina[] = []
+        for (const item of pendingQueue) {
+          if (item.type === 'execucao_rotina') {
+            localExecs.push({
+              id: item.id,
+              collectionId: 'execucoes_rotinas',
+              collectionName: 'execucoes_rotinas',
+              rotina: item.targetId,
+              usuario: item.userId || user?.id || '',
+              data_execucao: item.createdAt,
+              concluida: true,
+              status_validacao: item.payload.conforme ? 'aprovada' : 'aguardando_validacao',
+              created: item.createdAt,
+              updated: item.createdAt,
+            })
+          }
+        }
+        if (localExecs.length > 0) {
+          setExecucoes((prev) => {
+            const map = new Map<string, ExecucaoRotina>()
+            for (const e of prev) map.set(e.rotina, e)
+            for (const le of localExecs) map.set(le.rotina, le)
+            return Array.from(map.values())
+          })
         }
       }
 
+      // Se o navegador estiver offline, não tenta a rede e mantém os dados em cache
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        setLoading(false)
+        return
+      }
+
+      // 2. Busca dados frescos da rede
       const [rotList, exList, visList] = await Promise.all([
         rotinasService.getAll(lojaId),
         execucoesService.getExecutionsByDate(hojeStr),
@@ -92,21 +138,28 @@ export function MeuDiaPage() {
       setExecucoes(exList)
       setVisitas(visList)
 
-      // Salvar em cache de sessão para agilidade instantânea em navegação subsequente
-      sessionStorage.setItem(
-        cacheKey,
-        JSON.stringify({
-          rotinas: ativas,
-          execucoes: exList,
-          visitas: visList,
-          ts: Date.now(),
-        }),
-      )
+      // 3. Salva no IndexedDB para persistência entre sessões e modo desconectado
+      await saveLocalCache(cacheKey, {
+        rotinas: ativas,
+        execucoes: exList,
+        visitas: visList,
+      })
     } catch (err) {
-      console.error('Erro ao carregar dados de Meu Dia:', err)
+      console.warn('[MeuDia] Rede inacessível. Usando dados do IndexedDB:', err)
+      // Tenta recuperar do cache se ainda não tiver carregado
+      const fallback = await getLocalCache<{
+        rotinas: Rotina[]
+        execucoes: ExecucaoRotina[]
+        visitas: VisitaPromotor[]
+      }>(cacheKey)
+      if (fallback) {
+        setRotinas(fallback.rotinas || [])
+        setExecucoes(fallback.execucoes || [])
+        setVisitas(fallback.visitas || [])
+      }
       toast({
-        title: 'Atenção com conexão',
-        description: 'Usando dados mais recentes sincronizados no aparelho.',
+        title: 'Modo Offline Ativo',
+        description: 'Usando rotinas e visitas salvas no aparelho.',
       })
     } finally {
       setLoading(false)
@@ -203,12 +256,75 @@ export function MeuDiaPage() {
     setGuiadaAberta(true)
   }
 
+  // Executar rotina com fluxo guiado com suporte offline prioritário
   const handleConcluirExecucaoGuiada = async (res: ExecucaoGuiadaResult) => {
     if (!rotinaAlvo || !user) return
+    const agoraIso = new Date().toISOString()
+    const rotinaId = rotinaAlvo.id
+
+    // Atualização otimista imediata na UI: cria uma execução virtual local
+    const execucaoOtimista: ExecucaoRotina = {
+      id: `local_exec_${Date.now()}`,
+      collectionId: 'execucoes_rotinas',
+      collectionName: 'execucoes_rotinas',
+      rotina: rotinaId,
+      usuario: user.id,
+      data_execucao: agoraIso,
+      concluida: true,
+      status_validacao: res.conforme ? 'aprovada' : 'aguardando_validacao',
+      created: agoraIso,
+      updated: agoraIso,
+      expand: {
+        rotina: rotinaAlvo,
+        usuario: user,
+      },
+    }
+
+    // Atualiza estado e cache local do dia no IndexedDB
+    setExecucoes((prev) => {
+      const filtered = prev.filter((e) => e.rotina !== rotinaId)
+      const next = [execucaoOtimista, ...filtered]
+      const lojaId = lojaSelecionadaId !== 'todas' ? lojaSelecionadaId : undefined
+      const cacheKey = `vivavarejo_meudia_${lojaId || 'all'}_${hojeStr}`
+      saveLocalCache(cacheKey, {
+        rotinas,
+        execucoes: next,
+        visitas,
+      }).catch(() => {})
+      return next
+    })
+
+    // Se estiver offline ou a conexão cair, enfileira diretamente no IndexedDB
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      await enqueueOfflineItem({
+        type: 'execucao_rotina',
+        createdAt: agoraIso,
+        targetId: rotinaId,
+        userId: user.id,
+        lojaId: rotinaAlvo.loja,
+        payload: {
+          conforme: res.conforme,
+          observacao: res.observacao || '',
+          data_execucao: hojeStr,
+          horario_planejado: rotinaAlvo.horario_limite,
+        },
+        fotoBlob: res.fotoFile ? res.fotoFile : undefined,
+        fotoFileName: res.fotoFile ? res.fotoFile.name : undefined,
+        fotoFieldName: 'foto',
+      })
+
+      toast({
+        title: 'Registro salvo no aparelho (Offline)',
+        description: `${rotinaAlvo.nome} foi concluída offline e será enviada quando reconectar.`,
+      })
+      return
+    }
+
+    // Se estiver online, tenta enviar diretamente; se falhar, enfileira automaticamente
     try {
-      const existing = execMap.get(rotinaAlvo.id)
+      const existing = execMap.get(rotinaId)
       await execucoesService.toggleExecution(
-        rotinaAlvo.id,
+        rotinaId,
         user.id,
         false,
         existing?.id,
@@ -218,7 +334,7 @@ export function MeuDiaPage() {
 
       if (res.observacao || !res.conforme) {
         const updatedList = await execucoesService.getExecutionsByDate(hojeStr)
-        const thisExec = updatedList.find((e) => e.rotina === rotinaAlvo.id)
+        const thisExec = updatedList.find((e) => e.rotina === rotinaId)
         if (thisExec) {
           await pb.collection('execucoes_rotinas').update(thisExec.id, {
             observacao: res.observacao,
@@ -234,22 +350,63 @@ export function MeuDiaPage() {
           : `${rotinaAlvo.nome} registrada com fotos/obs.`,
       })
 
-      // Atualiza lista local
+      // Atualiza lista do servidor
       await carregarDados()
     } catch (err) {
-      console.error('Erro ao salvar execução:', err)
+      console.warn('[MeuDia] Falha de rede ao enviar execução. Enfileirando offline:', err)
+      // Enfileira para que NADA se perca
+      await enqueueOfflineItem({
+        type: 'execucao_rotina',
+        createdAt: agoraIso,
+        targetId: rotinaId,
+        userId: user.id,
+        lojaId: rotinaAlvo.loja,
+        payload: {
+          conforme: res.conforme,
+          observacao: res.observacao || '',
+          data_execucao: hojeStr,
+          horario_planejado: rotinaAlvo.horario_limite,
+        },
+        fotoBlob: res.fotoFile ? res.fotoFile : undefined,
+        fotoFileName: res.fotoFile ? res.fotoFile.name : undefined,
+        fotoFieldName: 'foto',
+      })
+
       toast({
-        title: 'Erro ao registrar',
-        description: 'Tente novamente ou verifique a conexão.',
-        variant: 'destructive',
+        title: 'Salvo na fila de envio',
+        description:
+          'Sinal instável. A tarefa foi salva no aparelho e será transmitida automaticamente.',
       })
     }
   }
 
-  // Ações de check-in / check-out de visita
+  // Ações de check-in de visita com suporte offline
   const handleCheckInVisita = async (v: VisitaPromotor) => {
+    const agoraIso = new Date().toISOString()
+    const hora = `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`
+
+    // Atualização otimista local
+    setVisitas((prev) =>
+      prev.map((vis) => (vis.id === v.id ? { ...vis, check_in: agoraIso } : vis)),
+    )
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      await enqueueOfflineItem({
+        type: 'visita_checkin',
+        createdAt: agoraIso,
+        targetId: v.id,
+        userId: user?.id,
+        lojaId: v.loja,
+        payload: { hora },
+      })
+      toast({
+        title: 'Check-in registrado no aparelho!',
+        description: `Entrada às ${hora} (Modo Offline). Será sincronizado quando a conexão voltar.`,
+      })
+      return
+    }
+
     try {
-      const hora = `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`
       await visitasPromotorService.registrarCheckIn(v.id, hora)
       toast({
         title: 'Check-in realizado!',
@@ -257,11 +414,18 @@ export function MeuDiaPage() {
       })
       await carregarDados()
     } catch (err) {
-      console.error('Erro no check-in:', err)
+      console.warn('[MeuDia] Falha ao enviar check-in online, salvando na fila:', err)
+      await enqueueOfflineItem({
+        type: 'visita_checkin',
+        createdAt: agoraIso,
+        targetId: v.id,
+        userId: user?.id,
+        lojaId: v.loja,
+        payload: { hora },
+      })
       toast({
-        title: 'Não foi possível registrar check-in',
-        description: 'Verifique a conexão.',
-        variant: 'destructive',
+        title: 'Check-in gravado no aparelho',
+        description: `Entrada registrada às ${hora}. Envio na fila automática.`,
       })
     }
   }
@@ -294,12 +458,17 @@ export function MeuDiaPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Indicador de Status Offline / Online com contador de pendências */}
+            <OfflineStatusIndicator />
             <StoreSelector />
             <Button
               variant="outline"
               size="icon"
-              onClick={carregarDados}
-              title="Sincronizar"
+              onClick={async () => {
+                await triggerQueueSync().catch(() => {})
+                await carregarDados()
+              }}
+              title="Sincronizar dados e fila"
               className="h-9 w-9 border-[#E5E7EB] shrink-0"
             >
               <RefreshCw
@@ -629,24 +798,147 @@ export function MeuDiaPage() {
         />
       )}
 
-      {/* Modal de conclusão e checklist de visita com fotos */}
+      {/* Modal de conclusão e checklist de visita com fotos e enfileiramento offline */}
       {visitaAlvo && (
         <ConcluirVisitaModal
           open={concluirVisitaAberta}
           onOpenChange={setConcluirVisitaAberta}
           visita={visitaAlvo}
           onConcluir={async (payload) => {
-            await visitasPromotorService.registrarConclusao(visitaAlvo.id, payload)
-            // Se tinha check-in e não tinha check-out, calcula permanência
-            if (visitaAlvo.check_in && !visitaAlvo.check_out) {
-              await visitasPromotorService.registrarCheckOut(visitaAlvo.id)
+            const agoraIso = new Date().toISOString()
+            const vId = visitaAlvo.id
+
+            // Atualização otimista na interface local
+            setVisitas((prev) =>
+              prev.map((vis) =>
+                vis.id === vId
+                  ? {
+                      ...vis,
+                      status: 'realizada',
+                      realizada_em: agoraIso,
+                      check_out: vis.check_in && !vis.check_out ? agoraIso : vis.check_out,
+                    }
+                  : vis,
+              ),
+            )
+
+            // Se estiver desconectado, enfileira diretamente
+            if (typeof navigator !== 'undefined' && !navigator.onLine) {
+              let fotoBlob: Blob | undefined
+              let fotoFileName: string | undefined
+              const extraFotos: Array<{ fieldName: string; blob: Blob; fileName: string }> = []
+              const plainPayload: Record<string, unknown> = {}
+
+              if (payload instanceof FormData) {
+                payload.forEach((val, key) => {
+                  if (val instanceof File) {
+                    if (key === 'foto_trabalho' && !fotoBlob) {
+                      fotoBlob = val
+                      fotoFileName = val.name
+                    } else {
+                      extraFotos.push({ fieldName: key, blob: val, fileName: val.name })
+                    }
+                  } else {
+                    plainPayload[key] = val
+                  }
+                })
+              } else {
+                Object.assign(plainPayload, payload)
+                if (payload.foto_trabalho instanceof File) {
+                  fotoBlob = payload.foto_trabalho
+                  fotoFileName = payload.foto_trabalho.name
+                }
+                if (payload.foto_gondola instanceof File) {
+                  extraFotos.push({
+                    fieldName: 'foto_gondola',
+                    blob: payload.foto_gondola,
+                    fileName: payload.foto_gondola.name,
+                  })
+                }
+              }
+
+              await enqueueOfflineItem({
+                type: 'visita_conclusao',
+                createdAt: agoraIso,
+                targetId: vId,
+                userId: user?.id,
+                lojaId: visitaAlvo.loja,
+                payload: plainPayload,
+                fotoBlob,
+                fotoFileName,
+                fotoFieldName: 'foto_trabalho',
+                extraFotos: extraFotos.length > 0 ? extraFotos : undefined,
+              })
+
+              toast({
+                title: 'Visita concluída no aparelho (Offline)!',
+                description:
+                  'Checklist e fotos gravados. Serão enviados automaticamente ao reconectar.',
+              })
+              setConcluirVisitaAberta(false)
+              return
             }
-            toast({
-              title: 'Visita concluída com sucesso!',
-              description: 'Checklist e fotos arquivados para a gestão.',
-            })
-            setConcluirVisitaAberta(false)
-            await carregarDados()
+
+            // Se online, tenta enviar com fallback para fila offline
+            try {
+              await visitasPromotorService.registrarConclusao(vId, payload)
+              if (visitaAlvo.check_in && !visitaAlvo.check_out) {
+                await visitasPromotorService.registrarCheckOut(vId)
+              }
+              toast({
+                title: 'Visita concluída com sucesso!',
+                description: 'Checklist e fotos arquivados para a gestão.',
+              })
+              setConcluirVisitaAberta(false)
+              await carregarDados()
+            } catch (err) {
+              console.warn('[MeuDia] Erro de rede ao concluir visita, enfileirando offline:', err)
+              let fotoBlob: Blob | undefined
+              let fotoFileName: string | undefined
+              const extraFotos: Array<{ fieldName: string; blob: Blob; fileName: string }> = []
+              const plainPayload: Record<string, unknown> = {}
+
+              if (payload instanceof FormData) {
+                payload.forEach((val, key) => {
+                  if (val instanceof File) {
+                    if (key === 'foto_trabalho' && !fotoBlob) {
+                      fotoBlob = val
+                      fotoFileName = val.name
+                    } else {
+                      extraFotos.push({ fieldName: key, blob: val, fileName: val.name })
+                    }
+                  } else {
+                    plainPayload[key] = val
+                  }
+                })
+              } else {
+                Object.assign(plainPayload, payload)
+                if (payload.foto_trabalho instanceof File) {
+                  fotoBlob = payload.foto_trabalho
+                  fotoFileName = payload.foto_trabalho.name
+                }
+              }
+
+              await enqueueOfflineItem({
+                type: 'visita_conclusao',
+                createdAt: agoraIso,
+                targetId: vId,
+                userId: user?.id,
+                lojaId: visitaAlvo.loja,
+                payload: plainPayload,
+                fotoBlob,
+                fotoFileName,
+                fotoFieldName: 'foto_trabalho',
+                extraFotos: extraFotos.length > 0 ? extraFotos : undefined,
+              })
+
+              toast({
+                title: 'Gravado na fila offline',
+                description:
+                  'Sinal fraco. Sua visita e fotos estão salvas e serão enviadas automaticamente.',
+              })
+              setConcluirVisitaAberta(false)
+            }
           }}
         />
       )}

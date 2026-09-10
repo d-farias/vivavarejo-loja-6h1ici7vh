@@ -11,6 +11,8 @@ import { isPlanoAtrasado } from '@/components/PlanosAcaoCard'
 import { isVisitaAtrasada } from '@/services/visitasPromotor'
 import { getHorarioStatus } from '@/lib/time-utils'
 import { AgendaMinhaEquipeSecao } from '@/components/AgendaMinhaEquipeSecao'
+import { OfflineStatusIndicator } from '@/components/OfflineStatusIndicator'
+import { saveLocalCache, getLocalCache } from '@/lib/offline/db'
 import type { Rotina, ExecucaoRotina, VisitaPromotor, RotinaPromotor, PlanoAcao } from '@/types'
 import {
   Calendar as CalendarIcon,
@@ -59,10 +61,34 @@ export default function AgendaDefault() {
     subtitulo?: string
   } | null>(null)
 
-  // Carregamento de dados
+  // Carregamento de dados com tolerância a offline e cache local
   const loadData = useCallback(async () => {
     setLoading(true)
+    const cacheKey = `vivavarejo_agenda_${lojaSelecionadaId || 'all'}_${currentDateStr}`
+
     try {
+      // 1. Tenta carregar do cache local IndexedDB primeiro
+      const cached = await getLocalCache<{
+        rotinas: Rotina[]
+        execucoes: ExecucaoRotina[]
+        visitas: VisitaPromotor[]
+        rotinasPromotores: RotinaPromotor[]
+        planosAcao: PlanoAcao[]
+      }>(cacheKey)
+
+      if (cached) {
+        setRotinas(cached.rotinas || [])
+        setExecucoes(cached.execucoes || [])
+        setVisitas(cached.visitas || [])
+        setRotinasPromotores(cached.rotinasPromotores || [])
+        setPlanosAcao(cached.planosAcao || [])
+      }
+
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        setLoading(false)
+        return
+      }
+
       const [r, e, v, rp, p] = await Promise.all([
         rotinasService.getAll(lojaSelecionadaId),
         execucoesService.getExecutionsByDate(currentDateStr).catch(() => [] as ExecucaoRotina[]),
@@ -80,8 +106,32 @@ export default function AgendaDefault() {
       setVisitas(v)
       setRotinasPromotores(rp)
       setPlanosAcao(p)
+
+      // Salva no IndexedDB
+      saveLocalCache(cacheKey, {
+        rotinas: r,
+        execucoes: e,
+        visitas: v,
+        rotinasPromotores: rp,
+        planosAcao: p,
+      }).catch(() => {})
     } catch (err) {
-      console.error('Erro ao carregar agenda:', err)
+      console.warn('Erro ao carregar agenda pela rede, usando dados em cache:', err)
+      const cached = await getLocalCache<{
+        rotinas: Rotina[]
+        execucoes: ExecucaoRotina[]
+        visitas: VisitaPromotor[]
+        rotinasPromotores: RotinaPromotor[]
+        planosAcao: PlanoAcao[]
+      }>(cacheKey)
+
+      if (cached) {
+        setRotinas(cached.rotinas || [])
+        setExecucoes(cached.execucoes || [])
+        setVisitas(cached.visitas || [])
+        setRotinasPromotores(cached.rotinasPromotores || [])
+        setPlanosAcao(cached.planosAcao || [])
+      }
     } finally {
       setLoading(false)
     }
@@ -312,6 +362,7 @@ export default function AgendaDefault() {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          <OfflineStatusIndicator />
           <StoreSelector />
         </div>
       </div>

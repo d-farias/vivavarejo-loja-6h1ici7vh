@@ -1,13 +1,13 @@
 // Service Worker para VivaVarejo PWA
-// Versão do app: 0.0.79
+// Versão do app: 0.0.114
 // Estratégia de cache:
 // 1. Navegação (HTML / App Shell): Network-first SEMPRE com fallback para cache apenas se offline.
 //    Isso garante que celulares com o app instalado recebam imediatamente a nova versão ao abrir ou recarregar com internet.
 // 2. Assets estáticos versionados pelo Vite (assets/*.js, assets/*.css): Network-first com fallback para cache.
-// 3. NUNCA interceptar nem cachear chamadas de API do PocketBase (/api/) ou serviços externos.
+// 3. NUNCA interceptar nem cachear chamadas de API do PocketBase (/api/) ou serviços externos (essas usam a camada IndexedDB do app).
 // 4. Ativação imediata: self.skipWaiting() e clients.claim(), enviando mensagem de update aos clientes abertos e expurgando caches antigos.
 
-const APP_VERSION = '0.0.79'
+const APP_VERSION = '0.0.114'
 const CACHE_NAME = `vivavarejo-shell-v${APP_VERSION}`
 
 const PRECACHE_ASSETS = [

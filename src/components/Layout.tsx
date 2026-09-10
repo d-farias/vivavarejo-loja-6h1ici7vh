@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { APP_VERSION_LABEL } from '@/lib/version'
+import { OfflineStatusIndicator } from '@/components/OfflineStatusIndicator'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -155,15 +156,20 @@ export default function Layout() {
           {/* Right Action / Avatar */}
           <div className="flex items-center gap-2">
             {!isAuthPage && user && (
-              <button
-                type="button"
-                onClick={() => setFalarEspecialistaOpen(true)}
-                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] hover:text-[#0F766E] text-[#374151] shadow-2xs transition-colors"
-                title="Fale diretamente com o consultor especialista"
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-[#0F766E]" />
-                <span>Falar com especialista</span>
-              </button>
+              <>
+                {/* Indicador de status Offline / Online e fila de envio */}
+                <OfflineStatusIndicator compact />
+
+                <button
+                  type="button"
+                  onClick={() => setFalarEspecialistaOpen(true)}
+                  className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] hover:text-[#0F766E] text-[#374151] shadow-2xs transition-colors"
+                  title="Fale diretamente com o consultor especialista"
+                >
+                  <MessageSquare className="w-3.5 h-3.5 text-[#0F766E]" />
+                  <span>Falar com especialista</span>
+                </button>
+              </>
             )}
 
             {!isAuthPage && user ? (

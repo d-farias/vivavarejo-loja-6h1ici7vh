@@ -9,6 +9,8 @@ import { promotoresService } from '@/services/promotores'
 import { fornecedoresService } from '@/services/fornecedores'
 import { usersService } from '@/services/funcionarios'
 import { clientesService } from '@/services/clientes'
+import { saveLocalCache, getLocalCache, enqueueOfflineItem } from '@/lib/offline/db'
+import { OfflineStatusIndicator } from '@/components/OfflineStatusIndicator'
 import type { VisitaPromotor, RotinaPromotor, Promotor, Fornecedor, User, Cliente } from '@/types'
 import { Handshake, AlertTriangle, CheckCircle2, X } from 'lucide-react'
 
@@ -36,7 +38,29 @@ export default function PromotoresPage() {
 
   const loadData = useCallback(async () => {
     setLoading(true)
+    const cacheKey = `vivavarejo_promotores_${lojaSelecionadaId || 'all'}`
+
     try {
+      // 1. Tenta carregar do cache local IndexedDB primeiro
+      const cached = await getLocalCache<{
+        visitas: VisitaPromotor[]
+        promotores: Promotor[]
+        fornecedores: Fornecedor[]
+        rotinasPromotor: RotinaPromotor[]
+      }>(cacheKey)
+
+      if (cached) {
+        setVisitas(cached.visitas || [])
+        setPromotores(cached.promotores || [])
+        setFornecedores(cached.fornecedores || [])
+        setRotinasPromotor(cached.rotinasPromotor || [])
+      }
+
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        setLoading(false)
+        return
+      }
+
       const [vis, prom, forn, rotProm, usrs, clis] = await Promise.all([
         visitasPromotorService.getAll(lojaSelecionadaId || undefined),
         promotoresService.getAll().catch(() => [] as Promotor[]),
@@ -53,9 +77,28 @@ export default function PromotoresPage() {
       setRotinasPromotor(rotProm)
       setUsuarios(usrs)
       setClientes(clis)
+
+      // Salva no IndexedDB
+      saveLocalCache(cacheKey, {
+        visitas: vis,
+        promotores: prom,
+        fornecedores: forn,
+        rotinasPromotor: rotProm,
+      }).catch(() => {})
     } catch (err) {
-      console.error('Erro ao carregar dados de promotores:', err)
-      showFeedback('Erro ao carregar módulo de promotores.', 'error')
+      console.warn('Rede instável ao carregar dados de promotores, usando cache:', err)
+      const cached = await getLocalCache<{
+        visitas: VisitaPromotor[]
+        promotores: Promotor[]
+        fornecedores: Fornecedor[]
+        rotinasPromotor: RotinaPromotor[]
+      }>(cacheKey)
+      if (cached) {
+        setVisitas(cached.visitas || [])
+        setPromotores(cached.promotores || [])
+        setFornecedores(cached.fornecedores || [])
+        setRotinasPromotor(cached.rotinasPromotor || [])
+      }
     } finally {
       setLoading(false)
     }
@@ -85,6 +128,7 @@ export default function PromotoresPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <OfflineStatusIndicator />
           <StoreSelector />
         </div>
       </div>
@@ -139,19 +183,85 @@ export default function PromotoresPage() {
             loadData()
           }}
           onConcluirVisita={async (visitaId, params) => {
-            if (params instanceof FormData) {
-              if (user?.id && !params.has('registrado_por')) {
-                params.append('registrado_por', user.id)
+            const agoraIso = new Date().toISOString()
+            if (typeof navigator !== 'undefined' && !navigator.onLine) {
+              // Modo Offline: enfileira para envio
+              let fotoBlob: Blob | undefined
+              let fotoFileName: string | undefined
+              const extraFotos: Array<{ fieldName: string; blob: Blob; fileName: string }> = []
+              const plainPayload: Record<string, unknown> = {}
+
+              if (params instanceof FormData) {
+                params.forEach((val, key) => {
+                  if (val instanceof File) {
+                    if (key === 'foto_trabalho' && !fotoBlob) {
+                      fotoBlob = val
+                      fotoFileName = val.name
+                    } else {
+                      extraFotos.push({ fieldName: key, blob: val, fileName: val.name })
+                    }
+                  } else {
+                    plainPayload[key] = val
+                  }
+                })
+              } else {
+                Object.assign(plainPayload, params)
+                if (params.foto_trabalho instanceof File) {
+                  fotoBlob = params.foto_trabalho
+                  fotoFileName = params.foto_trabalho.name
+                }
               }
-              await visitasPromotorService.registrarConclusao(visitaId, params)
-            } else {
-              await visitasPromotorService.registrarConclusao(visitaId, {
-                ...params,
-                registrado_por: user?.id,
+
+              const vis = visitas.find((v) => v.id === visitaId)
+              await enqueueOfflineItem({
+                type: 'visita_conclusao',
+                createdAt: agoraIso,
+                targetId: visitaId,
+                userId: user?.id,
+                lojaId: vis?.loja,
+                payload: plainPayload,
+                fotoBlob,
+                fotoFileName,
+                fotoFieldName: 'foto_trabalho',
+                extraFotos: extraFotos.length > 0 ? extraFotos : undefined,
               })
+
+              setVisitas((prev) =>
+                prev.map((v) =>
+                  v.id === visitaId ? { ...v, status: 'realizada', realizada_em: agoraIso } : v,
+                ),
+              )
+              showFeedback('Visita concluída no aparelho (Modo Offline)!')
+              return
             }
-            showFeedback('Visita avaliada e concluída com sucesso!')
-            loadData()
+
+            try {
+              if (params instanceof FormData) {
+                if (user?.id && !params.has('registrado_por')) {
+                  params.append('registrado_por', user.id)
+                }
+                await visitasPromotorService.registrarConclusao(visitaId, params)
+              } else {
+                await visitasPromotorService.registrarConclusao(visitaId, {
+                  ...params,
+                  registrado_por: user?.id,
+                })
+              }
+              showFeedback('Visita avaliada e concluída com sucesso!')
+              loadData()
+            } catch (err) {
+              console.warn('Erro de rede ao concluir visita, gravando na fila:', err)
+              const vis = visitas.find((v) => v.id === visitaId)
+              await enqueueOfflineItem({
+                type: 'visita_conclusao',
+                createdAt: agoraIso,
+                targetId: visitaId,
+                userId: user?.id,
+                lojaId: vis?.loja,
+                payload: params instanceof FormData ? {} : (params as any),
+              })
+              showFeedback('Salvo na fila de sincronização (Modo Offline)!')
+            }
           }}
           onCancelarVisita={async (visitaId, motivo) => {
             await visitasPromotorService.cancelarVisita(visitaId, motivo)
