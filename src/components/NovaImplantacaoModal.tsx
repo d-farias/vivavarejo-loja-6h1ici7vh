@@ -32,6 +32,8 @@ export function NovaImplantacaoModal({
   )
   const [titulo, setTitulo] = useState('')
   const [tipo, setTipo] = useState<TipoImplantacaoLayout>('layout_gondola')
+  const [categoria, setCategoria] = useState('')
+  const [etapa, setEtapa] = useState('')
   const [departamentoSetor, setDepartamentoSetor] = useState('')
   const [dataPrevista, setDataPrevista] = useState(new Date().toISOString().slice(0, 10))
   const [dataConclusao, setDataConclusao] = useState('')
@@ -40,6 +42,7 @@ export function NovaImplantacaoModal({
   const [progressoPerc, setProgressoPerc] = useState('0')
   const [fornecedorParceiro, setFornecedorParceiro] = useState('')
   const [descricaoEscopo, setDescricaoEscopo] = useState('')
+  const [fotoFile, setFotoFile] = useState<File | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,21 +52,27 @@ export function NovaImplantacaoModal({
     try {
       const prog = parseInt(progressoPerc, 10) || 0
 
-      await comercialService.criarImplantacao({
-        loja: lojaId || undefined,
-        titulo: titulo.trim(),
-        tipo,
-        departamento_setor: departamentoSetor.trim(),
-        data_prevista: dataPrevista,
-        data_conclusao: dataConclusao || undefined,
-        status,
-        responsavel_execucao: responsavelExecucao.trim() || undefined,
-        progresso_perc: Math.min(100, Math.max(0, prog)),
-        fornecedor_parceiro: fornecedorParceiro.trim() || undefined,
-        descricao_escopo: descricaoEscopo.trim() || undefined,
-      })
+      await comercialService.criarImplantacao(
+        {
+          loja: lojaId || undefined,
+          titulo: titulo.trim(),
+          tipo,
+          categoria: categoria.trim() || undefined,
+          etapa: etapa.trim() || undefined,
+          departamento_setor: departamentoSetor.trim(),
+          data_prevista: dataPrevista,
+          data_conclusao: dataConclusao || undefined,
+          status,
+          responsavel_execucao: responsavelExecucao.trim() || undefined,
+          progresso_perc: Math.min(100, Math.max(0, prog)),
+          fornecedor_parceiro: fornecedorParceiro.trim() || undefined,
+          descricao_escopo: descricaoEscopo.trim() || undefined,
+        },
+        fotoFile,
+      )
 
       onOpenChange(false)
+      setFotoFile(null)
       if (onCriadoSucesso) onCriadoSucesso()
     } catch (err) {
       console.error('Erro ao cadastrar cronograma de layout:', err)
@@ -137,7 +146,7 @@ export function NovaImplantacaoModal({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-semibold text-[#374151] mb-1">
                 Departamento / Setor *
@@ -153,16 +162,41 @@ export function NovaImplantacaoModal({
             </div>
             <div>
               <label className="block text-xs font-semibold text-[#374151] mb-1">
-                Fornecedor / Parceiro (Opcional)
+                Categoria da Gôndola
               </label>
               <input
                 type="text"
-                value={fornecedorParceiro}
-                onChange={(e) => setFornecedorParceiro(e.target.value)}
-                placeholder="Ex: Unilever / P&G"
+                value={categoria}
+                onChange={(e) => setCategoria(e.target.value)}
+                placeholder="Ex: Shampoos, Biscoitos..."
                 className="w-full text-xs bg-white border border-[#D1D5DB] rounded-lg px-2.5 py-2 text-[#1F2937] outline-none focus:border-[#0F766E]"
               />
             </div>
+            <div>
+              <label className="block text-xs font-semibold text-[#374151] mb-1">
+                Etapa do Cronograma
+              </label>
+              <input
+                type="text"
+                value={etapa}
+                onChange={(e) => setEtapa(e.target.value)}
+                placeholder="Ex: Virada de setor, Nova gôndola"
+                className="w-full text-xs bg-white border border-[#D1D5DB] rounded-lg px-2.5 py-2 text-[#1F2937] outline-none focus:border-[#0F766E]"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-[#374151] mb-1">
+              Fornecedor / Parceiro (Opcional)
+            </label>
+            <input
+              type="text"
+              value={fornecedorParceiro}
+              onChange={(e) => setFornecedorParceiro(e.target.value)}
+              placeholder="Ex: Unilever / P&G"
+              className="w-full text-xs bg-white border border-[#D1D5DB] rounded-lg px-2.5 py-2 text-[#1F2937] outline-none focus:border-[#0F766E]"
+            />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -241,6 +275,18 @@ export function NovaImplantacaoModal({
               onChange={(e) => setDescricaoEscopo(e.target.value)}
               placeholder="Ex: Redução de 2 módulos para 1 na marca X e ampliação de frentes na marca líder."
               className="w-full text-xs bg-white border border-[#D1D5DB] rounded-lg p-2.5 text-[#1F2937] outline-none focus:border-[#0F766E]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-[#374151] mb-1">
+              Evidência Fotográfica Inicial / Layout Referência (Opcional)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setFotoFile(e.target.files?.[0] || null)}
+              className="w-full text-xs text-[#4B5563] file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-[#0F766E] hover:file:bg-teal-100"
             />
           </div>
 

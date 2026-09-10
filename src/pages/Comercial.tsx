@@ -21,6 +21,13 @@ import {
   ArrowDownRight,
   Sparkles,
   Info,
+  Handshake,
+  Camera,
+  Image,
+  Eye,
+  Trash2,
+  Check,
+  AlertCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -30,11 +37,19 @@ import { comercialService } from '@/services/comercial'
 import { ImportarComercialModal } from '@/components/ImportarComercialModal'
 import { NovaAcaoComercialModal } from '@/components/NovaAcaoComercialModal'
 import { NovaImplantacaoModal } from '@/components/NovaImplantacaoModal'
+import { RegistrarEvidenciaImplantacaoModal } from '@/components/RegistrarEvidenciaImplantacaoModal'
+import { NovaNegociacaoModal } from '@/components/NovaNegociacaoModal'
+import { NovoMarcoNegociacaoModal } from '@/components/NovoMarcoNegociacaoModal'
+import { RegistrarEvidenciaMarcoModal } from '@/components/RegistrarEvidenciaMarcoModal'
+import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
+import { useAuth } from '@/context/AuthContext'
 import type {
   ComercialProduto,
   ComercialCategoria,
   ComercialAcao,
   ComercialImplantacao,
+  ComercialNegociacao,
+  ComercialNegociacaoMarco,
 } from '@/types'
 
 export type AbaComercial =
@@ -46,6 +61,7 @@ export type AbaComercial =
   | 'curvas'
   | 'implantacao'
   | 'acoes'
+  | 'negociacoes'
   | 'quebras'
 
 interface AbaItem {
@@ -56,6 +72,7 @@ interface AbaItem {
 }
 
 export default function ComercialPage() {
+  const { user } = useAuth()
   const { lojaSelecionadaId, lojas } = useStore()
 
   // Aba ativa
@@ -67,18 +84,48 @@ export default function ComercialPage() {
   const [filtroCurva, setFiltroCurva] = useState('todas')
   const [filtroFaixaSemVenda, setFiltroFaixaSemVenda] = useState('todas')
   const [filtroDepto, setFiltroDepto] = useState('todos')
+  const [filtroCategoriaImplantacao, setFiltroCategoriaImplantacao] = useState('todas')
+  const [filtroSazonalidadeNegociacao, setFiltroSazonalidadeNegociacao] = useState('todas')
+  const [filtroStatusNegociacao, setFiltroStatusNegociacao] = useState('todos')
 
   // Dados do PocketBase
   const [produtos, setProdutos] = useState<ComercialProduto[]>([])
   const [categorias, setCategorias] = useState<ComercialCategoria[]>([])
   const [acoes, setAcoes] = useState<ComercialAcao[]>([])
   const [implantacoes, setImplantacoes] = useState<ComercialImplantacao[]>([])
+  const [negociacoes, setNegociacoes] = useState<ComercialNegociacao[]>([])
+  const [marcosPorNegociacao, setMarcosPorNegociacao] = useState<
+    Record<string, ComercialNegociacaoMarco[]>
+  >({})
   const [loading, setLoading] = useState(true)
 
-  // Modais
+  // Modais de Criação & Edição
   const [importarModalOpen, setImportarModalOpen] = useState(false)
   const [novaAcaoModalOpen, setNovaAcaoModalOpen] = useState(false)
   const [novaImplantacaoModalOpen, setNovaImplantacaoModalOpen] = useState(false)
+  const [evidenciaImplantacaoModal, setEvidenciaImplantacaoModal] = useState<{
+    open: boolean
+    implantacao: ComercialImplantacao | null
+  }>({ open: false, implantacao: null })
+
+  // Modais de Negociações & Marcos
+  const [novaNegociacaoModalOpen, setNovaNegociacaoModalOpen] = useState(false)
+  const [negociacaoParaEditar, setNegociacaoParaEditar] = useState<ComercialNegociacao | null>(null)
+  const [novoMarcoModal, setNovoMarcoModal] = useState<{
+    open: boolean
+    negociacao: ComercialNegociacao | null
+  }>({ open: false, negociacao: null })
+  const [evidenciaMarcoModal, setEvidenciaMarcoModal] = useState<{
+    open: boolean
+    marco: ComercialNegociacaoMarco | null
+  }>({ open: false, marco: null })
+
+  // Visualizador Seguro de Foto
+  const [fotoVisualizador, setFotoVisualizador] = useState<{
+    open: boolean
+    url: string
+    title: string
+  }>({ open: false, url: '', title: '' })
 
   const lojaId = lojaSelecionadaId && lojaSelecionadaId !== 'todas' ? lojaSelecionadaId : undefined
 
@@ -86,7 +133,7 @@ export default function ComercialPage() {
   const carregarDados = async () => {
     setLoading(true)
     try {
-      const [prodsData, catsData, acoesData, impData] = await Promise.all([
+      const [prodsData, catsData, acoesData, impData, negsData] = await Promise.all([
         comercialService.listarProdutos({
           lojaId: lojaId || undefined,
           competencia,
@@ -101,12 +148,27 @@ export default function ComercialPage() {
         comercialService.listarImplantacoes({
           lojaId: lojaId || undefined,
         }),
+        comercialService.listarNegociacoes({
+          lojaId: lojaId || undefined,
+        }),
       ])
 
       setProdutos(prodsData)
       setCategorias(catsData)
       setAcoes(acoesData)
       setImplantacoes(impData)
+      setNegociacoes(negsData)
+
+      // Carregar marcos das negociações existentes
+      const marcosMap: Record<string, ComercialNegociacaoMarco[]> = {}
+      if (negsData.length > 0) {
+        const marcosPromessas = negsData.map(async (n) => {
+          const list = await comercialService.listarMarcos(n.id)
+          marcosMap[n.id] = list
+        })
+        await Promise.all(marcosPromessas)
+      }
+      setMarcosPorNegociacao(marcosMap)
     } catch (err) {
       console.error('Erro ao carregar dados comerciais:', err)
     } finally {
@@ -365,17 +427,42 @@ export default function ComercialPage() {
       )
     } else if (abaAtiva === 'implantacao') {
       csvHeader =
-        'Título;Tipo;Setor / Corredor;Data Prevista;Status;Progresso %;Responsável;Fornecedor'
+        'Título;Tipo;Categoria;Etapa;Setor / Corredor;Data Prevista;Status;Progresso %;Responsável;Evidência Foto;Executado Por;Executado Em'
       csvRows = implantacoes.map((i) =>
         [
           `"${i.titulo.replace(/"/g, '""')}"`,
           `"${i.tipo}"`,
+          `"${(i.categoria || '').replace(/"/g, '""')}"`,
+          `"${(i.etapa || '').replace(/"/g, '""')}"`,
           `"${i.departamento_setor.replace(/"/g, '""')}"`,
           i.data_prevista,
           `"${i.status}"`,
           i.progresso_perc ?? 0,
           `"${(i.responsavel_execucao || '').replace(/"/g, '""')}"`,
-          `"${(i.fornecedor_parceiro || '').replace(/"/g, '""')}"`,
+          i.foto_evidencia ? 'SIM' : i.concluido_sem_evidencia ? 'SEM EVIDÊNCIA' : 'NÃO',
+          `"${(i.foto_executado_por || '').replace(/"/g, '""')}"`,
+          `"${(i.foto_executado_em || '').replace(/"/g, '""')}"`,
+        ].join(';'),
+      )
+    } else if (abaAtiva === 'negociacoes') {
+      csvHeader =
+        'Título;Comprador;Fornecedor;Sazonalidade;Tipo Acordo;Produto;De;Por;Desconto %;Início;Fim;Status;Responsável Loja;Total Marcos'
+      csvRows = negociacoes.map((n) =>
+        [
+          `"${n.titulo.replace(/"/g, '""')}"`,
+          `"${(n.comprador_nome || '').replace(/"/g, '""')}"`,
+          `"${(n.fornecedor || '').replace(/"/g, '""')}"`,
+          `"${(n.sazonalidade || '').replace(/"/g, '""')}"`,
+          `"${n.tipo_acordo || ''}"`,
+          `"${(n.produto_descricao || '').replace(/"/g, '""')}"`,
+          (n.preco_de || 0).toFixed(2),
+          (n.preco_por || 0).toFixed(2),
+          (n.desconto_perc || 0).toFixed(1),
+          n.data_inicio,
+          n.data_fim || '',
+          `"${n.status}"`,
+          `"${(n.responsavel_loja || '').replace(/"/g, '""')}"`,
+          (marcosPorNegociacao[n.id] || []).length,
         ].join(';'),
       )
     }
@@ -412,6 +499,7 @@ export default function ComercialPage() {
     { id: 'curvas', label: 'Curvas A / B / C+', icon: Layers },
     { id: 'implantacao', label: 'Layout & Cronograma', icon: Calendar },
     { id: 'acoes', label: 'Ações, Pricing & Rebaixas', icon: Tag },
+    { id: 'negociacoes', label: 'Negociações & Sazonalidade', icon: Handshake },
     { id: 'quebras', label: '% Quebras por Categoria', icon: PieChart },
   ]
 
@@ -1422,77 +1510,278 @@ export default function ComercialPage() {
           )}
 
           {/* ==========================================================
-              ABA 7: CRONOGRAMA DE IMPLANTAÇÃO E LAYOUT
+              ABA 7: CRONOGRAMA DE IMPLANTAÇÃO E LAYOUT (AGENDA + EVIDÊNCIAS POR CATEGORIA)
              ========================================================== */}
           {abaAtiva === 'implantacao' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              {/* Cabeçalho da Aba */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-sm font-bold text-[#1F2937]">
-                    Cronograma de Implantação & Layout ({implantacoes.length})
+                  <h2 className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-[#0F766E]" />
+                    <span>Agenda de Implantação, Layout & Evidências ({implantacoes.length})</span>
                   </h2>
                   <p className="text-xs text-[#6B7280]">
-                    Projetos de remodelação, novos planogramas e viradas sazonais
+                    Agenda de execução por categoria, acompanhamento de prazos e comprovação
+                    fotográfica
                   </p>
                 </div>
                 <Button
                   size="sm"
                   onClick={() => setNovaImplantacaoModalOpen(true)}
-                  className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs"
+                  className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs self-start sm:self-auto"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Novo Projeto / Layout</span>
+                  <span>Novo Projeto / Etapa</span>
                 </Button>
+              </div>
+
+              {/* Filtro por Categoria da Gôndola e Status do Prazo */}
+              <div className="flex items-center gap-2 flex-wrap text-xs bg-white border border-[#E5E7EB] p-2.5 rounded-xl shadow-2xs">
+                <span className="text-[#6B7280] font-semibold text-[11px] uppercase tracking-wider">
+                  Filtrar Categoria:
+                </span>
+                <select
+                  value={filtroCategoriaImplantacao}
+                  onChange={(e) => setFiltroCategoriaImplantacao(e.target.value)}
+                  className="bg-white border border-[#D1D5DB] rounded-lg px-2.5 py-1 text-[#1F2937] outline-none focus:border-[#0F766E]"
+                >
+                  <option value="todas">Todas as Categorias</option>
+                  {Array.from(new Set(implantacoes.map((i) => i.categoria).filter(Boolean))).map(
+                    (cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ),
+                  )}
+                </select>
+
+                <div className="ml-auto flex items-center gap-2 text-[11px]">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <CheckCircle2 className="w-3 h-3" />
+                    <span>
+                      {implantacoes.filter((i) => i.status === 'concluido').length} Concluídas
+                    </span>
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+                    <Clock className="w-3 h-3" />
+                    <span>
+                      {
+                        implantacoes.filter((i) => {
+                          const hoje = new Date().toISOString().slice(0, 10)
+                          return i.status !== 'concluido' && i.data_prevista < hoje
+                        }).length
+                      }{' '}
+                      Atrasadas
+                    </span>
+                  </span>
+                </div>
               </div>
 
               {implantacoes.length === 0 ? (
                 <div className="bg-white border border-[#E5E7EB] rounded-xl p-8 text-center text-xs text-[#6B7280]">
-                  Nenhum cronograma de implantação cadastrado. Clique no botão acima para adicionar.
+                  Nenhum cronograma de implantação cadastrado. Clique no botão acima para adicionar
+                  a primeira etapa.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {implantacoes.map((imp) => (
-                    <div
-                      key={imp.id}
-                      className="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-2xs space-y-3 flex flex-col justify-between"
-                    >
-                      <div>
-                        <div className="flex items-start justify-between gap-2">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
-                            {imp.tipo.replace(/_/g, ' ')}
-                          </span>
-                          <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                              imp.status === 'concluido'
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                : imp.status === 'em_andamento'
-                                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                                  : 'bg-amber-50 text-amber-700 border border-amber-200'
-                            }`}
-                          >
-                            {imp.status}
-                          </span>
-                        </div>
-                        <h3 className="text-sm font-bold text-[#1F2937] mt-2 leading-snug">
-                          {imp.titulo}
-                        </h3>
-                        <p className="text-xs text-[#6B7280] mt-1">
-                          Setor: <b>{imp.departamento_setor}</b>{' '}
-                          {imp.fornecedor_parceiro && `• ${imp.fornecedor_parceiro}`}
-                        </p>
-                        {imp.descricao_escopo && (
-                          <p className="text-xs text-[#4B5563] mt-2 bg-[#F9FAFB] p-2 rounded-lg border border-[#E5E7EB]">
-                            {imp.descricao_escopo}
-                          </p>
-                        )}
-                      </div>
+                  {implantacoes
+                    .filter((imp) => {
+                      if (
+                        filtroCategoriaImplantacao !== 'todas' &&
+                        imp.categoria !== filtroCategoriaImplantacao
+                      ) {
+                        return false
+                      }
+                      return true
+                    })
+                    .map((imp) => {
+                      const hoje = new Date().toISOString().slice(0, 10)
+                      const estaAtrasado = imp.status !== 'concluido' && imp.data_prevista < hoje
+                      const venceHoje = imp.status !== 'concluido' && imp.data_prevista === hoje
+                      const fotoUrl = comercialService.getImplantacaoFotoUrl(imp)
 
-                      <div className="pt-2 border-t border-[#E5E7EB] flex items-center justify-between text-xs text-[#6B7280]">
-                        <span>Prazo: {imp.data_prevista}</span>
-                        <span className="font-bold text-[#0F766E]">{imp.progresso_perc ?? 0}%</span>
-                      </div>
-                    </div>
-                  ))}
+                      return (
+                        <div
+                          key={imp.id}
+                          className={`bg-white border rounded-xl p-4 shadow-2xs space-y-3 flex flex-col justify-between transition-all ${
+                            estaAtrasado
+                              ? 'border-amber-300 ring-1 ring-amber-200'
+                              : venceHoje
+                                ? 'border-teal-400 ring-1 ring-teal-200'
+                                : 'border-[#E5E7EB]'
+                          }`}
+                        >
+                          <div>
+                            {/* Tags do Topo */}
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
+                                {imp.tipo.replace(/_/g, ' ')}
+                              </span>
+                              <div className="flex items-center gap-1">
+                                {estaAtrasado && (
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                                    Atrasado
+                                  </span>
+                                )}
+                                {venceHoje && (
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800">
+                                    Vence Hoje
+                                  </span>
+                                )}
+                                <span
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                    imp.status === 'concluido'
+                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                      : imp.status === 'em_andamento'
+                                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                        : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                  }`}
+                                >
+                                  {imp.status}
+                                </span>
+                              </div>
+                            </div>
+
+                            <h3 className="text-sm font-bold text-[#1F2937] mt-2 leading-snug">
+                              {imp.titulo}
+                            </h3>
+
+                            {/* Categoria e Etapa do Cronograma */}
+                            <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-[#4B5563]">
+                              {imp.categoria && (
+                                <span className="inline-flex items-center gap-1 font-semibold text-[#0F766E] bg-teal-50 px-2 py-0.5 rounded">
+                                  Categoria: {imp.categoria}
+                                </span>
+                              )}
+                              {imp.etapa && (
+                                <span className="inline-flex items-center gap-1 text-[#4B5563] bg-gray-100 px-2 py-0.5 rounded">
+                                  Etapa: {imp.etapa}
+                                </span>
+                              )}
+                            </div>
+
+                            <p className="text-xs text-[#6B7280] mt-1.5">
+                              Setor: <b>{imp.departamento_setor}</b>{' '}
+                              {imp.fornecedor_parceiro && `• Parceiro: ${imp.fornecedor_parceiro}`}
+                            </p>
+
+                            {imp.descricao_escopo && (
+                              <p className="text-xs text-[#4B5563] mt-2 bg-[#F9FAFB] p-2 rounded-lg border border-[#E5E7EB] line-clamp-3">
+                                {imp.descricao_escopo}
+                              </p>
+                            )}
+
+                            {/* Evidência Fotográfica do Executado */}
+                            <div className="mt-3 pt-2.5 border-t border-[#F3F4F6]">
+                              <div className="flex items-center justify-between text-xs mb-1.5">
+                                <span className="font-semibold text-[#374151] flex items-center gap-1">
+                                  <Camera className="w-3.5 h-3.5 text-[#0F766E]" />
+                                  <span>Evidência da Gôndola / Layout:</span>
+                                </span>
+                                {imp.concluido_sem_evidencia && (
+                                  <span className="text-[10px] text-amber-700 font-medium bg-amber-50 px-1.5 py-0.2 rounded">
+                                    Concluído sem foto
+                                  </span>
+                                )}
+                              </div>
+
+                              {fotoUrl ? (
+                                <div className="space-y-1.5">
+                                  <div
+                                    onClick={() =>
+                                      setFotoVisualizador({
+                                        open: true,
+                                        url: fotoUrl,
+                                        title: `${imp.titulo} — Categoria: ${imp.categoria || 'Layout'}`,
+                                      })
+                                    }
+                                    className="cursor-pointer group relative rounded-lg overflow-hidden border border-[#E5E7EB] bg-gray-50 aspect-video flex items-center justify-center hover:opacity-95 transition-opacity"
+                                  >
+                                    <img
+                                      src={fotoUrl}
+                                      alt={`Evidência ${imp.titulo}`}
+                                      className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1.5">
+                                      <Eye className="w-4 h-4" />
+                                      <span>Ampliar Foto</span>
+                                    </div>
+                                  </div>
+                                  <div className="text-[11px] text-[#6B7280] flex items-center justify-between">
+                                    <span>
+                                      Por: <b>{imp.foto_executado_por || 'Colaborador'}</b>
+                                    </span>
+                                    <span>{imp.foto_executado_em || ''}</span>
+                                  </div>
+                                  {imp.observacao_execucao && (
+                                    <p className="text-[11px] text-[#4B5563] italic bg-teal-50/50 p-1.5 rounded border border-teal-100/50">
+                                      &ldquo;{imp.observacao_execucao}&rdquo;
+                                    </p>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="p-2.5 rounded-lg border border-dashed border-[#D1D5DB] text-center bg-gray-50/50">
+                                  <p className="text-[11px] text-[#6B7280]">
+                                    Nenhuma foto de comprovação anexada ainda.
+                                  </p>
+                                  <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() =>
+                                      setEvidenciaImplantacaoModal({
+                                        open: true,
+                                        implantacao: imp,
+                                      })
+                                    }
+                                    className="mt-1.5 text-xs h-7 text-[#0F766E] border-teal-200 hover:bg-teal-50"
+                                  >
+                                    <Camera className="w-3 h-3 mr-1" />
+                                    <span>Registrar Evidência</span>
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Rodapé do Card */}
+                          <div className="pt-2.5 border-t border-[#E5E7EB] flex items-center justify-between text-xs text-[#6B7280]">
+                            <div className="flex flex-col">
+                              <span>
+                                Prazo: <b className="text-[#1F2937]">{imp.data_prevista}</b>
+                              </span>
+                              {imp.responsavel_execucao && (
+                                <span className="text-[11px]">
+                                  Resp: {imp.responsavel_execucao}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              {imp.status !== 'concluido' && (
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  onClick={() =>
+                                    setEvidenciaImplantacaoModal({
+                                      open: true,
+                                      implantacao: imp,
+                                    })
+                                  }
+                                  className="h-7 text-xs bg-[#0F766E] hover:bg-[#115E59] text-white gap-1 px-2.5"
+                                >
+                                  <Check className="w-3 h-3" />
+                                  <span>Concluir</span>
+                                </Button>
+                              )}
+                              <span className="font-bold text-[#0F766E] ml-1">
+                                {imp.progresso_perc ?? 0}%
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
                 </div>
               )}
             </div>
@@ -1589,6 +1878,428 @@ export default function ComercialPage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ==========================================================
+              ABA NOVA: NEGOCIAÇÕES COM COMPRADOR & SAZONALIDADE
+             ========================================================== */}
+          {abaAtiva === 'negociacoes' && (
+            <div className="space-y-4">
+              {/* Topo da Aba */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
+                    <Handshake className="w-4 h-4 text-[#0F766E]" />
+                    <span>Negociações com Comprador & Sazonalidade ({negociacoes.length})</span>
+                  </h2>
+                  <p className="text-xs text-[#6B7280]">
+                    Acordos comerciais, sazonalidade, cronograma de marcos e evidências fotográficas
+                    na loja
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setNegociacaoParaEditar(null)
+                      setNovaNegociacaoModalOpen(true)
+                    }}
+                    className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Nova Negociação</span>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Filtros de Sazonalidade e Status */}
+              <div className="flex items-center gap-2 flex-wrap text-xs bg-white border border-[#E5E7EB] p-2.5 rounded-xl shadow-2xs">
+                <span className="text-[#6B7280] font-semibold text-[11px] uppercase tracking-wider">
+                  Sazonalidade:
+                </span>
+                <select
+                  value={filtroSazonalidadeNegociacao}
+                  onChange={(e) => setFiltroSazonalidadeNegociacao(e.target.value)}
+                  className="bg-white border border-[#D1D5DB] rounded-lg px-2.5 py-1 text-[#1F2937] outline-none focus:border-[#0F766E]"
+                >
+                  <option value="todas">Todas as Campanhas / Sazonalidades</option>
+                  {Array.from(new Set(negociacoes.map((n) => n.sazonalidade).filter(Boolean))).map(
+                    (saz) => (
+                      <option key={saz} value={saz}>
+                        {saz}
+                      </option>
+                    ),
+                  )}
+                </select>
+
+                <span className="text-[#6B7280] font-semibold text-[11px] uppercase tracking-wider ml-2">
+                  Status:
+                </span>
+                <select
+                  value={filtroStatusNegociacao}
+                  onChange={(e) => setFiltroStatusNegociacao(e.target.value)}
+                  className="bg-white border border-[#D1D5DB] rounded-lg px-2.5 py-1 text-[#1F2937] outline-none focus:border-[#0F766E]"
+                >
+                  <option value="todos">Todos os Status</option>
+                  <option value="planejada">Planejada</option>
+                  <option value="aguardando_execucao">Aguardando Execução</option>
+                  <option value="em_vigor">Em Vigor</option>
+                  <option value="concluida">Concluída</option>
+                  <option value="vencida">Vencida</option>
+                </select>
+
+                <div className="ml-auto flex items-center gap-2 text-[11px]">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-teal-50 text-[#0F766E] border border-teal-200">
+                    <Handshake className="w-3 h-3" />
+                    <span>{negociacoes.filter((n) => n.status === 'em_vigor').length} Ativas</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Lista / Grid de Negociações */}
+              {negociacoes.length === 0 ? (
+                <div className="bg-white border border-[#E5E7EB] rounded-xl p-8 text-center text-xs text-[#6B7280]">
+                  Nenhuma negociação cadastrada. Clique em &ldquo;Nova Negociação&rdquo; para
+                  registrar acordos com o comprador.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {negociacoes
+                    .filter((neg) => {
+                      if (
+                        filtroSazonalidadeNegociacao !== 'todas' &&
+                        neg.sazonalidade !== filtroSazonalidadeNegociacao
+                      ) {
+                        return false
+                      }
+                      if (
+                        filtroStatusNegociacao !== 'todos' &&
+                        neg.status !== filtroStatusNegociacao
+                      ) {
+                        return false
+                      }
+                      return true
+                    })
+                    .map((neg) => {
+                      const marcos = marcosPorNegociacao[neg.id] || []
+                      const marcosConcluidos = marcos.filter((m) => m.status === 'concluido').length
+                      const totalMarcos = marcos.length
+                      const hoje = new Date().toISOString().slice(0, 10)
+                      const marcosAtrasados = marcos.filter(
+                        (m) => m.status !== 'concluido' && m.data_limite < hoje,
+                      ).length
+
+                      return (
+                        <div
+                          key={neg.id}
+                          className="bg-white border border-[#E5E7EB] rounded-xl p-4 sm:p-5 shadow-2xs space-y-4 transition-all hover:border-[#0F766E]"
+                        >
+                          {/* Topo do Card de Negociação */}
+                          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-[#F3F4F6]">
+                            <div className="space-y-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-teal-100 text-[#0F766E] border border-teal-200 uppercase tracking-wide">
+                                  {neg.sazonalidade || 'Sazonal'}
+                                </span>
+                                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                                  {neg.tipo_acordo ? neg.tipo_acordo.replace(/_/g, ' ') : 'Acordo'}
+                                </span>
+                                <span
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                    neg.status === 'em_vigor'
+                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                      : neg.status === 'aguardando_execucao'
+                                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                        : neg.status === 'concluida'
+                                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                          : 'bg-gray-100 text-gray-600'
+                                  }`}
+                                >
+                                  {neg.status.replace(/_/g, ' ')}
+                                </span>
+                                {marcosAtrasados > 0 && (
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700 flex items-center gap-1">
+                                    <AlertCircle className="w-3 h-3" />
+                                    <span>{marcosAtrasados} marco(s) atrasado(s)</span>
+                                  </span>
+                                )}
+                              </div>
+                              <h3 className="text-base font-bold text-[#1F2937] leading-snug pt-0.5">
+                                {neg.titulo}
+                              </h3>
+                              <p className="text-xs text-[#6B7280]">
+                                Comprador: <b>{neg.comprador_nome || 'Não especificado'}</b> •
+                                Fornecedor: <b>{neg.fornecedor || 'Indústria'}</b> • Vigência:{' '}
+                                <b>{neg.data_inicio}</b> até{' '}
+                                <b>{neg.data_fim || 'Indeterminado'}</b>
+                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 shrink-0 self-start">
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setNegociacaoParaEditar(neg)
+                                  setNovaNegociacaoModalOpen(true)
+                                }}
+                                className="h-8 text-xs text-[#374151] border-[#D1D5DB]"
+                              >
+                                Editar Acordo
+                              </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={() => setNovoMarcoModal({ open: true, negociacao: neg })}
+                                className="h-8 text-xs bg-[#0F766E] hover:bg-[#115E59] text-white gap-1"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                                <span>Adicionar Marco</span>
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Termos do Acordo Comercial e Preços */}
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-[#F9FAFB] p-3 rounded-xl border border-[#E5E7EB] text-xs">
+                            <div className="space-y-1">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B7280] block">
+                                Produto & Espaço Acordado
+                              </span>
+                              <div className="font-semibold text-[#1F2937]">
+                                {neg.produto_descricao || 'Mix geral da negociação'}
+                              </div>
+                              {neg.espaco_gondola_acordado && (
+                                <p className="text-[11px] text-[#0F766E] font-medium">
+                                  Espaço: {neg.espaco_gondola_acordado}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="space-y-1">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B7280] block">
+                                Condições de Preço
+                              </span>
+                              <div className="flex items-center gap-2">
+                                {neg.preco_de && (
+                                  <span className="text-[#6B7280] line-through text-xs">
+                                    {formatCurrency(neg.preco_de)}
+                                  </span>
+                                )}
+                                {neg.preco_por && (
+                                  <span className="font-bold text-[#0F766E] text-sm">
+                                    {formatCurrency(neg.preco_por)}
+                                  </span>
+                                )}
+                                {neg.desconto_perc && (
+                                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-red-100 text-red-700">
+                                    -{neg.desconto_perc}%
+                                  </span>
+                                )}
+                              </div>
+                              {neg.bonificacao_detalhe && (
+                                <p className="text-[11px] text-[#4B5563]">
+                                  Bonif: {neg.bonificacao_detalhe}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="space-y-1">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B7280] block">
+                                Execução na Loja
+                              </span>
+                              <p className="text-[11px] text-[#4B5563]">
+                                Responsável: <b>{neg.responsavel_loja || 'Equipe da Loja'}</b>
+                              </p>
+                              <p className="text-[11px] text-[#6B7280]">
+                                Progresso dos Marcos:{' '}
+                                <b>
+                                  {marcosConcluidos}/{totalMarcos}
+                                </b>{' '}
+                                concluídos
+                              </p>
+                            </div>
+                          </div>
+
+                          {neg.descricao_acordo && (
+                            <p className="text-xs text-[#4B5563] bg-teal-50/40 p-2.5 rounded-lg border border-teal-100/60 leading-relaxed">
+                              <strong className="text-[#0F766E] block mb-0.5">
+                                Descrição do Acordado:
+                              </strong>
+                              {neg.descricao_acordo}
+                            </p>
+                          )}
+
+                          {/* Seção de Marcos da Negociação (Agenda + Fotos) */}
+                          <div className="space-y-2 pt-1">
+                            <div className="flex items-center justify-between text-xs font-semibold text-[#374151]">
+                              <span className="flex items-center gap-1.5">
+                                <Calendar className="w-3.5 h-3.5 text-[#0F766E]" />
+                                <span>Agenda de Marcos & Evidências em Loja ({totalMarcos})</span>
+                              </span>
+                              <span className="text-[11px] text-[#6B7280]">
+                                Garante o cumprimento do acordado com checagem fotográfica
+                              </span>
+                            </div>
+
+                            {marcos.length === 0 ? (
+                              <div className="p-3 bg-gray-50 rounded-lg text-center text-[11px] text-[#6B7280] border border-dashed border-[#E5E7EB]">
+                                Nenhum marco agendado ainda. Clique em &ldquo;Adicionar Marco&rdquo;
+                                acima (ex: Entrada do display, início do preço, fotos da ponta).
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+                                {marcos.map((m) => {
+                                  const mFotoUrl = comercialService.getMarcoFotoUrl(m)
+                                  const mAtrasado = m.status !== 'concluido' && m.data_limite < hoje
+                                  const mVenceHoje =
+                                    m.status !== 'concluido' && m.data_limite === hoje
+
+                                  return (
+                                    <div
+                                      key={m.id}
+                                      className={`p-3 rounded-xl border flex flex-col justify-between text-xs space-y-2.5 bg-white ${
+                                        mAtrasado
+                                          ? 'border-amber-300 ring-1 ring-amber-200'
+                                          : mVenceHoje
+                                            ? 'border-teal-400 ring-1 ring-teal-200'
+                                            : 'border-[#E5E7EB]'
+                                      }`}
+                                    >
+                                      <div>
+                                        <div className="flex items-start justify-between gap-1.5">
+                                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 capitalize">
+                                            {m.tipo_marco
+                                              ? m.tipo_marco.replace(/_/g, ' ')
+                                              : 'Marco'}
+                                          </span>
+                                          <div className="flex items-center gap-1">
+                                            {mAtrasado && (
+                                              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-red-100 text-red-700">
+                                                Atrasado
+                                              </span>
+                                            )}
+                                            {mVenceHoje && (
+                                              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-teal-100 text-teal-800">
+                                                Hoje
+                                              </span>
+                                            )}
+                                            <span
+                                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                                m.status === 'concluido'
+                                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                  : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                              }`}
+                                            >
+                                              {m.status}
+                                            </span>
+                                          </div>
+                                        </div>
+
+                                        <h4 className="font-bold text-[#1F2937] mt-1.5 leading-snug">
+                                          {m.titulo}
+                                        </h4>
+                                        <p className="text-[11px] text-[#6B7280] mt-0.5">
+                                          Prazo: <b className="text-[#1F2937]">{m.data_limite}</b>{' '}
+                                          {m.responsavel && `• Resp: ${m.responsavel}`}
+                                        </p>
+                                        {m.observacao && (
+                                          <p className="text-[11px] text-[#4B5563] mt-1 italic">
+                                            {m.observacao}
+                                          </p>
+                                        )}
+
+                                        {/* Foto da Evidência do Marco */}
+                                        <div className="mt-2 pt-2 border-t border-[#F3F4F6]">
+                                          {mFotoUrl ? (
+                                            <div className="space-y-1">
+                                              <div
+                                                onClick={() =>
+                                                  setFotoVisualizador({
+                                                    open: true,
+                                                    url: mFotoUrl,
+                                                    title: `${neg.titulo} — ${m.titulo}`,
+                                                  })
+                                                }
+                                                className="cursor-pointer group relative rounded-lg overflow-hidden border border-[#E5E7EB] bg-gray-50 aspect-video flex items-center justify-center hover:opacity-95 transition-opacity"
+                                              >
+                                                <img
+                                                  src={mFotoUrl}
+                                                  alt={`Evidência ${m.titulo}`}
+                                                  className="w-full h-full object-cover"
+                                                />
+                                                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[11px] font-semibold gap-1">
+                                                  <Eye className="w-3.5 h-3.5" />
+                                                  <span>Ver Foto</span>
+                                                </div>
+                                              </div>
+                                              <div className="text-[10px] text-[#6B7280] flex items-center justify-between">
+                                                <span>
+                                                  Por: <b>{m.executado_por || 'Loja'}</b>
+                                                </span>
+                                                <span>{m.executado_em || ''}</span>
+                                              </div>
+                                            </div>
+                                          ) : (
+                                            <div className="p-2 rounded bg-gray-50 border border-dashed border-[#D1D5DB] text-center">
+                                              <p className="text-[10px] text-[#6B7280]">
+                                                {m.concluido_sem_evidencia
+                                                  ? 'Concluído sem foto registrada.'
+                                                  : 'Sem evidência fotográfica.'}
+                                              </p>
+                                              {m.status !== 'concluido' && (
+                                                <Button
+                                                  type="button"
+                                                  size="sm"
+                                                  variant="outline"
+                                                  onClick={() =>
+                                                    setEvidenciaMarcoModal({
+                                                      open: true,
+                                                      marco: m,
+                                                    })
+                                                  }
+                                                  className="mt-1 h-6 text-[10px] text-[#0F766E] border-teal-200 hover:bg-teal-50"
+                                                >
+                                                  <Camera className="w-2.5 h-2.5 mr-1" />
+                                                  <span>Fotografar Loja</span>
+                                                </Button>
+                                              )}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+
+                                      {/* Ações do Marco */}
+                                      {m.status !== 'concluido' && (
+                                        <div className="pt-2 border-t border-[#F3F4F6] flex items-center justify-end">
+                                          <Button
+                                            type="button"
+                                            size="sm"
+                                            onClick={() =>
+                                              setEvidenciaMarcoModal({
+                                                open: true,
+                                                marco: m,
+                                              })
+                                            }
+                                            className="h-7 text-xs bg-[#0F766E] hover:bg-[#115E59] text-white gap-1 w-full justify-center"
+                                          >
+                                            <Check className="w-3 h-3" />
+                                            <span>Concluir Marco</span>
+                                          </Button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
                 </div>
               )}
             </div>
@@ -1723,6 +2434,45 @@ export default function ComercialPage() {
         lojas={lojas}
         lojaSelecionada={lojaId}
         onCriadoSucesso={carregarDados}
+      />
+
+      <RegistrarEvidenciaImplantacaoModal
+        open={evidenciaImplantacaoModal.open}
+        onOpenChange={(open) => setEvidenciaImplantacaoModal((prev) => ({ ...prev, open }))}
+        implantacao={evidenciaImplantacaoModal.implantacao}
+        userName={user?.nome || 'Responsável'}
+        onSucesso={carregarDados}
+      />
+
+      <NovaNegociacaoModal
+        open={novaNegociacaoModalOpen}
+        onOpenChange={setNovaNegociacaoModalOpen}
+        lojas={lojas}
+        lojaSelecionada={lojaId}
+        negociacaoParaEditar={negociacaoParaEditar}
+        onSucesso={carregarDados}
+      />
+
+      <NovoMarcoNegociacaoModal
+        open={novoMarcoModal.open}
+        onOpenChange={(open) => setNovoMarcoModal((prev) => ({ ...prev, open }))}
+        negociacao={novoMarcoModal.negociacao}
+        onSucesso={carregarDados}
+      />
+
+      <RegistrarEvidenciaMarcoModal
+        open={evidenciaMarcoModal.open}
+        onOpenChange={(open) => setEvidenciaMarcoModal((prev) => ({ ...prev, open }))}
+        marco={evidenciaMarcoModal.marco}
+        userName={user?.nome || 'Responsável'}
+        onSucesso={carregarDados}
+      />
+
+      <FotoVisualizadorModal
+        isOpen={fotoVisualizador.open}
+        onClose={() => setFotoVisualizador((prev) => ({ ...prev, open: false }))}
+        fotoUrl={fotoVisualizador.url}
+        titulo={fotoVisualizador.title}
       />
     </div>
   )

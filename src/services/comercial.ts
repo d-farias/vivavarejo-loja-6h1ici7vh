@@ -4,6 +4,8 @@ import type {
   ComercialCategoria,
   ComercialAcao,
   ComercialImplantacao,
+  ComercialNegociacao,
+  ComercialNegociacaoMarco,
 } from '@/types'
 
 export interface ListComercialProdutosParams {
@@ -36,6 +38,17 @@ export interface ListComercialImplantacaoParams {
   lojaId?: string
   tipo?: string
   status?: string
+  categoria?: string
+  sort?: string
+}
+
+export interface ListComercialNegociacoesParams {
+  lojaId?: string
+  sazonalidade?: string
+  status?: string
+  tipoAcordo?: string
+  fornecedor?: string
+  busca?: string
   sort?: string
 }
 
@@ -264,6 +277,9 @@ export const comercialService = {
     if (params.status && params.status !== 'todos') {
       filters.push(`status = "${params.status}"`)
     }
+    if (params.categoria && params.categoria !== 'todas') {
+      filters.push(`categoria = "${params.categoria}"`)
+    }
 
     const filterStr = filters.length > 0 ? filters.join(' && ') : undefined
 
@@ -275,18 +291,232 @@ export const comercialService = {
     })
   },
 
-  async criarImplantacao(data: Partial<ComercialImplantacao>): Promise<ComercialImplantacao> {
+  async criarImplantacao(
+    data: Partial<ComercialImplantacao>,
+    fotoFile?: File | null,
+  ): Promise<ComercialImplantacao> {
+    if (fotoFile) {
+      const formData = new FormData()
+      Object.entries(data).forEach(([key, val]) => {
+        if (val !== undefined && val !== null) {
+          formData.append(key, typeof val === 'object' ? JSON.stringify(val) : String(val))
+        }
+      })
+      formData.append('foto_evidencia', fotoFile)
+      return pb.collection('comercial_implantacao').create<ComercialImplantacao>(formData)
+    }
     return pb.collection('comercial_implantacao').create<ComercialImplantacao>(data)
   },
 
   async atualizarImplantacao(
     id: string,
     data: Partial<ComercialImplantacao>,
+    fotoFile?: File | null,
   ): Promise<ComercialImplantacao> {
+    if (fotoFile) {
+      const formData = new FormData()
+      Object.entries(data).forEach(([key, val]) => {
+        if (val !== undefined && val !== null) {
+          formData.append(key, typeof val === 'object' ? JSON.stringify(val) : String(val))
+        }
+      })
+      formData.append('foto_evidencia', fotoFile)
+      return pb.collection('comercial_implantacao').update<ComercialImplantacao>(id, formData)
+    }
     return pb.collection('comercial_implantacao').update<ComercialImplantacao>(id, data)
+  },
+
+  async concluirImplantacaoComEvidencia(
+    id: string,
+    params: {
+      executadoPor: string
+      observacao?: string
+      fotoFile?: File | null
+      semEvidencia?: boolean
+    },
+  ): Promise<ComercialImplantacao> {
+    const dataConclusao = new Date().toISOString().slice(0, 10)
+    const agoraFormatado =
+      new Date().toLocaleDateString('pt-BR') +
+      ' ' +
+      new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+
+    const payload: Partial<ComercialImplantacao> = {
+      status: 'concluido',
+      progresso_perc: 100,
+      data_conclusao: dataConclusao,
+      foto_executado_por: params.executadoPor,
+      foto_executado_em: agoraFormatado,
+      observacao_execucao: params.observacao || undefined,
+      concluido_sem_evidencia: params.semEvidencia || !params.fotoFile,
+    }
+
+    if (params.fotoFile) {
+      const formData = new FormData()
+      Object.entries(payload).forEach(([k, v]) => {
+        if (v !== undefined) formData.append(k, String(v))
+      })
+      formData.append('foto_evidencia', params.fotoFile)
+      return pb.collection('comercial_implantacao').update<ComercialImplantacao>(id, formData)
+    }
+
+    return pb.collection('comercial_implantacao').update<ComercialImplantacao>(id, payload)
   },
 
   async excluirImplantacao(id: string): Promise<boolean> {
     return pb.collection('comercial_implantacao').delete(id)
+  },
+
+  getImplantacaoFotoUrl(imp: ComercialImplantacao, thumb?: string): string | null {
+    if (!imp.foto_evidencia) return null
+    return pb.files.getURL(imp, imp.foto_evidencia, { thumb })
+  },
+
+  // ==================== NEGOCIAÇÕES COM COMPRADOR & SAZONALIDADE ====================
+  async listarNegociacoes(
+    params: ListComercialNegociacoesParams = {},
+  ): Promise<ComercialNegociacao[]> {
+    const filters: string[] = []
+
+    if (params.lojaId && params.lojaId !== 'todas') {
+      filters.push(`(loja = "${params.lojaId}" || loja = null || loja = "")`)
+    }
+    if (params.sazonalidade && params.sazonalidade !== 'todas') {
+      filters.push(`sazonalidade ~ "${params.sazonalidade}"`)
+    }
+    if (params.status && params.status !== 'todos') {
+      filters.push(`status = "${params.status}"`)
+    }
+    if (params.tipoAcordo && params.tipoAcordo !== 'todos') {
+      filters.push(`tipo_acordo = "${params.tipoAcordo}"`)
+    }
+    if (params.fornecedor && params.fornecedor.trim()) {
+      filters.push(`fornecedor ~ "${params.fornecedor.trim()}"`)
+    }
+    if (params.busca && params.busca.trim()) {
+      const q = params.busca.trim().replace(/"/g, '\\"')
+      filters.push(
+        `(titulo ~ "${q}" || fornecedor ~ "${q}" || comprador_nome ~ "${q}" || sazonalidade ~ "${q}" || produto_descricao ~ "${q}")`,
+      )
+    }
+
+    const filterStr = filters.length > 0 ? filters.join(' && ') : undefined
+
+    return pb.collection('comercial_negociacoes').getFullList<ComercialNegociacao>({
+      filter: filterStr,
+      sort: params.sort || '-data_inicio',
+      expand: 'loja,responsavel_usuario',
+      requestKey: null,
+    })
+  },
+
+  async criarNegociacao(data: Partial<ComercialNegociacao>): Promise<ComercialNegociacao> {
+    return pb.collection('comercial_negociacoes').create<ComercialNegociacao>(data)
+  },
+
+  async atualizarNegociacao(
+    id: string,
+    data: Partial<ComercialNegociacao>,
+  ): Promise<ComercialNegociacao> {
+    return pb.collection('comercial_negociacoes').update<ComercialNegociacao>(id, data)
+  },
+
+  async excluirNegociacao(id: string): Promise<boolean> {
+    return pb.collection('comercial_negociacoes').delete(id)
+  },
+
+  // ==================== MARCOS DA NEGOCIAÇÃO (AGENDA & EVIDÊNCIAS) ====================
+  async listarMarcos(negociacaoId?: string): Promise<ComercialNegociacaoMarco[]> {
+    const filter = negociacaoId ? `negociacao = "${negociacaoId}"` : undefined
+    return pb.collection('comercial_negociacao_marcos').getFullList<ComercialNegociacaoMarco>({
+      filter,
+      sort: 'data_limite',
+      expand: 'negociacao',
+      requestKey: null,
+    })
+  },
+
+  async criarMarco(
+    data: Partial<ComercialNegociacaoMarco>,
+    fotoFile?: File | null,
+  ): Promise<ComercialNegociacaoMarco> {
+    if (fotoFile) {
+      const formData = new FormData()
+      Object.entries(data).forEach(([key, val]) => {
+        if (val !== undefined && val !== null) {
+          formData.append(key, typeof val === 'object' ? JSON.stringify(val) : String(val))
+        }
+      })
+      formData.append('foto_evidencia', fotoFile)
+      return pb.collection('comercial_negociacao_marcos').create<ComercialNegociacaoMarco>(formData)
+    }
+    return pb.collection('comercial_negociacao_marcos').create<ComercialNegociacaoMarco>(data)
+  },
+
+  async atualizarMarco(
+    id: string,
+    data: Partial<ComercialNegociacaoMarco>,
+    fotoFile?: File | null,
+  ): Promise<ComercialNegociacaoMarco> {
+    if (fotoFile) {
+      const formData = new FormData()
+      Object.entries(data).forEach(([key, val]) => {
+        if (val !== undefined && val !== null) {
+          formData.append(key, typeof val === 'object' ? JSON.stringify(val) : String(val))
+        }
+      })
+      formData.append('foto_evidencia', fotoFile)
+      return pb
+        .collection('comercial_negociacao_marcos')
+        .update<ComercialNegociacaoMarco>(id, formData)
+    }
+    return pb.collection('comercial_negociacao_marcos').update<ComercialNegociacaoMarco>(id, data)
+  },
+
+  async concluirMarcoComEvidencia(
+    id: string,
+    params: {
+      executadoPor: string
+      observacao?: string
+      fotoFile?: File | null
+      semEvidencia?: boolean
+    },
+  ): Promise<ComercialNegociacaoMarco> {
+    const agoraFormatado =
+      new Date().toLocaleDateString('pt-BR') +
+      ' ' +
+      new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+
+    const payload: Partial<ComercialNegociacaoMarco> = {
+      status: 'concluido',
+      executado_por: params.executadoPor,
+      executado_em: agoraFormatado,
+      observacao: params.observacao || undefined,
+      concluido_sem_evidencia: params.semEvidencia || !params.fotoFile,
+    }
+
+    if (params.fotoFile) {
+      const formData = new FormData()
+      Object.entries(payload).forEach(([k, v]) => {
+        if (v !== undefined) formData.append(k, String(v))
+      })
+      formData.append('foto_evidencia', params.fotoFile)
+      return pb
+        .collection('comercial_negociacao_marcos')
+        .update<ComercialNegociacaoMarco>(id, formData)
+    }
+
+    return pb
+      .collection('comercial_negociacao_marcos')
+      .update<ComercialNegociacaoMarco>(id, payload)
+  },
+
+  async excluirMarco(id: string): Promise<boolean> {
+    return pb.collection('comercial_negociacao_marcos').delete(id)
+  },
+
+  getMarcoFotoUrl(marco: ComercialNegociacaoMarco, thumb?: string): string | null {
+    if (!marco.foto_evidencia) return null
+    return pb.files.getURL(marco, marco.foto_evidencia, { thumb })
   },
 }

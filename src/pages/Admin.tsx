@@ -1158,8 +1158,8 @@ export default function Admin() {
           <span>Promotores & Fornecedores ({promotores.length + fornecedores.length})</span>
         </button>
 
-        {/* Usuários & Perfis: apenas ADM Geral tem a prerrogativa de criar/desativar ADMs e gerenciar perfis globais */}
-        {isAdminGeral && (
+        {/* Usuários & Perfis: ADM Geral gerencia todas as redes; ADM de Rede gerencia os usuários da sua rede */}
+        {(isAdminGeral || isAdmRede) && (
           <button
             onClick={() => {
               setActiveTab('usuarios')
@@ -1172,7 +1172,11 @@ export default function Admin() {
             }`}
           >
             <UserCheck className="w-4 h-4" />
-            <span>Usuários & Perfis ({usuarios.length})</span>
+            <span>
+              {isAdmRede
+                ? `Usuários da Rede (${usuarios.length})`
+                : `Usuários & Perfis (${usuarios.length})`}
+            </span>
           </button>
         )}
 
@@ -2271,7 +2275,7 @@ export default function Admin() {
                       className="px-2.5 py-2 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E]"
                     >
                       <option value="todos">Todos os Perfis</option>
-                      <option value="admin">ADM Geral</option>
+                      {isAdminGeral && <option value="admin">ADM Geral</option>}
                       <option value="adm_rede">ADM de Rede</option>
                       <option value="lider">Líder</option>
                       <option value="funcionario">Funcionário</option>
@@ -2747,23 +2751,31 @@ export default function Admin() {
             </div>
 
             <form onSubmit={handleSaveLoja} className="space-y-3.5 text-xs sm:text-sm">
-              <div>
-                <label className="block text-xs font-semibold text-[#374151] mb-1">
-                  Cliente / Rede <span className="text-red-500">*</span>
-                </label>
-                <select
+              {isAdmRede ? (
+                <input
+                  type="hidden"
                   name="cliente"
-                  defaultValue={lojaModal.data?.cliente || (clientes[0]?.id ?? '')}
-                  required
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
-                >
-                  {clientes.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  value={lojaModal.data?.cliente || user?.cliente || clientes[0]?.id || ''}
+                />
+              ) : (
+                <div>
+                  <label className="block text-xs font-semibold text-[#374151] mb-1">
+                    Cliente / Rede <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="cliente"
+                    defaultValue={lojaModal.data?.cliente || (clientes[0]?.id ?? '')}
+                    required
+                    className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
+                  >
+                    {clientes.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div>
                 <label className="block text-xs font-semibold text-[#374151] mb-1">
@@ -3241,38 +3253,50 @@ export default function Admin() {
                   <option value="lider">
                     Líder (Gerencial de loja: gerencia rotinas, prazos e equipe da loja)
                   </option>
-                  <option value="adm_rede">
-                    ADM de Rede (Gerencia exclusivamente a sua própria rede, lojas e demandas)
-                  </option>
-                  <option value="admin">
-                    ADM Geral / Consultor Dono (Superusuário global: cria ADMs de rede e visão
-                    global)
-                  </option>
+                  {isAdminGeral && (
+                    <option value="adm_rede">
+                      ADM de Rede (Gerencia exclusivamente a sua própria rede, lojas e demandas)
+                    </option>
+                  )}
+                  {isAdminGeral && (
+                    <option value="admin">
+                      ADM Geral / Consultor Dono (Superusuário global: cria ADMs de rede e visão
+                      global)
+                    </option>
+                  )}
                 </select>
               </div>
 
-              {/* Vínculo de Rede (Obrigatório para adm_rede e opcional para outros) */}
-              <div>
-                <label className="block text-xs font-semibold text-[#374151] mb-1">
-                  Rede / Cliente Vinculado (Obrigatório para ADM de Rede)
-                </label>
-                <select
+              {/* Vínculo de Rede (Para ADM Geral pode escolher; para ADM de Rede é fixo na própria rede) */}
+              {isAdmRede ? (
+                <input
+                  type="hidden"
                   name="cliente"
-                  defaultValue={userModal.user?.cliente || ''}
-                  className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
-                >
-                  <option value="">Nenhuma rede vinculada</option>
-                  {clientes.map((cli) => (
-                    <option key={cli.id} value={cli.id}>
-                      {cli.nome} {cli.segmento ? `(${cli.segmento})` : ''}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-[11px] text-[#6B7280] mt-0.5">
-                  Para o perfil <strong>ADM de Rede</strong>, este vínculo define quais lojas e
-                  dados ele terá permissão para administrar.
-                </p>
-              </div>
+                  value={user?.cliente || clientes[0]?.id || ''}
+                />
+              ) : (
+                <div>
+                  <label className="block text-xs font-semibold text-[#374151] mb-1">
+                    Rede / Cliente Vinculado (Obrigatório para ADM de Rede)
+                  </label>
+                  <select
+                    name="cliente"
+                    defaultValue={userModal.user?.cliente || ''}
+                    className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
+                  >
+                    <option value="">Nenhuma rede vinculada</option>
+                    {clientes.map((cli) => (
+                      <option key={cli.id} value={cli.id}>
+                        {cli.nome} {cli.segmento ? `(${cli.segmento})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-[11px] text-[#6B7280] mt-0.5">
+                    Para o perfil <strong>ADM de Rede</strong>, este vínculo define quais lojas e
+                    dados ele terá permissão para administrar.
+                  </p>
+                </div>
+              )}
 
               {/* Status Ativo */}
               <div>

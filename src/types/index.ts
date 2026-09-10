@@ -584,6 +584,8 @@ export interface ComercialImplantacao extends RecordModel {
   titulo: string
   tipo: TipoImplantacaoLayout
   departamento_setor: string
+  categoria?: string
+  etapa?: string
   data_prevista: string // YYYY-MM-DD
   data_conclusao?: string // YYYY-MM-DD
   status: StatusImplantacaoLayout
@@ -592,10 +594,95 @@ export interface ComercialImplantacao extends RecordModel {
   progresso_perc?: number
   fornecedor_parceiro?: string
   descricao_escopo?: string
+  foto_evidencia?: string
+  foto_executado_por?: string
+  foto_executado_em?: string
+  observacao_execucao?: string
+  concluido_sem_evidencia?: boolean
   created: string
   updated: string
   expand?: {
     loja?: Loja
     responsavel_usuario?: User
+  }
+}
+
+export type TipoAcordoNegociacao =
+  | 'preco_rebaixa'
+  | 'espaco_extra'
+  | 'tabloide_encarte'
+  | 'bonificacao'
+  | 'ponta_gondola'
+  | 'ilha_destaque'
+  | 'compre_ganhe'
+  | 'outro'
+
+export type StatusNegociacao =
+  | 'planejada'
+  | 'aguardando_execucao'
+  | 'em_vigor'
+  | 'concluida'
+  | 'vencida'
+  | 'cancelada'
+
+export interface ComercialNegociacao extends RecordModel {
+  loja?: string
+  titulo: string
+  comprador_nome?: string
+  fornecedor?: string
+  departamento?: string
+  categoria?: string
+  sazonalidade?: string
+  tipo_acordo?: TipoAcordoNegociacao
+  descricao_acordo?: string
+  produto_codigo?: string
+  produto_descricao?: string
+  preco_de?: number
+  preco_por?: number
+  desconto_perc?: number
+  bonificacao_detalhe?: string
+  espaco_gondola_acordado?: string
+  data_inicio: string // YYYY-MM-DD
+  data_fim?: string // YYYY-MM-DD
+  status: StatusNegociacao
+  responsavel_loja?: string
+  responsavel_usuario?: string
+  observacoes?: string
+  competencia?: string
+  created: string
+  updated: string
+  expand?: {
+    loja?: Loja
+    responsavel_usuario?: User
+    marcos?: ComercialNegociacaoMarco[]
+  }
+}
+
+export type TipoMarcoNegociacao =
+  | 'entrada_material'
+  | 'montagem_espaco'
+  | 'inicio_preco'
+  | 'auditoria_meio'
+  | 'retirada_material'
+  | 'outro'
+
+export type StatusMarcoNegociacao = 'pendente' | 'concluido' | 'atrasado' | 'cancelado'
+
+export interface ComercialNegociacaoMarco extends RecordModel {
+  negociacao: string
+  titulo: string
+  tipo_marco?: TipoMarcoNegociacao
+  data_limite: string // YYYY-MM-DD
+  status: StatusMarcoNegociacao
+  responsavel?: string
+  foto_evidencia?: string
+  executado_por?: string
+  executado_em?: string
+  observacao?: string
+  concluido_sem_evidencia?: boolean
+  created: string
+  updated: string
+  expand?: {
+    negociacao?: ComercialNegociacao
   }
 }

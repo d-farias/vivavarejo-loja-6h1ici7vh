@@ -1468,11 +1468,12 @@ export function MaterialVendaAba() {
                 <span className="w-5 h-5 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center text-[11px] font-extrabold">
                   2
                 </span>
-                <span>Acesso por Perfil & Permissões</span>
+                <span>Acesso por Perfil & Permissões (com ADM de Rede)</span>
               </div>
               <p className="text-[11px] text-[#6B7280] leading-snug">
-                Regras de perfil (Operador, Encarregado, Gerente, GO e Diretor). Cada colaborador vê
-                apenas o necessário.
+                Hierarquia clara: Funcionário (chão de loja), Líder (gerência de loja),
+                Administrador da Rede (gestão autônoma de lojas, demandas, rotinas e usuários dentro
+                da própria rede) e ADM Geral.
               </p>
             </div>
 
