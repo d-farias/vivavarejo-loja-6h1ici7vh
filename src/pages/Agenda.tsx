@@ -304,9 +304,6 @@ export default function AgendaDefault() {
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F2937]">
               Agenda Operacional do Dia
             </h1>
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
-              Dia × Tarefas
-            </span>
           </div>
           <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">
             Ordem cronológica das rotinas, horários limite, visitas de promotores e planos de ação

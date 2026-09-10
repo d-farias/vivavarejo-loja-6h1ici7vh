@@ -109,13 +109,12 @@ export default function Layout() {
   const hasAdminAccess = isAdminGeral || isAdmRede
   const isLiderOrAdmin = perfil === 'admin' || perfil === 'adm_rede' || perfil === 'lider'
 
-  // Se for perfil campo, exibe navegação simples e operacional focada em execução.
+  // Se for perfil campo, exibe navegação simples e operacional focada em execução no drawer lateral.
   // Se for gestão, exibe navegação analítica completa.
   const navLinks = isCampo
     ? [
         { to: '/meu-dia', label: 'Meu Dia', icon: Calendar },
         { to: '/promotores', label: 'Visitas', icon: Handshake },
-        { to: '/agenda', label: 'Tarefas', icon: ListChecks },
         { to: '/validades', label: 'Validades', icon: CalendarCheck },
       ]
     : [

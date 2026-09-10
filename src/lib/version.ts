@@ -1,5 +1,5 @@
 /**
  * Constantes de versão e metadados do aplicativo VivaVarejo
  */
-export const APP_VERSION = '0.0.107'
+export const APP_VERSION = '0.0.108'
 export const APP_VERSION_LABEL = `v${APP_VERSION}`
