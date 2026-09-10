@@ -340,7 +340,7 @@ export default function Index() {
           concluidos: rotConcluidas,
           perc: rotPerc,
           icone: Calendar,
-          cor: '#2563EB',
+          cor: '#0F766E',
           link: '/rotinas',
         },
         {
@@ -657,7 +657,7 @@ export default function Index() {
   const donutData = useMemo(() => {
     return [
       { name: 'Aprovadas / Validadas', value: kpis.aprovadas, color: '#059669' },
-      { name: 'Aguardando Validação', value: kpis.aguardandoValidacao, color: '#2563EB' },
+      { name: 'Aguardando Validação', value: kpis.aguardandoValidacao, color: '#0F766E' },
       {
         name: 'Atrasadas / Pendentes',
         value: Math.max(0, kpis.atrasadas),
@@ -858,7 +858,7 @@ export default function Index() {
         </p>
         <button
           onClick={loadData}
-          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold bg-[#2563EB] text-white rounded-md hover:bg-[#1D4ED8] transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold bg-[#0F766E] text-white rounded-md hover:bg-[#115E59] transition-colors"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           <span>Tentar novamente</span>
@@ -876,7 +876,7 @@ export default function Index() {
             <h1 className="text-2xl sm:text-3xl font-bold text-[#1F2937] tracking-tight">
               Dashboard Analítico
             </h1>
-            <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded bg-blue-50 text-[#2563EB] border border-blue-200">
+            <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded bg-teal-50 text-[#0F766E] border border-teal-200">
               Operação em Tempo Real
             </span>
           </div>
@@ -897,7 +897,7 @@ export default function Index() {
               onClick={() => setPeriodo('hoje')}
               className={`px-3.5 py-2 text-xs font-semibold rounded-md transition-all min-h-[40px] flex items-center justify-center ${
                 periodo === 'hoje'
-                  ? 'bg-white text-[#2563EB] shadow-xs'
+                  ? 'bg-white text-[#0F766E] shadow-xs'
                   : 'text-[#4B5563] hover:text-[#1F2937]'
               }`}
             >
@@ -908,7 +908,7 @@ export default function Index() {
               onClick={() => setPeriodo('semana')}
               className={`px-3.5 py-2 text-xs font-semibold rounded-md transition-all min-h-[40px] flex items-center justify-center ${
                 periodo === 'semana'
-                  ? 'bg-white text-[#2563EB] shadow-xs'
+                  ? 'bg-white text-[#0F766E] shadow-xs'
                   : 'text-[#4B5563] hover:text-[#1F2937]'
               }`}
             >
@@ -919,7 +919,7 @@ export default function Index() {
               onClick={() => setPeriodo('mes')}
               className={`px-3.5 py-2 text-xs font-semibold rounded-md transition-all min-h-[40px] flex items-center justify-center ${
                 periodo === 'mes'
-                  ? 'bg-white text-[#2563EB] shadow-xs'
+                  ? 'bg-white text-[#0F766E] shadow-xs'
                   : 'text-[#4B5563] hover:text-[#1F2937]'
               }`}
             >
@@ -935,7 +935,7 @@ export default function Index() {
               setEditingPlano(null)
               setPlanoModalOpen(true)
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] bg-[#2563EB] hover:bg-[#1D4ED8] text-xs font-semibold text-white rounded-md shadow-xs transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] bg-[#0F766E] hover:bg-[#115E59] text-xs font-semibold text-white rounded-md shadow-xs transition-colors"
           >
             <Wrench className="w-3.5 h-3.5" />
             <span>Abrir Chamado / Ação</span>
@@ -945,7 +945,7 @@ export default function Index() {
             <button
               type="button"
               onClick={handleOpenInstall}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-xs font-semibold text-[#2563EB] rounded-md transition-colors"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 bg-teal-50 hover:bg-teal-100 border border-teal-200 text-xs font-semibold text-[#0F766E] rounded-md transition-colors"
               title="Instale o VivaVarejo no celular"
             >
               <Smartphone className="w-3.5 h-3.5" />
@@ -967,7 +967,7 @@ export default function Index() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total de Tarefas Programadas */}
         <div className="bg-white border border-[#E5E7EB] rounded-lg p-3.5 sm:p-5 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-md bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-md bg-teal-50 text-[#0F766E] border border-teal-200 flex items-center justify-center shrink-0">
             <Calendar className="w-5 h-5" />
           </div>
           <div className="min-w-0">
@@ -1048,7 +1048,7 @@ export default function Index() {
       <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 sm:p-5 shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-teal-50 text-[#0F766E] border border-teal-200 flex items-center justify-center shrink-0">
               <Boxes className="w-4 h-4" />
             </div>
             <div>
@@ -1157,7 +1157,7 @@ export default function Index() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-teal-50 text-[#0F766E] border border-teal-200 flex items-center justify-center">
                 <BarChart3 className="w-4 h-4" />
               </div>
               <h3 className="text-sm font-bold text-[#1F2937]">
@@ -1177,7 +1177,7 @@ export default function Index() {
               onClick={() => setAbaEficiencia('setor')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
                 abaEficiencia === 'setor'
-                  ? 'bg-white text-[#2563EB] shadow-xs'
+                  ? 'bg-white text-[#0F766E] shadow-xs'
                   : 'text-[#4B5563] hover:text-[#1F2937]'
               }`}
             >
@@ -1188,7 +1188,7 @@ export default function Index() {
               onClick={() => setAbaEficiencia('lider')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
                 abaEficiencia === 'lider'
-                  ? 'bg-white text-[#2563EB] shadow-xs'
+                  ? 'bg-white text-[#0F766E] shadow-xs'
                   : 'text-[#4B5563] hover:text-[#1F2937]'
               }`}
             >
@@ -1199,7 +1199,7 @@ export default function Index() {
               onClick={() => setAbaEficiencia('loja')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
                 abaEficiencia === 'loja'
-                  ? 'bg-white text-[#2563EB] shadow-xs'
+                  ? 'bg-white text-[#0F766E] shadow-xs'
                   : 'text-[#4B5563] hover:text-[#1F2937]'
               }`}
             >
@@ -1265,7 +1265,7 @@ export default function Index() {
               <div key={item.id} className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <Store className="w-3.5 h-3.5 text-[#2563EB]" />
+                    <Store className="w-3.5 h-3.5 text-[#0F766E]" />
                     <span className="font-bold text-[#1F2937]">{item.nome}</span>
                     <span className="text-[#6B7280]">({item.cidade})</span>
                   </div>
@@ -1304,7 +1304,7 @@ export default function Index() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0F766E] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
               <Database className="w-3 h-3" />
               <span>ERP & Auditoria de Loja</span>
             </span>
@@ -1416,7 +1416,7 @@ export default function Index() {
           <div className="p-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg space-y-1">
             <div className="flex items-center justify-between text-[#6B7280] text-xs">
               <span className="font-medium">Estoques Parados</span>
-              <Boxes className="w-3.5 h-3.5 text-blue-600" />
+              <Boxes className="w-3.5 h-3.5 text-[#0F766E]" />
             </div>
             <div className="text-lg font-bold text-[#1F2937] leading-tight">
               {indicadoresNegocio.estoquesParados.valor}
@@ -1438,7 +1438,7 @@ export default function Index() {
         <div className="lg:col-span-2 bg-white border border-[#E5E7EB] rounded-xl p-5 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-teal-50 text-[#0F766E] border border-teal-200 flex items-center justify-center">
                 <BarChart3 className="w-4 h-4" />
               </div>
               <div>
@@ -1489,10 +1489,10 @@ export default function Index() {
                   <Bar
                     dataKey="concluidas"
                     name="Concluídas"
-                    fill="#2563EB"
+                    fill="#0F766E"
                     radius={[4, 4, 0, 0]}
                   />
-                  <Bar dataKey="aprovadas" name="Aprovadas" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="aprovadas" name="Aprovadas" fill="#14B8A6" radius={[4, 4, 0, 0]} />
                   <Bar
                     dataKey="atrasadas"
                     name="Atrasadas / Pendentes"
@@ -1508,7 +1508,7 @@ export default function Index() {
         {/* Gráfico 2: Donut de Aderência Operacional (1 coluna em desktop) */}
         <div className="bg-white border border-[#E5E7EB] rounded-xl p-5 shadow-xs flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-teal-50 text-[#0F766E] border border-teal-200 flex items-center justify-center">
               <PieChartIcon className="w-4 h-4" />
             </div>
             <div>
@@ -1596,7 +1596,7 @@ export default function Index() {
           <div className="flex items-center gap-3">
             <Link
               to="/agenda"
-              className="text-xs font-semibold text-[#2563EB] hover:underline inline-flex items-center gap-1"
+              className="text-xs font-semibold text-[#0F766E] hover:underline inline-flex items-center gap-1"
             >
               <span>Abrir Motor de Prioridade da Agenda</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -1668,47 +1668,47 @@ export default function Index() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Link
           to="/agenda"
-          className="p-4 rounded-lg border border-[#E5E7EB] bg-white hover:border-[#2563EB] shadow-xs flex items-center justify-between group transition-all"
+          className="p-4 rounded-lg border border-[#E5E7EB] bg-white hover:border-[#0F766E] shadow-xs flex items-center justify-between group transition-all"
         >
           <div>
-            <div className="text-xs font-bold uppercase text-[#1F2937] group-hover:text-[#2563EB] transition-colors">
+            <div className="text-xs font-bold uppercase text-[#1F2937] group-hover:text-[#0F766E] transition-colors">
               Agenda & Motor de Prioridade
             </div>
             <div className="text-[11px] text-[#6B7280]">
               Execuções detalhadas do dia, checagem e score
             </div>
           </div>
-          <ArrowRight className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#2563EB] transition-colors" />
+          <ArrowRight className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#0F766E] transition-colors" />
         </Link>
 
         <Link
           to="/rotinas"
-          className="p-4 rounded-lg border border-[#E5E7EB] bg-white hover:border-[#2563EB] shadow-xs flex items-center justify-between group transition-all"
+          className="p-4 rounded-lg border border-[#E5E7EB] bg-white hover:border-[#0F766E] shadow-xs flex items-center justify-between group transition-all"
         >
           <div>
-            <div className="text-xs font-bold uppercase text-[#1F2937] group-hover:text-[#2563EB] transition-colors">
+            <div className="text-xs font-bold uppercase text-[#1F2937] group-hover:text-[#0F766E] transition-colors">
               Biblioteca de Rotinas
             </div>
             <div className="text-[11px] text-[#6B7280]">
               Cadastre, edite modelos e atribua frequências
             </div>
           </div>
-          <Layers className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#2563EB] transition-colors" />
+          <Layers className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#0F766E] transition-colors" />
         </Link>
 
         <Link
           to="/validades"
-          className="p-4 rounded-lg border border-[#E5E7EB] bg-white hover:border-[#2563EB] shadow-xs flex items-center justify-between group transition-all"
+          className="p-4 rounded-lg border border-[#E5E7EB] bg-white hover:border-[#0F766E] shadow-xs flex items-center justify-between group transition-all"
         >
           <div>
-            <div className="text-xs font-bold uppercase text-[#1F2937] group-hover:text-[#2563EB] transition-colors">
+            <div className="text-xs font-bold uppercase text-[#1F2937] group-hover:text-[#0F766E] transition-colors">
               Gestão de Validades & Perdas
             </div>
             <div className="text-[11px] text-[#6B7280]">
               Auditoria preventiva e giro de produtos críticos
             </div>
           </div>
-          <ArrowRight className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#2563EB] transition-colors" />
+          <ArrowRight className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#0F766E] transition-colors" />
         </Link>
       </div>
 

@@ -74,7 +74,7 @@ export default function PromotoresPage() {
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F2937]">
               Promotores & Fornecedores
             </h1>
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#2563EB]/10 text-[#2563EB]">
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-teal-50 text-[#0F766E] border border-teal-200">
               Operação de Loja
             </span>
           </div>
@@ -94,13 +94,13 @@ export default function PromotoresPage() {
         <div
           className={`p-3 rounded-md text-xs sm:text-sm flex items-center justify-between border ${
             feedbackMsg.type === 'success'
-              ? 'bg-blue-50 border-[#2563EB]/30 text-[#1F2937]'
+              ? 'bg-teal-50 border-teal-200 text-[#1F2937]'
               : 'bg-red-50 border-red-200 text-[#B91C1C]'
           }`}
         >
           <div className="flex items-center gap-2">
             {feedbackMsg.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-[#2563EB] shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-[#0F766E] shrink-0" />
             ) : (
               <AlertTriangle className="w-4 h-4 text-[#B91C1C] shrink-0" />
             )}

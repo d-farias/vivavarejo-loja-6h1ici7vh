@@ -439,7 +439,7 @@ export default function PerdasPage() {
             <span className="text-xs text-[#6B7280]">Perdas & Validades × Inventário</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937] tracking-tight mt-1 flex items-center gap-2.5">
-            <ShieldAlert className="w-6 h-6 text-[#2563EB]" />
+            <ShieldAlert className="w-6 h-6 text-[#0F766E]" />
             <span>Painel de Perdas & Inventário</span>
           </h1>
           <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">
@@ -452,7 +452,7 @@ export default function PerdasPage() {
           <button
             onClick={handleExportarCsv}
             disabled={perdasFiltradas.length === 0}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#374151] hover:text-[#2563EB] text-xs font-semibold rounded-lg shadow-2xs transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#374151] hover:text-[#0F766E] text-xs font-semibold rounded-lg shadow-2xs transition-colors disabled:opacity-50"
             title="Exportar planilha de perdas e quebras em formato CSV"
           >
             <Download className="w-3.5 h-3.5" />
@@ -464,7 +464,7 @@ export default function PerdasPage() {
               setSetorPreSelecionado('')
               setRegistroInventarioOpen(true)
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#2563EB] text-[#2563EB] hover:bg-blue-50 text-xs font-semibold rounded-lg shadow-2xs transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#0F766E] text-[#0F766E] hover:bg-teal-50 text-xs font-semibold rounded-lg shadow-2xs transition-colors"
           >
             <ClipboardCheck className="w-3.5 h-3.5" />
             <span>Contagem de Inventário</span>
@@ -475,7 +475,7 @@ export default function PerdasPage() {
               setSetorPreSelecionado('')
               setRegistroPerdaOpen(true)
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors"
           >
             <Plus className="w-4 h-4" />
             <span>Registrar Perda (2 toques)</span>
@@ -492,7 +492,7 @@ export default function PerdasPage() {
               onClick={() => setFiltroPeriodo('7')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
                 filtroPeriodo === '7'
-                  ? 'bg-white text-[#2563EB] shadow-2xs'
+                  ? 'bg-white text-[#0F766E] shadow-2xs'
                   : 'text-[#6B7280] hover:text-[#1F2937]'
               }`}
             >
@@ -502,7 +502,7 @@ export default function PerdasPage() {
               onClick={() => setFiltroPeriodo('30')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
                 filtroPeriodo === '30'
-                  ? 'bg-white text-[#2563EB] shadow-2xs'
+                  ? 'bg-white text-[#0F766E] shadow-2xs'
                   : 'text-[#6B7280] hover:text-[#1F2937]'
               }`}
             >
@@ -512,7 +512,7 @@ export default function PerdasPage() {
               onClick={() => setFiltroPeriodo('90')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
                 filtroPeriodo === '90'
-                  ? 'bg-white text-[#2563EB] shadow-2xs'
+                  ? 'bg-white text-[#0F766E] shadow-2xs'
                   : 'text-[#6B7280] hover:text-[#1F2937]'
               }`}
             >
@@ -522,7 +522,7 @@ export default function PerdasPage() {
               onClick={() => setFiltroPeriodo('tudo')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
                 filtroPeriodo === 'tudo'
-                  ? 'bg-white text-[#2563EB] shadow-2xs'
+                  ? 'bg-white text-[#0F766E] shadow-2xs'
                   : 'text-[#6B7280] hover:text-[#1F2937]'
               }`}
             >
@@ -538,7 +538,7 @@ export default function PerdasPage() {
                 <select
                   value={filtroLoja}
                   onChange={(e) => setFiltroLoja(e.target.value)}
-                  className="px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB] text-xs"
+                  className="px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E] text-xs"
                 >
                   <option value="todas">Todas as Lojas</option>
                   {lojas.map((l) => (
@@ -555,7 +555,7 @@ export default function PerdasPage() {
               <select
                 value={filtroMotivo}
                 onChange={(e) => setFiltroMotivo(e.target.value)}
-                className="px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#2563EB] text-xs"
+                className="px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-md text-[#1F2937] outline-none focus:border-[#0F766E] text-xs"
               >
                 <option value="todos">Todos os Motivos</option>
                 <option value="vencimento">Vencimento</option>
@@ -573,7 +573,7 @@ export default function PerdasPage() {
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
                 placeholder="Buscar item ou setor..."
-                className="pl-8 pr-3 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937] w-40 sm:w-48"
+                className="pl-8 pr-3 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937] w-40 sm:w-48"
               />
             </div>
           </div>
@@ -637,7 +637,7 @@ export default function PerdasPage() {
           <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs relative overflow-hidden">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
-                <CalendarCheck className="w-4 h-4 text-[#2563EB]" />
+                <CalendarCheck className="w-4 h-4 text-[#0F766E]" />
                 <span>Validades Pendentes</span>
               </span>
               {tarefasValidadeNaoAbertas.length > 0 && (
@@ -711,7 +711,7 @@ export default function PerdasPage() {
                 <h2 className="text-sm sm:text-base font-bold text-[#1F2937]">
                   Cruzamento: Validade Pendente × Perda Registrada
                 </h2>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#2563EB] text-white uppercase tracking-wider">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#0F766E] text-white uppercase tracking-wider">
                   Diferencial VivaVarejo
                 </span>
               </div>
@@ -755,7 +755,7 @@ export default function PerdasPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <span className="text-xs font-bold text-[#1F2937] flex items-center gap-1.5">
-                        <Layers className="w-3.5 h-3.5 text-[#2563EB]" />
+                        <Layers className="w-3.5 h-3.5 text-[#0F766E]" />
                         <span>{item.setor}</span>
                       </span>
                     </div>
@@ -779,7 +779,7 @@ export default function PerdasPage() {
                   <div className="mt-3 space-y-2 text-xs">
                     <div className="flex items-center justify-between p-2 rounded-md bg-white border border-[#E5E7EB]">
                       <span className="text-[#6B7280] flex items-center gap-1">
-                        <CalendarCheck className="w-3.5 h-3.5 text-[#2563EB]" />
+                        <CalendarCheck className="w-3.5 h-3.5 text-[#0F766E]" />
                         <span>Validades não abertas:</span>
                       </span>
                       <strong
@@ -824,7 +824,7 @@ export default function PerdasPage() {
                           setSetorPreSelecionado(item.setor)
                           setRegistroPerdaOpen(true)
                         }}
-                        className="flex-1 py-1.5 px-2 rounded-md bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#374151] hover:text-[#2563EB] text-[11px] font-semibold transition-colors text-center"
+                        className="flex-1 py-1.5 px-2 rounded-md bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#374151] hover:text-[#0F766E] text-[11px] font-semibold transition-colors text-center"
                       >
                         + Apontar perda
                       </button>
@@ -944,7 +944,7 @@ export default function PerdasPage() {
                                   : undefined,
                               })
                             }}
-                            className="p-1 rounded text-[#2563EB] hover:bg-blue-50 transition-colors"
+                            className="p-1 rounded text-[#0F766E] hover:bg-teal-50 transition-colors"
                             title="Visualizar foto da comprovação com zoom seguro"
                           >
                             <Camera className="w-4 h-4" />

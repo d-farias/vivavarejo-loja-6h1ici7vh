@@ -262,7 +262,7 @@ export default function ValidadesPage() {
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F2937]">
               Validade × Calendário
             </h1>
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#2563EB]/10 text-[#2563EB]">
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
               Cronograma Operacional
             </span>
           </div>
@@ -280,9 +280,9 @@ export default function ValidadesPage() {
               <button
                 type="button"
                 onClick={() => setImportModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#1F2937] text-xs font-semibold rounded-md shadow-2xs transition-colors"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-md shadow-2xs transition-colors"
               >
-                <FileSpreadsheet className="w-4 h-4 text-[#2563EB]" />
+                <FileSpreadsheet className="w-4 h-4 text-[#0F766E]" />
                 <span>Importar Cronograma</span>
               </button>
 
@@ -292,7 +292,7 @@ export default function ValidadesPage() {
                   setEditingTarefa(null)
                   setFormModalOpen(true)
                 }}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-md shadow-2xs transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-2xs transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 <span>Nova Tarefa</span>
@@ -314,12 +314,12 @@ export default function ValidadesPage() {
           </button>
 
           <div className="flex items-center gap-2.5 px-3 py-1.5 bg-[#F7F7F5] rounded-lg border border-[#E5E7EB]">
-            <CalendarIcon className="w-4 h-4 text-[#2563EB]" />
+            <CalendarIcon className="w-4 h-4 text-[#0F766E]" />
             <div>
               <div className="text-xs sm:text-sm font-bold text-[#1F2937] flex items-center gap-2 capitalize">
                 <span>{diaDaSemana}</span>
                 {isToday && (
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-[#2563EB] text-white">
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-[#0F766E] text-white">
                     Hoje
                   </span>
                 )}
@@ -329,7 +329,7 @@ export default function ValidadesPage() {
                   {dataParts[2]}/{dataParts[1]}/{dataParts[0]}
                 </span>
                 <span>•</span>
-                <span className="font-semibold text-[#2563EB]">Semana {semanaDoMes} do mês</span>
+                <span className="font-semibold text-[#0F766E]">Semana {semanaDoMes} do mês</span>
               </div>
             </div>
           </div>
@@ -345,7 +345,7 @@ export default function ValidadesPage() {
           {!isToday && (
             <button
               onClick={handleIrParaHoje}
-              className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[#2563EB] border border-[#2563EB]/40 hover:bg-blue-50 transition-colors"
+              className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[#0F766E] border border-teal-200 hover:bg-teal-50 transition-colors"
             >
               Voltar para Hoje
             </button>
@@ -359,7 +359,7 @@ export default function ValidadesPage() {
             type="date"
             value={dataVisualizacao}
             onChange={(e) => e.target.value && setDataVisualizacao(e.target.value)}
-            className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+            className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
           />
         </div>
       </div>
@@ -369,7 +369,7 @@ export default function ValidadesPage() {
         <div className="p-3.5 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
           <span className="text-xs text-[#6B7280] font-medium flex items-center justify-between">
             <span>Tarefas Programadas</span>
-            <CalendarIcon className="w-4 h-4 text-[#2563EB]" />
+            <CalendarIcon className="w-4 h-4 text-[#0F766E]" />
           </span>
           <div className="text-2xl sm:text-3xl font-bold text-[#1F2937] mt-1 leading-none">
             {stats.total}
@@ -445,7 +445,7 @@ export default function ValidadesPage() {
         <div className="p-3 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs col-span-2 sm:col-span-1">
           <span className="text-[11px] text-[#6B7280] font-medium flex items-center justify-between">
             <span>Robô de Alertas</span>
-            <Clock className="w-3.5 h-3.5 text-[#2563EB]" />
+            <Clock className="w-3.5 h-3.5 text-[#0F766E]" />
           </span>
           <div className="text-xs font-bold text-[#1F2937] mt-1.5 flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -465,7 +465,7 @@ export default function ValidadesPage() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar por setor, descrição, validador..."
-              className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+              className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E] text-[#1F2937]"
             />
           </div>
 
@@ -476,7 +476,7 @@ export default function ValidadesPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-2.5 py-1 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                className="px-2.5 py-1 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
               >
                 <option value="todas">Todos</option>
                 <option value="pendente">Pendente</option>
@@ -493,7 +493,7 @@ export default function ValidadesPage() {
                 <select
                   value={setorFilter}
                   onChange={(e) => setSetorFilter(e.target.value)}
-                  className="px-2.5 py-1 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"
+                  className="px-2.5 py-1 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 >
                   <option value="todos">Todos os setores</option>
                   {setoresDisponiveis.map((s) => (
@@ -511,7 +511,7 @@ export default function ValidadesPage() {
       {/* Lista de Tarefas do Dia */}
       {loading ? (
         <div className="p-12 text-center bg-white border border-[#E5E7EB] rounded-lg">
-          <RefreshCw className="w-6 h-6 animate-spin text-[#2563EB] mx-auto mb-2" />
+          <RefreshCw className="w-6 h-6 animate-spin text-[#0F766E] mx-auto mb-2" />
           <p className="text-xs text-[#6B7280]">Carregando cronograma de validades...</p>
         </div>
       ) : tarefasFiltradas.length === 0 ? (
@@ -528,7 +528,7 @@ export default function ValidadesPage() {
             <div className="flex items-center justify-center gap-2 pt-2">
               <button
                 onClick={() => setImportModalOpen(true)}
-                className="px-3.5 py-2 text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#2563EB] rounded-md"
+                className="px-3.5 py-2 text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#0F766E] rounded-md"
               >
                 Importar Planilha
               </button>
@@ -537,7 +537,7 @@ export default function ValidadesPage() {
                   setEditingTarefa(null)
                   setFormModalOpen(true)
                 }}
-                className="px-4 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md"
+                className="px-4 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md"
               >
                 Cadastrar Manualmente
               </button>
@@ -562,7 +562,7 @@ export default function ValidadesPage() {
                       ? 'border-red-300 bg-red-50/25 border-l-4 border-l-[#B91C1C]'
                       : st === 'aguardando_validacao'
                         ? 'border-amber-200 bg-amber-50/20'
-                        : 'border-[#E5E7EB] hover:border-[#2563EB]/40'
+                        : 'border-[#E5E7EB] hover:border-[#0F766E]/40'
                 }`}
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
@@ -575,13 +575,13 @@ export default function ValidadesPage() {
 
                       {/* Selo de Semana do Mês se houver rodízio */}
                       {tarefa.semana_mes ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-[#1E40AF]">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-teal-100 text-[#0F766E]">
                           Semana {tarefa.semana_mes}
                         </span>
                       ) : null}
 
                       {/* Selo de Horário / Janela */}
-                      <span className="inline-flex items-center gap-1 font-mono text-xs font-bold px-2 py-0.5 rounded bg-blue-50 text-[#2563EB] border border-blue-200">
+                      <span className="inline-flex items-center gap-1 font-mono text-xs font-bold px-2 py-0.5 rounded bg-teal-50 text-[#0F766E] border border-teal-200">
                         <Clock className="w-3 h-3" />
                         <span>
                           {tarefa.horario_inicio}
@@ -603,7 +603,7 @@ export default function ValidadesPage() {
                         </span>
                       )}
                       {st === 'em_andamento' && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-[#2563EB]">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-[#0F766E]">
                           <Play className="w-3 h-3" />
                           EM ANDAMENTO
                         </span>
@@ -629,7 +629,7 @@ export default function ValidadesPage() {
                       {/* Tag de Alerta 1h antes */}
                       {tarefa.alerta_previo_enviado_em && (
                         <span
-                          className="text-[10px] text-[#2563EB] bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100"
+                          className="text-[10px] text-[#0F766E] bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200"
                           title={`Alerta prévio enviado em ${tarefa.alerta_previo_enviado_em}`}
                         >
                           ✉ Alerta 1h enviado
@@ -704,7 +704,7 @@ export default function ValidadesPage() {
                             protectedUrl || tarefasValidadeService.getFotoUrl(tarefa),
                           )
                         }}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-blue-50 text-[#2563EB] border border-blue-200 text-xs font-semibold hover:bg-blue-100 transition-colors"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-teal-50 text-[#0F766E] border border-teal-200 text-xs font-semibold hover:bg-teal-100 transition-colors"
                         title="Visualizar foto comprobatória protegida"
                       >
                         <Camera className="w-3.5 h-3.5" />
@@ -739,10 +739,10 @@ export default function ValidadesPage() {
                       <button
                         type="button"
                         onClick={() => handleIniciar(tarefa)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#374151] text-xs font-semibold"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#374151] text-xs font-semibold"
                         title="Marcar como iniciada na loja"
                       >
-                        <Play className="w-3.5 h-3.5 text-[#2563EB]" />
+                        <Play className="w-3.5 h-3.5 text-[#0F766E]" />
                         <span>Iniciar</span>
                       </button>
                     )}
@@ -752,7 +752,7 @@ export default function ValidadesPage() {
                       <button
                         type="button"
                         onClick={() => setConcluirModalTarefa(tarefa)}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold shadow-2xs"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold shadow-2xs"
                       >
                         <Camera className="w-3.5 h-3.5" />
                         <span>Concluir com Prova</span>
@@ -780,7 +780,7 @@ export default function ValidadesPage() {
                             setEditingTarefa(tarefa)
                             setFormModalOpen(true)
                           }}
-                          className="p-1 text-[#9CA3AF] hover:text-[#2563EB] rounded transition-colors"
+                          className="p-1 text-[#9CA3AF] hover:text-[#0F766E] rounded transition-colors"
                           title="Editar tarefa"
                         >
                           <Edit2 className="w-3.5 h-3.5" />

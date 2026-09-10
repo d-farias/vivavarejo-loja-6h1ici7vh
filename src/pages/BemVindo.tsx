@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { TipoPessoaCliente } from '@/types'
 import { useContatosAtendimento } from '@/hooks/use-contatos-atendimento'
+import { APP_VERSION_LABEL } from '@/lib/version'
 import {
   Dialog,
   DialogContent,
@@ -1014,7 +1015,7 @@ export default function BemVindo() {
             <div className="flex items-center gap-2">
               <span>© {new Date().getFullYear()} VivaVarejo. Todos os direitos reservados.</span>
               <span className="font-mono font-bold bg-teal-50 text-[#0F766E] px-1.5 py-0.5 rounded border border-teal-200 text-[10px]">
-                v0.1.00
+                {APP_VERSION_LABEL}
               </span>
             </div>
             <span>

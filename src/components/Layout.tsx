@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import { APP_VERSION_LABEL } from '@/lib/version'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -513,7 +514,7 @@ export default function Layout() {
           <div className="flex items-center gap-2">
             <span className="font-bold text-[#1F2937]">VivaVarejo</span>
             <span className="text-xs font-mono font-bold bg-teal-50 text-[#0F766E] px-1.5 py-0.5 rounded border border-teal-200">
-              v0.1.00
+              {APP_VERSION_LABEL}
             </span>
           </div>{' '}
           <div>

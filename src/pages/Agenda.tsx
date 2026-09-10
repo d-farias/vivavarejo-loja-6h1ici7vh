@@ -305,7 +305,7 @@ export default function AgendaDefault() {
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F2937]">
               Agenda Operacional do Dia
             </h1>
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#2563EB]/10 text-[#2563EB]">
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
               Dia × Tarefas
             </span>
           </div>
