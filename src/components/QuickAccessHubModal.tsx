@@ -331,10 +331,11 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
             <div className="flex items-center gap-2 min-w-0">
               <Sparkles className="w-4 h-4 text-[#0F766E] shrink-0" />
               <span className="truncate">
-                Dica: você também pode abrir este Hub a qualquer momento pelo menu superior.
+                Dica: selecione qualquer atalho para navegar diretamente à sua rotina.
               </span>
             </div>
             <label className="flex items-center gap-2 cursor-pointer text-xs select-none shrink-0 text-[#374151]">
+              {' '}
               <input
                 type="checkbox"
                 checked={naoMostrarNovamenteHoje}

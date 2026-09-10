@@ -42,7 +42,6 @@ export default function Layout() {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
   const [falarEspecialistaOpen, setFalarEspecialistaOpen] = useState(false)
   const [pwaModalOpen, setPwaModalOpen] = useState(false)
-  const [quickAccessModalOpen, setQuickAccessModalOpen] = useState(false)
 
   // Perfil operacional x gestão
   const emailLower = (user?.email || '').toLowerCase()
@@ -312,18 +311,6 @@ export default function Layout() {
               })}
 
               <div className="pt-3 space-y-2 border-t border-[#E5E7EB] mt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    setQuickAccessModalOpen(true)
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#0F766E] bg-teal-50 border border-teal-200 hover:bg-teal-100 transition-colors"
-                >
-                  <ListChecks className="w-4 h-4 text-[#0F766E]" />
-                  <span>Hub de Acesso Rápido</span>
-                </button>
-
                 {!isInstalled && (
                   <button
                     type="button"
@@ -394,12 +381,7 @@ export default function Layout() {
       )}
 
       {/* Hub de Acesso Rápido (Logo após o login e na entrada do sistema) */}
-      {!isAuthPage && user && (
-        <QuickAccessHubModal
-          forceOpen={quickAccessModalOpen ? true : undefined}
-          onClose={() => setQuickAccessModalOpen(false)}
-        />
-      )}
+      {!isAuthPage && user && <QuickAccessHubModal />}
 
       {/* Modal Falar com Especialista */}
       <FalarEspecialistaModal
