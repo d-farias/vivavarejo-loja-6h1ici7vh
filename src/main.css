@@ -16,108 +16,92 @@
       'Segoe UI',
       Roboto,
       sans-serif;
-    background-color: #f7f7f5;
-    color: #1f2937;
+    background-color: #0b1220;
+    color: #f8fafc;
+    color-scheme: dark;
   }
 
   :root {
-    /* Change the colors to match the design system */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Modelo visual escuro premium inspirado na referência (~#0B1220 fundo, ~#151E30 cards, #2563EB / #3B82F6 accent) */
+    --background: 222 47% 8%; /* #0B1220 */
+    --foreground: 210 40% 98%; /* #F8FAFC */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 210 40% 98%;
-    --secondary-foreground: 222.2 84% 4.9%;
-
-    --muted: 210 40% 98%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 98%;
-    --accent-foreground: 222.2 84% 4.9%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 217 91% 60%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 222.2 84% 4.9%;
-
-    --sidebar-primary: 222.2 84% 4.9%;
-
-    --sidebar-primary-foreground: 0 0% 100%;
-
-    --sidebar-accent: 210 40% 98%;
-
-    --sidebar-accent-foreground: 222.2 84% 4.9%;
-
-    --sidebar-border: 214.3 31.8% 91.4%;
-
-    --sidebar-ring: 222.2 84% 4.9%;
-
-    --chart-1: 34 100% 44%;
-    --chart-2: 189 100% 38%;
-    --chart-3: 209 100% 32%;
-    --chart-4: 42 100% 50%;
-    --chart-5: 33 100% 50%;
-  }
-
-  .dark {
-    /* Change the colors to match the design system consistent with the dark mode */
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
+    --card: 220 39% 14%; /* #151E30 */
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 220 39% 14%; /* #151E30 */
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 84% 4.9%;
+    --primary: 217 91% 60%; /* #3B82F6 azul vibrante */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 222.2 84% 4.9%;
+    --secondary: 222 35% 19%; /* #1E293B */
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 222.2 84% 4.9%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 222 35% 18%; /* #1C263A */
+    --muted-foreground: 215 20% 65%; /* #94A3B8 */
 
-    --accent: 222.2 84% 4.9%;
+    --accent: 220 39% 18%; /* #1B263B */
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 222.2 84% 4.9%;
-    --input: 222.2 84% 4.9%;
-    --ring: 214.3 31.8% 91.4%;
-    --sidebar-background: 222.2 84% 4.9%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 222.2 84% 4.9%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222.2 84% 4.9%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 222.2 84% 4.9%;
-    --sidebar-ring: 222.2 84% 4.9%;
+    --border: 220 30% 20%; /* #223049 */
+    --input: 220 30% 22%; /* #24344E */
+    --ring: 217 91% 60%;
 
-    --chart-1: 270 100% 44%;
-    --chart-2: 164 100% 38%;
-    --chart-3: 43 100% 32%;
-    --chart-4: 340 100% 50%;
-    --chart-5: 10 100% 50%;
+    --radius: 0.75rem;
+
+    --sidebar-background: 222 47% 7%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 39% 15%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 220 30% 20%;
+    --sidebar-ring: 217 91% 60%;
+
+    --chart-1: 217 91% 60%;
+    --chart-2: 160 84% 39%;
+    --chart-3: 262 83% 58%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 0 84% 60%;
+  }
+
+  .dark {
+    --background: 222 47% 8%;
+    --foreground: 210 40% 98%;
+    --card: 220 39% 14%;
+    --card-foreground: 210 40% 98%;
+    --popover: 220 39% 14%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 35% 19%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 222 35% 18%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 220 39% 18%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 30% 20%;
+    --input: 220 30% 22%;
+    --ring: 217 91% 60%;
+    --sidebar-background: 222 47% 7%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 39% 15%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 220 30% 20%;
+    --sidebar-ring: 217 91% 60%;
+    --chart-1: 217 91% 60%;
+    --chart-2: 160 84% 39%;
+    --chart-3: 262 83% 58%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 0 84% 60%;
   }
 
   /* NEVER REMOVE THIS */
@@ -135,12 +119,12 @@
   }
 }
 
-/* Indicador e barra de rolagem horizontal visível e fluida para mobile */
+/* Indicador e barra de rolagem horizontal visível e fluida para mobile no tema escuro */
 .scrollbar-thin-horizontal {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  scrollbar-color: #93c5fd #f3f4f6;
+  scrollbar-color: #2563eb #151e30;
 }
 
 .scrollbar-thin-horizontal::-webkit-scrollbar {
@@ -148,17 +132,17 @@
 }
 
 .scrollbar-thin-horizontal::-webkit-scrollbar-track {
-  background: #f3f4f6;
+  background: #151e30;
   border-radius: 9999px;
 }
 
 .scrollbar-thin-horizontal::-webkit-scrollbar-thumb {
-  background-color: #93c5fd;
+  background-color: #3b82f6;
   border-radius: 9999px;
 }
 
 .scrollbar-thin-horizontal::-webkit-scrollbar-thumb:hover {
-  background-color: #2563eb;
+  background-color: #60a5fa;
 }
 
 /* Barra de rolagem vertical visível para formulários e modais no celular */
@@ -166,7 +150,7 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 #f8fafc;
+  scrollbar-color: #334155 #0b1220;
 }
 
 .scrollbar-mobile-vertical::-webkit-scrollbar {
@@ -174,13 +158,154 @@
 }
 
 .scrollbar-mobile-vertical::-webkit-scrollbar-track {
-  background: #f8fafc;
+  background: #0b1220;
   border-radius: 9999px;
 }
 
 .scrollbar-mobile-vertical::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
+  background-color: #334155;
   border-radius: 9999px;
+}
+
+/* OVERRIDES GLOBAIS DE TEMA ESCURO PREMIUM:
+   Garante que o fundo escuro azul-marinho (#0B1220) e as superfícies (#151E30)
+   tenham contraste ideal com texto branco e bordas sutis (#223049), mantendo o print
+   completamente claro e legível. */
+@media screen {
+  body {
+    background-color: #0b1220 !important;
+    color: #f1f5f9 !important;
+  }
+
+  /* Fundo principal da aplicação */
+  .bg-\[\#F7F7F5\],
+  .bg-\[\#f7f7f5\],
+  .bg-\[\#F9FAFB\],
+  .bg-gray-50,
+  .bg-neutral-50,
+  .bg-slate-50 {
+    background-color: #0b1220 !important;
+    color: #e2e8f0;
+  }
+
+  /* Superfícies, cards, modais e containers */
+  .bg-white {
+    background-color: #151e30 !important;
+    color: #f8fafc;
+  }
+
+  .bg-white\/95,
+  .bg-white\/90,
+  .bg-white\/80 {
+    background-color: rgba(21, 30, 48, 0.95) !important;
+    color: #f8fafc;
+  }
+
+  /* Bordas sutis no tom azul-marinho */
+  .border-\[\#E5E7EB\],
+  .border-\[\#e5e7eb\],
+  .border-gray-200,
+  .border-gray-100,
+  .border-slate-200,
+  .border-neutral-200 {
+    border-color: #223049 !important;
+  }
+
+  .divide-\[\#E5E7EB\] > :not([hidden]) ~ :not([hidden]),
+  .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+    border-color: #223049 !important;
+  }
+
+  /* Títulos em branco e textos principais */
+  .text-\[\#1F2937\],
+  .text-\[\#1f2937\],
+  .text-\[\#111827\],
+  .text-gray-900,
+  .text-slate-900 {
+    color: #f8fafc !important;
+  }
+
+  /* Textos secundários em cinza-azulado claro */
+  .text-\[\#4B5563\],
+  .text-\[\#374151\],
+  .text-gray-700,
+  .text-slate-700 {
+    color: #cbd5e1 !important;
+  }
+
+  .text-\[\#6B7280\],
+  .text-gray-500,
+  .text-slate-500 {
+    color: #94a3b8 !important;
+  }
+
+  .text-\[\#9CA3AF\],
+  .text-gray-400 {
+    color: #64748b !important;
+  }
+
+  /* Inputs, selects e textareas */
+  input:not([type='checkbox']):not([type='radio']),
+  select,
+  textarea {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #24344e !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #64748b !important;
+  }
+
+  /* Hovers de linha e botões neutros */
+  .hover\:bg-gray-100:hover,
+  .hover\:bg-gray-50:hover,
+  .hover\:bg-\[\#F7F7F5\]:hover {
+    background-color: #1a253c !important;
+  }
+
+  /* Elementos de destaque em azul com fundo sutil */
+  .bg-blue-50,
+  .bg-blue-50\/60,
+  .bg-blue-50\/80,
+  .bg-blue-50\/50 {
+    background-color: rgba(37, 99, 235, 0.15) !important;
+    border-color: rgba(59, 130, 246, 0.35) !important;
+    color: #93c5fd !important;
+  }
+
+  .border-blue-200,
+  .border-blue-100 {
+    border-color: rgba(59, 130, 246, 0.3) !important;
+  }
+
+  .bg-emerald-50 {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+    color: #6ee7b7 !important;
+  }
+
+  .bg-amber-50 {
+    background-color: rgba(245, 158, 11, 0.15) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+    color: #fcd34d !important;
+  }
+
+  .bg-rose-50,
+  .bg-red-50 {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #fca5a5 !important;
+  }
+
+  /* Dropdown e popover menus */
+  [role='menu'],
+  [data-radix-popper-content-wrapper] > div {
+    background-color: #151e30 !important;
+    border-color: #223049 !important;
+    color: #f8fafc !important;
+  }
 }
 
 @media print {
@@ -198,7 +323,9 @@
   html,
   body {
     background-color: #ffffff !important;
+    background: #ffffff !important;
     color: #111827 !important;
+    color-scheme: light !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     overflow: visible !important;
@@ -206,6 +333,18 @@
     min-height: auto !important;
     font-size: 11.5px !important;
     line-height: 1.35 !important;
+  }
+
+  /* Garante documento limpo, claro e legível ao imprimir */
+  * {
+    color-scheme: light !important;
+  }
+
+  .bg-white,
+  .print\:bg-white,
+  #material-venda-conteudo {
+    background-color: #ffffff !important;
+    color: #111827 !important;
   }
 
   /* Ocultar elementos estruturais de navegação e controles web */

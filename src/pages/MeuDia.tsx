@@ -440,34 +440,34 @@ export function MeuDiaPage() {
             <div className="space-y-2.5">
               {/* FAÇA AGORA */}
               {tarefasClassificadas.facaAgora && (
-                <div className="p-3.5 rounded-xl border-2 border-red-400 bg-red-50/40 shadow-xs relative">
+                <div className="p-4 rounded-2xl border-2 border-rose-500 bg-rose-500/10 shadow-lg relative">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider bg-red-600 text-white px-2 py-0.5 rounded">
+                    <span className="text-[11px] font-bold uppercase tracking-wider bg-rose-600 text-white px-2.5 py-0.5 rounded-full shadow-xs">
                       Faça agora — Prioridade Máxima
                     </span>
-                    <span className="text-xs font-mono font-bold text-red-800">
+                    <span className="text-xs font-mono font-bold text-rose-300">
                       {tarefasClassificadas.facaAgora.horario_limite || 'Imediato'}
                     </span>
                   </div>
 
-                  <h3 className="text-sm font-bold text-[#1F2937] leading-snug">
+                  <h3 className="text-sm font-bold text-white leading-snug">
                     {tarefasClassificadas.facaAgora.nome}
                   </h3>
                   {tarefasClassificadas.facaAgora.observacoes && (
-                    <p className="text-xs text-[#4B5563] mt-1 line-clamp-2">
+                    <p className="text-xs text-[#CBD5E1] mt-1 line-clamp-2">
                       {tarefasClassificadas.facaAgora.observacoes}
                     </p>
                   )}
 
                   <div className="mt-3 flex items-center justify-between gap-2">
-                    <span className="text-[11px] text-[#6B7280]">
+                    <span className="text-[11px] text-[#94A3B8]">
                       {tarefasClassificadas.facaAgora.responsavel || 'Operação de Loja'}
                     </span>
                     <Button
                       type="button"
                       size="sm"
                       onClick={() => handleAbrirExecucao(tarefasClassificadas.facaAgora!)}
-                      className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold h-8 px-3"
+                      className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold h-8 px-3 rounded-xl shadow-md"
                     >
                       <PlayCircle className="w-3.5 h-3.5 mr-1" />
                       Executar tarefa
@@ -478,20 +478,20 @@ export function MeuDiaPage() {
 
               {/* DEPOIS */}
               {tarefasClassificadas.depois && (
-                <div className="p-3 rounded-xl border border-amber-300 bg-amber-50/30">
+                <div className="p-3.5 rounded-2xl border border-amber-500/30 bg-amber-500/10">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300">
                       Depois — Limite {tarefasClassificadas.depois.horario_limite || '10:30'}
                     </span>
                     <button
                       type="button"
                       onClick={() => handleAbrirExecucao(tarefasClassificadas.depois!)}
-                      className="text-xs font-bold text-[#2563EB] hover:underline"
+                      className="text-xs font-bold text-[#60A5FA] hover:underline"
                     >
                       Executar agora →
                     </button>
                   </div>
-                  <h4 className="text-xs font-bold text-[#1F2937]">
+                  <h4 className="text-xs font-bold text-white">
                     {tarefasClassificadas.depois.nome}
                   </h4>
                 </div>
@@ -499,20 +499,20 @@ export function MeuDiaPage() {
 
               {/* EM SEGUIDA */}
               {tarefasClassificadas.emSeguida && (
-                <div className="p-3 rounded-xl border border-[#E5E7EB] bg-white">
+                <div className="p-3.5 rounded-2xl border border-[#223049] bg-[#151E30]">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B7280]">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#94A3B8]">
                       Em seguida — Limite {tarefasClassificadas.emSeguida.horario_limite || '11:00'}
                     </span>
                     <button
                       type="button"
                       onClick={() => handleAbrirExecucao(tarefasClassificadas.emSeguida!)}
-                      className="text-xs font-semibold text-[#2563EB] hover:underline"
+                      className="text-xs font-semibold text-[#60A5FA] hover:underline"
                     >
                       Executar →
                     </button>
                   </div>
-                  <h4 className="text-xs font-semibold text-[#1F2937]">
+                  <h4 className="text-xs font-semibold text-white">
                     {tarefasClassificadas.emSeguida.nome}
                   </h4>
                 </div>

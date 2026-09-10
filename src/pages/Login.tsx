@@ -95,13 +95,13 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-140px)] flex items-center justify-center py-10 px-4">
-      <div className="w-full max-w-md bg-white border border-[#E5E7EB] rounded-lg p-6 sm:p-8 shadow-xs">
+    <div className="min-h-[calc(100vh-140px)] flex items-center justify-center py-10 px-4 bg-[#0B1220]">
+      <div className="w-full max-w-md bg-[#151E30] border border-[#223049] rounded-2xl p-6 sm:p-8 shadow-xl">
         {/* Link Voltar à Landing Page */}
         <div className="mb-4">
           <Link
             to="/bem-vindo"
-            className="inline-flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#1F2937] transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs text-[#94A3B8] hover:text-white transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Voltar à apresentação</span>
@@ -110,11 +110,11 @@ export default function Login() {
 
         {/* Header */}
         <div className="flex flex-col items-center text-center mb-6">
-          <div className="w-10 h-10 rounded bg-[#2563EB] flex items-center justify-center text-white mb-3 shadow-xs">
-            <div className="w-4 h-4 border-2 border-white rotate-45 transform" />
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] flex items-center justify-center text-white mb-3 shadow-lg shadow-blue-500/25">
+            <div className="w-5 h-5 border-2 border-white rotate-45 transform" />
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937]">VivaVarejo</h1>
-          <p className="text-xs sm:text-sm text-[#6B7280] mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-white">VivaVarejo</h1>
+          <p className="text-xs sm:text-sm text-[#94A3B8] mt-1">
             Acompanhamento operacional e gestão de rotinas
           </p>
         </div>
@@ -138,57 +138,57 @@ export default function Login() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#CBD5E1] mb-1.5">
               E-mail
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
+              <Mail className="w-4 h-4 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="seu@email.com"
-                className={`w-full pl-9 pr-3 py-2 text-sm bg-white border ${
+                className={`w-full pl-9 pr-3 py-2 text-sm bg-[#0B1220] border ${
                   fieldErrors.email
-                    ? 'border-[#B91C1C] focus:ring-red-200'
-                    : 'border-[#E5E7EB] focus:border-[#2563EB]'
-                } rounded-md outline-none focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937] placeholder:text-gray-400`}
+                    ? 'border-rose-500 focus:ring-rose-500/30'
+                    : 'border-[#24344E] focus:border-[#3B82F6]'
+                } rounded-xl outline-none focus:ring-2 focus:ring-[#3B82F6]/25 text-white placeholder:text-[#64748B]`}
                 disabled={loading}
               />
             </div>
             {fieldErrors.email && (
-              <p className="text-[11px] text-[#B91C1C] mt-1 font-medium">{fieldErrors.email}</p>
+              <p className="text-[11px] text-rose-400 mt-1 font-medium">{fieldErrors.email}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#CBD5E1] mb-1.5">
               Senha
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
+              <Lock className="w-4 h-4 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className={`w-full pl-9 pr-3 py-2 text-sm bg-white border ${
+                className={`w-full pl-9 pr-3 py-2 text-sm bg-[#0B1220] border ${
                   fieldErrors.password
-                    ? 'border-[#B91C1C] focus:ring-red-200'
-                    : 'border-[#E5E7EB] focus:border-[#2563EB]'
-                } rounded-md outline-none focus:ring-2 focus:ring-[#3B82F6]/25 text-[#1F2937] placeholder:text-gray-400`}
+                    ? 'border-rose-500 focus:ring-rose-500/30'
+                    : 'border-[#24344E] focus:border-[#3B82F6]'
+                } rounded-xl outline-none focus:ring-2 focus:ring-[#3B82F6]/25 text-white placeholder:text-[#64748B]`}
                 disabled={loading}
               />
             </div>
             {fieldErrors.password && (
-              <p className="text-[11px] text-[#B91C1C] mt-1 font-medium">{fieldErrors.password}</p>
+              <p className="text-[11px] text-rose-400 mt-1 font-medium">{fieldErrors.password}</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-2.5 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm rounded-md shadow-xs transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full mt-2 py-2.5 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm rounded-xl shadow-lg shadow-blue-600/30 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
           >
             {loading ? 'Acessando...' : 'Acesse sua conta'}
           </button>
@@ -203,16 +203,16 @@ export default function Login() {
               setForgotFeedback(null)
               setShowForgotModal(true)
             }}
-            className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] hover:underline transition-colors"
+            className="text-xs font-semibold text-[#60A5FA] hover:text-[#93C5FD] hover:underline transition-colors"
           >
             Esqueci minha senha
           </button>
         </div>
 
         {/* Signup Link */}
-        <div className="mt-5 pt-4 border-t border-[#E5E7EB] text-center text-xs text-[#6B7280]">
+        <div className="mt-5 pt-4 border-t border-[#223049] text-center text-xs text-[#94A3B8]">
           Não tem conta?{' '}
-          <Link to="/signup" className="text-[#2563EB] font-semibold hover:underline">
+          <Link to="/signup" className="text-[#60A5FA] font-semibold hover:underline">
             Cadastre-se
           </Link>
         </div>
@@ -227,14 +227,14 @@ export default function Login() {
               if (!forgotLoading) setShowForgotModal(false)
             }}
           />
-          <div className="relative w-full max-w-md bg-white rounded-lg shadow-xl border border-[#E5E7EB] p-6 z-10 space-y-4">
-            <div className="flex items-center gap-2.5 pb-2 border-b border-[#E5E7EB]">
-              <div className="w-8 h-8 rounded-full bg-[#3B82F6]/10 text-[#2563EB] flex items-center justify-center shrink-0">
+          <div className="relative w-full max-w-md bg-[#151E30] rounded-2xl shadow-2xl border border-[#223049] p-6 z-10 space-y-4 text-white">
+            <div className="flex items-center gap-2.5 pb-2 border-b border-[#223049]">
+              <div className="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-500/30 text-[#60A5FA] flex items-center justify-center shrink-0">
                 <KeyRound className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-[#1F2937]">Recuperar Senha</h3>
-                <p className="text-xs text-[#6B7280]">
+                <h3 className="text-base font-bold text-white">Recuperar Senha</h3>
+                <p className="text-xs text-[#94A3B8]">
                   Instruções para redefinir o acesso à sua conta
                 </p>
               </div>
@@ -331,11 +331,11 @@ export default function Login() {
               className="space-y-3.5 text-xs sm:text-sm"
             >
               <div>
-                <label className="block text-xs font-semibold text-[#374151] mb-1">
+                <label className="block text-xs font-semibold text-[#CBD5E1] mb-1">
                   E-mail cadastrado
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-4 h-4 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="email"
                     value={forgotEmail}
@@ -343,26 +343,26 @@ export default function Login() {
                     required
                     disabled={forgotLoading}
                     placeholder="seu@email.com"
-                    className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#3B82F6]/20 text-[#1F2937]"
+                    className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-[#0B1220] border border-[#24344E] rounded-xl outline-none focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 text-white"
                   />
                 </div>
               </div>
 
-              <div className="p-3 rounded-md bg-[#F7F7F5] border border-[#E5E7EB] text-[11px] text-[#4B5563] space-y-1">
-                <p className="font-semibold text-[#1F2937]">Dica para Líderes e Colaboradores:</p>
+              <div className="p-3 rounded-xl bg-[#0B1220] border border-[#223049] text-[11px] text-[#94A3B8] space-y-1">
+                <p className="font-semibold text-white">Dica para Líderes e Colaboradores:</p>
                 <p>
                   Caso não receba a mensagem em alguns minutos, qualquer usuário com perfil{' '}
-                  <strong className="text-[#2563EB]">Admin</strong> pode gerar uma nova senha
+                  <strong className="text-[#60A5FA]">Admin</strong> pode gerar uma nova senha
                   temporária instantaneamente na aba <em>Usuários & Perfis</em>.
                 </p>
               </div>
 
-              <div className="flex items-center justify-between gap-2 pt-3 border-t border-[#E5E7EB]">
+              <div className="flex items-center justify-between gap-2 pt-3 border-t border-[#223049]">
                 <button
                   type="button"
                   onClick={() => setShowForgotModal(false)}
                   disabled={forgotLoading}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#4B5563] hover:text-[#1F2937]"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#94A3B8] hover:text-white"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>Voltar ao login</span>
@@ -370,7 +370,7 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={forgotLoading}
-                  className="px-4 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md shadow-xs transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl shadow-lg shadow-blue-600/30 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {forgotLoading ? 'Enviando...' : 'Enviar link de redefinição'}
                 </button>

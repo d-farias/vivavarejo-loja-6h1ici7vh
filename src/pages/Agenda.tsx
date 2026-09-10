@@ -318,35 +318,35 @@ export default function AgendaDefault() {
         </div>
       </div>
 
-      {/* Date Navigation Bar */}
-      <div className="bg-white border border-[#E5E7EB] rounded-xl p-3.5 sm:p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* Date Navigation Bar escuro */}
+      <div className="bg-[#151E30] border border-[#223049] rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleMudarDia(-1)}
-            className="p-2 rounded-lg border border-[#E5E7EB] hover:bg-gray-100 text-[#374151] transition-colors"
+            className="p-2 rounded-xl border border-[#24344E] hover:bg-[#1E293B] text-white transition-colors"
             title="Dia anterior"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
 
-          <div className="flex items-center gap-2.5 px-3 py-1.5 bg-[#F7F7F5] rounded-lg border border-[#E5E7EB]">
-            <CalendarIcon className="w-4 h-4 text-[#2563EB]" />
+          <div className="flex items-center gap-2.5 px-3 py-1.5 bg-[#0B1220] rounded-xl border border-[#223049]">
+            <CalendarIcon className="w-4 h-4 text-[#60A5FA]" />
             <div>
-              <div className="text-xs sm:text-sm font-bold text-[#1F2937] flex items-center gap-2">
+              <div className="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
                 <span>{dataInfo.weekday}</span>
                 {isToday && (
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-[#2563EB] text-white">
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#2563EB] text-white">
                     Hoje
                   </span>
                 )}
               </div>
-              <div className="text-[11px] text-[#6B7280]">{dataInfo.formatted}</div>
+              <div className="text-[11px] text-[#94A3B8]">{dataInfo.formatted}</div>
             </div>
           </div>
 
           <button
             onClick={() => handleMudarDia(1)}
-            className="p-2 rounded-lg border border-[#E5E7EB] hover:bg-gray-100 text-[#374151] transition-colors"
+            className="p-2 rounded-xl border border-[#24344E] hover:bg-[#1E293B] text-white transition-colors"
             title="Dia seguinte"
           >
             <ChevronRight className="w-4 h-4" />
@@ -355,7 +355,7 @@ export default function AgendaDefault() {
           {!isToday && (
             <button
               onClick={handleIrParaHoje}
-              className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[#2563EB] border border-[#2563EB]/40 hover:bg-blue-50 transition-colors"
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#60A5FA] border border-[#3B82F6]/40 hover:bg-[#1E293B] transition-colors"
             >
               Voltar para Hoje
             </button>
@@ -364,127 +364,123 @@ export default function AgendaDefault() {
 
         {/* Input direto de data */}
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <span className="text-xs text-[#6B7280]">Ir para:</span>
+          <span className="text-xs text-[#94A3B8]">Ir para:</span>
           <input
             type="date"
             value={currentDateStr}
             onChange={(e) => e.target.value && setCurrentDateStr(e.target.value)}
-            className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB] text-[#1F2937]"
+            className="px-2.5 py-1.5 text-xs bg-[#0B1220] border border-[#24344E] rounded-xl outline-none focus:border-[#3B82F6] text-white"
           />
         </div>
       </div>
 
-      {/* 6 Cards de Indicadores Enriquecidos */}
+      {/* 6 Cards de Indicadores Enriquecidos com tiles coloridos consistentes */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        {/* Card 1: Rotinas do Dia */}
-        <div className="p-3 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
-          <span className="text-xs text-[#6B7280] font-medium flex items-center justify-between">
+        {/* Card 1: Rotinas do Dia - Tile Azul */}
+        <div className="p-3.5 sm:p-4 bg-[#151E30] border border-[#223049] rounded-2xl shadow-xs">
+          <span className="text-xs text-[#94A3B8] font-medium flex items-center justify-between">
             <span>Rotinas do Dia</span>
-            <Layers className="w-4 h-4 text-[#2563EB]" />
+            <div className="w-7 h-7 rounded-lg bg-blue-500/15 border border-blue-500/30 text-[#60A5FA] flex items-center justify-center">
+              <Layers className="w-3.5 h-3.5" />
+            </div>
           </span>
-          <div className="text-2xl sm:text-3xl font-bold text-[#1F2937] mt-1 leading-none">
+          <div className="text-2xl sm:text-3xl font-bold text-white mt-1 leading-none">
             {statsDia.total}
           </div>
-          <span className="text-xs text-[#6B7280] mt-1 block">
+          <span className="text-xs text-[#94A3B8] mt-1.5 block">
             {statsDia.concluidas} concluídas
           </span>
         </div>
 
-        {/* Card 2: % Concluído com barra de progresso */}
-        <div className="p-3 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
-          <span className="text-xs text-[#6B7280] font-medium flex items-center justify-between">
+        {/* Card 2: % Concluído - Tile Verde */}
+        <div className="p-3.5 sm:p-4 bg-[#151E30] border border-[#223049] rounded-2xl shadow-xs">
+          <span className="text-xs text-[#94A3B8] font-medium flex items-center justify-between">
             <span>% Concluído</span>
-            <CheckCircle2
-              className={`w-4 h-4 ${
-                statsDia.taxa >= 90
-                  ? 'text-emerald-600'
-                  : statsDia.taxa >= 70
-                    ? 'text-amber-600'
-                    : 'text-red-600'
-              }`}
-            />
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+            </div>
           </span>
           <div
             className={`text-2xl sm:text-3xl font-bold mt-1 leading-none ${
               statsDia.taxa >= 90
-                ? 'text-emerald-700'
+                ? 'text-emerald-400'
                 : statsDia.taxa >= 70
-                  ? 'text-amber-700'
-                  : 'text-red-700'
+                  ? 'text-amber-400'
+                  : 'text-rose-400'
             }`}
           >
             {statsDia.taxa}%
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2 overflow-hidden">
+          <div className="w-full bg-[#0B1220] rounded-full h-1.5 mt-2 overflow-hidden border border-[#223049]">
             <div
               className={`h-1.5 rounded-full transition-all duration-300 ${
                 statsDia.taxa >= 90
-                  ? 'bg-emerald-600'
+                  ? 'bg-emerald-500'
                   : statsDia.taxa >= 70
                     ? 'bg-amber-500'
-                    : 'bg-red-500'
+                    : 'bg-rose-500'
               }`}
               style={{ width: `${statsDia.taxa}%` }}
             />
           </div>
         </div>
 
-        {/* Card 3: Atrasadas com contador/badge de horário limite rompido */}
+        {/* Card 3: Atrasadas - Tile Vermelho */}
         <div
-          className={`p-3 sm:p-4 rounded-lg shadow-2xs border ${
+          className={`p-3.5 sm:p-4 rounded-2xl shadow-xs border ${
             statsDia.atrasadas > 0
-              ? 'bg-red-50/60 border-red-200 text-[#B91C1C]'
-              : 'bg-white border-[#E5E7EB]'
+              ? 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+              : 'bg-[#151E30] border-[#223049]'
           }`}
         >
           <span className="text-xs font-medium flex items-center justify-between">
-            <span
-              className={statsDia.atrasadas > 0 ? 'font-bold text-[#B91C1C]' : 'text-[#6B7280]'}
-            >
+            <span className={statsDia.atrasadas > 0 ? 'font-bold text-rose-400' : 'text-[#94A3B8]'}>
               Atrasadas
             </span>
-            <AlertTriangle
-              className={`w-4 h-4 ${statsDia.atrasadas > 0 ? 'text-[#B91C1C]' : 'text-gray-400'}`}
-            />
+            <div className="w-7 h-7 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center">
+              <AlertTriangle className="w-3.5 h-3.5" />
+            </div>
           </span>
           <div className="flex items-baseline gap-2 mt-1">
             <div
               className={`text-2xl sm:text-3xl font-bold leading-none ${
-                statsDia.atrasadas > 0 ? 'text-[#B91C1C]' : 'text-[#1F2937]'
+                statsDia.atrasadas > 0 ? 'text-rose-400' : 'text-white'
               }`}
             >
               {statsDia.atrasadas}
             </div>
             {statsDia.atrasadas > 0 && (
-              <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-red-100 text-[#B91C1C] border border-red-300">
-                Horário rompido
+              <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                Rompido
               </span>
             )}
           </div>
-          <span className="text-xs opacity-80 mt-1 block truncate">
+          <span className="text-xs text-[#94A3B8] mt-1.5 block truncate">
             {statsDia.atrasadas > 0
               ? `${statsDia.atrasadas} ${statsDia.atrasadas === 1 ? 'rotina rompeu' : 'rotinas romperam'} o limite`
               : 'Nenhum limite rompido'}
           </span>
         </div>
 
-        {/* Card 4: Evidências/Fotos enviadas no dia com visualização em modal */}
-        <div className="p-3 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
-          <span className="text-xs text-[#6B7280] font-medium flex items-center justify-between">
+        {/* Card 4: Evidências/Fotos - Tile Roxo */}
+        <div className="p-3.5 sm:p-4 bg-[#151E30] border border-[#223049] rounded-2xl shadow-xs">
+          <span className="text-xs text-[#94A3B8] font-medium flex items-center justify-between">
             <span>Evidências / Fotos</span>
-            <Camera className="w-4 h-4 text-[#2563EB]" />
+            <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center">
+              <Camera className="w-3.5 h-3.5" />
+            </div>
           </span>
           <div className="flex items-baseline gap-2 mt-1">
-            <div className="text-2xl sm:text-3xl font-bold text-[#1F2937] leading-none">
+            <div className="text-2xl sm:text-3xl font-bold text-white leading-none">
               {statsDia.evidenciasCount}
             </div>
             {statsDia.evidenciasCount > 0 && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-[#2563EB] border border-blue-200">
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
                 Hoje
               </span>
             )}
           </div>
-          <div className="text-xs text-[#6B7280] mt-1 flex items-center justify-between">
+          <div className="text-xs text-[#94A3B8] mt-1.5 flex items-center justify-between">
             <span>{statsDia.evidenciasCount === 1 ? 'Foto enviada' : 'Fotos enviadas'}</span>
             {statsDia.evidenciasCount > 0 && (
               <button
@@ -500,7 +496,7 @@ export default function AgendaDefault() {
                     })
                   }
                 }}
-                className="text-[11px] font-semibold text-[#2563EB] hover:text-[#1D4ED8] inline-flex items-center gap-0.5 hover:underline"
+                className="text-[11px] font-semibold text-[#60A5FA] hover:text-[#93C5FD] inline-flex items-center gap-0.5 hover:underline"
                 title="Visualizar evidência fotográfica enviada"
               >
                 <Eye className="w-3 h-3" />
@@ -510,53 +506,55 @@ export default function AgendaDefault() {
           </div>
         </div>
 
-        {/* Card 5: Visitas Promotores */}
-        <div className="p-3 sm:p-4 bg-white border border-[#E5E7EB] rounded-lg shadow-2xs">
-          <span className="text-xs text-[#6B7280] font-medium flex items-center justify-between">
+        {/* Card 5: Visitas Promotores - Tile Laranja/Âmbar */}
+        <div className="p-3.5 sm:p-4 bg-[#151E30] border border-[#223049] rounded-2xl shadow-xs">
+          <span className="text-xs text-[#94A3B8] font-medium flex items-center justify-between">
             <span>Visitas Promotores</span>
-            <Handshake className="w-4 h-4 text-[#2563EB]" />
+            <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center">
+              <Handshake className="w-3.5 h-3.5" />
+            </div>
           </span>
-          <div className="text-2xl sm:text-3xl font-bold text-[#1F2937] mt-1 leading-none">
+          <div className="text-2xl sm:text-3xl font-bold text-white mt-1 leading-none">
             {statsDia.visitasCount}
           </div>
-          <span className="text-xs text-[#6B7280] mt-1 block">
+          <span className="text-xs text-[#94A3B8] mt-1.5 block">
             {visitasDoDia.filter((v) => v.status === 'realizada').length} realizadas hoje
           </span>
         </div>
 
-        {/* Card 6: Status dos Planos de Ação 5W2H com prazo hoje */}
+        {/* Card 6: Status dos Planos de Ação 5W2H - Tile Ciano */}
         <div
-          className={`p-3 sm:p-4 rounded-lg shadow-2xs border ${
+          className={`p-3.5 sm:p-4 rounded-2xl shadow-xs border ${
             planosHojeStatus.atrasadosGeral > 0
-              ? 'bg-amber-50/50 border-amber-200'
-              : 'bg-white border-[#E5E7EB]'
+              ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+              : 'bg-[#151E30] border-[#223049]'
           }`}
         >
           <span className="text-xs font-medium flex items-center justify-between">
             <span
               className={
                 planosHojeStatus.atrasadosGeral > 0
-                  ? 'text-amber-900 font-semibold'
-                  : 'text-[#6B7280]'
+                  ? 'text-amber-300 font-semibold'
+                  : 'text-[#94A3B8]'
               }
             >
               Planos 5W2H (Hoje)
             </span>
-            <CheckSquare
-              className={`w-4 h-4 ${planosHojeStatus.atrasadosGeral > 0 ? 'text-amber-700' : 'text-[#2563EB]'}`}
-            />
+            <div className="w-7 h-7 rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center">
+              <CheckSquare className="w-3.5 h-3.5" />
+            </div>
           </span>
           <div className="flex items-baseline gap-2 mt-1">
-            <div className="text-2xl sm:text-3xl font-bold text-[#1F2937] leading-none">
+            <div className="text-2xl sm:text-3xl font-bold text-white leading-none">
               {planosHojeStatus.totalHoje}
             </div>
             {planosHojeStatus.concluidosHoje > 0 && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">
                 {planosHojeStatus.concluidosHoje} ok
               </span>
             )}
           </div>
-          <span className="text-xs text-[#6B7280] mt-1 block truncate">
+          <span className="text-xs text-[#94A3B8] mt-1.5 block truncate">
             {planosHojeStatus.totalHoje === 0
               ? planosHojeStatus.atrasadosGeral > 0
                 ? `${planosHojeStatus.atrasadosGeral} em atraso geral`
@@ -568,19 +566,19 @@ export default function AgendaDefault() {
 
       {/* Mini-carrossel / Tira compacta de Evidências Fotográficas do Dia (quando houver fotos) */}
       {evidenciasDoDia.length > 0 && (
-        <div className="bg-white border border-[#E5E7EB] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-[#151E30] border border-[#223049] rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-7 h-7 rounded-md bg-blue-50 text-[#2563EB] flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center shrink-0">
               <Camera className="w-4 h-4" />
             </div>
             <div className="min-w-0">
-              <div className="text-xs font-bold text-[#1F2937] flex items-center gap-2">
+              <div className="text-xs font-bold text-white flex items-center gap-2">
                 <span>Evidências Fotográficas do Dia</span>
-                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-blue-100 text-[#2563EB]">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-[#60A5FA]">
                   {evidenciasDoDia.length}
                 </span>
               </div>
-              <p className="text-[11px] text-[#6B7280] truncate">
+              <p className="text-[11px] text-[#94A3B8] truncate">
                 Fotos e comprovações de rotinas enviadas pelos operadores na loja hoje
               </p>
             </div>
@@ -599,21 +597,21 @@ export default function AgendaDefault() {
                     subtitulo: `Registro por ${ev.responsavel || 'Equipe'}${ev.horario ? ` às ${ev.horario}` : ''}`,
                   })
                 }
-                className="group flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] bg-[#F7F7F5] hover:bg-blue-50 hover:border-blue-200 transition-colors text-left shrink-0"
+                className="group flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#24344E] bg-[#0B1220] hover:bg-[#1E293B] hover:border-[#3B82F6]/50 transition-colors text-left shrink-0"
                 title={`Visualizar foto: ${ev.titulo}`}
               >
-                <div className="w-6 h-6 rounded bg-blue-100 text-[#2563EB] flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-lg bg-blue-500/20 text-[#60A5FA] flex items-center justify-center shrink-0">
                   <Camera className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0 max-w-[140px]">
-                  <div className="text-xs font-semibold text-[#1F2937] truncate group-hover:text-[#2563EB]">
+                  <div className="text-xs font-semibold text-white truncate group-hover:text-[#60A5FA]">
                     {ev.titulo}
                   </div>
-                  <div className="text-[10px] text-[#6B7280] truncate">
+                  <div className="text-[10px] text-[#94A3B8] truncate">
                     {ev.responsavel} {ev.horario ? `• ${ev.horario}` : ''}
                   </div>
                 </div>
-                <Eye className="w-3.5 h-3.5 text-[#6B7280] group-hover:text-[#2563EB] shrink-0" />
+                <Eye className="w-3.5 h-3.5 text-[#94A3B8] group-hover:text-[#60A5FA] shrink-0" />
               </button>
             ))}
           </div>

@@ -1096,21 +1096,25 @@ export default function Index() {
               <Link
                 key={trab.tipo}
                 to={trab.link}
-                className="p-3 rounded-lg border border-[#E5E7EB] hover:border-[#2563EB] bg-[#F9FAFB] hover:bg-white transition-all flex flex-col justify-between group"
+                className="p-3.5 rounded-xl border border-[#223049] hover:border-[#3B82F6] bg-[#0B1220] hover:bg-[#151E30] transition-all flex flex-col justify-between group shadow-xs"
               >
-                <div className="flex items-center justify-between gap-1 mb-2">
-                  <div className="flex items-center gap-1.5 min-w-0">
+                <div className="flex items-center justify-between gap-1 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
                     <div
-                      className="w-6 h-6 rounded flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: `${trab.cor}15`, color: trab.cor }}
+                      className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-xs border"
+                      style={{
+                        backgroundColor: `${trab.cor}20`,
+                        borderColor: `${trab.cor}40`,
+                        color: trab.cor,
+                      }}
                     >
-                      <Icone className="w-3.5 h-3.5" />
+                      <Icone className="w-4 h-4" />
                     </div>
-                    <span className="text-xs font-semibold text-[#1F2937] truncate">
-                      {trab.tipo}
-                    </span>
+                    <span className="text-xs font-semibold text-white truncate">{trab.tipo}</span>
                   </div>
-                  <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${badgeBg}`}>
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeBg}`}
+                  >
                     {trab.perc}%
                   </span>
                 </div>
