@@ -259,13 +259,6 @@ export default function BemVindo() {
 
           {/* Links no cabeçalho */}
           <nav className="flex items-center gap-2 sm:gap-4 text-xs font-medium">
-            <button
-              type="button"
-              onClick={handleScrollToInterest}
-              className="px-3 py-1.5 text-[#4B5563] hover:text-[#1F2937] hover:bg-gray-100 rounded-lg transition-colors font-medium"
-            >
-              Tenho interesse
-            </button>
             <Link
               to="/login"
               className="px-3.5 py-1.5 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] hover:text-[#0F766E] rounded-lg transition-colors font-semibold shadow-2xs"
