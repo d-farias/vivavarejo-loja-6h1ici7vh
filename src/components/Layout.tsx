@@ -17,8 +17,6 @@ import {
   LayoutDashboard,
   Calendar,
   ListChecks,
-  Users,
-  Shield,
   KeyRound,
   Handshake,
   MessageSquare,
