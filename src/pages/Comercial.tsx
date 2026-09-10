@@ -441,7 +441,6 @@ export default function ComercialPage() {
             <span className="px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-teal-50 text-[#0F766E] border border-teal-200">
               Gestão Comercial & Negócio
             </span>
-            <span className="text-xs text-[#6B7280]">VivaVarejo • Visão de Negócio</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937] tracking-tight mt-1 flex items-center gap-2.5">
             <TrendingUp className="w-6 h-6 text-[#0F766E]" />
@@ -569,28 +568,27 @@ export default function ComercialPage() {
         acoes.length === 0 &&
         implantacoes.length === 0 ? (
         /* Estado Vazio Amigável Conforme Requisito 3 */
-        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 sm:p-12 text-center max-w-xl mx-auto shadow-2xs space-y-4">
-          <div className="w-14 h-14 rounded-2xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center mx-auto shadow-2xs">
-            <TrendingUp className="w-7 h-7" />
+        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 text-center max-w-md mx-auto shadow-2xs space-y-3">
+          <div className="w-12 h-12 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center mx-auto">
+            <TrendingUp className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-[#1F2937]">
-              Nenhum dado comercial registrado nesta competência
+            <h2 className="text-sm sm:text-base font-bold text-[#1F2937]">
+              Nenhum dado comercial nesta competência
             </h2>
-            <p className="text-xs sm:text-sm text-[#4B5563] mt-1.5 max-w-md mx-auto leading-relaxed">
-              O VivaVarejo opera com dados 100% integrados e sem números fictícios. Comece
-              importando sua planilha de sortimento, rupturas ou vendas.
+            <p className="text-xs text-[#6B7280] mt-1">
+              Importe sua planilha de sortimento, vendas ou rupturas para começar.
             </p>
           </div>
 
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="pt-1 flex flex-col sm:flex-row items-center justify-center gap-2">
             <Button
               size="sm"
               onClick={() => setImportarModalOpen(true)}
-              className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-2 shadow-xs w-full sm:w-auto"
+              className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs w-full sm:w-auto"
             >
               <UploadCloud className="w-4 h-4" />
-              <span>Importar Planilha (XLSX / CSV)</span>
+              <span>Importar Planilha</span>
             </Button>
             <Button
               variant="outline"
@@ -599,7 +597,7 @@ export default function ComercialPage() {
               className="text-xs rounded-xl w-full sm:w-auto"
             >
               <Plus className="w-4 h-4 mr-1 text-[#0F766E]" />
-              <span>Cadastrar Ação Manual</span>
+              <span>Nova Ação</span>
             </Button>
           </div>
         </div>

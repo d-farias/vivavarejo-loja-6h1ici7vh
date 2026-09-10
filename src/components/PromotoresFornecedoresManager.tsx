@@ -612,23 +612,19 @@ export function PromotoresFornecedoresManager({
 
           {/* Tabela de Visitas com scroll horizontal dedicado e aviso no celular */}
           {filteredVisitas.length === 0 ? (
-            <div className="p-8 text-center bg-white border border-[#E5E7EB] rounded-lg">
-              <Calendar className="w-8 h-8 text-[#9CA3AF] mx-auto mb-2" />
+            <div className="p-6 text-center bg-white border border-[#E5E7EB] rounded-lg">
+              <Calendar className="w-7 h-7 text-[#9CA3AF] mx-auto mb-1.5" />
               <p className="text-sm font-medium text-[#1F2937]">Nenhuma visita encontrada.</p>
-              <p className="text-xs text-[#6B7280] mt-1">
-                Agende visitas de repositores e representantes nas lojas para controlar a eficiência
-                do atendimento.
-              </p>
               {promotores.length > 0 && lojas.length > 0 && (
                 <button
                   onClick={() => {
                     setEditingVisita(null)
                     setAgendarModalOpen(true)
                   }}
-                  className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs"
+                  className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Agendar primeira visita</span>
+                  <span>Agendar visita</span>
                 </button>
               )}
             </div>

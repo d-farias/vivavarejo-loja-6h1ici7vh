@@ -515,20 +515,16 @@ export default function ValidadesPage() {
           <p className="text-xs text-[#6B7280]">Carregando cronograma de validades...</p>
         </div>
       ) : tarefasFiltradas.length === 0 ? (
-        <div className="p-10 text-center bg-white border border-[#E5E7EB] rounded-lg space-y-3">
-          <CalendarIcon className="w-8 h-8 text-[#9CA3AF] mx-auto" />
+        <div className="p-6 text-center bg-white border border-[#E5E7EB] rounded-lg space-y-2">
+          <CalendarIcon className="w-7 h-7 text-[#9CA3AF] mx-auto" />
           <p className="text-sm font-semibold text-[#1F2937]">
             Nenhuma tarefa de validade programada para este dia.
           </p>
-          <p className="text-xs text-[#6B7280] max-w-md mx-auto">
-            Importe o cronograma de validades via planilha (Excel/CSV) ou cadastre as tarefas
-            manualmente por setor e janela horária.
-          </p>
           {podeGerenciar && (
-            <div className="flex items-center justify-center gap-2 pt-2">
+            <div className="flex items-center justify-center gap-2 pt-1">
               <button
                 onClick={() => setImportModalOpen(true)}
-                className="px-3.5 py-2 text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#0F766E] rounded-md"
+                className="px-3 py-1.5 text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#0F766E] rounded-md"
               >
                 Importar Planilha
               </button>
@@ -537,9 +533,9 @@ export default function ValidadesPage() {
                   setEditingTarefa(null)
                   setFormModalOpen(true)
                 }}
-                className="px-4 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md"
+                className="px-3.5 py-1.5 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-md"
               >
-                Cadastrar Manualmente
+                Nova Tarefa
               </button>
             </div>
           )}

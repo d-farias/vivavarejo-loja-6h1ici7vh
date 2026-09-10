@@ -865,7 +865,7 @@ export default function PerdasPage() {
         </div>
 
         {perdasFiltradas.length === 0 ? (
-          <div className="py-12 text-center text-xs text-[#6B7280] bg-[#F7F7F5]/50 rounded-lg border border-dashed border-[#E5E7EB]">
+          <div className="py-6 text-center text-xs text-[#6B7280] bg-[#F7F7F5]/50 rounded-lg border border-dashed border-[#E5E7EB]">
             Nenhuma perda registrada com os filtros atuais.
           </div>
         ) : (
@@ -990,7 +990,7 @@ export default function PerdasPage() {
         </div>
 
         {inventariosFiltrados.length === 0 ? (
-          <div className="py-8 text-center text-xs text-[#6B7280] bg-[#F7F7F5]/50 rounded-lg border border-dashed border-[#E5E7EB]">
+          <div className="py-6 text-center text-xs text-[#6B7280] bg-[#F7F7F5]/50 rounded-lg border border-dashed border-[#E5E7EB]">
             Nenhum inventário registrado no período selecionado.
           </div>
         ) : (
