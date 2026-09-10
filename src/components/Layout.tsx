@@ -135,19 +135,19 @@ export default function Layout() {
       ]
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#0B1220] text-[#F8FAFC]">
-      {/* Top Navigation Bar escuro premium */}
-      <header className="sticky top-0 z-40 w-full bg-[#0B1220]/95 backdrop-blur-md border-b border-[#1E293B] transition-colors">
+    <div className="flex flex-col min-h-screen bg-[#F7F7F5] text-[#1F2937]">
+      {/* Top Navigation Bar sóbrio tema claro */}
+      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-[#E5E7EB] shadow-2xs transition-colors">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           {/* Logo & Title */}
           <div className="flex items-center gap-3">
             <NavLink to="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] flex items-center justify-center text-white shadow-md shadow-blue-500/20 transition-transform group-hover:scale-105">
+              <div className="w-9 h-9 rounded-xl bg-[#0F766E] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
                 {/* Compact square diamond logo */}
                 <div className="w-4 h-4 border-2 border-white rotate-45 transform" />
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-bold tracking-wider uppercase text-white leading-tight">
+                <span className="text-sm font-bold tracking-wider uppercase text-[#1F2937] leading-tight">
                   VivaVarejo
                 </span>
               </div>
@@ -165,8 +165,8 @@ export default function Layout() {
                   className={({ isActive }) =>
                     `relative px-3.5 py-2 rounded-xl text-sm font-medium transition-colors ${
                       isActive
-                        ? 'text-white bg-[#151E30] font-semibold'
-                        : 'text-[#94A3B8] hover:text-white hover:bg-[#151E30]/60'
+                        ? 'text-[#0F766E] bg-teal-50 font-bold'
+                        : 'text-[#4B5563] hover:text-[#1F2937] hover:bg-gray-100/70'
                     }`
                   }
                 >
@@ -174,7 +174,7 @@ export default function Layout() {
                     <>
                       <span>{link.label}</span>
                       {isActive && (
-                        <span className="absolute bottom-[-6px] left-3 right-3 h-[2px] bg-[#3B82F6] rounded-full transition-all duration-200" />
+                        <span className="absolute bottom-[-6px] left-3 right-3 h-[2px] bg-[#0F766E] rounded-full transition-all duration-200" />
                       )}
                     </>
                   )}
@@ -189,10 +189,10 @@ export default function Layout() {
               <button
                 type="button"
                 onClick={() => setFalarEspecialistaOpen(true)}
-                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#151E30] border border-[#24344E] hover:border-[#3B82F6] hover:text-[#60A5FA] text-[#CBD5E1] shadow-2xs transition-colors"
+                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] hover:text-[#0F766E] text-[#374151] shadow-2xs transition-colors"
                 title="Fale diretamente com o consultor especialista"
               >
-                <MessageSquare className="w-3.5 h-3.5 text-[#60A5FA]" />
+                <MessageSquare className="w-3.5 h-3.5 text-[#0F766E]" />
                 <span>Falar com especialista</span>
               </button>
             )}
@@ -203,7 +203,7 @@ export default function Layout() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
-                      className="w-9 h-9 rounded-xl border border-[#24344E] hover:border-[#3B82F6] bg-[#151E30] text-[#94A3B8] hover:text-white flex items-center justify-center transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]/30"
+                      className="w-9 h-9 rounded-xl border border-[#E5E7EB] hover:border-[#0F766E] bg-white text-[#4B5563] hover:text-[#1F2937] flex items-center justify-center transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/30"
                       title="Contato com especialista"
                       aria-label="Contato com especialista"
                     >
@@ -212,13 +212,13 @@ export default function Layout() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="w-56 bg-[#151E30] border border-[#223049] shadow-2xl text-white"
+                    className="w-56 bg-white border border-[#E5E7EB] shadow-lg text-[#1F2937]"
                   >
                     <DropdownMenuItem
                       onClick={() => setFalarEspecialistaOpen(true)}
-                      className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2.5 text-[#CBD5E1] hover:text-white hover:bg-[#1E293B]"
+                      className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2.5 text-[#374151] hover:text-[#0F766E] hover:bg-teal-50"
                     >
-                      <MessageSquare className="w-4 h-4 text-[#60A5FA]" />
+                      <MessageSquare className="w-4 h-4 text-[#0F766E]" />
                       <span>Falar com especialista</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -228,7 +228,7 @@ export default function Layout() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
-                      className="w-9 h-9 rounded-full bg-blue-500/15 border border-blue-500/30 text-[#60A5FA] hover:bg-blue-500/25 flex items-center justify-center font-semibold text-xs tracking-wider transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]/30"
+                      className="w-9 h-9 rounded-full bg-teal-50 border border-teal-200 text-[#0F766E] hover:bg-teal-100 flex items-center justify-center font-bold text-xs tracking-wider transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/30 shadow-2xs"
                       title={user.name || user.email}
                       aria-label="Menu do usuário"
                     >
@@ -237,44 +237,44 @@ export default function Layout() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="w-56 bg-[#151E30] border border-[#223049] shadow-2xl text-white"
+                    className="w-56 bg-white border border-[#E5E7EB] shadow-lg text-[#1F2937]"
                   >
                     <DropdownMenuLabel className="font-normal p-3">
                       <div className="flex flex-col space-y-1">
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-sm font-semibold text-white leading-none">
+                          <p className="text-sm font-bold text-[#1F2937] leading-none">
                             {user.name || 'Líder'}
                           </p>
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider bg-blue-500/20 text-[#60A5FA]">
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider bg-teal-50 text-[#0F766E] border border-teal-200">
                             {perfil}
                           </span>
                         </div>
-                        <p className="text-xs text-[#94A3B8] truncate leading-none">{user.email}</p>
+                        <p className="text-xs text-[#6B7280] truncate leading-none">{user.email}</p>
                       </div>
                     </DropdownMenuLabel>
                     {hasAdminAccess && (
                       <>
                         <DropdownMenuItem
                           onClick={() => navigate('/admin')}
-                          className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2 text-[#60A5FA] hover:bg-[#1E293B]"
+                          className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2 text-[#0F766E] hover:bg-teal-50"
                         >
                           <GitBranch className="w-4 h-4" />
                           <span>{isAdmRede ? 'Workflow Rede' : 'Workflow Geral'}</span>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-[#223049]" />
+                        <DropdownMenuSeparator className="bg-[#E5E7EB]" />
                       </>
                     )}
                     <DropdownMenuItem
                       onClick={() => setChangePasswordOpen(true)}
-                      className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2 text-[#CBD5E1] hover:text-white hover:bg-[#1E293B]"
+                      className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2 text-[#374151] hover:text-[#1F2937] hover:bg-gray-50"
                     >
-                      <KeyRound className="w-4 h-4 text-[#94A3B8]" />
+                      <KeyRound className="w-4 h-4 text-[#6B7280]" />
                       <span>Alterar senha</span>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-[#223049]" />
+                    <DropdownMenuSeparator className="bg-[#E5E7EB]" />
                     <DropdownMenuItem
                       onClick={handleLogout}
-                      className="text-rose-400 focus:text-rose-300 focus:bg-rose-500/10 cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2"
+                      className="text-rose-600 focus:text-rose-700 focus:bg-rose-50 cursor-pointer p-2.5 font-semibold text-xs flex items-center gap-2"
                     >
                       <LogOut className="w-4 h-4" />
                       <span>Sair da conta</span>
@@ -285,14 +285,14 @@ export default function Layout() {
                 {/* Mobile Menu Button */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="md:hidden p-2 rounded-xl text-[#94A3B8] hover:text-white hover:bg-[#151E30] min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  className="md:hidden p-2 rounded-xl text-[#4B5563] hover:text-[#1F2937] hover:bg-gray-100 min-h-[44px] min-w-[44px] flex items-center justify-center"
                   aria-label="Abrir menu"
                 >
                   {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
               </div>
             ) : isAuthPage ? (
-              <span className="text-xs text-[#94A3B8] hidden sm:inline">Acesso de Liderança</span>
+              <span className="text-xs text-[#6B7280] hidden sm:inline">Acesso de Liderança</span>
             ) : null}
           </div>
         </div>
@@ -303,47 +303,47 @@ export default function Layout() {
         <div className="fixed inset-0 z-50 md:hidden flex">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity duration-200"
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-200"
             onClick={() => setMobileMenuOpen(false)}
           />
           {/* Drawer Panel */}
-          <div className="relative w-4/5 max-w-xs bg-[#0D1526] h-full shadow-2xl flex flex-col z-10 border-r border-[#1E293B] transform transition-transform duration-200 ease-in-out text-white">
-            <div className="p-4 border-b border-[#1E293B] flex items-center justify-between">
+          <div className="relative w-4/5 max-w-xs bg-white h-full shadow-2xl flex flex-col z-10 border-r border-[#E5E7EB] transform transition-transform duration-200 ease-in-out text-[#1F2937]">
+            <div className="p-4 border-b border-[#E5E7EB] flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#2563EB] flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-xl bg-[#0F766E] flex items-center justify-center text-white">
                   <div className="w-3.5 h-3.5 border-2 border-white rotate-45 transform" />
                 </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-white">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#1F2937]">
                   VivaVarejo
                 </span>
               </div>
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-1 rounded-lg text-[#94A3B8] hover:text-white"
+                className="p-1 rounded-lg text-[#6B7280] hover:text-[#1F2937]"
                 aria-label="Fechar menu"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-4 border-b border-[#1E293B] bg-[#151E30] flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-500/20 text-[#60A5FA] font-semibold text-xs flex items-center justify-center border border-blue-500/30">
+            <div className="p-4 border-b border-[#E5E7EB] bg-[#F7F7F5] flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-teal-50 text-[#0F766E] font-bold text-xs flex items-center justify-center border border-teal-200">
                 {getInitials(user.name, user.email)}
               </div>
               <div className="overflow-hidden">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-semibold text-white truncate">
+                  <span className="text-xs font-bold text-[#1F2937] truncate">
                     {user.name || 'Líder'}
                   </span>
-                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase bg-blue-500/20 text-[#60A5FA]">
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase bg-teal-50 text-[#0F766E] border border-teal-200">
                     {perfil}
                   </span>
                 </div>
-                <div className="text-[11px] text-[#94A3B8] truncate">{user.email}</div>
+                <div className="text-[11px] text-[#6B7280] truncate">{user.email}</div>
               </div>
             </div>
 
-            <nav className="p-3 space-y-1.5 flex-1">
+            <nav className="p-3 space-y-1.5 flex-1 overflow-y-auto">
               {navLinks.map((link) => {
                 const Icon = link.icon
                 return (
@@ -355,8 +355,8 @@ export default function Layout() {
                     className={({ isActive }) =>
                       `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                         isActive
-                          ? 'bg-[#2563EB] text-white font-semibold shadow-md shadow-blue-600/30'
-                          : 'text-[#94A3B8] hover:bg-[#151E30] hover:text-white'
+                          ? 'bg-[#0F766E] text-white font-bold shadow-sm'
+                          : 'text-[#4B5563] hover:bg-gray-100 hover:text-[#1F2937]'
                       }`
                     }
                   >
@@ -366,7 +366,7 @@ export default function Layout() {
                 )
               })}
 
-              <div className="pt-3 space-y-2 border-t border-[#1E293B] mt-2">
+              <div className="pt-3 space-y-2 border-t border-[#E5E7EB] mt-2">
                 {!isInstalled && (
                   <button
                     type="button"
@@ -374,9 +374,9 @@ export default function Layout() {
                       setMobileMenuOpen(false)
                       handleOpenInstall()
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#60A5FA] bg-[#151E30] border border-[#24344E] hover:border-[#3B82F6] transition-colors"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#0F766E] bg-teal-50 border border-teal-200 hover:bg-teal-100 transition-colors"
                   >
-                    <Smartphone className="w-4 h-4 text-[#3B82F6]" />
+                    <Smartphone className="w-4 h-4 text-[#0F766E]" />
                     <span>Instalar app no celular</span>
                   </button>
                 )}
@@ -387,7 +387,7 @@ export default function Layout() {
                     setMobileMenuOpen(false)
                     setFalarEspecialistaOpen(true)
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-colors"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0F766E] hover:bg-[#115E59] shadow-sm transition-colors"
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>Falar com especialista</span>
@@ -395,15 +395,15 @@ export default function Layout() {
               </div>
             </nav>
 
-            <div className="p-3 border-t border-[#1E293B] space-y-1 bg-[#0B1220]">
+            <div className="p-3 border-t border-[#E5E7EB] space-y-1 bg-[#F7F7F5]">
               <button
                 onClick={() => {
                   setMobileMenuOpen(false)
                   setChangePasswordOpen(true)
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#CBD5E1] hover:bg-[#151E30] hover:text-white transition-colors"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#374151] hover:bg-white hover:text-[#1F2937] transition-colors"
               >
-                <KeyRound className="w-4 h-4 text-[#94A3B8]" />
+                <KeyRound className="w-4 h-4 text-[#6B7280]" />
                 <span>Alterar senha</span>
               </button>
               <button
@@ -411,7 +411,7 @@ export default function Layout() {
                   setMobileMenuOpen(false)
                   handleLogout()
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-rose-400 hover:bg-rose-500/15 transition-colors"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Sair da conta</span>
@@ -464,13 +464,13 @@ export default function Layout() {
         }}
       />
 
-      {/* Footer escuro premium */}
-      <footer className="w-full border-t border-[#1E293B] bg-[#0B1220] py-4 mt-auto pb-20 md:pb-4">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#94A3B8]">
+      {/* Footer sóbrio tema claro */}
+      <footer className="w-full border-t border-[#E5E7EB] bg-white py-4 mt-auto pb-20 md:pb-4">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#6B7280]">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-white">VivaVarejo</span>
-            <span className="text-xs font-mono font-bold bg-blue-500/15 text-[#60A5FA] px-1.5 py-0.5 rounded border border-blue-500/30">
-              v0.0.99
+            <span className="font-bold text-[#1F2937]">VivaVarejo</span>
+            <span className="text-xs font-mono font-bold bg-teal-50 text-[#0F766E] px-1.5 py-0.5 rounded border border-teal-200">
+              v0.1.00
             </span>
           </div>{' '}
           <div>

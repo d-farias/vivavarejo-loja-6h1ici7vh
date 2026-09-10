@@ -1096,21 +1096,23 @@ export default function Index() {
               <Link
                 key={trab.tipo}
                 to={trab.link}
-                className="p-3.5 rounded-xl border border-[#223049] hover:border-[#3B82F6] bg-[#0B1220] hover:bg-[#151E30] transition-all flex flex-col justify-between group shadow-xs"
+                className="p-3.5 rounded-xl border border-[#E5E7EB] hover:border-[#0F766E] bg-white hover:bg-[#F7F7F5] transition-all flex flex-col justify-between group shadow-2xs"
               >
                 <div className="flex items-center justify-between gap-1 mb-2.5">
                   <div className="flex items-center gap-2 min-w-0">
                     <div
-                      className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-xs border"
+                      className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-2xs border"
                       style={{
-                        backgroundColor: `${trab.cor}20`,
-                        borderColor: `${trab.cor}40`,
+                        backgroundColor: `${trab.cor}15`,
+                        borderColor: `${trab.cor}35`,
                         color: trab.cor,
                       }}
                     >
                       <Icone className="w-4 h-4" />
                     </div>
-                    <span className="text-xs font-semibold text-white truncate">{trab.tipo}</span>
+                    <span className="text-xs font-semibold text-[#1F2937] truncate">
+                      {trab.tipo}
+                    </span>
                   </div>
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeBg}`}

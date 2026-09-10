@@ -16,92 +16,96 @@
       'Segoe UI',
       Roboto,
       sans-serif;
-    background-color: #0b1220;
-    color: #f8fafc;
-    color-scheme: dark;
+    background-color: #f7f7f5;
+    color: #1f2937;
+    color-scheme: light;
   }
 
   :root {
-    /* Modelo visual escuro premium inspirado na referência (~#0B1220 fundo, ~#151E30 cards, #2563EB / #3B82F6 accent) */
-    --background: 222 47% 8%; /* #0B1220 */
-    --foreground: 210 40% 98%; /* #F8FAFC */
+    /* TEMA CLARO SÓBRIO:
+       Fundo warm off-white (#F7F7F5), superfícies brancas com bordas steel sutis (#E5E7EB),
+       textos em slate/cinza escuro de alto contraste (#1F2937, #374151) e
+       único acento sóbrio verde-azulado/teal profundo (#0F766E / hsl(175 77% 26%)). */
+    --background: 60 5% 96%; /* #F7F7F5 */
+    --foreground: 217 33% 17%; /* #1F2937 - slate escuro WCAG AA */
 
-    --card: 220 39% 14%; /* #151E30 */
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 217 33% 17%;
 
-    --popover: 220 39% 14%; /* #151E30 */
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 217 33% 17%;
 
-    --primary: 217 91% 60%; /* #3B82F6 azul vibrante */
+    /* Acento sóbrio: Teal/Verde-azulado profundo */
+    --primary: 175 77% 26%; /* #0F766E */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 35% 19%; /* #1E293B */
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 210 20% 96%; /* #F1F5F9 */
+    --secondary-foreground: 217 33% 17%;
 
-    --muted: 222 35% 18%; /* #1C263A */
-    --muted-foreground: 215 20% 65%; /* #94A3B8 */
+    --muted: 210 20% 96%; /* #F1F5F9 */
+    --muted-foreground: 215 16% 40%; /* #4B5563 / #374151 WCAG AA */
 
-    --accent: 220 39% 18%; /* #1B263B */
-    --accent-foreground: 210 40% 98%;
+    --accent: 175 40% 94%; /* Fundo sutil do acento teal */
+    --accent-foreground: 175 77% 24%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 45%; /* Vermelho sóbrio acessível */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 30% 20%; /* #223049 */
-    --input: 220 30% 22%; /* #24344E */
-    --ring: 217 91% 60%;
+    --border: 220 13% 91%; /* #E5E7EB steel sutil */
+    --input: 220 13% 91%;
+    --ring: 175 77% 26%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 222 47% 7%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 217 33% 17%;
+    --sidebar-primary: 175 77% 26%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 39% 15%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 220 30% 20%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-accent: 175 40% 94%;
+    --sidebar-accent-foreground: 175 77% 24%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 175 77% 26%;
 
-    --chart-1: 217 91% 60%;
-    --chart-2: 160 84% 39%;
-    --chart-3: 262 83% 58%;
-    --chart-4: 38 92% 50%;
-    --chart-5: 0 84% 60%;
+    --chart-1: 175 77% 26%;
+    --chart-2: 160 60% 35%;
+    --chart-3: 220 60% 40%;
+    --chart-4: 35 85% 45%;
+    --chart-5: 0 75% 50%;
   }
 
   .dark {
-    --background: 222 47% 8%;
-    --foreground: 210 40% 98%;
-    --card: 220 39% 14%;
-    --card-foreground: 210 40% 98%;
-    --popover: 220 39% 14%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
+    --background: 60 5% 96%;
+    --foreground: 217 33% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 217 33% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 217 33% 17%;
+    --primary: 175 77% 26%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 222 35% 19%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 222 35% 18%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 220 39% 18%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 220 30% 20%;
-    --input: 220 30% 22%;
-    --ring: 217 91% 60%;
-    --sidebar-background: 222 47% 7%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217 91% 60%;
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 217 33% 17%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 40%;
+    --accent: 175 40% 94%;
+    --accent-foreground: 175 77% 24%;
+    --destructive: 0 84.2% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 175 77% 26%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 217 33% 17%;
+    --sidebar-primary: 175 77% 26%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 39% 15%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 220 30% 20%;
-    --sidebar-ring: 217 91% 60%;
-    --chart-1: 217 91% 60%;
-    --chart-2: 160 84% 39%;
-    --chart-3: 262 83% 58%;
-    --chart-4: 38 92% 50%;
-    --chart-5: 0 84% 60%;
+    --sidebar-accent: 175 40% 94%;
+    --sidebar-accent-foreground: 175 77% 24%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 175 77% 26%;
+    --chart-1: 175 77% 26%;
+    --chart-2: 160 60% 35%;
+    --chart-3: 220 60% 40%;
+    --chart-4: 35 85% 45%;
+    --chart-5: 0 75% 50%;
   }
 
   /* NEVER REMOVE THIS */
@@ -119,10 +123,10 @@
   }
 }
 
-/* Barras de rolagem globais e estilizadas (mantidas com contraste adequado e sóbrio) */
+/* Barras de rolagem globais e estilizadas (adaptadas ao tema claro sóbrio) */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #2b3954 #0b1220;
+  scrollbar-color: #cbd5e1 #f7f7f5;
 }
 
 ::-webkit-scrollbar {
@@ -131,25 +135,25 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #0b1220;
+  background: #f7f7f5;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #2b3954;
+  background-color: #cbd5e1;
   border-radius: 9999px;
-  border: 1px solid #151e30;
+  border: 1px solid #e2e8f0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #3e5277;
+  background-color: #94a3b8;
 }
 
-/* Indicador e barra de rolagem horizontal visível e fluida para mobile no tema escuro */
+/* Indicador e barra de rolagem horizontal visível e fluida para mobile no tema claro */
 .scrollbar-thin-horizontal {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  scrollbar-color: #3b82f6 #151e30;
+  scrollbar-color: #0f766e #e5e7eb;
 }
 
 .scrollbar-thin-horizontal::-webkit-scrollbar {
@@ -157,17 +161,17 @@
 }
 
 .scrollbar-thin-horizontal::-webkit-scrollbar-track {
-  background: #151e30;
+  background: #f1f5f9;
   border-radius: 9999px;
 }
 
 .scrollbar-thin-horizontal::-webkit-scrollbar-thumb {
-  background-color: #334a6e;
+  background-color: #0f766e;
   border-radius: 9999px;
 }
 
 .scrollbar-thin-horizontal::-webkit-scrollbar-thumb:hover {
-  background-color: #4a6694;
+  background-color: #115e59;
 }
 
 /* Barra de rolagem vertical visível para formulários e modais no celular */
@@ -175,7 +179,7 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  scrollbar-color: #334a6e #0b1220;
+  scrollbar-color: #cbd5e1 #f7f7f5;
 }
 
 .scrollbar-mobile-vertical::-webkit-scrollbar {
@@ -183,174 +187,37 @@
 }
 
 .scrollbar-mobile-vertical::-webkit-scrollbar-track {
-  background: #0b1220;
+  background: #f7f7f5;
   border-radius: 9999px;
 }
 
 .scrollbar-mobile-vertical::-webkit-scrollbar-thumb {
-  background-color: #334a6e;
+  background-color: #cbd5e1;
   border-radius: 9999px;
 }
 
 .scrollbar-mobile-vertical::-webkit-scrollbar-thumb:hover {
-  background-color: #4a6694;
+  background-color: #94a3b8;
 }
 
-/* OVERRIDES GLOBAIS DE TEMA ESCURO PREMIUM:
-   Garante que o fundo escuro azul-marinho (#0B1220) e as superfícies (#151E30)
-   tenham contraste ideal com texto branco e bordas sutis (#223049), mantendo o print
-   completamente claro e legível. */
+/* REGRAS GLOBAIS DE TEMA CLARO SÓBRIO & CONTRASTE WCAG AA:
+   Fundo warm off-white (#F7F7F5), cards brancos (#FFFFFF) com bordas steel 1px (#E5E7EB),
+   textos slate escuro legíveis no chão de loja iluminado e acento sóbrio verde-azulado (#0F766E). */
 @media screen {
   body {
-    background-color: #0b1220 !important;
-    color: #f1f5f9 !important;
+    background-color: #f7f7f5 !important;
+    color: #1f2937 !important;
   }
 
-  /* Fundo principal da aplicação */
-  .bg-\[\#F7F7F5\],
-  .bg-\[\#f7f7f5\],
-  .bg-\[\#F9FAFB\],
-  .bg-gray-50,
-  .bg-neutral-50,
-  .bg-slate-50 {
-    background-color: #0b1220 !important;
-    color: #e2e8f0;
+  /* Garante legibilidade WCAG AA nos textos secundários sem cinzas fracos */
+  .text-gray-400,
+  .text-slate-400 {
+    color: #64748b; /* Substitui cinza fraco por slate-500 legível */
   }
 
-  /* Superfícies, cards, modais e containers */
-  .bg-white {
-    background-color: #151e30 !important;
-    color: #f8fafc;
-  }
-
-  .bg-white\/95,
-  .bg-white\/90,
-  .bg-white\/80 {
-    background-color: rgba(21, 30, 48, 0.95) !important;
-    color: #f8fafc;
-  }
-
-  /* Bordas sutis no tom azul-marinho */
-  .border-\[\#E5E7EB\],
-  .border-\[\#e5e7eb\],
-  .border-gray-200,
-  .border-gray-100,
-  .border-slate-200,
-  .border-neutral-200 {
-    border-color: #223049 !important;
-  }
-
-  .divide-\[\#E5E7EB\] > :not([hidden]) ~ :not([hidden]),
-  .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
-    border-color: #223049 !important;
-  }
-
-  /* Títulos em branco e textos principais */
-  .text-\[\#1F2937\],
-  .text-\[\#1f2937\],
-  .text-\[\#111827\],
-  .text-gray-900,
-  .text-slate-900 {
-    color: #f8fafc !important;
-  }
-
-  /* Textos secundários em cinza-azulado claro (garante contraste > 4.5:1 no escuro) */
-  .text-\[\#4B5563\],
-  .text-\[\#374151\],
-  .text-gray-700,
-  .text-slate-700 {
-    color: #cbd5e1 !important;
-  }
-
-  .text-\[\#6B7280\],
   .text-gray-500,
   .text-slate-500 {
-    color: #94a3b8 !important;
-  }
-
-  .text-\[\#9CA3AF\],
-  .text-gray-400 {
-    color: #94a3b8 !important; /* Elevado de #64748b para #94a3b8 para WCAG AA legível */
-  }
-
-  /* Caixinhas mono de horário limite e chips claros de informação:
-     Garante fundo escuro elegante com texto claro e legível, sem cinza invisível */
-  .font-mono.border-\[\#E5E7EB\],
-  .bg-\[\#F7F7F5\].text-\[\#374151\],
-  span.bg-gray-100,
-  div.bg-gray-100 {
-    background-color: #0f172a !important;
-    border-color: #24344e !important;
-    color: #e2e8f0 !important;
-  }
-
-  /* Inputs, selects e textareas */
-  input:not([type='checkbox']):not([type='radio']),
-  select,
-  textarea {
-    background-color: #0f172a !important;
-    color: #f8fafc !important;
-    border-color: #24344e !important;
-  }
-
-  input::placeholder,
-  textarea::placeholder {
-    color: #94a3b8 !important; /* Contraste adequado para leitura no placeholder */
-  }
-
-  /* Hovers de linha e botões neutros */
-  .hover\:bg-gray-100:hover,
-  .hover\:bg-gray-50:hover,
-  .hover\:bg-\[\#F7F7F5\]:hover {
-    background-color: #1a253c !important;
-  }
-
-  /* Elementos de destaque em azul com fundo sutil e sóbrio */
-  .bg-blue-50,
-  .bg-blue-50\/60,
-  .bg-blue-50\/80,
-  .bg-blue-50\/50 {
-    background-color: rgba(37, 99, 235, 0.12) !important;
-    border-color: rgba(59, 130, 246, 0.25) !important;
-    color: #93c5fd !important;
-  }
-
-  .border-blue-200,
-  .border-blue-100 {
-    border-color: rgba(59, 130, 246, 0.25) !important;
-  }
-
-  .bg-emerald-50 {
-    background-color: rgba(16, 185, 129, 0.12) !important;
-    border-color: rgba(16, 185, 129, 0.25) !important;
-    color: #6ee7b7 !important;
-  }
-
-  .bg-amber-50 {
-    background-color: rgba(245, 158, 11, 0.12) !important;
-    border-color: rgba(245, 158, 11, 0.25) !important;
-    color: #fcd34d !important;
-  }
-
-  .bg-rose-50,
-  .bg-red-50 {
-    background-color: rgba(239, 68, 68, 0.12) !important;
-    border-color: rgba(239, 68, 68, 0.25) !important;
-    color: #fca5a5 !important;
-  }
-
-  .bg-purple-50 {
-    background-color: rgba(168, 85, 247, 0.12) !important;
-    border-color: rgba(168, 85, 247, 0.25) !important;
-    color: #d8b4fe !important;
-  }
-
-  /* Dropdown e popover menus */
-  [role='menu'],
-  [data-radix-popper-content-wrapper] > div {
-    background-color: #151e30 !important;
-    border-color: #223049 !important;
-    color: #f8fafc !important;
+    color: #4b5563; /* Contraste > 4.5:1 sobre branco/off-white */
   }
 }
 

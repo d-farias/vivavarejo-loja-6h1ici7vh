@@ -58,7 +58,7 @@ export function BottomNavMobile({ isCampo, onOpenMais }: BottomNavMobileProps) {
   return (
     <nav
       aria-label="Navegação inferior rápida"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B1220]/95 backdrop-blur-md border-t border-[#1E293B] shadow-[0_-4px_20px_rgba(0,0,0,0.4)] pb-[env(safe-area-inset-bottom)]"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#E5E7EB] shadow-[0_-2px_12px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom)]"
     >
       <div className="grid grid-cols-4 h-15 max-w-lg mx-auto items-center px-2 py-1">
         {items.map((item) => (
@@ -68,8 +68,8 @@ export function BottomNavMobile({ isCampo, onOpenMais }: BottomNavMobileProps) {
             className={({ isActive }) =>
               `flex flex-col items-center justify-center h-full py-1 rounded-xl transition-all ${
                 isActive
-                  ? 'text-white bg-[#2563EB]/20 border border-[#3B82F6]/40 font-bold'
-                  : 'text-[#94A3B8] hover:text-white hover:bg-[#151E30] font-medium'
+                  ? 'text-[#0F766E] bg-teal-50 border border-teal-200 font-bold'
+                  : 'text-[#6B7280] hover:text-[#1F2937] hover:bg-gray-100/70 font-medium'
               }`
             }
           >
@@ -77,11 +77,11 @@ export function BottomNavMobile({ isCampo, onOpenMais }: BottomNavMobileProps) {
               <>
                 <item.icon
                   className={`w-5 h-5 transition-transform ${
-                    isActive ? 'scale-110 text-[#60A5FA]' : 'text-[#94A3B8]'
+                    isActive ? 'scale-110 text-[#0F766E]' : 'text-[#6B7280]'
                   }`}
                 />
                 <span
-                  className={`text-[11px] mt-0.5 leading-none tracking-tight ${isActive ? 'text-[#60A5FA]' : 'text-[#94A3B8]'}`}
+                  className={`text-[11px] mt-0.5 leading-none tracking-tight ${isActive ? 'text-[#0F766E] font-bold' : 'text-[#6B7280]'}`}
                 >
                   {item.label}
                 </span>
@@ -94,7 +94,7 @@ export function BottomNavMobile({ isCampo, onOpenMais }: BottomNavMobileProps) {
         <button
           type="button"
           onClick={onOpenMais}
-          className="flex flex-col items-center justify-center h-full py-1 rounded-xl text-[#94A3B8] hover:text-white hover:bg-[#151E30] font-medium transition-colors"
+          className="flex flex-col items-center justify-center h-full py-1 rounded-xl text-[#6B7280] hover:text-[#1F2937] hover:bg-gray-100/70 font-medium transition-colors"
         >
           <Menu className="w-5 h-5" />
           <span className="text-[11px] mt-0.5 leading-none tracking-tight">Mais</span>

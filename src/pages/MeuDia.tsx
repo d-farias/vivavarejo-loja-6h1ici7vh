@@ -486,7 +486,7 @@ export function MeuDiaPage() {
                     <button
                       type="button"
                       onClick={() => handleAbrirExecucao(tarefasClassificadas.depois!)}
-                      className="text-xs font-bold text-[#60A5FA] hover:underline"
+                      className="text-xs font-bold text-[#0F766E] hover:underline"
                     >
                       Executar agora →
                     </button>
@@ -499,20 +499,20 @@ export function MeuDiaPage() {
 
               {/* EM SEGUIDA */}
               {tarefasClassificadas.emSeguida && (
-                <div className="p-3.5 rounded-2xl border border-[#223049] bg-[#151E30]">
+                <div className="p-3.5 rounded-2xl border border-[#E5E7EB] bg-white">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#94A3B8]">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B7280]">
                       Em seguida — Limite {tarefasClassificadas.emSeguida.horario_limite || '11:00'}
                     </span>
                     <button
                       type="button"
                       onClick={() => handleAbrirExecucao(tarefasClassificadas.emSeguida!)}
-                      className="text-xs font-semibold text-[#60A5FA] hover:underline"
+                      className="text-xs font-semibold text-[#0F766E] hover:underline"
                     >
                       Executar →
                     </button>
                   </div>
-                  <h4 className="text-xs font-semibold text-white">
+                  <h4 className="text-xs font-semibold text-[#1F2937]">
                     {tarefasClassificadas.emSeguida.nome}
                   </h4>
                 </div>

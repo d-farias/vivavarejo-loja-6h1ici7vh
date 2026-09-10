@@ -645,7 +645,7 @@ export function AgendaMinhaEquipeSecao({
                                           subtitulo: `Evidência fotográfica enviada${horaEnvio ? ` às ${horaEnvio}` : ''}`,
                                         })
                                       }
-                                      className="text-[10px] font-semibold text-[#93C5FD] hover:text-white hover:underline block mt-0.5"
+                                      className="text-[10px] font-semibold text-[#0F766E] hover:underline block mt-0.5"
                                     >
                                       Ampliar foto →
                                     </button>
@@ -653,20 +653,19 @@ export function AgendaMinhaEquipeSecao({
                                 </div>
                               ) : (
                                 /* Marcador discreto quando a tarefa não possui evidência fotográfica */
-                                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0B1220]/70 border border-[#223049] text-[#94A3B8] text-[11px]">
-                                  <Camera className="w-3.5 h-3.5 text-[#64748B]" />
+                                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 border border-[#E5E7EB] text-[#6B7280] text-[11px]">
+                                  <Camera className="w-3.5 h-3.5 text-[#9CA3AF]" />
                                   <span>sem evidência</span>
                                 </div>
                               )}
-
                               {/* Botão para registrar/comprovar execução direto da Agenda Minha Equipe */}
                               <button
                                 type="button"
                                 onClick={() => setRotinaConcluirModal(routine)}
-                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-xs transition-colors ${
+                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-2xs transition-colors ${
                                   isConcluida
-                                    ? 'bg-[#1E293B] hover:bg-[#27354E] text-[#93C5FD] border border-[#24344E]'
-                                    : 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white'
+                                    ? 'bg-gray-100 hover:bg-gray-200 text-[#1F2937] border border-[#E5E7EB]'
+                                    : 'bg-[#0F766E] hover:bg-[#115E59] text-white'
                                 }`}
                                 title={
                                   isConcluida
@@ -676,7 +675,7 @@ export function AgendaMinhaEquipeSecao({
                               >
                                 <Camera className="w-3.5 h-3.5" />
                                 <span>{isConcluida ? 'Reenviar foto' : 'Comprovar'}</span>
-                              </button>
+                              </button>{' '}
                             </div>
                           </div>
                         )
