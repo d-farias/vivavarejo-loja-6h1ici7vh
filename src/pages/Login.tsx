@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import pb from '@/lib/pocketbase/client'
 import { isPerfilCampo } from '@/lib/perfil-utils'
+import { triggerQuickAccessHub } from '@/components/QuickAccessHubModal'
 import { AlertCircle, Lock, Mail, CheckCircle2, KeyRound, ArrowLeft, Info } from 'lucide-react'
 
 export default function Login() {
@@ -58,6 +59,9 @@ export default function Login() {
 
     try {
       await login(email, password)
+      // Dispara exibição do hub de acesso rápido logo após o login
+      triggerQuickAccessHub()
+
       // Direcionamento inteligente conforme item 4 da especificação:
       // Gestores -> /agenda; Campo (promotores, repositores, funcionários operacionais) -> /meu-dia.
       // Se o usuário tentava acessar uma página específica diretamente, honra essa rota.

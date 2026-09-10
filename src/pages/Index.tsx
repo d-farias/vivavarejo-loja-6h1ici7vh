@@ -27,6 +27,7 @@ import { PwaInstallModal } from '@/components/PwaInstallModal'
 import { usePwaInstall } from '@/hooks/use-pwa-install'
 import { EnquadramentoClienteCard } from '@/components/EnquadramentoClienteCard'
 import { AtendimentoPosAcessoModal } from '@/components/AtendimentoPosAcessoModal'
+import { QuickAccessTopBanner } from '@/components/QuickAccessTopBanner'
 import { planosAcaoService } from '@/services/planosAcao'
 import { clientesService } from '@/services/clientes'
 import { atendimentosService } from '@/services/atendimentos'
@@ -953,6 +954,9 @@ export default function Index() {
           )}
         </div>
       </div>
+
+      {/* Atalhos de Acesso Rápido para Direcionamento Imediato */}
+      <QuickAccessTopBanner />
 
       {/* Menu de Enquadramento do Cliente (Exclusivo Admin) */}
       {isAdmin && clientesAdmin.length > 0 && (

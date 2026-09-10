@@ -32,6 +32,7 @@ import { FalarEspecialistaModal } from '@/components/FalarEspecialistaModal'
 import { PwaInstallModal } from '@/components/PwaInstallModal'
 import { InactivityWarningModal } from '@/components/InactivityWarningModal'
 import { BottomNavMobile } from '@/components/BottomNavMobile'
+import { QuickAccessHubModal } from '@/components/QuickAccessHubModal'
 import { usePwaInstall } from '@/hooks/use-pwa-install'
 import { useAutoLogout } from '@/hooks/use-auto-logout'
 
@@ -43,6 +44,7 @@ export default function Layout() {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
   const [falarEspecialistaOpen, setFalarEspecialistaOpen] = useState(false)
   const [pwaModalOpen, setPwaModalOpen] = useState(false)
+  const [quickAccessModalOpen, setQuickAccessModalOpen] = useState(false)
 
   // Perfil operacional x gestão
   const emailLower = (user?.email || '').toLowerCase()
@@ -186,15 +188,28 @@ export default function Layout() {
           {/* Right Action / Avatar */}
           <div className="flex items-center gap-2">
             {!isAuthPage && user && (
-              <button
-                type="button"
-                onClick={() => setFalarEspecialistaOpen(true)}
-                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] hover:text-[#0F766E] text-[#374151] shadow-2xs transition-colors"
-                title="Fale diretamente com o consultor especialista"
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-[#0F766E]" />
-                <span>Falar com especialista</span>
-              </button>
+              <>
+                {/* Atalho direto para reabrir o Hub de Acesso Rápido */}
+                <button
+                  type="button"
+                  onClick={() => setQuickAccessModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-50 border border-teal-200 hover:bg-teal-100 text-[#0F766E] shadow-2xs transition-colors"
+                  title="Abrir Hub de Acesso Rápido"
+                >
+                  <ListChecks className="w-3.5 h-3.5 text-[#0F766E]" />
+                  <span className="hidden sm:inline">Acesso rápido</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFalarEspecialistaOpen(true)}
+                  className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] hover:text-[#0F766E] text-[#374151] shadow-2xs transition-colors"
+                  title="Fale diretamente com o consultor especialista"
+                >
+                  <MessageSquare className="w-3.5 h-3.5 text-[#0F766E]" />
+                  <span>Falar com especialista</span>
+                </button>
+              </>
             )}
 
             {!isAuthPage && user ? (
@@ -204,8 +219,8 @@ export default function Layout() {
                   <DropdownMenuTrigger asChild>
                     <button
                       className="w-9 h-9 rounded-xl border border-[#E5E7EB] hover:border-[#0F766E] bg-white text-[#4B5563] hover:text-[#1F2937] flex items-center justify-center transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-[#0F766E]/30"
-                      title="Contato com especialista"
-                      aria-label="Contato com especialista"
+                      title="Opções rápidas e especialista"
+                      aria-label="Opções rápidas e especialista"
                     >
                       <MoreVertical className="w-4 h-4" />
                     </button>
@@ -214,6 +229,14 @@ export default function Layout() {
                     align="end"
                     className="w-56 bg-white border border-[#E5E7EB] shadow-lg text-[#1F2937]"
                   >
+                    <DropdownMenuItem
+                      onClick={() => setQuickAccessModalOpen(true)}
+                      className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2.5 text-[#0F766E] hover:bg-teal-50"
+                    >
+                      <ListChecks className="w-4 h-4 text-[#0F766E]" />
+                      <span className="font-bold">Hub de Acesso Rápido</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-[#E5E7EB]" />
                     <DropdownMenuItem
                       onClick={() => setFalarEspecialistaOpen(true)}
                       className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2.5 text-[#374151] hover:text-[#0F766E] hover:bg-teal-50"
@@ -367,6 +390,18 @@ export default function Layout() {
               })}
 
               <div className="pt-3 space-y-2 border-t border-[#E5E7EB] mt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    setQuickAccessModalOpen(true)
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#0F766E] bg-teal-50 border border-teal-200 hover:bg-teal-100 transition-colors"
+                >
+                  <ListChecks className="w-4 h-4 text-[#0F766E]" />
+                  <span>Hub de Acesso Rápido</span>
+                </button>
+
                 {!isInstalled && (
                   <button
                     type="button"
@@ -374,7 +409,7 @@ export default function Layout() {
                       setMobileMenuOpen(false)
                       handleOpenInstall()
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#0F766E] bg-teal-50 border border-teal-200 hover:bg-teal-100 transition-colors"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#374151] bg-white border border-[#E5E7EB] hover:bg-gray-100 transition-colors"
                   >
                     <Smartphone className="w-4 h-4 text-[#0F766E]" />
                     <span>Instalar app no celular</span>
@@ -433,6 +468,14 @@ export default function Layout() {
           onOpenChange={setChangePasswordOpen}
           userEmail={user.email}
           userId={user.id}
+        />
+      )}
+
+      {/* Hub de Acesso Rápido (Logo após o login e na entrada do sistema) */}
+      {!isAuthPage && user && (
+        <QuickAccessHubModal
+          forceOpen={quickAccessModalOpen ? true : undefined}
+          onClose={() => setQuickAccessModalOpen(false)}
         />
       )}
 
