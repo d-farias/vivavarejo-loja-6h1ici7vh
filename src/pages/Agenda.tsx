@@ -19,6 +19,7 @@ import { isPlanoAtrasado } from '@/components/PlanosAcaoCard'
 import { isVisitaAtrasada } from '@/services/visitasPromotor'
 import { parseHorarioLimiteToMinutes, getHorarioStatus } from '@/lib/time-utils'
 import { normalizarNomeCanonico, getChaveCanonico } from '@/lib/cargos'
+import { AgendaMinhaEquipeSecao } from '@/components/AgendaMinhaEquipeSecao'
 import type {
   Rotina,
   ExecucaoRotina,
@@ -1251,6 +1252,9 @@ export default function AgendaPage() {
           )}
         </div>
       )}
+
+      {/* AGENDA MINHA EQUIPE: Unificação da visão Minha Equipe embutida diretamente na Agenda */}
+      <AgendaMinhaEquipeSecao embedded tituloCustomizado="Agenda Minha Equipe" />
 
       {/* Alerta de Devolvidas pelo Regional (Retrabalho imediato) */}
       {statsDia.devolvidas > 0 && (
