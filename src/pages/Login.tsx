@@ -2,19 +2,19 @@ import React, { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import pb from '@/lib/pocketbase/client'
+import { isPerfilCampo } from '@/lib/perfil-utils'
 import { AlertCircle, Lock, Mail, CheckCircle2, KeyRound, ArrowLeft, Info } from 'lucide-react'
 
 export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  // Destino pós-login padrão é a Agenda (/agenda), conforme solicitação do usuário.
-  // Se o usuário foi interceptado de uma rota específica (que não seja a raiz ou a própria agenda), preserva o destino pretendido.
+  // Destino pós-login padrão: respeita rota de interceptação (se específica); caso contrário direciona por perfil
   const stateData =
     (location.state as { from?: { pathname: string }; expiredMessage?: string }) || {}
   const stateFrom = stateData.from?.pathname
   const expiredMessage = stateData.expiredMessage
-  const from = stateFrom && stateFrom !== '/' && stateFrom !== '/login' ? stateFrom : '/agenda'
+  const hasSpecificFrom = stateFrom && stateFrom !== '/' && stateFrom !== '/login'
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -58,13 +58,15 @@ export default function Login() {
 
     try {
       await login(email, password)
-      // Direcionamento inteligente: se a rota de origem era '/', decide por perfil
-      if (from === '/') {
-        const emailLower = email.toLowerCase()
-        const isOperacional = emailLower.includes('promotor') || emailLower.includes('repositor')
-        navigate(isOperacional ? '/meu-dia' : '/agenda', { replace: true })
+      // Direcionamento inteligente conforme item 4 da especificação:
+      // Gestores -> /agenda; Campo (promotores, repositores, funcionários operacionais) -> /meu-dia.
+      // Se o usuário tentava acessar uma página específica diretamente, honra essa rota.
+      if (hasSpecificFrom) {
+        navigate(stateFrom!, { replace: true })
       } else {
-        navigate(from, { replace: true })
+        const loggedUser = pb.authStore.record as any
+        const eCampo = isPerfilCampo(loggedUser)
+        navigate(eCampo ? '/meu-dia' : '/agenda', { replace: true })
       }
     } catch (err: unknown) {
       const errorObj = err as {

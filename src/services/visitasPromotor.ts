@@ -91,10 +91,10 @@ export const visitasPromotorService = {
           responsavel_execucao?: string
           validador_fiscalizacao?: string
           status_fiscalizacao?: 'pendente' | 'aprovada' | 'devolvida'
-          foto_trabalho?: string
-          foto_gondola?: string
-          foto_abastecimento?: string
-          foto_validades?: string
+          foto_trabalho?: string | File
+          foto_gondola?: string | File
+          foto_abastecimento?: string | File
+          foto_validades?: string | File
         },
   ): Promise<VisitaPromotor> {
     const nowIso = new Date().toISOString()
