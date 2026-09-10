@@ -461,3 +461,141 @@ export interface Perda extends RecordModel {
     registrado_por?: User
   }
 }
+
+// ==================== MÓDULO COMERCIAL ====================
+
+export type CurvaAbc = 'A' | 'B' | 'C' | 'C+'
+export type TipoRuptura = 'fisica' | 'virtual' | 'gondola' | 'nenhuma'
+export type FaixaSemVenda = 'nenhuma' | '30_dias' | '60_dias' | 'acima_90_dias'
+
+export interface ComercialProduto extends RecordModel {
+  loja?: string
+  competencia: string // YYYY-MM ou YYYY-MM-DD
+  codigo: string
+  descricao: string
+  departamento?: string
+  categoria?: string
+  fornecedor?: string
+  curva?: CurvaAbc
+  estoque_fisico?: number
+  estoque_virtual?: number
+  em_ruptura?: boolean
+  tipo_ruptura?: TipoRuptura
+  dias_sem_venda?: number
+  faixa_sem_venda?: FaixaSemVenda
+  preco_venda?: number
+  custo_medio?: number
+  margem_perc?: number
+  giro_dias?: number // Cobertura / Giro em dias
+  venda_qtd_periodo?: number
+  venda_valor_periodo?: number
+  participacao_valor_perc?: number
+  participacao_qtd_perc?: number
+  ativo_sortimento?: boolean
+  created: string
+  updated: string
+  expand?: {
+    loja?: Loja
+  }
+}
+
+export interface ComercialCategoria extends RecordModel {
+  loja?: string
+  competencia: string // YYYY-MM
+  departamento: string
+  categoria: string
+  venda_valor?: number
+  venda_qtd?: number
+  meta_venda_valor?: number
+  atingimento_meta_perc?: number
+  participacao_vendas_perc?: number
+  margem_lucro_perc?: number
+  quebra_valor?: number
+  quebra_perc_sobre_venda?: number
+  total_skus_sortimento?: number
+  total_skus_ruptura?: number
+  taxa_ruptura_perc?: number
+  created: string
+  updated: string
+  expand?: {
+    loja?: Loja
+  }
+}
+
+export type TipoAcaoComercial =
+  | 'acao_comercial'
+  | 'pricing'
+  | 'rebaixa'
+  | 'tabloide'
+  | 'ponta_gondola'
+
+export type MotivoRebaixa =
+  | 'validade_proxima'
+  | 'descontinuado'
+  | 'excesso_estoque'
+  | 'concorrencia'
+  | 'campanha'
+
+export type StatusAcaoComercial = 'planejada' | 'em_vigor' | 'concluida' | 'cancelada'
+
+export interface ComercialAcao extends RecordModel {
+  loja?: string
+  titulo: string
+  tipo: TipoAcaoComercial
+  departamento?: string
+  categoria?: string
+  produto_codigo?: string
+  produto_descricao?: string
+  preco_de?: number
+  preco_por?: number
+  desconto_perc?: number
+  motivo_rebaixa?: MotivoRebaixa
+  data_inicio: string // YYYY-MM-DD
+  data_fim?: string // YYYY-MM-DD
+  status: StatusAcaoComercial
+  mecanica_promocional?: string
+  responsavel_nome?: string
+  responsavel_usuario?: string
+  observacoes?: string
+  created: string
+  updated: string
+  expand?: {
+    loja?: Loja
+    responsavel_usuario?: User
+  }
+}
+
+export type TipoImplantacaoLayout =
+  | 'layout_gondola'
+  | 'reforma_setor'
+  | 'implantacao_mix'
+  | 'virada_sazonal'
+  | 'ajuste_planograma'
+
+export type StatusImplantacaoLayout =
+  | 'planejado'
+  | 'em_andamento'
+  | 'concluido'
+  | 'atrasado'
+  | 'cancelado'
+
+export interface ComercialImplantacao extends RecordModel {
+  loja?: string
+  titulo: string
+  tipo: TipoImplantacaoLayout
+  departamento_setor: string
+  data_prevista: string // YYYY-MM-DD
+  data_conclusao?: string // YYYY-MM-DD
+  status: StatusImplantacaoLayout
+  responsavel_execucao?: string
+  responsavel_usuario?: string
+  progresso_perc?: number
+  fornecedor_parceiro?: string
+  descricao_escopo?: string
+  created: string
+  updated: string
+  expand?: {
+    loja?: Loja
+    responsavel_usuario?: User
+  }
+}

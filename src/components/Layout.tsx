@@ -25,6 +25,7 @@ import {
   ShieldAlert,
   Smartphone,
   GitBranch,
+  TrendingUp,
 } from 'lucide-react'
 import { ChangePasswordModal } from '@/components/ChangePasswordModal'
 import { FalarEspecialistaModal } from '@/components/FalarEspecialistaModal'
@@ -119,6 +120,7 @@ export default function Layout() {
         { to: '/agenda', label: 'Agenda', icon: Calendar },
         { to: '/rotinas', label: 'Rotinas', icon: ListChecks },
         { to: '/validades', label: 'Validade × Calendário', icon: CalendarCheck },
+        { to: '/comercial', label: 'Comercial', icon: TrendingUp },
         { to: '/perdas', label: 'Perdas & Inventário', icon: ShieldAlert },
         ...(isLiderOrAdmin ? [{ to: '/promotores', label: 'Promotores', icon: Handshake }] : []),
         { to: '/', label: 'Dashboard', icon: LayoutDashboard },

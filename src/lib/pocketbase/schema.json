@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-10T16:37:58.324Z",
+  "generatedAt": "2026-09-10T16:55:31.936Z",
   "collections": [
     {
       "name": "users",
@@ -2024,6 +2024,575 @@
       ],
       "indexes": [
         "CREATE INDEX idx_auditoria_cliente_created ON auditoria_acoes (cliente, created DESC)"
+      ]
+    },
+    {
+      "name": "comercial_produtos",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "competencia",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "codigo",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "descricao",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "departamento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "categoria",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "fornecedor",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "curva",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["A", "B", "C", "C+"]
+        },
+        {
+          "name": "estoque_fisico",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "estoque_virtual",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "em_ruptura",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tipo_ruptura",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["fisica", "virtual", "gondola", "nenhuma"]
+        },
+        {
+          "name": "dias_sem_venda",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "faixa_sem_venda",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["nenhuma", "30_dias", "60_dias", "acima_90_dias"]
+        },
+        {
+          "name": "preco_venda",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "custo_medio",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "margem_perc",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "giro_dias",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "venda_qtd_periodo",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "venda_valor_periodo",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "participacao_valor_perc",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "participacao_qtd_perc",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ativo_sortimento",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_cprod_loja ON comercial_produtos (loja)",
+        "CREATE INDEX idx_cprod_comp ON comercial_produtos (competencia)",
+        "CREATE INDEX idx_cprod_codigo ON comercial_produtos (codigo)",
+        "CREATE INDEX idx_cprod_curva ON comercial_produtos (curva)",
+        "CREATE INDEX idx_cprod_ruptura ON comercial_produtos (em_ruptura)",
+        "CREATE INDEX idx_cprod_faixa_sv ON comercial_produtos (faixa_sem_venda)",
+        "CREATE INDEX idx_cprod_cat ON comercial_produtos (categoria)"
+      ]
+    },
+    {
+      "name": "comercial_categorias",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "competencia",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "departamento",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "categoria",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "venda_valor",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "venda_qtd",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "meta_venda_valor",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "atingimento_meta_perc",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "participacao_vendas_perc",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "margem_lucro_perc",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quebra_valor",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quebra_perc_sobre_venda",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_skus_sortimento",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_skus_ruptura",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "taxa_ruptura_perc",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_ccat_loja ON comercial_categorias (loja)",
+        "CREATE INDEX idx_ccat_comp ON comercial_categorias (competencia)",
+        "CREATE INDEX idx_ccat_dept ON comercial_categorias (departamento)",
+        "CREATE INDEX idx_ccat_cat ON comercial_categorias (categoria)"
+      ]
+    },
+    {
+      "name": "comercial_acoes",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "titulo",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "tipo",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["acao_comercial", "pricing", "rebaixa", "tabloide", "ponta_gondola"]
+        },
+        {
+          "name": "departamento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "categoria",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_codigo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_descricao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "preco_de",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "preco_por",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "desconto_perc",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "motivo_rebaixa",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "validade_proxima",
+            "descontinuado",
+            "excesso_estoque",
+            "concorrencia",
+            "campanha"
+          ]
+        },
+        {
+          "name": "data_inicio",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "data_fim",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["planejada", "em_vigor", "concluida", "cancelada"]
+        },
+        {
+          "name": "mecanica_promocional",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsavel_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsavel_usuario",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "observacoes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_cacoes_loja ON comercial_acoes (loja)",
+        "CREATE INDEX idx_cacoes_tipo ON comercial_acoes (tipo)",
+        "CREATE INDEX idx_cacoes_status ON comercial_acoes (status)",
+        "CREATE INDEX idx_cacoes_inicio ON comercial_acoes (data_inicio)"
+      ]
+    },
+    {
+      "name": "comercial_implantacao",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "titulo",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "tipo",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "layout_gondola",
+            "reforma_setor",
+            "implantacao_mix",
+            "virada_sazonal",
+            "ajuste_planograma"
+          ]
+        },
+        {
+          "name": "departamento_setor",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "data_prevista",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "data_conclusao",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["planejado", "em_andamento", "concluido", "atrasado", "cancelado"]
+        },
+        {
+          "name": "responsavel_execucao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsavel_usuario",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "progresso_perc",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "fornecedor_parceiro",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "descricao_escopo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_cimp_loja ON comercial_implantacao (loja)",
+        "CREATE INDEX idx_cimp_status ON comercial_implantacao (status)",
+        "CREATE INDEX idx_cimp_data ON comercial_implantacao (data_prevista)",
+        "CREATE INDEX idx_cimp_tipo ON comercial_implantacao (tipo)"
       ]
     }
   ]

@@ -20,6 +20,7 @@ import BemVindo from './pages/BemVindo'
 import NotFound from './pages/NotFound'
 import Validades from './pages/Validades'
 import Perdas from './pages/Perdas'
+import Comercial from './pages/Comercial'
 
 const DocumentTitleSync = () => {
   const location = useLocation()
@@ -106,6 +107,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Perdas />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/comercial"
+                element={
+                  <ProtectedRoute>
+                    <Comercial />
                   </ProtectedRoute>
                 }
               />

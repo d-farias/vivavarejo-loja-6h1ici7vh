@@ -14,6 +14,7 @@ import {
   ArrowRight,
   X,
   Compass,
+  TrendingUp,
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { isPerfilCampo } from '@/lib/perfil-utils'
@@ -165,6 +166,14 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
       badge: 'Diário',
       description: 'Ordem cronológica das rotinas e equipe',
       icon: Calendar,
+      highlight: true,
+    },
+    {
+      to: '/comercial',
+      label: 'Comercial',
+      badge: 'Negócio',
+      description: 'Rupturas, vendas, curvas A/B/C+, margens e layout',
+      icon: TrendingUp,
       highlight: true,
     },
     {
