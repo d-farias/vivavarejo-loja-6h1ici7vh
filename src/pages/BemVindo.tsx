@@ -443,7 +443,7 @@ export default function BemVindo() {
                 Módulo Comercial Completo
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
-                Da planilha ao chão de loja sem fricção
+                Da planilha ao chão de loja
               </h2>
               <p className="text-xs sm:text-sm text-[#4B5563]">
                 Importe planilhas (XLSX/CSV) ou conecte ao seu ERP para sincronizar os dados que
@@ -816,7 +816,7 @@ export default function BemVindo() {
                 VivaVarejo
               </span>
               <span className="text-xs text-[#6B7280]">
-                • A camada de execução entre o ERP e o chão de loja
+                • Prioridades do dia definidas, acompanhadas e comprovadas na execução.
               </span>
             </div>
 
@@ -885,7 +885,7 @@ export default function BemVindo() {
           <FalarEspecialistaModal
             open={modalEspecialistaOpen}
             onOpenChange={setModalEspecialistaOpen}
-            assuntoContexto="Demonstração da camada de execução VivaVarejo"
+            assuntoContexto="Demonstração VivaVarejo"
           />
 
           {/* Linha de contato e redes sociais */}
@@ -961,7 +961,7 @@ export default function BemVindo() {
                 {APP_VERSION_LABEL}
               </span>
             </div>
-            <span>A camada de execução operacional entre o ERP e o chão de loja.</span>
+            <span>Prioridades do dia definidas, acompanhadas e comprovadas na execução.</span>
           </div>
         </div>
       </footer>
