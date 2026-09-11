@@ -310,7 +310,7 @@ export default function BemVindo() {
                 onClick={handleScrollToInterest}
                 className="w-full sm:w-auto px-6 py-3 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-sm rounded-xl shadow-xs transition-all hover:scale-[1.02] inline-flex items-center justify-center gap-2"
               >
-                <span>Criar conta grátis</span>
+                <span>Criar conta</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
