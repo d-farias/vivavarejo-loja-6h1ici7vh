@@ -285,7 +285,7 @@ export default function BemVindo() {
             {/* Chip discreto */}
             <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-semibold text-[#0F766E] shadow-2xs">
               <ShieldCheck className="w-4 h-4 shrink-0 text-[#0F766E]" />
-              <span>Execução 360° para o Varejo Físico</span>
+              <span>Execução para o Varejo Físico</span>
             </div>
 
             {/* Posicionamento Principal */}
