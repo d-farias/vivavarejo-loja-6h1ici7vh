@@ -1,0 +1,2577 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VivaVarejo · Carrossel de Anúncio e Tour pelo App (1200×628)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Reset & base styling */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        width: 100%;
+        min-height: 100vh;
+        background-color: #f1f5f9;
+        font-family:
+          'Plus Jakarta Sans',
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        color: #1f2937;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 16px 80px 16px;
+      }
+
+      /* Barra de navegação e atalhos de exportação no topo */
+      .top-nav {
+        width: 1200px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 16px 24px;
+        margin-bottom: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+      }
+
+      .top-nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .top-nav-icon {
+        width: 24px;
+        height: 24px;
+        background: #0f766e;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .top-nav-diamond {
+        width: 10px;
+        height: 10px;
+        border: 2px solid #ffffff;
+        border-radius: 2px;
+        transform: rotate(45deg);
+      }
+
+      .top-nav-title {
+        font-size: 17px;
+        font-weight: 800;
+        color: #1f2937;
+      }
+
+      .top-nav-meta {
+        font-size: 13px;
+        font-weight: 600;
+        color: #64748b;
+      }
+
+      .top-nav-jump {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .jump-pill {
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #0f766e;
+        background-color: #f0fdfa;
+        border: 1px solid #ccfbf1;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+      }
+
+      .jump-pill:hover {
+        background-color: #0f766e;
+        color: #ffffff;
+      }
+
+      /* Container de slides */
+      .slides-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 48px;
+        align-items: center;
+      }
+
+      /* Bloco de cada slide: legenda + moldura 1200x628 */
+      .slide-unit {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .slide-header-legend {
+        width: 1200px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        padding: 0 4px;
+      }
+
+      .slide-number-badge {
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #0f766e;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .slide-number-badge::before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #0f766e;
+      }
+
+      .slide-hint {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      /* CANVAS PRINCIPAL: 1200x628px FIXO */
+      .slide-canvas {
+        width: 1200px;
+        height: 628px;
+        min-width: 1200px;
+        min-height: 628px;
+        max-width: 1200px;
+        max-height: 628px;
+        background-color: #ffffff;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-radius: 4px;
+        box-shadow:
+          0 20px 45px -10px rgba(15, 23, 42, 0.16),
+          0 0 0 1px rgba(15, 23, 42, 0.08);
+      }
+
+      /* Faixa superior do slide do app */
+      .slide-top-bar {
+        height: 52px;
+        padding: 0 40px;
+        background-color: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+      }
+
+      .slide-brand-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .slide-brand-logo {
+        width: 22px;
+        height: 22px;
+        background: #0f766e;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .slide-brand-diamond {
+        width: 9px;
+        height: 9px;
+        border: 2px solid #ffffff;
+        border-radius: 2px;
+        transform: rotate(45deg);
+      }
+
+      .slide-brand-text {
+        font-size: 18px;
+        font-weight: 800;
+        color: #1f2937;
+        letter-spacing: -0.02em;
+      }
+
+      .slide-store-pill {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: #374151;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 4px 12px;
+        border-radius: 6px;
+      }
+
+      .slide-store-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #0f766e;
+      }
+
+      .slide-top-tag {
+        font-size: 12px;
+        font-weight: 700;
+        color: #0f766e;
+        background: #f0fdfa;
+        border: 1px solid #ccfbf1;
+        padding: 4px 10px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      /* Corpo do slide de tour (duas colunas: esquerda pitch/explicação, direita mockup da tela em CSS) */
+      .slide-body {
+        height: 512px;
+        padding: 24px 40px;
+        display: grid;
+        grid-template-columns: 460px 640px;
+        column-gap: 20px;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      /* Coluna Esquerda: Mensagens do cliente/pitch */
+      .pitch-col {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-right: 16px;
+      }
+
+      .pitch-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background-color: #f0fdfa;
+        color: #0f766e;
+        border: 1px solid #ccfbf1;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 4px 10px;
+        border-radius: 5px;
+        margin-bottom: 12px;
+        align-self: flex-start;
+      }
+
+      .pitch-badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #0f766e;
+      }
+
+      .pitch-title {
+        font-size: 27px;
+        font-weight: 800;
+        line-height: 1.18;
+        letter-spacing: -0.025em;
+        color: #1f2937;
+        margin-bottom: 12px;
+      }
+
+      .pitch-title span {
+        color: #0f766e;
+      }
+
+      .pitch-desc {
+        font-size: 14.5px;
+        font-weight: 500;
+        line-height: 1.45;
+        color: #4b5563;
+        margin-bottom: 20px;
+      }
+
+      .pitch-checklist {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .pitch-check-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #374151;
+        line-height: 1.35;
+      }
+
+      .pitch-check-icon {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        background-color: #0f766e;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .pitch-check-icon svg {
+        width: 12px;
+        height: 12px;
+      }
+
+      /* Coluna Direita: Mockup de interface do App em CSS puro */
+      .mockup-col {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+      }
+
+      .app-window {
+        width: 100%;
+        height: 464px;
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+      }
+
+      /* Header interno do Mockup */
+      .window-header {
+        height: 42px;
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 14px;
+        flex-shrink: 0;
+      }
+
+      .window-dots {
+        display: flex;
+        gap: 5px;
+      }
+
+      .w-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #cbd5e1;
+      }
+
+      .window-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .window-badge {
+        font-size: 10.5px;
+        font-weight: 700;
+        color: #0f766e;
+        background-color: #f0fdfa;
+        padding: 2px 7px;
+        border-radius: 4px;
+        border: 1px solid #ccfbf1;
+      }
+
+      .window-content {
+        flex: 1;
+        padding: 14px;
+        background-color: #f7f7f5;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      /* Estilos para cards de rotina/tarefa no Mockup */
+      .mockup-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .mockup-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .mockup-tag {
+        font-size: 10.5px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 4px;
+      }
+
+      .tag-now {
+        background-color: #fef2f2;
+        border: 1px solid #fee2e2;
+        color: #b91c1c;
+      }
+
+      .tag-then {
+        background-color: #f0fdfa;
+        border: 1px solid #ccfbf1;
+        color: #0f766e;
+      }
+
+      .tag-next {
+        background-color: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+      }
+
+      .tag-done {
+        background-color: #f0fdf4;
+        border: 1px solid #dcfce7;
+        color: #15803d;
+      }
+
+      .mockup-card-title {
+        font-size: 13.5px;
+        font-weight: 700;
+        color: #1f2937;
+        line-height: 1.25;
+      }
+
+      .mockup-card-meta {
+        font-size: 11.5px;
+        font-weight: 500;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .mockup-card-meta span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      /* Tabela compacta dentro do Mockup */
+      .mockup-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #ffffff;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        font-size: 11px;
+      }
+
+      .mockup-table th {
+        background-color: #f8fafc;
+        padding: 7px 8px;
+        text-align: left;
+        font-weight: 700;
+        color: #475569;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .mockup-table td {
+        padding: 7px 8px;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+      }
+
+      .badge-curva {
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-weight: 800;
+        font-size: 10px;
+      }
+
+      .curva-a {
+        background-color: #fee2e2;
+        color: #991b1b;
+      }
+
+      .curva-b {
+        background-color: #fef3c7;
+        color: #92400e;
+      }
+
+      .curva-c {
+        background-color: #f1f5f9;
+        color: #475569;
+      }
+
+      /* Faixa inferior de cada slide */
+      .slide-bottom-bar {
+        height: 52px;
+        background-color: #f7f7f5;
+        border-top: 1px solid #e5e7eb;
+        padding: 0 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+        position: relative;
+      }
+
+      .slide-bottom-bar::before {
+        content: '';
+        position: absolute;
+        top: -1px;
+        left: 0;
+        width: 240px;
+        height: 2px;
+        background-color: #0f766e;
+      }
+
+      .slide-bottom-quote {
+        font-size: 14.5px;
+        font-weight: 700;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .slide-bottom-badge {
+        font-size: 10.5px;
+        font-weight: 800;
+        text-transform: uppercase;
+        background: #f0fdfa;
+        color: #0f766e;
+        border: 1px solid #ccfbf1;
+        padding: 2px 7px;
+        border-radius: 4px;
+      }
+
+      .slide-bottom-url {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f766e;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .slide-bottom-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #0f766e;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- BARRA SUPERIOR DE CONTROLE E NAVEGAÇÃO -->
+    <header class="top-nav">
+      <div class="top-nav-brand">
+        <div class="top-nav-icon">
+          <div class="top-nav-diamond"></div>
+        </div>
+        <div>
+          <span class="top-nav-title">VivaVarejo · Carrossel Publicitário (1200×628)</span>
+          <div class="top-nav-meta">
+            10 slides prontos para exportar via captura de tela (LinkedIn / Instagram / Pitch)
+          </div>
+        </div>
+      </div>
+      <div class="top-nav-jump">
+        <a href="#slide-1" class="jump-pill">01 Capa</a>
+        <a href="#slide-2" class="jump-pill">02 Meu Dia</a>
+        <a href="#slide-3" class="jump-pill">03 Foto & Prova</a>
+        <a href="#slide-4" class="jump-pill">04 Validação</a>
+        <a href="#slide-5" class="jump-pill">05 Agenda</a>
+        <a href="#slide-6" class="jump-pill">06 Comercial</a>
+        <a href="#slide-7" class="jump-pill">07 Sazonalidade</a>
+        <a href="#slide-8" class="jump-pill">08 Layout</a>
+        <a href="#slide-9" class="jump-pill">09 Offline</a>
+        <a href="#slide-10" class="jump-pill">10 Multi-Rede</a>
+        <a href="#slide-11" class="jump-pill">11 CTA Final</a>
+      </div>
+    </header>
+
+    <!-- PILHA DE SLIDES -->
+    <main class="slides-stack">
+      <!-- =========================================================
+           SLIDE 1: CAPA
+           ========================================================= -->
+      <section class="slide-unit" id="slide-1">
+        <div class="slide-header-legend">
+          <span class="slide-number-badge">Slide 01 de 11 — Capa Oficial</span>
+          <span class="slide-hint">1200×628 · Fundo branco · Verde institucional</span>
+        </div>
+        <div class="slide-canvas">
+          <div class="slide-top-bar">
+            <div class="slide-brand-group">
+              <div class="slide-brand-logo">
+                <div class="slide-brand-diamond"></div>
+              </div>
+              <span class="slide-brand-text">vivavarejo</span>
+            </div>
+            <div class="slide-store-pill">
+              <span class="slide-store-dot"></span>
+              <span>Supermercado Bom Preço — Unidade Centro</span>
+            </div>
+            <span class="slide-top-tag">Tour de Demonstração</span>
+          </div>
+
+          <div class="slide-body" style="grid-template-columns: 560px 520px; padding: 36px 48px">
+            <div class="pitch-col">
+              <div class="pitch-badge">
+                <span class="pitch-badge-dot"></span>
+                <span>Plataforma de Execução em Loja</span>
+              </div>
+              <h1
+                style="
+                  font-size: 38px;
+                  font-weight: 800;
+                  line-height: 1.12;
+                  letter-spacing: -0.03em;
+                  color: #1f2937;
+                  margin-bottom: 14px;
+                "
+              >
+                Prioridades do dia definidas, acompanhadas e
+                <span style="color: #0f766e">comprovadas na execução.</span>
+              </h1>
+              <p
+                style="
+                  font-size: 16px;
+                  font-weight: 500;
+                  color: #4b5563;
+                  line-height: 1.45;
+                  margin-bottom: 24px;
+                "
+              >
+                Conecte os dados do seu supermercado (ERP, rupturas e metas) à rotina real de quem
+                está no chão de loja, com dono, horário e evidência em foto.
+              </p>
+              <div class="pitch-checklist">
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Visão executiva completa do líder ao operador de seção</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Comercial, prevenção de perdas e operação integrados</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mockup-col">
+              <div class="app-window" style="height: 440px; justify-content: space-between">
+                <div class="window-header">
+                  <div class="window-dots">
+                    <span class="w-dot"></span><span class="w-dot"></span
+                    ><span class="w-dot"></span>
+                  </div>
+                  <div class="window-title">VivaVarejo · Visão Geral da Unidade</div>
+                  <span class="window-badge">Loja Aberta</span>
+                </div>
+                <div class="window-content" style="gap: 12px; padding: 18px">
+                  <div
+                    style="
+                      background: #ffffff;
+                      border: 1px solid #e5e7eb;
+                      border-radius: 6px;
+                      padding: 14px;
+                    "
+                  >
+                    <div
+                      style="
+                        font-size: 11px;
+                        font-weight: 700;
+                        color: #64748b;
+                        text-transform: uppercase;
+                      "
+                    >
+                      Indicador de Execução Hoje
+                    </div>
+                    <div style="font-size: 28px; font-weight: 800; color: #0f766e; margin: 4px 0">
+                      94.2% Concluído
+                    </div>
+                    <div style="font-size: 12px; color: #4b5563">
+                      36 de 38 rotinas diárias executadas no prazo
+                    </div>
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+                    <div
+                      style="
+                        background: #ffffff;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 6px;
+                        padding: 12px;
+                      "
+                    >
+                      <div style="font-size: 11px; font-weight: 700; color: #64748b">
+                        Ruptura Global
+                      </div>
+                      <div style="font-size: 20px; font-weight: 800; color: #1f2937">2.4%</div>
+                      <div style="font-size: 11px; color: #0f766e; font-weight: 600">
+                        Dentro da meta (&lt;3%)
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        background: #ffffff;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 6px;
+                        padding: 12px;
+                      "
+                    >
+                      <div style="font-size: 11px; font-weight: 700; color: #64748b">
+                        Evidências em Foto
+                      </div>
+                      <div style="font-size: 20px; font-weight: 800; color: #1f2937">28 Fotos</div>
+                      <div style="font-size: 11px; color: #0f766e; font-weight: 600">
+                        100% auditáveis
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    style="
+                      background: #f0fdfa;
+                      border: 1px solid #ccfbf1;
+                      border-radius: 6px;
+                      padding: 12px;
+                      display: flex;
+                      align-items: center;
+                      gap: 10px;
+                    "
+                  >
+                    <div
+                      style="width: 8px; height: 8px; border-radius: 50%; background: #0f766e"
+                    ></div>
+                    <span style="font-size: 12.5px; font-weight: 700; color: #0f766e"
+                      >Próximos slides: veja como a equipe opera no chão de loja →</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="slide-bottom-bar">
+            <div class="slide-bottom-quote">
+              <span class="slide-bottom-badge">Gestão</span>
+              <span>Prioridades operacionais de gestão</span>
+            </div>
+            <div class="slide-bottom-url">
+              <span class="slide-bottom-dot"></span>
+              <span>vivavarejo.goskip.app</span>
+            </div>
+          </footer>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 2: MEU DIA & PRIORIDADES (FAÇA AGORA, DEPOIS, EM SEGUIDA)
+           ========================================================= -->
+      <section class="slide-unit" id="slide-2">
+        <div class="slide-header-legend">
+          <span class="slide-number-badge">Slide 02 de 11 — Tela Meu Dia</span>
+          <span class="slide-hint">Motor de Prioridades Operacionais</span>
+        </div>
+        <div class="slide-canvas">
+          <div class="slide-top-bar">
+            <div class="slide-brand-group">
+              <div class="slide-brand-logo"><div class="slide-brand-diamond"></div></div>
+              <span class="slide-brand-text">vivavarejo</span>
+            </div>
+            <div class="slide-store-pill">
+              <span class="slide-store-dot"></span
+              ><span>Supermercado Bom Preço — Unidade Centro</span>
+            </div>
+            <span class="slide-top-tag">Módulo Meu Dia</span>
+          </div>
+
+          <div class="slide-body">
+            <div class="pitch-col">
+              <div class="pitch-badge">
+                <span class="pitch-badge-dot"></span><span>Foco Operacional Claro</span>
+              </div>
+              <h2 class="pitch-title">
+                Chega de operador perdido: <span>Faça agora, Depois e Em seguida.</span>
+              </h2>
+              <p class="pitch-desc">
+                O operador abre o celular e vê exatamente a sua próxima ação, com horário limite,
+                setor e instrução objetiva — sem listas infinitas e sem confusão.
+              </p>
+              <div class="pitch-checklist">
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span><strong>Faça agora:</strong> prioridade máxima urgente da abertura</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span><strong>Depois:</strong> checagem sequencial com horário limite</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span><strong>Em seguida:</strong> rotina de manutenção e abastecimento</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mockup-col">
+              <div class="app-window">
+                <div class="window-header">
+                  <div class="window-dots">
+                    <span class="w-dot"></span><span class="w-dot"></span
+                    ><span class="w-dot"></span>
+                  </div>
+                  <div class="window-title">Meu Dia · João Silva (Líder Mercearia)</div>
+                  <span class="window-badge">3 Pendentes</span>
+                </div>
+                <div class="window-content">
+                  <!-- Faça Agora -->
+                  <div class="mockup-card" style="border-left: 3px solid #b91c1c">
+                    <div class="mockup-card-header">
+                      <span class="mockup-tag tag-now">Faça agora — Limite 08:30</span>
+                      <span style="font-size: 11px; font-weight: 700; color: #b91c1c"
+                        >Prioridade Máxima</span
+                      >
+                    </div>
+                    <div class="mockup-card-title">
+                      Auditoria de Ruptura de Frente de Loja (Curva A)
+                    </div>
+                    <div class="mockup-card-meta">
+                      <span>Setor: Mercearia Alta</span>
+                      <span>Obrigatório: Foto da gôndola</span>
+                    </div>
+                  </div>
+                  <!-- Depois -->
+                  <div class="mockup-card" style="border-left: 3px solid #0f766e">
+                    <div class="mockup-card-header">
+                      <span class="mockup-tag tag-then">Depois — Limite 10:00</span>
+                      <span style="font-size: 11px; font-weight: 600; color: #64748b">Próxima</span>
+                    </div>
+                    <div class="mockup-card-title">
+                      Conferência de Validades de Iogurtes e Frios (&lt;5 dias)
+                    </div>
+                    <div class="mockup-card-meta">
+                      <span>Setor: Laticínios</span>
+                      <span>Etiquetagem de rebaixa</span>
+                    </div>
+                  </div>
+                  <!-- Em Seguida -->
+                  <div class="mockup-card" style="border-left: 3px solid #64748b">
+                    <div class="mockup-card-header">
+                      <span class="mockup-tag tag-next">Em seguida — Limite 11:30</span>
+                      <span style="font-size: 11px; font-weight: 600; color: #64748b"
+                        >Programada</span
+                      >
+                    </div>
+                    <div class="mockup-card-title">
+                      Abastecimento das Pontas de Gôndola de Bebidas
+                    </div>
+                    <div class="mockup-card-meta">
+                      <span>Setor: Bebidas</span>
+                      <span>Foto pós-reposição</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="slide-bottom-bar">
+            <div class="slide-bottom-quote">
+              <span class="slide-bottom-badge">Gestão</span
+              ><span>Prioridades operacionais de gestão</span>
+            </div>
+            <div class="slide-bottom-url">
+              <span class="slide-bottom-dot"></span><span>vivavarejo.goskip.app</span>
+            </div>
+          </footer>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 3: EXECUÇÃO COM EVIDÊNCIA EM FOTO
+           ========================================================= -->
+      <section class="slide-unit" id="slide-3">
+        <div class="slide-header-legend">
+          <span class="slide-number-badge">Slide 03 de 11 — Evidência Fotográfica</span>
+          <span class="slide-hint">Comprovação Inquestionável</span>
+        </div>
+        <div class="slide-canvas">
+          <div class="slide-top-bar">
+            <div class="slide-brand-group">
+              <div class="slide-brand-logo"><div class="slide-brand-diamond"></div></div>
+              <span class="slide-brand-text">vivavarejo</span>
+            </div>
+            <div class="slide-store-pill">
+              <span class="slide-store-dot"></span
+              ><span>Supermercado Bom Preço — Unidade Centro</span>
+            </div>
+            <span class="slide-top-tag">Execução Guiada</span>
+          </div>
+
+          <div class="slide-body">
+            <div class="pitch-col">
+              <div class="pitch-badge">
+                <span class="pitch-badge-dot"></span><span>Chega de 'Acho que foi feito'</span>
+              </div>
+              <h2 class="pitch-title">
+                Execução comprovada na prática com <span>foto obrigatória.</span>
+              </h2>
+              <p class="pitch-desc">
+                Cada tarefa crítica exige foto real do chão de loja. O líder e a diretoria veem o
+                antes e depois com carimbo de horário, responsável e unidade.
+              </p>
+              <div class="pitch-checklist">
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Captura direta pela câmera do celular ou tablet</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Carimbo temporal inviolável (data, hora e operador)</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Histórico fotográfico consultável em auditorias e visitas</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mockup-col">
+              <div class="app-window">
+                <div class="window-header">
+                  <div class="window-dots">
+                    <span class="w-dot"></span><span class="w-dot"></span
+                    ><span class="w-dot"></span>
+                  </div>
+                  <div class="window-title">Conclusão de Rotina com Evidência</div>
+                  <span
+                    class="window-badge"
+                    style="background: #f0fdf4; color: #15803d; border-color: #dcfce7"
+                    >Foto Anexada</span
+                  >
+                </div>
+                <div class="window-content" style="gap: 12px">
+                  <div class="mockup-card">
+                    <div class="mockup-card-title">Reposição e Alinhamento de Frente de Caixa</div>
+                    <div class="mockup-card-meta">
+                      Responsável: Mariana Ramos · Setor: Frente de Loja
+                    </div>
+                  </div>
+                  <!-- Simulação do quadro de foto capturada -->
+                  <div
+                    style="
+                      background: #ffffff;
+                      border: 1px solid #e5e7eb;
+                      border-radius: 6px;
+                      padding: 10px;
+                      display: flex;
+                      flex-direction: column;
+                      gap: 8px;
+                    "
+                  >
+                    <div
+                      style="
+                        font-size: 11px;
+                        font-weight: 700;
+                        color: #0f766e;
+                        text-transform: uppercase;
+                      "
+                    >
+                      Evidência Enviada (08:42:15)
+                    </div>
+                    <div
+                      style="
+                        height: 160px;
+                        background: #0f172a;
+                        border-radius: 4px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        position: relative;
+                        overflow: hidden;
+                      "
+                    >
+                      <svg
+                        width="60"
+                        height="60"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#0f766e"
+                        stroke-width="1.5"
+                      >
+                        <path
+                          d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                        />
+                        <circle cx="12" cy="13" r="4" />
+                      </svg>
+                      <div
+                        style="
+                          position: absolute;
+                          bottom: 8px;
+                          left: 8px;
+                          background: rgba(0, 0, 0, 0.7);
+                          color: #ffffff;
+                          font-size: 10px;
+                          padding: 2px 6px;
+                          border-radius: 3px;
+                          font-family: monospace;
+                        "
+                      >
+                        GÔNDOLA_FRENTE_0842.JPG · VERIFICADO
+                      </div>
+                    </div>
+                    <div style="font-size: 12px; color: #374151; font-weight: 500">
+                      "Todos os 6 caixas reabastecidos com doces, pilhas e sacolas conforme padrão."
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 8px">
+                    <button
+                      style="
+                        flex: 1;
+                        padding: 9px;
+                        background: #0f766e;
+                        color: #fff;
+                        font-size: 12.5px;
+                        font-weight: 700;
+                        border: none;
+                        border-radius: 5px;
+                      "
+                    >
+                      Enviar para Validação
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="slide-bottom-bar">
+            <div class="slide-bottom-quote">
+              <span class="slide-bottom-badge">Gestão</span
+              ><span>Prioridades operacionais de gestão</span>
+            </div>
+            <div class="slide-bottom-url">
+              <span class="slide-bottom-dot"></span><span>vivavarejo.goskip.app</span>
+            </div>
+          </footer>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 4: VALIDAÇÃO PELO LÍDER / REGIONAL
+           ========================================================= -->
+      <section class="slide-unit" id="slide-4">
+        <div class="slide-header-legend">
+          <span class="slide-number-badge">Slide 04 de 11 — Validação do Líder</span>
+          <span class="slide-hint">Controle de Qualidade Operacional</span>
+        </div>
+        <div class="slide-canvas">
+          <div class="slide-top-bar">
+            <div class="slide-brand-group">
+              <div class="slide-brand-logo"><div class="slide-brand-diamond"></div></div>
+              <span class="slide-brand-text">vivavarejo</span>
+            </div>
+            <div class="slide-store-pill">
+              <span class="slide-store-dot"></span
+              ><span>Supermercado Bom Preço — Unidade Centro</span>
+            </div>
+            <span class="slide-top-tag">Fluxo de Aprovação</span>
+          </div>
+
+          <div class="slide-body">
+            <div class="pitch-col">
+              <div class="pitch-badge">
+                <span class="pitch-badge-dot"></span><span>Qualidade Sem Retrabalho</span>
+              </div>
+              <h2 class="pitch-title">
+                O líder valida em 1 clique: <span>aprova ou devolve com apontamento.</span>
+              </h2>
+              <p class="pitch-desc">
+                Se o padrão de loja não foi atendido, a rotina é devolvida na hora para correção,
+                notificando o responsável sem atrito e com evidência visual.
+              </p>
+              <div class="pitch-checklist">
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Fila de validação rápida para o gerente de loja e regional</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Aprovação com carimbo oficial ou devolução com motivo claro</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Métricas de conformidade por setor e por colaborador</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mockup-col">
+              <div class="app-window">
+                <div class="window-header">
+                  <div class="window-dots">
+                    <span class="w-dot"></span><span class="w-dot"></span
+                    ><span class="w-dot"></span>
+                  </div>
+                  <div class="window-title">Painel de Validação · Gerente de Operações</div>
+                  <span
+                    class="window-badge"
+                    style="background: #fef3c7; color: #92400e; border-color: #fde68a"
+                    >2 Aguardando</span
+                  >
+                </div>
+                <div class="window-content" style="gap: 12px">
+                  <!-- Item em validação -->
+                  <div class="mockup-card" style="border: 1.5px solid #0f766e">
+                    <div class="mockup-card-header">
+                      <span
+                        class="mockup-tag"
+                        style="background: #f0fdfa; color: #0f766e; border: 1px solid #ccfbf1"
+                        >Aguardando Validação</span
+                      >
+                      <span style="font-size: 11px; font-weight: 600; color: #64748b"
+                        >Enviado às 09:15</span
+                      >
+                    </div>
+                    <div class="mockup-card-title">
+                      Higienização e Termometria dos Balcões de Carnes
+                    </div>
+                    <div class="mockup-card-meta">
+                      <span>Açougue · Resp: Carlos Mendes</span>
+                      <span>Foto: Termômetro 2.8°C</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 6px">
+                      <button
+                        style="
+                          flex: 1;
+                          padding: 7px;
+                          background: #0f766e;
+                          color: #ffffff;
+                          border: none;
+                          border-radius: 5px;
+                          font-size: 12px;
+                          font-weight: 700;
+                        "
+                      >
+                        Aprovar Rotina
+                      </button>
+                      <button
+                        style="
+                          padding: 7px 14px;
+                          background: #ffffff;
+                          color: #b91c1c;
+                          border: 1px solid #fecaca;
+                          border-radius: 5px;
+                          font-size: 12px;
+                          font-weight: 700;
+                        "
+                      >
+                        Devolver
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Item aprovado recentemente -->
+                  <div class="mockup-card">
+                    <div class="mockup-card-header">
+                      <span class="mockup-tag tag-done">Aprovado pelo Gerente</span>
+                      <span style="font-size: 11px; font-weight: 600; color: #15803d">08:50</span>
+                    </div>
+                    <div class="mockup-card-title">
+                      Checagem de Pães e Salgados no Balcão Térmico
+                    </div>
+                    <div class="mockup-card-meta">Padaria · Resp: Ana Paula · Nota 10/10</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="slide-bottom-bar">
+            <div class="slide-bottom-quote">
+              <span class="slide-bottom-badge">Gestão</span
+              ><span>Prioridades operacionais de gestão</span>
+            </div>
+            <div class="slide-bottom-url">
+              <span class="slide-bottom-dot"></span><span>vivavarejo.goskip.app</span>
+            </div>
+          </footer>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 5: AGENDA DO DIA & MINHA EQUIPE
+           ========================================================= -->
+      <section class="slide-unit" id="slide-5">
+        <div class="slide-header-legend">
+          <span class="slide-number-badge">Slide 05 de 11 — Agenda do Dia</span>
+          <span class="slide-hint">Gestão Completa da Equipe em Loja</span>
+        </div>
+        <div class="slide-canvas">
+          <div class="slide-top-bar">
+            <div class="slide-brand-group">
+              <div class="slide-brand-logo"><div class="slide-brand-diamond"></div></div>
+              <span class="slide-brand-text">vivavarejo</span>
+            </div>
+            <div class="slide-store-pill">
+              <span class="slide-store-dot"></span
+              ><span>Supermercado Bom Preço — Unidade Centro</span>
+            </div>
+            <span class="slide-top-tag">Agenda da Equipe</span>
+          </div>
+
+          <div class="slide-body">
+            <div class="pitch-col">
+              <div class="pitch-badge">
+                <span class="pitch-badge-dot"></span><span>Visão 360° da Escala</span>
+              </div>
+              <h2 class="pitch-title">
+                Agenda consolidada do dia: <span>quem faz o quê e em qual horário.</span>
+              </h2>
+              <p class="pitch-desc">
+                Substitua murais de papel e planilhas soltas. Acompanhe a esteira de execuções de
+                cada setor da loja em tempo real.
+              </p>
+              <div class="pitch-checklist">
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Filtro por setor (Hortifrúti, Mercearia, Açougue, Padaria, Caixas)</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Acompanhamento de visitas de promotores e fornecedores</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Alertas automáticos para rotinas em risco de atraso</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mockup-col">
+              <div class="app-window">
+                <div class="window-header">
+                  <div class="window-dots">
+                    <span class="w-dot"></span><span class="w-dot"></span
+                    ><span class="w-dot"></span>
+                  </div>
+                  <div class="window-title">Agenda Geral · 14 de Outubro</div>
+                  <span class="window-badge">12 Operadores Ativos</span>
+                </div>
+                <div class="window-content" style="gap: 8px">
+                  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px">
+                    <div
+                      style="
+                        background: #fff;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 5px;
+                        padding: 6px;
+                        text-align: center;
+                      "
+                    >
+                      <div style="font-size: 10px; color: #64748b; font-weight: 700">TOTAL</div>
+                      <div style="font-size: 16px; font-weight: 800; color: #1f2937">38</div>
+                    </div>
+                    <div
+                      style="
+                        background: #f0fdf4;
+                        border: 1px solid #dcfce7;
+                        border-radius: 5px;
+                        padding: 6px;
+                        text-align: center;
+                      "
+                    >
+                      <div style="font-size: 10px; color: #15803d; font-weight: 700">
+                        CONCLUÍDAS
+                      </div>
+                      <div style="font-size: 16px; font-weight: 800; color: #15803d">31</div>
+                    </div>
+                    <div
+                      style="
+                        background: #f0fdfa;
+                        border: 1px solid #ccfbf1;
+                        border-radius: 5px;
+                        padding: 6px;
+                        text-align: center;
+                      "
+                    >
+                      <div style="font-size: 10px; color: #0f766e; font-weight: 700">
+                        EM ANDAMENTO
+                      </div>
+                      <div style="font-size: 16px; font-weight: 800; color: #0f766e">5</div>
+                    </div>
+                    <div
+                      style="
+                        background: #fef2f2;
+                        border: 1px solid #fee2e2;
+                        border-radius: 5px;
+                        padding: 6px;
+                        text-align: center;
+                      "
+                    >
+                      <div style="font-size: 10px; color: #b91c1c; font-weight: 700">ATRASO</div>
+                      <div style="font-size: 16px; font-weight: 800; color: #b91c1c">2</div>
+                    </div>
+                  </div>
+
+                  <table class="mockup-table">
+                    <thead>
+                      <tr>
+                        <th>Horário</th>
+                        <th>Rotina / Operação</th>
+                        <th>Setor</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>07:30</strong></td>
+                        <td>Abertura de FLV & Pulverização</td>
+                        <td>Hortifrúti</td>
+                        <td><span class="mockup-tag tag-done">Concluída</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>08:00</strong></td>
+                        <td>Termometria Balcões de Carnes</td>
+                        <td>Açougue</td>
+                        <td><span class="mockup-tag tag-done">Concluída</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>09:30</strong></td>
+                        <td>Ruptura e Abastecimento de Leites</td>
+                        <td>Mercearia</td>
+                        <td><span class="mockup-tag tag-then">Em Execução</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>11:00</strong></td>
+                        <td>Checagem de Validades Próximas</td>
+                        <td>Frios</td>
+                        <td><span class="mockup-tag tag-next">Programada</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="slide-bottom-bar">
+            <div class="slide-bottom-quote">
+              <span class="slide-bottom-badge">Gestão</span
+              ><span>Prioridades operacionais de gestão</span>
+            </div>
+            <div class="slide-bottom-url">
+              <span class="slide-bottom-dot"></span><span>vivavarejo.goskip.app</span>
+            </div>
+          </footer>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 6: COMERCIAL (RUPTURAS, CURVAS A/B/C, NEGATIVOS/SEM VENDAS)
+           ========================================================= -->
+      <section class="slide-unit" id="slide-6">
+        <div class="slide-header-legend">
+          <span class="slide-number-badge">Slide 06 de 11 — Módulo Comercial</span>
+          <span class="slide-hint">Gestão de Ruptura, Curvas A/B/C e Negativos</span>
+        </div>
+        <div class="slide-canvas">
+          <div class="slide-top-bar">
+            <div class="slide-brand-group">
+              <div class="slide-brand-logo"><div class="slide-brand-diamond"></div></div>
+              <span class="slide-brand-text">vivavarejo</span>
+            </div>
+            <div class="slide-store-pill">
+              <span class="slide-store-dot"></span
+              ><span>Supermercado Bom Preço — Unidade Centro</span>
+            </div>
+            <span class="slide-top-tag">Comercial & Ruptura</span>
+          </div>
+
+          <div class="slide-body">
+            <div class="pitch-col">
+              <div class="pitch-badge">
+                <span class="pitch-badge-dot"></span><span>Recuperação de Vendas</span>
+              </div>
+              <h2 class="pitch-title">
+                Inteligência comercial: <span>rupturas, curvas A/B/C e sem vendas 30/60/90+.</span>
+              </h2>
+              <p class="pitch-desc">
+                Identifique exatamente onde está o dinheiro parado: produtos negativos no estoque,
+                itens sem venda encalhados e furos de gôndola que custam receita.
+              </p>
+              <div class="pitch-checklist">
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Filtro imediato por Curva A (80% do faturamento da loja)</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Detecção de estoque negativo (furo de cadastro / furto)</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Sem vendas 30, 60 e 90+ dias pronto para ação comercial</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mockup-col">
+              <div class="app-window">
+                <div class="window-header">
+                  <div class="window-dots">
+                    <span class="w-dot"></span><span class="w-dot"></span
+                    ><span class="w-dot"></span>
+                  </div>
+                  <div class="window-title">Painel Comercial · Rupturas & Curvas</div>
+                  <span class="window-badge">Taxa Ruptura: 2.1%</span>
+                </div>
+                <div class="window-content" style="gap: 8px">
+                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px">
+                    <div
+                      style="
+                        background: #ffffff;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 5px;
+                        padding: 6px 8px;
+                      "
+                    >
+                      <div style="font-size: 10px; font-weight: 700; color: #64748b">
+                        CURVA A RUPTURA
+                      </div>
+                      <div style="font-size: 15px; font-weight: 800; color: #b91c1c">4 itens</div>
+                    </div>
+                    <div
+                      style="
+                        background: #ffffff;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 5px;
+                        padding: 6px 8px;
+                      "
+                    >
+                      <div style="font-size: 10px; font-weight: 700; color: #64748b">
+                        ESTOQUE NEGATIVO
+                      </div>
+                      <div style="font-size: 15px; font-weight: 800; color: #b91c1c">8 itens</div>
+                    </div>
+                    <div
+                      style="
+                        background: #ffffff;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 5px;
+                        padding: 6px 8px;
+                      "
+                    >
+                      <div style="font-size: 10px; font-weight: 700; color: #64748b">
+                        SEM VENDA 60D+
+                      </div>
+                      <div style="font-size: 15px; font-weight: 800; color: #0f766e">12 itens</div>
+                    </div>
+                  </div>
+
+                  <table class="mockup-table">
+                    <thead>
+                      <tr>
+                        <th>Produto</th>
+                        <th>Curva</th>
+                        <th>Estoque</th>
+                        <th>Diagnóstico</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Arroz Branco 5kg Tipo 1</strong></td>
+                        <td><span class="badge-curva curva-a">A</span></td>
+                        <td style="color: #b91c1c; font-weight: 700">0 un</td>
+                        <td><span class="mockup-tag tag-now">Ruptura Total</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Óleo de Soja 900ml</strong></td>
+                        <td><span class="badge-curva curva-a">A</span></td>
+                        <td style="color: #b91c1c; font-weight: 700">-3 un</td>
+                        <td><span class="mockup-tag tag-now">Estoque Negativo</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Café Torrado 500g Tradicional</strong></td>
+                        <td><span class="badge-curva curva-b">B</span></td>
+                        <td>24 un</td>
+                        <td><span class="mockup-tag tag-then">Em Gôndola</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Biscoito Recheado Especial 140g</strong></td>
+                        <td><span class="badge-curva curva-c">C</span></td>
+                        <td>110 un</td>
+                        <td><span class="mockup-tag tag-next">Sem Venda 60d</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="slide-bottom-bar">
+            <div class="slide-bottom-quote">
+              <span class="slide-bottom-badge">Gestão</span
+              ><span>Prioridades operacionais de gestão</span>
+            </div>
+            <div class="slide-bottom-url">
+              <span class="slide-bottom-dot"></span><span>vivavarejo.goskip.app</span>
+            </div>
+          </footer>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 7: NEGOCIAÇÕES & SAZONALIDADE COM MARCOS E FOTOS
+           ========================================================= -->
+      <section class="slide-unit" id="slide-7">
+        <div class="slide-header-legend">
+          <span class="slide-number-badge">Slide 07 de 11 — Negociações & Sazonalidade</span>
+          <span class="slide-hint">Garantia de Acordos Comerciais</span>
+        </div>
+        <div class="slide-canvas">
+          <div class="slide-top-bar">
+            <div class="slide-brand-group">
+              <div class="slide-brand-logo"><div class="slide-brand-diamond"></div></div>
+              <span class="slide-brand-text">vivavarejo</span>
+            </div>
+            <div class="slide-store-pill">
+              <span class="slide-store-dot"></span
+              ><span>Supermercado Bom Preço — Unidade Centro</span>
+            </div>
+            <span class="slide-top-tag">Contratos & Indústria</span>
+          </div>
+
+          <div class="slide-body">
+            <div class="pitch-col">
+              <div class="pitch-badge">
+                <span class="pitch-badge-dot"></span><span>Renda Comercial Garantida</span>
+              </div>
+              <h2 class="pitch-title">
+                Negociações da indústria cumpridas <span>com marcos e fotos de comprovação.</span>
+              </h2>
+              <p class="pitch-desc">
+                Ponta de gôndola, ilha promocional e encartes contratados são executados no prazo e
+                comprovados com fotos para cobrança de verba sem glosa.
+              </p>
+              <div class="pitch-checklist">
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Marcos contratuais: montagem, abastecimento e desmontagem</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Dossiê fotográfico pronto para envio ao fornecedor parceiro</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Controle de sazonalidade: Páscoa, São João, Black Friday, Natal</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mockup-col">
+              <div class="app-window">
+                <div class="window-header">
+                  <div class="window-dots">
+                    <span class="w-dot"></span><span class="w-dot"></span
+                    ><span class="w-dot"></span>
+                  </div>
+                  <div class="window-title">Negociação · Indústria de Bebidas Premium</div>
+                  <span
+                    class="window-badge"
+                    style="background: #f0fdf4; color: #15803d; border-color: #dcfce7"
+                    >Verba Aprovada</span
+                  >
+                </div>
+                <div class="window-content" style="gap: 10px">
+                  <div class="mockup-card">
+                    <div class="mockup-card-header">
+                      <span style="font-size: 12px; font-weight: 800; color: #1f2937"
+                        >Ilha Central de Cervejas Artesanais (Outubro)</span
+                      >
+                      <span style="font-size: 11px; font-weight: 700; color: #0f766e"
+                        >R$ 8.500 em verba</span
+                      >
+                    </div>
+                    <div class="mockup-card-meta">Período: 01/10 a 31/10 · 3 marcos definidos</div>
+                  </div>
+
+                  <!-- Marco 1 Concluído -->
+                  <div
+                    style="
+                      background: #ffffff;
+                      border: 1px solid #e5e7eb;
+                      border-radius: 5px;
+                      padding: 8px 10px;
+                    "
+                  >
+                    <div style="display: flex; justify-content: space-between; align-items: center">
+                      <span style="font-size: 12px; font-weight: 700; color: #1f2937"
+                        >Marco 1: Montagem e Precificação da Ilha</span
+                      >
+                      <span class="mockup-tag tag-done">Comprovado c/ Foto</span>
+                    </div>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 2px">
+                      Evidência registrada em 01/10 às 06:45 por Gestor de Mercearia
+                    </div>
+                  </div>
+
+                  <!-- Marco 2 Em Andamento -->
+                  <div
+                    style="
+                      background: #ffffff;
+                      border: 1px solid #0f766e;
+                      border-radius: 5px;
+                      padding: 8px 10px;
+                    "
+                  >
+                    <div style="display: flex; justify-content: space-between; align-items: center">
+                      <span style="font-size: 12px; font-weight: 700; color: #0f766e"
+                        >Marco 2: Auditoria de Abastecimento Quinzenal</span
+                      >
+                      <span class="mockup-tag tag-then">Aguardando Foto</span>
+                    </div>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 2px">
+                      Prazo: até amanhã às 12:00 · 100% de presença exigida
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="slide-bottom-bar">
+            <div class="slide-bottom-quote">
+              <span class="slide-bottom-badge">Gestão</span
+              ><span>Prioridades operacionais de gestão</span>
+            </div>
+            <div class="slide-bottom-url">
+              <span class="slide-bottom-dot"></span><span>vivavarejo.goskip.app</span>
+            </div>
+          </footer>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 8: LAYOUT & CRONOGRAMA DE IMPLANTAÇÃO COM EVIDÊNCIAS
+           ========================================================= -->
+      <section class="slide-unit" id="slide-8">
+        <div class="slide-header-legend">
+          <span class="slide-number-badge">Slide 08 de 11 — Layout & Cronograma</span>
+          <span class="slide-hint">Execução Fiel do Planograma</span>
+        </div>
+        <div class="slide-canvas">
+          <div class="slide-top-bar">
+            <div class="slide-brand-group">
+              <div class="slide-brand-logo"><div class="slide-brand-diamond"></div></div>
+              <span class="slide-brand-text">vivavarejo</span>
+            </div>
+            <div class="slide-store-pill">
+              <span class="slide-store-dot"></span
+              ><span>Supermercado Bom Preço — Unidade Centro</span>
+            </div>
+            <span class="slide-top-tag">Planogramas & Layout</span>
+          </div>
+
+          <div class="slide-body">
+            <div class="pitch-col">
+              <div class="pitch-badge">
+                <span class="pitch-badge-dot"></span><span>Do Papel para a Gôndola</span>
+              </div>
+              <h2 class="pitch-title">
+                Cronograma de implantação de layout <span>com marcos e evidências reais.</span>
+              </h2>
+              <p class="pitch-desc">
+                Reformulou o layout de um corredor ou categoria? Acompanhe o avanço etapa por etapa
+                com foto das prateleiras, tags e sinalização instaladas.
+              </p>
+              <div class="pitch-checklist">
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Controle de datas de início, virada de gôndola e conclusão</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Registro fotográfico de cada módulo antes e depois</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Garantia de que o cliente encontrará o mix otimizado</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mockup-col">
+              <div class="app-window">
+                <div class="window-header">
+                  <div class="window-dots">
+                    <span class="w-dot"></span><span class="w-dot"></span
+                    ><span class="w-dot"></span>
+                  </div>
+                  <div class="window-title">Implantação · Novo Planograma de Perfumaria</div>
+                  <span class="window-badge">75% Concluído</span>
+                </div>
+                <div class="window-content" style="gap: 10px">
+                  <div class="mockup-card">
+                    <div class="mockup-card-header">
+                      <span style="font-size: 12.5px; font-weight: 700; color: #1f2937"
+                        >Corredor 4 — Perfumaria & Higiene Pessoal</span
+                      >
+                      <span style="font-size: 11px; font-weight: 700; color: #0f766e"
+                        >3 de 4 Módulos</span
+                      >
+                    </div>
+                    <div
+                      style="
+                        height: 6px;
+                        background: #e5e7eb;
+                        border-radius: 999px;
+                        overflow: hidden;
+                        margin-top: 4px;
+                      "
+                    >
+                      <div style="width: 75%; height: 100%; background: #0f766e"></div>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; flex-direction: column; gap: 6px">
+                    <div
+                      style="
+                        background: #ffffff;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 5px;
+                        padding: 7px 10px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                      "
+                    >
+                      <span style="font-size: 11.5px; font-weight: 600; color: #1f2937"
+                        >Módulo 1: Shampoos e Condicionadores Premium</span
+                      >
+                      <span class="mockup-tag tag-done">Foto Validada</span>
+                    </div>
+                    <div
+                      style="
+                        background: #ffffff;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 5px;
+                        padding: 7px 10px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                      "
+                    >
+                      <span style="font-size: 11.5px; font-weight: 600; color: #1f2937"
+                        >Módulo 2: Sabonetes e Cuidados Corporais</span
+                      >
+                      <span class="mockup-tag tag-done">Foto Validada</span>
+                    </div>
+                    <div
+                      style="
+                        background: #ffffff;
+                        border: 1px solid #0f766e;
+                        border-radius: 5px;
+                        padding: 7px 10px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                      "
+                    >
+                      <span style="font-size: 11.5px; font-weight: 700; color: #0f766e"
+                        >Módulo 3: Higiene Bucal & Fitas Dentais</span
+                      >
+                      <span class="mockup-tag tag-then">Em Implantação</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="slide-bottom-bar">
+            <div class="slide-bottom-quote">
+              <span class="slide-bottom-badge">Gestão</span
+              ><span>Prioridades operacionais de gestão</span>
+            </div>
+            <div class="slide-bottom-url">
+              <span class="slide-bottom-dot"></span><span>vivavarejo.goskip.app</span>
+            </div>
+          </footer>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 9: MODO OFFLINE (FILA DE ENVIO, NADA SE PERDE)
+           ========================================================= -->
+      <section class="slide-unit" id="slide-9">
+        <div class="slide-header-legend">
+          <span class="slide-number-badge">Slide 09 de 11 — Tecnologia Offline-First</span>
+          <span class="slide-hint">Resiliência Total no Depósito e Subsolo</span>
+        </div>
+        <div class="slide-canvas">
+          <div class="slide-top-bar">
+            <div class="slide-brand-group">
+              <div class="slide-brand-logo"><div class="slide-brand-diamond"></div></div>
+              <span class="slide-brand-text">vivavarejo</span>
+            </div>
+            <div class="slide-store-pill">
+              <span class="slide-store-dot" style="background: #f59e0b"></span
+              ><span>Modo Offline Ativo · Fila Local</span>
+            </div>
+            <span class="slide-top-tag">Resiliência Operacional</span>
+          </div>
+
+          <div class="slide-body">
+            <div class="pitch-col">
+              <div class="pitch-badge">
+                <span class="pitch-badge-dot"></span><span>Sem Sinal de Wi-Fi? Sem Problema</span>
+              </div>
+              <h2 class="pitch-title">
+                Modo Offline inteligente: <span>opere sem internet, nada se perde.</span>
+              </h2>
+              <p class="pitch-desc">
+                Câmaras frias, depósitos e áreas sem sinal não param sua operação. Registros e fotos
+                entram na fila segura e sincronizam automaticamente ao reconectar.
+              </p>
+              <div class="pitch-checklist">
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Fila de envio local no aparelho (IndexedDB criptografado)</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Sincronização em segundo plano sem intervenção do usuário</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Feedback visual discreto para o colaborador ter certeza do envio</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mockup-col">
+              <div class="app-window">
+                <div class="window-header">
+                  <div class="window-dots">
+                    <span class="w-dot"></span><span class="w-dot"></span
+                    ><span class="w-dot"></span>
+                  </div>
+                  <div class="window-title">Motor de Sincronização Offline</div>
+                  <span
+                    class="window-badge"
+                    style="background: #fef3c7; color: #92400e; border-color: #fde68a"
+                    >3 Itens na Fila</span
+                  >
+                </div>
+                <div class="window-content" style="gap: 10px">
+                  <div
+                    style="
+                      background: #ffffff;
+                      border: 1px solid #e5e7eb;
+                      border-radius: 6px;
+                      padding: 12px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: space-between;
+                    "
+                  >
+                    <div>
+                      <div style="font-size: 13px; font-weight: 800; color: #1f2937">
+                        Status: Operando Offline
+                      </div>
+                      <div style="font-size: 11px; color: #64748b">
+                        Seus registros estão 100% seguros na memória local
+                      </div>
+                    </div>
+                    <span
+                      style="
+                        font-size: 11px;
+                        font-weight: 700;
+                        color: #d97706;
+                        background: #fffbeb;
+                        border: 1px solid #fef3c7;
+                        padding: 3px 8px;
+                        border-radius: 4px;
+                      "
+                      >Aguardando Sinal</span
+                    >
+                  </div>
+
+                  <!-- Fila de Pendências -->
+                  <div style="display: flex; flex-direction: column; gap: 6px">
+                    <div
+                      style="
+                        background: #ffffff;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 5px;
+                        padding: 8px 10px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                      "
+                    >
+                      <div>
+                        <div style="font-size: 11.5px; font-weight: 700; color: #1f2937">
+                          Contagem de Validade · Câmara Fria A
+                        </div>
+                        <div style="font-size: 10px; color: #64748b">
+                          Gravado às 10:14 · Foto 1.2MB anexada
+                        </div>
+                      </div>
+                      <span class="mockup-tag tag-then">Na fila</span>
+                    </div>
+
+                    <div
+                      style="
+                        background: #ffffff;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 5px;
+                        padding: 8px 10px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                      "
+                    >
+                      <div>
+                        <div style="font-size: 11.5px; font-weight: 700; color: #1f2937">
+                          Baixa de Perda por Quebra · Depósito
+                        </div>
+                        <div style="font-size: 10px; color: #64748b">
+                          Gravado às 10:18 · 2 itens registrados
+                        </div>
+                      </div>
+                      <span class="mockup-tag tag-then">Na fila</span>
+                    </div>
+
+                    <div
+                      style="
+                        background: #ffffff;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 5px;
+                        padding: 8px 10px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                      "
+                    >
+                      <div>
+                        <div style="font-size: 11.5px; font-weight: 700; color: #1f2937">
+                          Checklist de Segurança Noturna
+                        </div>
+                        <div style="font-size: 10px; color: #64748b">
+                          Gravado às 10:22 · Assinatura salva
+                        </div>
+                      </div>
+                      <span class="mockup-tag tag-then">Na fila</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="slide-bottom-bar">
+            <div class="slide-bottom-quote">
+              <span class="slide-bottom-badge">Gestão</span
+              ><span>Prioridades operacionais de gestão</span>
+            </div>
+            <div class="slide-bottom-url">
+              <span class="slide-bottom-dot"></span><span>vivavarejo.goskip.app</span>
+            </div>
+          </footer>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 10: MULTI-REDE & ADMINISTRADOR DA REDE
+           ========================================================= -->
+      <section class="slide-unit" id="slide-10">
+        <div class="slide-header-legend">
+          <span class="slide-number-badge">Slide 10 de 11 — Arquitetura Multi-Rede</span>
+          <span class="slide-hint">Gestão Centralizada de 1 a 100+ Lojas</span>
+        </div>
+        <div class="slide-canvas">
+          <div class="slide-top-bar">
+            <div class="slide-brand-group">
+              <div class="slide-brand-logo"><div class="slide-brand-diamond"></div></div>
+              <span class="slide-brand-text">vivavarejo</span>
+            </div>
+            <div class="slide-store-pill">
+              <span class="slide-store-dot"></span><span>Rede Bom Preço (14 Unidades)</span>
+            </div>
+            <span class="slide-top-tag">Perfil: ADM de Rede</span>
+          </div>
+
+          <div class="slide-body">
+            <div class="pitch-col">
+              <div class="pitch-badge">
+                <span class="pitch-badge-dot"></span><span>Escalabilidade Real</span>
+              </div>
+              <h2 class="pitch-title">
+                Multi-rede com perfil exclusivo para o <span>Administrador da Rede.</span>
+              </h2>
+              <p class="pitch-desc">
+                Compare o desempenho de cada filial lado a lado: execução, perdas, rupturas e
+                auditorias sem misturar os dados entre redes concorrentes.
+              </p>
+              <div class="pitch-checklist">
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Ranking de execução loja a loja para benchmarking interno</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Replicação de modelos e rotinas padrão para todas as filiais</span>
+                </div>
+                <div class="pitch-check-item">
+                  <div class="pitch-check-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span>Segurança rigorosa com isolamento de dados por cliente</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mockup-col">
+              <div class="app-window">
+                <div class="window-header">
+                  <div class="window-dots">
+                    <span class="w-dot"></span><span class="w-dot"></span
+                    ><span class="w-dot"></span>
+                  </div>
+                  <div class="window-title">Painel da Rede · Comparativo de Lojas</div>
+                  <span class="window-badge">14 Lojas Ativas</span>
+                </div>
+                <div class="window-content" style="gap: 8px">
+                  <table class="mockup-table">
+                    <thead>
+                      <tr>
+                        <th>Filial / Unidade</th>
+                        <th>Execução</th>
+                        <th>Ruptura</th>
+                        <th>Evidências</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Loja 01 — Centro</strong></td>
+                        <td style="color: #0f766e; font-weight: 800">96.8%</td>
+                        <td>1.8%</td>
+                        <td><span class="mockup-tag tag-done">34 Fotos</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Loja 04 — Shopping Sul</strong></td>
+                        <td style="color: #0f766e; font-weight: 800">94.2%</td>
+                        <td>2.3%</td>
+                        <td><span class="mockup-tag tag-done">29 Fotos</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Loja 07 — Norte Express</strong></td>
+                        <td style="color: #0f766e; font-weight: 800">91.5%</td>
+                        <td>2.7%</td>
+                        <td><span class="mockup-tag tag-then">22 Fotos</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Loja 12 — Hiper Leste</strong></td>
+                        <td style="color: #b91c1c; font-weight: 800">78.4%</td>
+                        <td style="color: #b91c1c; font-weight: 700">4.9%</td>
+                        <td><span class="mockup-tag tag-now">Atenção</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <div
+                    style="
+                      background: #ffffff;
+                      border: 1px solid #e5e7eb;
+                      border-radius: 5px;
+                      padding: 8px 10px;
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                    "
+                  >
+                    <span style="font-size: 11.5px; font-weight: 600; color: #475569"
+                      >Planos de ação gerados automaticamente para lojas abaixo da meta</span
+                    >
+                    <span style="font-size: 11px; font-weight: 700; color: #0f766e"
+                      >Metodologia 5W2H</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="slide-bottom-bar">
+            <div class="slide-bottom-quote">
+              <span class="slide-bottom-badge">Gestão</span
+              ><span>Prioridades operacionais de gestão</span>
+            </div>
+            <div class="slide-bottom-url">
+              <span class="slide-bottom-dot"></span><span>vivavarejo.goskip.app</span>
+            </div>
+          </footer>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 11: SLIDE FINAL (CTA: SOLICITE UMA DEMONSTRAÇÃO + CRIAR CONTA)
+           ========================================================= -->
+      <section class="slide-unit" id="slide-11">
+        <div class="slide-header-legend">
+          <span class="slide-number-badge">Slide 11 de 11 — CTA de Fechamento</span>
+          <span class="slide-hint">Conversão Direta para o Aplicativo</span>
+        </div>
+        <div class="slide-canvas">
+          <div class="slide-top-bar">
+            <div class="slide-brand-group">
+              <div class="slide-brand-logo"><div class="slide-brand-diamond"></div></div>
+              <span class="slide-brand-text">vivavarejo</span>
+            </div>
+            <div class="slide-store-pill">
+              <span class="slide-store-dot"></span><span>Demonstração ao Vivo Disponível</span>
+            </div>
+            <span class="slide-top-tag">Comece Agora</span>
+          </div>
+
+          <div class="slide-body" style="grid-template-columns: 600px 480px; padding: 40px 48px">
+            <div class="pitch-col">
+              <div class="pitch-badge">
+                <span class="pitch-badge-dot"></span><span>Pronto para o seu Varejo</span>
+              </div>
+              <h2
+                style="
+                  font-size: 34px;
+                  font-weight: 800;
+                  line-height: 1.15;
+                  letter-spacing: -0.03em;
+                  color: #1f2937;
+                  margin-bottom: 14px;
+                "
+              >
+                Transforme a execução do seu supermercado ainda hoje.
+              </h2>
+              <p
+                style="
+                  font-size: 16px;
+                  font-weight: 500;
+                  color: #4b5563;
+                  line-height: 1.45;
+                  margin-bottom: 24px;
+                "
+              >
+                Prioridades do dia definidas, acompanhadas e comprovadas na execução. Sem papel, sem
+                adivinhação e sem perda de vendas.
+              </p>
+
+              <!-- Bloco de CTAs duplos com hierarquia clara -->
+              <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap">
+                <a
+                  href="https://vivavarejo.goskip.app/#demonstracao"
+                  style="
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    background-color: #0f766e;
+                    color: #ffffff;
+                    font-size: 16px;
+                    font-weight: 700;
+                    padding: 14px 28px;
+                    border-radius: 8px;
+                    text-decoration: none;
+                    border: 1px solid #0f766e;
+                  "
+                >
+                  Solicite uma demonstração
+                </a>
+                <a
+                  href="https://vivavarejo.goskip.app/login"
+                  style="
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    background-color: #ffffff;
+                    color: #0f766e;
+                    font-size: 15px;
+                    font-weight: 700;
+                    padding: 13px 22px;
+                    border-radius: 8px;
+                    text-decoration: none;
+                    border: 1.5px solid #0f766e;
+                  "
+                >
+                  criar conta
+                </a>
+              </div>
+              <div style="font-size: 13px; font-weight: 600; color: #64748b; margin-top: 10px">
+                Tutorial comercial liberado · Acesso imediato no navegador ou celular
+              </div>
+            </div>
+
+            <div class="mockup-col">
+              <div
+                style="
+                  width: 100%;
+                  background: #f8fafc;
+                  border: 1px solid #e2e8f0;
+                  border-radius: 8px;
+                  padding: 24px;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 14px;
+                  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05);
+                "
+              >
+                <div style="display: flex; align-items: center; gap: 8px">
+                  <div
+                    style="width: 10px; height: 10px; border-radius: 50%; background: #0f766e"
+                  ></div>
+                  <span
+                    style="
+                      font-size: 13px;
+                      font-weight: 800;
+                      color: #0f766e;
+                      text-transform: uppercase;
+                      letter-spacing: 0.06em;
+                    "
+                    >Acesso Imediato</span
+                  >
+                </div>
+                <div style="font-size: 20px; font-weight: 800; color: #1f2937; line-height: 1.25">
+                  Veja na prática como sua equipe vai operar amanhã cedo.
+                </div>
+                <ul
+                  style="
+                    list-style: none;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                    font-size: 13px;
+                    color: #374151;
+                    font-weight: 600;
+                  "
+                >
+                  <li style="display: flex; align-items: center; gap: 8px">
+                    ✓ Implantação rápida sem interrupção de loja
+                  </li>
+                  <li style="display: flex; align-items: center; gap: 8px">
+                    ✓ Compatível com qualquer aparelho celular ou coletor
+                  </li>
+                  <li style="display: flex; align-items: center; gap: 8px">
+                    ✓ Modelos de rotinas de supermercado inclusos
+                  </li>
+                </ul>
+                <div
+                  style="
+                    margin-top: 6px;
+                    padding-top: 12px;
+                    border-top: 1px solid #e2e8f0;
+                    font-size: 13px;
+                    font-weight: 700;
+                    color: #0f766e;
+                  "
+                >
+                  vivavarejo.goskip.app
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="slide-bottom-bar">
+            <div class="slide-bottom-quote">
+              <span class="slide-bottom-badge">Gestão</span
+              ><span>Prioridades operacionais de gestão</span>
+            </div>
+            <div class="slide-bottom-url">
+              <span class="slide-bottom-dot"></span><span>vivavarejo.goskip.app</span>
+            </div>
+          </footer>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

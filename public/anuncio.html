@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VivaVarejo · Anúncio Execução 360° em Ação (1200×628)</title>
+    <title>VivaVarejo · Anúncio Execução em Loja (1200×628)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -24,7 +24,7 @@
       body {
         width: 100%;
         min-height: 100vh;
-        background-color: #e2e8f0;
+        background-color: #f7f7f5;
         font-family:
           'Plus Jakarta Sans',
           -apple-system,
@@ -34,7 +34,7 @@
           Helvetica,
           Arial,
           sans-serif;
-        color: #1e293b;
+        color: #1f2937;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         display: flex;
@@ -70,8 +70,8 @@
       .canvas-container {
         position: relative;
         box-shadow:
-          0 25px 50px -12px rgba(15, 23, 42, 0.25),
-          0 0 0 1px rgba(15, 23, 42, 0.06);
+          0 25px 50px -12px rgba(15, 23, 42, 0.18),
+          0 0 0 1px rgba(15, 23, 42, 0.08);
         border-radius: 4px;
         overflow: hidden;
       }
@@ -97,7 +97,7 @@
         height: 564px;
         padding: 44px 56px 20px 56px;
         display: grid;
-        grid-template-columns: 570px 518px;
+        grid-template-columns: 580px 508px;
         column-gap: 0;
         align-items: center;
       }
@@ -118,12 +118,12 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
       }
 
       .logo-icon {
-        width: 24px;
-        height: 24px;
+        width: 26px;
+        height: 26px;
         background: #0f766e;
         border-radius: 6px;
         display: flex;
@@ -133,46 +133,54 @@
       }
 
       .logo-diamond {
-        width: 10px;
-        height: 10px;
+        width: 11px;
+        height: 11px;
         border: 2px solid #ffffff;
         border-radius: 2px;
         transform: rotate(45deg);
       }
 
       .logo-title {
-        font-size: 23px;
+        font-size: 24px;
         font-weight: 800;
         letter-spacing: -0.02em;
-        color: #1e293b;
+        color: #1f2937;
         line-height: 1;
       }
 
+      /* Linha sob o logo mantida verbatim: "Prioridades do dia definidas, acompanhadas e comprovadas na execução." */
       .logo-tagline {
-        font-size: 13.5px;
-        font-weight: 500;
-        color: #64748b;
+        font-size: 14.5px;
+        font-weight: 600;
+        color: #0f766e;
         letter-spacing: -0.01em;
-        margin-bottom: 28px;
+        margin-bottom: 22px;
+        line-height: 1.35;
       }
 
-      /* 2. Título grande em bold */
-      .hero-title {
-        font-size: 46px;
-        font-weight: 800;
-        line-height: 1.08;
-        letter-spacing: -0.035em;
-        color: #1e293b;
+      /* Bloco de chamada editorial do tutorial comercial */
+      .offer-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #f0fdfa;
+        border: 1px solid #ccfbf1;
+        color: #0f766e;
+        font-size: 11.5px;
+        font-weight: 700;
         text-transform: uppercase;
-        margin-bottom: 24px;
+        letter-spacing: 0.08em;
+        padding: 5px 12px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+        align-self: flex-start;
       }
 
-      .hero-title .line-1 {
-        display: block;
-      }
-
-      .hero-title .line-2 {
-        display: block;
+      .offer-badge-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background-color: #0f766e;
       }
 
       /* Bullets */
@@ -180,7 +188,7 @@
         display: flex;
         flex-direction: column;
         gap: 14px;
-        margin-bottom: 34px;
+        margin-bottom: 30px;
       }
 
       .bullet-item {
@@ -190,14 +198,14 @@
       }
 
       .bullet-dot {
-        width: 18px;
-        height: 18px;
-        border-radius: 4px;
+        width: 20px;
+        height: 20px;
+        border-radius: 5px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        margin-top: 3px;
+        margin-top: 2px;
       }
 
       .bullet-dot.primary {
@@ -206,64 +214,107 @@
       }
 
       .bullet-dot.secondary {
-        background-color: #e2e8f0;
-        color: #475569;
+        background-color: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        color: #0f766e;
       }
 
       .bullet-dot svg {
-        width: 12px;
-        height: 12px;
+        width: 13px;
+        height: 13px;
       }
 
-      /* 3. Bullet 1 em verde, bold: "conecta e comprova" */
       .bullet-1-text {
-        font-size: 19px;
+        font-size: 20px;
         font-weight: 700;
         color: #0f766e;
         letter-spacing: -0.015em;
         line-height: 1.25;
       }
 
-      /* 4. Bullet 2 em slate */
       .bullet-2-text {
-        font-size: 16.5px;
+        font-size: 16px;
         font-weight: 500;
-        color: #334155;
-        line-height: 1.38;
+        color: #374151;
+        line-height: 1.4;
         letter-spacing: -0.01em;
-        max-width: 480px;
+        max-width: 500px;
       }
 
-      /* 5. Botão retangular verde #0F766E com texto branco bold */
+      .bullet-tutorial-box {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-left: 3px solid #0f766e;
+        padding: 12px 14px;
+        border-radius: 6px;
+        margin-bottom: 24px;
+      }
+
+      .bullet-tutorial-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #0f766e;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 4px;
+      }
+
+      .bullet-tutorial-desc {
+        font-size: 14px;
+        font-weight: 500;
+        color: #4b5563;
+        line-height: 1.35;
+      }
+
+      /* CTAs: Botão principal "Solicite uma demonstração" + Ação secundária "criar conta" direcionando para o APP */
       .cta-wrapper {
         display: flex;
         align-items: center;
-        gap: 16px;
+        flex-wrap: wrap;
+        gap: 14px;
       }
 
-      .cta-button {
+      .cta-button-primary {
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        gap: 8px;
         background-color: #0f766e;
         color: #ffffff;
-        font-size: 17px;
+        font-size: 16.5px;
         font-weight: 700;
-        padding: 16px 36px;
+        padding: 14px 28px;
         border-radius: 8px;
-        border: none;
+        border: 1px solid #0f766e;
         letter-spacing: -0.01em;
-        box-shadow: 0 4px 12px rgba(15, 118, 110, 0.28);
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .cta-button-secondary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background-color: #ffffff;
+        color: #0f766e;
+        font-size: 15px;
+        font-weight: 700;
+        padding: 13px 22px;
+        border-radius: 8px;
+        border: 1.5px solid #0f766e;
+        letter-spacing: -0.01em;
         text-decoration: none;
         cursor: pointer;
       }
 
       .cta-subtext {
-        font-size: 13px;
+        font-size: 12.5px;
         font-weight: 600;
         color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.02em;
+        width: 100%;
+        margin-top: -4px;
       }
 
       /* =========================================================
@@ -288,7 +339,7 @@
         perspective-origin: 50% 48%;
       }
 
-      /* Pedestal / sombra realista embaixo do livro */
+      /* Pedestal / sombra sóbria embaixo do livro */
       .book-pedestal-shadow {
         position: absolute;
         bottom: 30px;
@@ -296,14 +347,10 @@
         transform: translateX(-44%) rotateX(65deg);
         width: 320px;
         height: 90px;
-        background: radial-gradient(
-          ellipse at center,
-          rgba(15, 23, 42, 0.38) 0%,
-          rgba(15, 23, 42, 0.18) 45%,
-          rgba(15, 23, 42, 0) 70%
-        );
+        background: #0f172a;
+        opacity: 0.22;
         border-radius: 50%;
-        filter: blur(8px);
+        filter: blur(10px);
         pointer-events: none;
         z-index: 1;
       }
@@ -315,7 +362,8 @@
         transform: translateX(-48%) rotate(-4deg);
         width: 250px;
         height: 16px;
-        background: rgba(15, 23, 42, 0.42);
+        background: #0f172a;
+        opacity: 0.35;
         filter: blur(5px);
         border-radius: 50%;
         z-index: 1;
@@ -332,28 +380,25 @@
         z-index: 2;
       }
 
-      /* Capa da frente */
+      /* Capa da frente — Fundo sóbrio grafite escuro com acabamento fosco */
       .book-cover {
         position: absolute;
         inset: 0;
         width: 290px;
         height: 418px;
-        background: #0f172a;
+        background: #111827;
         border-radius: 4px 10px 10px 4px;
         color: #ffffff;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         padding: 26px 22px 22px 24px;
-        box-shadow:
-          inset 4px 0 10px rgba(255, 255, 255, 0.08),
-          inset -3px 0 8px rgba(0, 0, 0, 0.55),
-          inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.12);
         transform: translateZ(18px);
         overflow: hidden;
       }
 
-      /* Efeito de brilho/acabamento fosco da capa */
+      /* Efeito de acabamento fosco da capa */
       .book-cover::after {
         content: '';
         position: absolute;
@@ -361,13 +406,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(
-          115deg,
-          rgba(255, 255, 255, 0.15) 0%,
-          rgba(255, 255, 255, 0.03) 30%,
-          transparent 50%,
-          rgba(0, 0, 0, 0.25) 100%
-        );
+        background: rgba(255, 255, 255, 0.03);
         pointer-events: none;
       }
 
@@ -378,12 +417,8 @@
         left: 10px;
         bottom: 0;
         width: 3px;
-        background: linear-gradient(
-          to right,
-          rgba(0, 0, 0, 0.4),
-          rgba(255, 255, 255, 0.1),
-          rgba(0, 0, 0, 0.2)
-        );
+        background: #000000;
+        opacity: 0.3;
         pointer-events: none;
         z-index: 5;
       }
@@ -402,7 +437,7 @@
         font-weight: 700;
         letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: #2dd4bf;
+        color: #14b8a6;
         display: flex;
         align-items: center;
         gap: 6px;
@@ -412,7 +447,7 @@
         content: '';
         width: 6px;
         height: 6px;
-        background: #2dd4bf;
+        background: #0f766e;
         border-radius: 1px;
         display: inline-block;
         transform: rotate(45deg);
@@ -423,10 +458,10 @@
         font-weight: 600;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: #94a3b8;
+        color: #9ca3af;
       }
 
-      /* Títulos na capa */
+      /* Títulos na capa: alterado para "EXECUÇÃO EM LOJA" */
       .book-titles {
         position: relative;
         z-index: 2;
@@ -438,7 +473,7 @@
         font-weight: 800;
         line-height: 1.15;
         letter-spacing: -0.025em;
-        color: #f8fafc;
+        color: #f9fafb;
         text-transform: uppercase;
         margin-bottom: 8px;
         border-bottom: 2px solid #0f766e;
@@ -447,20 +482,19 @@
 
       .book-subtitle {
         font-size: 13.5px;
-        font-weight: 400;
+        font-weight: 500;
         line-height: 1.35;
-        color: #cbd5e1;
-        font-style: italic;
+        color: #d1d5db;
         letter-spacing: -0.01em;
       }
 
-      /* Área de foto com ilustração SVG sóbria de gôndola/supermercado */
+      /* Área de foto com ilustração SVG sóbria de gôndola/supermercado no padrão verde institucional */
       .book-photo-area {
         position: relative;
         z-index: 2;
         width: 100%;
         height: 130px;
-        background: #020617;
+        background: #030712;
         border-radius: 6px;
         border: 1px solid rgba(255, 255, 255, 0.12);
         overflow: hidden;
@@ -487,13 +521,13 @@
       .book-author-note {
         font-size: 9.5px;
         font-weight: 600;
-        color: #94a3b8;
+        color: #9ca3af;
         letter-spacing: 0.05em;
         text-transform: uppercase;
       }
 
       .book-author-note strong {
-        color: #f1f5f9;
+        color: #f3f4f6;
         display: block;
         font-size: 10.5px;
       }
@@ -505,17 +539,17 @@
         left: 0;
         width: 36px;
         height: 418px;
-        background: linear-gradient(to right, #090e17 0%, #0f172a 60%, #1e293b 100%);
+        background: #111827;
+        border-right: 1px solid #1f2937;
         transform: rotateY(-90deg) translateZ(0px);
         transform-origin: left;
         border-radius: 3px 0 0 3px;
-        box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.8);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
         padding: 18px 0;
-        color: #94a3b8;
+        color: #9ca3af;
       }
 
       .spine-title {
@@ -525,7 +559,7 @@
         font-weight: 700;
         letter-spacing: 0.18em;
         text-transform: uppercase;
-        color: #e2e8f0;
+        color: #e5e7eb;
       }
 
       .spine-logo {
@@ -545,14 +579,13 @@
         height: 406px;
         background: repeating-linear-gradient(
           to right,
-          #e2e8f0 0px,
-          #f8fafc 2px,
-          #cbd5e1 3px,
-          #94a3b8 4px
+          #e5e7eb 0px,
+          #f9fafb 2px,
+          #d1d5db 3px,
+          #9ca3af 4px
         );
         transform: rotateY(90deg) translateZ(284px);
         transform-origin: right;
-        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.35);
       }
 
       /* Páginas do topo */
@@ -564,69 +597,13 @@
         height: 32px;
         background: repeating-linear-gradient(
           to bottom,
-          #e2e8f0 0px,
-          #f8fafc 2px,
-          #cbd5e1 3px,
-          #94a3b8 4px
+          #e5e7eb 0px,
+          #f9fafb 2px,
+          #d1d5db 3px,
+          #9ca3af 4px
         );
         transform: rotateX(90deg) translateZ(0px);
         transform-origin: top;
-      }
-
-      /* Selo de autoridade circular em verde: "VIVAVAREJO · GUIA PRÁTICO" */
-      .authority-badge {
-        position: absolute;
-        top: 14px;
-        right: -18px;
-        width: 106px;
-        height: 106px;
-        background: #0f766e;
-        color: #ffffff;
-        border-radius: 50%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        box-shadow:
-          0 10px 24px -4px rgba(15, 118, 110, 0.5),
-          0 0 0 4px rgba(255, 255, 255, 0.95),
-          0 0 0 6px rgba(15, 118, 110, 0.3);
-        z-index: 10;
-        transform: translateZ(35px) rotate(8deg);
-      }
-
-      .authority-badge-inner {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 4px;
-      }
-
-      .authority-badge-logo {
-        font-size: 11.5px;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        line-height: 1;
-        margin-bottom: 3px;
-      }
-
-      .authority-badge-divider {
-        width: 28px;
-        height: 1.5px;
-        background: rgba(255, 255, 255, 0.6);
-        margin: 3px 0;
-      }
-
-      .authority-badge-sub {
-        font-size: 9.5px;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: #99f6e4;
-        line-height: 1;
       }
 
       /* =========================================================
@@ -634,8 +611,8 @@
          ========================================================= */
       .bottom-bar {
         height: 64px;
-        background-color: #f1f1ef;
-        border-top: 1px solid #e2e8f0;
+        background-color: #f7f7f5;
+        border-top: 1px solid #e5e7eb;
         padding: 0 56px;
         display: flex;
         align-items: center;
@@ -650,15 +627,15 @@
         position: absolute;
         top: -1px;
         left: 0;
-        width: 280px;
+        width: 320px;
         height: 2px;
         background-color: #0f766e;
       }
 
       .bottom-quote {
-        font-size: 16px;
+        font-size: 15.5px;
         font-weight: 700;
-        color: #1e293b;
+        color: #1f2937;
         letter-spacing: -0.015em;
         display: flex;
         align-items: center;
@@ -715,15 +692,17 @@
               </div>
               <span class="logo-title">vivavarejo</span>
             </div>
+
+            <!-- Linha sob o logo mantida verbatim -->
             <p class="logo-tagline">
               Prioridades do dia definidas, acompanhadas e comprovadas na execução.
             </p>
 
-            <!-- 2. Título grande em bold -->
-            <h1 class="hero-title">
-              <span class="line-1">EXECUÇÃO 360°</span>
-              <span class="line-2">EM AÇÃO:</span>
-            </h1>
+            <!-- Tag de oferta do Tutorial Comercial no App -->
+            <div class="offer-badge">
+              <span class="offer-badge-dot"></span>
+              <span>Tutorial Comercial no App</span>
+            </div>
 
             <!-- Bullets -->
             <div class="bullets-container">
@@ -759,10 +738,25 @@
               </div>
             </div>
 
-            <!-- 5. Botão "Baixe Grátis" -->
+            <!-- Bloco tutorial comercial ofertado dentro do app -->
+            <div class="bullet-tutorial-box">
+              <div class="bullet-tutorial-title">Acesso ao Tutorial Comercial no App</div>
+              <div class="bullet-tutorial-desc">
+                Metodologia completa de gestão de rupturas, curvas A/B/C, layout e validação diária.
+              </div>
+            </div>
+
+            <!-- Botões: Principal "Solicite uma demonstração" + Secundário "criar conta" (direcionando para o app) -->
             <div class="cta-wrapper">
-              <a href="https://vivavarejo.goskip.app" class="cta-button"> Baixe Grátis </a>
-              <span class="cta-subtext">Acesso imediato · PDF</span>
+              <a href="https://vivavarejo.goskip.app/#demonstracao" class="cta-button-primary">
+                Solicite uma demonstração
+              </a>
+              <a href="https://vivavarejo.goskip.app/login" class="cta-button-secondary">
+                criar conta
+              </a>
+              <span class="cta-subtext"
+                >Tutorial comercial liberado · Acesso imediato no navegador ou celular</span
+              >
             </div>
           </div>
 
@@ -778,7 +772,7 @@
                 <!-- Lombada 3D escura (Spine) -->
                 <div class="book-spine">
                   <div class="spine-logo"></div>
-                  <span class="spine-title">GUIA DO LÍDER DE LOJA · VIVAVAREJO</span>
+                  <span class="spine-title">EXECUÇÃO EM LOJA · VIVAVAREJO</span>
                   <div class="spine-logo"></div>
                 </div>
 
@@ -796,46 +790,24 @@
                     <div class="book-edition-tag">Edição Executiva</div>
                   </div>
 
-                  <!-- Títulos na capa -->
+                  <!-- Títulos na capa: "EXECUÇÃO EM LOJA" -->
                   <div class="book-titles">
-                    <h2 class="book-main-title">GUIA DO LÍDER DE LOJA</h2>
-                    <p class="book-subtitle">“Os 7 indicadores que separam execução de promessa”</p>
+                    <h2 class="book-main-title">EXECUÇÃO EM LOJA</h2>
+                    <p class="book-subtitle">Prioridades operacionais de gestão</p>
                   </div>
 
-                  <!-- Área de foto: Ilustração SVG sóbria de gôndola/corredor de supermercado -->
-                  <!-- SUBSTITUIR POR FOTO REAL DE CHÃO DE LOJA -->
+                  <!-- Área de foto: Ilustração SVG sóbria de gôndola/corredor de supermercado sem azul -->
                   <div class="book-photo-area">
                     <svg
                       viewBox="0 0 240 130"
                       xmlns="http://www.w3.org/2000/svg"
                       preserveAspectRatio="xMidYMid slice"
                     >
-                      <defs>
-                        <linearGradient id="aisleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="0%" stop-color="#1E293B" />
-                          <stop offset="50%" stop-color="#0F172A" />
-                          <stop offset="100%" stop-color="#020617" />
-                        </linearGradient>
-                        <linearGradient id="shelfHighlight" x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stop-color="#334155" />
-                          <stop offset="50%" stop-color="#475569" />
-                          <stop offset="100%" stop-color="#1E293B" />
-                        </linearGradient>
-                        <linearGradient id="perspectiveFloor" x1="50%" y1="0%" x2="50%" y2="100%">
-                          <stop offset="0%" stop-color="#0F172A" />
-                          <stop offset="100%" stop-color="#1E293B" />
-                        </linearGradient>
-                      </defs>
-
                       <!-- Fundo ambiente escuro do corredor -->
-                      <rect width="240" height="130" fill="url(#aisleGrad)" />
+                      <rect width="240" height="130" fill="#0f172a" />
 
                       <!-- Piso com perspectiva convergente ao centro -->
-                      <polygon
-                        points="90,75 150,75 220,130 20,130"
-                        fill="url(#perspectiveFloor)"
-                        opacity="0.8"
-                      />
+                      <polygon points="90,75 150,75 220,130 20,130" fill="#1e293b" opacity="0.9" />
                       <!-- Linha central reflexo do piso -->
                       <line
                         x1="120"
@@ -848,19 +820,19 @@
                         opacity="0.6"
                       />
 
-                      <!-- Foco de iluminação de teto do supermercado -->
-                      <polygon points="105,0 135,0 150,75 90,75" fill="#38BDF8" opacity="0.05" />
+                      <!-- Foco de iluminação de teto neutro sóbrio -->
+                      <polygon points="105,0 135,0 150,75 90,75" fill="#f8fafc" opacity="0.04" />
 
                       <!-- Gôndola Esquerda (Perspectiva 3D de prateleiras) -->
-                      <polygon points="12,18 90,75 90,130 12,130" fill="#0B1329" />
+                      <polygon points="12,18 90,75 90,130 12,130" fill="#0a0f1d" />
                       <!-- Prateleira 1 (Alta) -->
-                      <polygon points="12,38 90,82 90,85 12,41" fill="url(#shelfHighlight)" />
+                      <polygon points="12,38 90,82 90,85 12,41" fill="#334155" />
                       <rect
                         x="20"
                         y="24"
                         width="8"
                         height="14"
-                        fill="#64748B"
+                        fill="#64748b"
                         rx="1"
                         opacity="0.8"
                       />
@@ -869,7 +841,7 @@
                         y="27"
                         width="9"
                         height="11"
-                        fill="#0F766E"
+                        fill="#0f766e"
                         rx="1"
                         opacity="0.9"
                       />
@@ -878,7 +850,7 @@
                         y="29"
                         width="7"
                         height="9"
-                        fill="#94A3B8"
+                        fill="#94a3b8"
                         rx="1"
                         opacity="0.7"
                       />
@@ -896,19 +868,19 @@
                         y="34"
                         width="7"
                         height="4"
-                        fill="#0F766E"
+                        fill="#0f766e"
                         rx="1"
                         opacity="0.9"
                       />
 
                       <!-- Prateleira 2 (Média) -->
-                      <polygon points="12,65 90,96 90,99 12,68" fill="url(#shelfHighlight)" />
+                      <polygon points="12,65 90,96 90,99 12,68" fill="#334155" />
                       <rect
                         x="18"
                         y="49"
                         width="9"
                         height="16"
-                        fill="#0F766E"
+                        fill="#0f766e"
                         rx="1"
                         opacity="0.85"
                       />
@@ -917,7 +889,7 @@
                         y="52"
                         width="8"
                         height="13"
-                        fill="#64748B"
+                        fill="#64748b"
                         rx="1"
                         opacity="0.8"
                       />
@@ -926,22 +898,22 @@
                         y="55"
                         width="10"
                         height="10"
-                        fill="#2DD4BF"
+                        fill="#0f766e"
                         rx="1"
-                        opacity="0.75"
+                        opacity="0.95"
                       />
                       <rect
                         x="51"
                         y="58"
                         width="7"
                         height="7"
-                        fill="#94A3B8"
+                        fill="#94a3b8"
                         rx="1"
                         opacity="0.7"
                       />
 
                       <!-- Prateleira 3 (Baixa) -->
-                      <polygon points="12,94 90,111 90,114 12,97" fill="url(#shelfHighlight)" />
+                      <polygon points="12,94 90,111 90,114 12,97" fill="#334155" />
                       <rect
                         x="18"
                         y="78"
@@ -956,7 +928,7 @@
                         y="81"
                         width="10"
                         height="13"
-                        fill="#64748B"
+                        fill="#64748b"
                         rx="1"
                         opacity="0.8"
                       />
@@ -965,21 +937,21 @@
                         y="85"
                         width="8"
                         height="9"
-                        fill="#0F766E"
+                        fill="#0f766e"
                         rx="1"
                         opacity="0.9"
                       />
 
                       <!-- Gôndola Direita (Perspectiva 3D de prateleiras) -->
-                      <polygon points="228,18 150,75 150,130 228,130" fill="#0B1329" />
+                      <polygon points="228,18 150,75 150,130 228,130" fill="#0a0f1d" />
                       <!-- Prateleira 1 Dir -->
-                      <polygon points="228,38 150,82 150,85 228,41" fill="url(#shelfHighlight)" />
+                      <polygon points="228,38 150,82 150,85 228,41" fill="#334155" />
                       <rect
                         x="210"
                         y="24"
                         width="8"
                         height="14"
-                        fill="#94A3B8"
+                        fill="#94a3b8"
                         rx="1"
                         opacity="0.8"
                       />
@@ -988,7 +960,7 @@
                         y="27"
                         width="9"
                         height="11"
-                        fill="#0F766E"
+                        fill="#0f766e"
                         rx="1"
                         opacity="0.9"
                       />
@@ -997,7 +969,7 @@
                         y="30"
                         width="8"
                         height="8"
-                        fill="#64748B"
+                        fill="#64748b"
                         rx="1"
                         opacity="0.7"
                       />
@@ -1006,13 +978,13 @@
                         y="33"
                         width="8"
                         height="5"
-                        fill="#2DD4BF"
+                        fill="#0f766e"
                         rx="1"
-                        opacity="0.8"
+                        opacity="0.85"
                       />
 
                       <!-- Prateleira 2 Dir -->
-                      <polygon points="228,65 150,96 150,99 228,68" fill="url(#shelfHighlight)" />
+                      <polygon points="228,65 150,96 150,99 228,68" fill="#334155" />
                       <rect
                         x="210"
                         y="49"
@@ -1027,7 +999,7 @@
                         y="53"
                         width="9"
                         height="12"
-                        fill="#0F766E"
+                        fill="#0f766e"
                         rx="1"
                         opacity="0.9"
                       />
@@ -1036,19 +1008,19 @@
                         y="56"
                         width="9"
                         height="9"
-                        fill="#94A3B8"
+                        fill="#94a3b8"
                         rx="1"
                         opacity="0.7"
                       />
 
                       <!-- Prateleira 3 Dir -->
-                      <polygon points="228,94 150,111 150,114 228,97" fill="url(#shelfHighlight)" />
+                      <polygon points="228,94 150,111 150,114 228,97" fill="#334155" />
                       <rect
                         x="208"
                         y="77"
                         width="11"
                         height="17"
-                        fill="#64748B"
+                        fill="#64748b"
                         rx="1"
                         opacity="0.8"
                       />
@@ -1057,26 +1029,25 @@
                         y="81"
                         width="11"
                         height="13"
-                        fill="#2DD4BF"
+                        fill="#0f766e"
                         rx="1"
                         opacity="0.85"
                       />
 
-                      <!-- Ponto focal / tela/tablet de auditoria no fundo do corredor -->
+                      <!-- Ponto focal / tablet de auditoria no fundo do corredor -->
                       <rect
                         x="114"
                         y="68"
                         width="12"
                         height="8"
                         rx="1"
-                        fill="#0F766E"
-                        stroke="#2DD4BF"
+                        fill="#0f766e"
+                        stroke="#14b8a6"
                         stroke-width="0.8"
                       />
-                      <circle cx="120" cy="72" r="1.5" fill="#FFFFFF" />
+                      <circle cx="120" cy="72" r="1.5" fill="#ffffff" />
                     </svg>
                   </div>
-                  <!-- FIM ÁREA DE FOTO -->
 
                   <!-- Rodapé da Capa -->
                   <div class="book-cover-footer">
@@ -1088,7 +1059,7 @@
                       style="
                         font-size: 11px;
                         font-weight: 700;
-                        color: #2dd4bf;
+                        color: #14b8a6;
                         letter-spacing: 0.05em;
                       "
                     >
@@ -1096,27 +1067,16 @@
                     </div>
                   </div>
                 </div>
-                <!-- FIM BOOK COVER -->
-
-                <!-- Selo circular de autoridade verde sobreposto: "VIVAVAREJO · GUIA PRÁTICO" -->
-                <div class="authority-badge">
-                  <div class="authority-badge-inner">
-                    <span class="authority-badge-logo">VIVAVAREJO</span>
-                    <span class="authority-badge-divider"></span>
-                    <span class="authority-badge-sub">GUIA PRÁTICO</span>
-                  </div>
-                </div>
               </div>
-              <!-- FIM BOOK WRAP -->
             </div>
           </div>
         </main>
 
-        <!-- FAIXA INFERIOR (100% da largura do canvas) -->
+        <!-- FAIXA INFERIOR: Prioridades operacionais de gestão + vivavarejo.goskip.app -->
         <footer class="bottom-bar">
           <div class="bottom-quote">
-            <span class="bottom-quote-tag">Síntese</span>
-            <span>O guia essencial para o líder que executa — não só acompanha!</span>
+            <span class="bottom-quote-tag">Gestão</span>
+            <span>Prioridades operacionais de gestão</span>
           </div>
           <div class="bottom-url">
             <span class="bottom-url-dot"></span>
