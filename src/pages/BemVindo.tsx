@@ -6,8 +6,6 @@ import {
   ShoppingBag,
   UtensilsCrossed,
   Pill,
-  Tv,
-  Hammer,
   Sparkles,
   Dog,
   Store,
@@ -18,6 +16,17 @@ import {
   Check,
   Instagram,
   Linkedin,
+  CalendarCheck,
+  Camera,
+  BadgeAlert,
+  Users2,
+  GitBranch,
+  TrendingUp,
+  FileSpreadsheet,
+  WifiOff,
+  Network,
+  Lock,
+  MessageSquare,
 } from 'lucide-react'
 import { TipoPessoaCliente } from '@/types'
 import { useContatosAtendimento } from '@/hooks/use-contatos-atendimento'
@@ -30,11 +39,8 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { ProtecaoDadosSecao } from '@/components/ProtecaoDadosSecao'
+import { FalarEspecialistaModal } from '@/components/FalarEspecialistaModal'
 
-/**
- * Endereços de redes sociais do rodapé da landing page.
- * Versão sincronizada com os blocos completos da página institucional.
- */
 const INSTAGRAM_URL = 'https://www.instagram.com/vivavarejo/'
 const LINKEDIN_PERSONAL_URL = 'https://br.linkedin.com/in/dalvanifarias'
 
@@ -210,6 +216,8 @@ export default function BemVindo() {
 
   // Modal de Proteção de Dados
   const [modalProtecaoOpen, setModalProtecaoOpen] = useState(false)
+  // Modal de Falar com Especialista
+  const [modalEspecialistaOpen, setModalEspecialistaOpen] = useState(false)
 
   // Funil de interesse em 2 passos
   const [tipoPessoa, setTipoPessoa] = useState<TipoPessoaCliente | null>(null)
@@ -245,11 +253,11 @@ export default function BemVindo() {
 
   return (
     <div className="min-h-screen bg-[#F7F7F5] text-[#1F2937] flex flex-col font-sans">
-      {/* Header sóbrio com efeito de vidro fosco */}
+      {/* Header sóbrio: apenas marca à esquerda e botão Entrar à direita */}
       <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-[#E5E7EB]">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-[#0F766E] flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-[#0F766E] flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
               <div className="w-4 h-4 border-2 border-white rotate-45 transform" />
             </div>
             <span className="text-sm font-bold tracking-wider uppercase text-[#1F2937] leading-tight">
@@ -257,7 +265,7 @@ export default function BemVindo() {
             </span>
           </Link>
 
-          {/* Links no cabeçalho */}
+          {/* Apenas botão Entrar */}
           <nav className="flex items-center gap-2 sm:gap-4 text-xs font-medium">
             <Link
               to="/login"
@@ -271,382 +279,299 @@ export default function BemVindo() {
 
       {/* Main Content */}
       <main className="flex-1 w-full">
-        {/* Seção Hero: Fundo claro sóbrio com gradiente suave off-white e destaque teal profundo */}
-        <section className="relative pt-12 pb-16 sm:pt-20 sm:pb-20 px-4 sm:px-6 border-b border-[#E5E7EB] overflow-hidden bg-[#F7F7F5]">
-          <div className="relative max-w-3xl mx-auto text-center space-y-6">
-            {/* Chip pequeno no topo */}
-            <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs sm:text-sm font-semibold text-[#0F766E] shadow-2xs">
+        {/* Seção Hero: Posicionamento Principal e Tese Central */}
+        <section className="pt-12 pb-16 sm:pt-20 sm:pb-20 px-4 sm:px-6 border-b border-[#E5E7EB] bg-[#F7F7F5]">
+          <div className="max-w-3xl mx-auto text-center space-y-6">
+            {/* Chip discreto */}
+            <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-semibold text-[#0F766E] shadow-2xs">
               <ShieldCheck className="w-4 h-4 shrink-0 text-[#0F766E]" />
-              <span className="leading-snug">
-                Plataforma de Operação para Líderes, Gerentes e Redes
-              </span>
+              <span>Execução 360° para o Varejo Físico</span>
             </div>
 
-            {/* Título grande em negrito + Descrição de apoio */}
+            {/* Posicionamento Principal */}
             <div className="space-y-4">
-              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[#1F2937] tracking-tight leading-tight sm:leading-tight">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[#1F2937] tracking-tight leading-tight">
                 A camada de execução entre o ERP e o chão de loja
               </h1>
+              <p className="text-base sm:text-lg font-medium text-[#0F766E] max-w-2xl mx-auto leading-relaxed">
+                “Seu ERP mostra o que aconteceu. O VivaVarejo garante que seja feito.”
+              </p>
               <p className="text-sm sm:text-base text-[#4B5563] max-w-2xl mx-auto leading-relaxed">
-                O VivaVarejo é a plataforma de execução operacional no ponto de venda que organiza a
-                rotina das equipes, direciona prioridades, comprova a execução com fotos e
-                transforma o que acontece na loja em informação para gestão.
+                Direcionamento de prioridades diárias, comprovação de rotinas com fotos, gestão de
+                validades, visitas de promotores e sincronização de dados comerciais em uma só
+                plataforma.
               </p>
             </div>
 
-            {/* CTAs no padrão sóbrio de acento único */}
+            {/* CTAs */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <button
                 type="button"
                 onClick={handleScrollToInterest}
-                className="w-full sm:w-auto px-6 py-3 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-sm rounded-xl shadow-sm transition-all hover:scale-[1.02] inline-flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-6 py-3 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-sm rounded-xl shadow-xs transition-all hover:scale-[1.02] inline-flex items-center justify-center gap-2"
               >
-                <span>Tenho interesse</span>
+                <span>Criar conta grátis</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
-              <Link
-                to="/login"
-                className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] hover:text-[#0F766E] font-semibold text-sm rounded-xl transition-all inline-flex items-center justify-center shadow-2xs"
+              <button
+                type="button"
+                onClick={() => setModalEspecialistaOpen(true)}
+                className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] hover:text-[#0F766E] font-semibold text-sm rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-2xs"
               >
-                Já tenho conta
-              </Link>
+                <MessageSquare className="w-4 h-4 text-[#0F766E]" />
+                <span>Falar com especialista</span>
+              </button>
             </div>
 
-            {/* Três linhas com check */}
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-[#4B5563]">
-              <span className="inline-flex items-center gap-2 font-medium">
+            {/* Benefícios rápidos */}
+            <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-[#4B5563]">
+              <span className="inline-flex items-center gap-1.5 font-medium">
                 <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
                 Sem necessidade de cartão
               </span>
-              <span className="inline-flex items-center gap-2 font-medium">
+              <span className="inline-flex items-center gap-1.5 font-medium">
                 <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-                Ativação em menos de 2 minutos
+                Modo offline com fila segura
               </span>
-              <span className="inline-flex items-center gap-2 font-medium">
+              <span className="inline-flex items-center gap-1.5 font-medium">
                 <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-                Compatível com celular e desktop
+                Celular e desktop
               </span>
             </div>
           </div>
         </section>
 
-        {/* Nova Seção: O Desafio do Varejo (Inovação VivaVarejo — Da Informação à Execução) */}
+        {/* Módulos do Produto Real: Apresentação Prática em Grade */}
         <section className="py-12 sm:py-16 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]">
-          <div className="max-w-4xl mx-auto space-y-4 text-center">
-            <div className="inline-flex items-center justify-center px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200 text-xs font-semibold text-[#0F766E]">
-              O Desafio do Varejo
-            </div>
-
-            <div className="space-y-3">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1F2937] tracking-tight">
-                O desafio do varejo não é falta de informação. É falta de execução.
-              </h2>
-              <p className="text-sm sm:text-base text-[#4B5563] max-w-3xl mx-auto leading-relaxed">
-                ERP registra. BI mostra. WhatsApp distribui. E o gerente fica no meio, juntando tudo
-                em vez de estar no chão de loja. O VivaVarejo é a camada que falta: transforma
-                informação em prioridade, ação, responsável e prazo — e acompanha a execução até o
-                problema estar resolvido.
-              </p>
-            </div>
-
-            <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-2">
-              <div className="inline-block px-5 py-2.5 rounded-xl bg-[#F7F7F5] border border-[#E5E7EB] text-xs sm:text-sm font-bold text-[#1F2937] shadow-2xs">
-                <span className="text-[#0F766E]">
-                  Informação → Prioridade → Ação → Acompanhamento → Resultado.
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Banner de destaque sobrio com CTA */}
-        <section className="px-4 sm:px-6 py-6 bg-[#F7F7F5]">
-          <div className="max-w-5xl mx-auto rounded-2xl bg-white border border-[#E5E7EB] p-6 sm:p-8 text-[#1F2937] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden">
-            <div className="space-y-2 text-center sm:text-left relative z-10">
-              <span className="text-[11px] uppercase font-bold tracking-wider px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-[#0F766E]">
-                VivaVarejo em Campo
-              </span>
-              <h3 className="text-xl sm:text-2xl font-extrabold leading-tight text-[#1F2937]">
-                Tudo o que sua equipe precisa, em um só lugar.
-              </h3>
-              <p className="text-xs sm:text-sm text-[#4B5563] max-w-xl leading-relaxed">
-                Agenda de rotinas, controle de validade, presença de promotores com fotos e chamados
-                5W2H no celular.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={handleScrollToInterest}
-              className="relative z-10 px-5 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition-all shrink-0 hover:scale-105"
-            >
-              Começar agora
-            </button>
-          </div>
-        </section>
-
-        {/* Seção "O que você ganha no dia a dia" (6 itens com tiles discretos) */}
-        <section className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5] border-b border-[#E5E7EB]">
-          <div className="max-w-5xl mx-auto space-y-8">
-            <div className="text-center space-y-3">
-              <div className="inline-flex items-center justify-center px-3.5 py-1 rounded-full bg-white border border-[#E5E7EB] text-xs font-semibold text-[#0F766E]">
-                Operação Real de Loja
+          <div className="max-w-6xl mx-auto space-y-8">
+            <div className="text-center space-y-2 max-w-2xl mx-auto">
+              <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-xs font-semibold text-[#0F766E]">
+                Módulos Integrados
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
-                O que você ganha no dia a dia
+                Tudo o que acontece no chão de loja, sob controle
               </h2>
-              <p className="text-sm sm:text-base text-[#4B5563] max-w-2xl mx-auto leading-relaxed">
-                Menos improviso e mais clareza para líderes, encarregados e equipe de chão de loja.
+              <p className="text-xs sm:text-sm text-[#4B5563]">
+                Cada setor com processos claros, execução acompanhada e evidências registradas no
+                momento da ação.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Item 1 */}
-              <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-2xs flex items-start gap-3.5 hover:border-[#0F766E]/50 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
-                  <Check className="w-5 h-5 stroke-[2.5]" />
+              {/* Módulo 1: Agenda & Meu Dia */}
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] hover:border-[#0F766E]/50 transition-colors space-y-2.5">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+                  <CalendarCheck className="w-5 h-5" />
                 </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm font-bold text-[#1F2937]">Rotinas estruturadas</h3>
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                    Saiba o que precisa ser feito, quando e como.
-                  </p>
-                </div>
-              </div>
-
-              {/* Item 2 */}
-              <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-2xs flex items-start gap-3.5 hover:border-[#0F766E]/50 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
-                  <Check className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm font-bold text-[#1F2937]">Orientação operacional</h3>
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                    Tenha alternativas e recomendações para cada situação.
-                  </p>
-                </div>
-              </div>
-
-              {/* Item 3 */}
-              <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-2xs flex items-start gap-3.5 hover:border-emerald-500/50 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0">
-                  <Check className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm font-bold text-[#1F2937]">Alertas imediatos</h3>
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                    Não espere o fechamento do mês para descobrir um problema.
-                  </p>
-                </div>
-              </div>
-
-              {/* Item 4 */}
-              <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-2xs flex items-start gap-3.5 hover:border-amber-500/50 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center shrink-0">
-                  <Check className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm font-bold text-[#1F2937]">Acompanhamento</h3>
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                    Saiba o que foi realizado, o que está pendente e onde atuar.
-                  </p>
-                </div>
-              </div>
-
-              {/* Item 5 */}
-              <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-2xs flex items-start gap-3.5 hover:border-[#0F766E]/50 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
-                  <Check className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm font-bold text-[#1F2937]">Padronização</h3>
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                    Faça a operação acontecer de acordo com o processo definido.
-                  </p>
-                </div>
-              </div>
-
-              {/* Item 6 */}
-              <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-2xs flex items-start gap-3.5 hover:border-[#0F766E]/50 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
-                  <Check className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm font-bold text-[#1F2937]">Gestão na ponta</h3>
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                    Transforme conhecimento operacional em ação dentro da loja.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Seção Frase de Impacto */}
-        <section className="py-12 sm:py-16 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-2xl p-6 sm:p-10 text-center space-y-5 shadow-2xs">
-              <div className="inline-flex items-center justify-center px-3.5 py-1 rounded-full bg-white border border-[#E5E7EB] text-xs font-semibold text-[#0F766E]">
-                Operação em Tempo Real
-              </div>
-
-              <div className="space-y-3">
-                <h2 className="text-2xl sm:text-4xl font-extrabold text-[#1F2937] tracking-tight">
-                  Não espere o relatório para agir
-                </h2>
-                <p className="text-sm sm:text-base text-[#4B5563] max-w-2xl mx-auto leading-relaxed">
-                  O VivaVarejo acompanha a operação enquanto ela acontece, permitindo corrigir
-                  desvios na hora.
+                <h3 className="text-sm font-bold text-[#1F2937]">Agenda & Meu Dia</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">
+                  Priorização clara do turno dividida em <strong>Faça agora</strong>,{' '}
+                  <strong>Depois</strong> e <strong>Em seguida</strong>, garantindo foco no que traz
+                  impacto imediato.
                 </p>
               </div>
 
-              {/* Apoio visual com a lógica do produto */}
-              <div className="pt-4 border-t border-[#E5E7EB] max-w-2xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center text-xs">
-                <div className="p-3 rounded-xl bg-white border border-[#E5E7EB]">
-                  <span className="block text-[10px] uppercase font-bold text-[#6B7280]">
-                    Relatório
-                  </span>
-                  <span className="font-semibold text-[#4B5563]">é passado</span>
+              {/* Módulo 2: Execução com Foto */}
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] hover:border-[#0F766E]/50 transition-colors space-y-2.5">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+                  <Camera className="w-5 h-5" />
                 </div>
-                <div className="p-3 rounded-xl bg-white border border-teal-300">
-                  <span className="block text-[10px] uppercase font-bold text-[#0F766E]">
-                    Alerta
-                  </span>
-                  <span className="font-bold text-[#0F766E]">é presente</span>
+                <h3 className="text-sm font-bold text-[#1F2937]">Execução com Foto & Validação</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">
+                  Comprovação visual de cada rotina finalizada, com fluxo de validação pela
+                  liderança e imagens protegidas por tokens de acesso.
+                </p>
+              </div>
+
+              {/* Módulo 3: Validades */}
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] hover:border-[#0F766E]/50 transition-colors space-y-2.5">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+                  <BadgeAlert className="w-5 h-5" />
                 </div>
-                <div className="p-3 rounded-xl bg-white border border-[#E5E7EB]">
-                  <span className="block text-[10px] uppercase font-bold text-[#1F2937]">
-                    Orientação
-                  </span>
-                  <span className="font-semibold text-[#1F2937]">é ação</span>
+                <h3 className="text-sm font-bold text-[#1F2937]">Controle de Validades</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">
+                  Varredura preventiva por setor com alertas automáticos (30, 60 e 90 dias) para
+                  evitar perdas de mercadoria e recolhimento tardio.
+                </p>
+              </div>
+
+              {/* Módulo 4: Perdas & Inventário */}
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] hover:border-[#0F766E]/50 transition-colors space-y-2.5">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5" />
                 </div>
-                <div className="p-3 rounded-xl bg-white border border-emerald-300">
-                  <span className="block text-[10px] uppercase font-bold text-emerald-700">
-                    Acompanhamento
-                  </span>
-                  <span className="font-semibold text-emerald-700">é gestão</span>
+                <h3 className="text-sm font-bold text-[#1F2937]">Perdas & Inventário Rotativo</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">
+                  Apontamento ágil de quebras por motivo e contagens rotativas periódicas,
+                  identificando divergências antes do fechamento mensal.
+                </p>
+              </div>
+
+              {/* Módulo 5: Promotores & Visitas */}
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] hover:border-[#0F766E]/50 transition-colors space-y-2.5">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+                  <Users2 className="w-5 h-5" />
                 </div>
+                <h3 className="text-sm font-bold text-[#1F2937]">Promotores & Visitas</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">
+                  Registro de check-in e check-out de promotores de fornecedores, com fotos de
+                  gôndola e checklist de conformidade por visita.
+                </p>
+              </div>
+
+              {/* Módulo 6: Workflow 5W2H */}
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] hover:border-[#0F766E]/50 transition-colors space-y-2.5">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+                  <GitBranch className="w-5 h-5" />
+                </div>
+                <h3 className="text-sm font-bold text-[#1F2937]">Planos de Ação 5W2H</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">
+                  Transforme inconformidades em planos estruturados com responsável, prazo,
+                  causa-raiz e acompanhamento de status em tempo real.
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Seção: As Três Camadas do VivaVarejo */}
+        {/* Destaque Comercial: Inteligência de Gôndola e ERP */}
         <section className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5] border-b border-[#E5E7EB]">
-          <div className="max-w-4xl mx-auto space-y-8">
-            <div className="text-center space-y-3">
-              <div className="inline-flex items-center justify-center px-3.5 py-1 rounded-full bg-white border border-[#E5E7EB] text-xs font-semibold text-[#0F766E]">
-                Arquitetura Operacional
+          <div className="max-w-5xl mx-auto space-y-6">
+            <div className="space-y-2 text-center max-w-2xl mx-auto">
+              <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white border border-[#E5E7EB] text-xs font-semibold text-[#0F766E]">
+                Módulo Comercial Completo
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
-                Como o VivaVarejo funciona na prática
+                Da planilha ao chão de loja sem fricção
               </h2>
-              <p className="text-sm sm:text-base text-[#4B5563] max-w-xl mx-auto leading-relaxed">
-                Três camadas integradas que tiram o conhecimento da teoria e colocam a loja em
-                movimento com foco em execução e resultados.
+              <p className="text-xs sm:text-sm text-[#4B5563]">
+                Importe planilhas (XLSX/CSV) ou conecte ao seu ERP para sincronizar os dados que
+                direcionam as ações na loja.
               </p>
             </div>
 
-            <div className="space-y-4">
-              {/* Camada 1: Conhecimento */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#E5E7EB] shadow-2xs flex flex-col sm:flex-row sm:items-start gap-4">
-                <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] font-bold text-base flex items-center justify-center shrink-0">
-                  1
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+              <div className="bg-white p-4 rounded-xl border border-[#E5E7EB] space-y-1.5">
+                <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
+                  Rupturas & Estoque Virtual
                 </div>
-                <div className="space-y-1.5 flex-1">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-[#0F766E]">
-                    Camada 1
-                  </div>
-                  <h3 className="text-lg font-extrabold text-[#1F2937]">CONHECIMENTO</h3>
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                    A experiência de varejo acumulada. As melhores práticas organizadas para apoiar
-                    as decisões diárias da sua equipe.
-                  </p>
-                </div>
+                <p className="text-[#6B7280] leading-relaxed">
+                  Identifique itens com saldo em sistema que não estão na gôndola e atue antes de
+                  perder vendas.
+                </p>
               </div>
 
-              {/* Camada 2: Processo */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#E5E7EB] shadow-2xs flex flex-col sm:flex-row sm:items-start gap-4">
-                <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] font-bold text-base flex items-center justify-center shrink-0">
-                  2
+              <div className="bg-white p-4 rounded-xl border border-[#E5E7EB] space-y-1.5">
+                <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
+                  Negativos & Sem Venda 30/60/90+
                 </div>
-                <div className="space-y-1.5 flex-1">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-[#0F766E]">
-                    Camada 2
-                  </div>
-                  <h3 className="text-lg font-extrabold text-[#1F2937]">PROCESSO</h3>
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                    Essa experiência transformada em rotinas, checklists, padrões, alternativas e
-                    procedimentos práticos no dia a dia.
-                  </p>
-                </div>
+                <p className="text-[#6B7280] leading-relaxed">
+                  Diagnóstico rápido de estoque travado e divergências para correções imediatas de
+                  saldo.
+                </p>
               </div>
 
-              {/* Camada 3: Inteligência Operacional */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-teal-300 shadow-sm flex flex-col sm:flex-row sm:items-start gap-4">
-                <div className="w-11 h-11 rounded-xl bg-[#0F766E] text-white font-bold text-base flex items-center justify-center shrink-0 shadow-xs">
-                  3
+              <div className="bg-white p-4 rounded-xl border border-[#E5E7EB] space-y-1.5">
+                <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
+                  Curvas A/B/C+ & Margens
                 </div>
-                <div className="space-y-3 flex-1">
-                  <div>
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-[#0F766E]">
-                      Camada 3 • Em tempo real
-                    </div>
-                    <h3 className="text-lg font-extrabold text-[#1F2937]">
-                      INTELIGÊNCIA OPERACIONAL
-                    </h3>
-                    <p className="text-xs sm:text-sm text-[#4B5563] mt-1 leading-relaxed">
-                      Orientação ativa durante o turno com alertas em tempo real. O sistema dizendo
-                      no momento exato:
-                    </p>
-                  </div>
+                <p className="text-[#6B7280] leading-relaxed">
+                  Acompanhamento de sortimento crítico, precificação e rebaixas com foco na margem
+                  real.
+                </p>
+              </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
-                    <div className="p-2.5 rounded-xl bg-[#F7F7F5] border border-[#E5E7EB] text-[#374151]">
-                      “Aconteceu isso.”
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] font-medium">
-                      “Faça isso agora.”
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-[#F7F7F5] border border-[#E5E7EB] text-[#374151]">
-                      “Se não puder fazer dessa maneira, utilize esta alternativa.”
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-[#F7F7F5] border border-[#E5E7EB] text-[#374151]">
-                      “Isso continua pendente.”
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 font-medium sm:col-span-2">
-                      “Atenção: esse processo não foi executado.”
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-[#E5E7EB]">
-                    <p className="text-xs font-semibold text-[#0F766E]">
-                      Isso é muito mais valioso que um dashboard: é suporte à decisão onde o
-                      resultado acontece.
-                    </p>
-                  </div>
+              <div className="bg-white p-4 rounded-xl border border-[#E5E7EB] space-y-1.5">
+                <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
+                  Layout & Sazonalidade
                 </div>
+                <p className="text-[#6B7280] leading-relaxed">
+                  Cronogramas de implantação de ponta de gôndola e campanhas sazonais comprovados
+                  com fotos.
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Bloco "Opção de interesse" / Funil PF/CNPJ */}
-        <section id="opcao-interesse" className="py-12 sm:py-16 px-4 sm:px-6 bg-white">
+        {/* Recursos de Confiança: Modo Offline, Multi-rede e Segurança */}
+        <section className="py-12 sm:py-16 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]">
+          <div className="max-w-5xl mx-auto space-y-8">
+            <div className="text-center space-y-2 max-w-xl mx-auto">
+              <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-xs font-semibold text-[#0F766E]">
+                Engenharia para o Varejo Real
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
+                Feito para a realidade do ponto de venda
+              </h2>
+              <p className="text-xs sm:text-sm text-[#4B5563]">
+                Confiabilidade para operações com sinal instável e gestão corporativa para redes em
+                expansão.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Cartão 1: Modo Offline */}
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+                  <WifiOff className="w-5 h-5" />
+                </div>
+                <h3 className="text-sm font-bold text-[#1F2937]">Modo Offline Seguro</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">
+                  Depósitos e subsolos sem internet não travam a equipe: os registros entram em uma
+                  fila local e são sincronizados automaticamente na reconexão, sem perda de dados.
+                </p>
+              </div>
+
+              {/* Cartão 2: Multi-rede */}
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+                  <Network className="w-5 h-5" />
+                </div>
+                <h3 className="text-sm font-bold text-[#1F2937]">Gestão Multi-Rede</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">
+                  Cada rede possui seu Administrador com gestão autônoma de lojas, equipes e
+                  permissões, com isolamento rigoroso entre clientes no backend.
+                </p>
+              </div>
+
+              {/* Cartão 3: Importação Ágil */}
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+                  <FileSpreadsheet className="w-5 h-5" />
+                </div>
+                <h3 className="text-sm font-bold text-[#1F2937]">Planilhas e ERP</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">
+                  Importação direta de arquivos XLSX/CSV de produtos, validades e rotinas,
+                  permitindo operar sem burocracia desde o primeiro dia.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Funil de interesse em 2 passos: PF/PJ e Segmento */}
+        <section id="opcao-interesse" className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5]">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-sm space-y-8">
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
               {/* Cabeçalho do Funil */}
-              <div className="border-b border-[#E5E7EB] pb-5 space-y-2">
+              <div className="border-b border-[#E5E7EB] pb-4 space-y-1">
                 <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#0F766E]">
                   <span>Perfil de Atuação</span>
                   <span>•</span>
                   <span>Passo {isStep1Complete ? '2 de 2' : '1 de 2'}</span>
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
-                  Perfil de Atuação
+                <h2 className="text-xl sm:text-2xl font-extrabold text-[#1F2937] tracking-tight">
+                  Comece pelo seu segmento
                 </h2>
-                <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed">
-                  Personalizamos as rotinas de acordo com o porte e o segmento da sua loja.
+                <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+                  Adaptamos os modelos de rotinas e prioridades de acordo com o formato da sua
+                  operação.
                 </p>
               </div>
 
@@ -661,7 +586,7 @@ export default function BemVindo() {
                     >
                       1
                     </span>
-                    <span>Você é pessoa física ou jurídica?</span>
+                    <span>Tipo de empresa:</span>
                   </label>
                   {tipoPessoa && (
                     <span className="text-xs font-medium text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 inline-flex items-center gap-1">
@@ -671,7 +596,7 @@ export default function BemVindo() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {/* Cartão PJ */}
                   <button
                     type="button"
@@ -683,7 +608,7 @@ export default function BemVindo() {
                     }`}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+                      <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                         <Building2 className="w-5 h-5" />
                       </div>
                       <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-[#0F766E]">
@@ -692,8 +617,7 @@ export default function BemVindo() {
                     </div>
                     <div className="text-sm font-bold text-[#1F2937]">Pessoa Jurídica / Rede</div>
                     <p className="text-xs text-[#4B5563] mt-1 leading-relaxed">
-                      Lojas físicas, redes com filiais, franquias, supermercados ou empresas
-                      estruturadas.
+                      Lojas físicas, redes de supermercados, franquias ou operações com filiais.
                     </p>
                   </button>
 
@@ -708,7 +632,7 @@ export default function BemVindo() {
                     }`}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+                      <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                         <User className="w-5 h-5" />
                       </div>
                       <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-[#0F766E]">
@@ -717,7 +641,7 @@ export default function BemVindo() {
                     </div>
                     <div className="text-sm font-bold text-[#1F2937]">Pessoa Física / Lojista</div>
                     <p className="text-xs text-[#4B5563] mt-1 leading-relaxed">
-                      Lojista independente, MEI, consultor de varejo ou profissional autônomo.
+                      Lojista independente, MEI ou consultor de varejo autônomo.
                     </p>
                   </button>
                 </div>
@@ -735,7 +659,7 @@ export default function BemVindo() {
                       >
                         2
                       </span>
-                      <span>Qual é o segmento da sua loja?</span>
+                      <span>Selecione o segmento:</span>
                     </label>
                     {segmento && (
                       <span className="text-xs font-medium text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 inline-flex items-center gap-1">
@@ -794,31 +718,28 @@ export default function BemVindo() {
                   {segmento === 'Outro' && (
                     <div className="pt-2">
                       <label className="block text-xs font-semibold uppercase tracking-wider text-[#1F2937] mb-1">
-                        Especifique o segmento da sua loja:
+                        Especifique o segmento:
                       </label>
                       <input
                         type="text"
                         value={outroSegmento}
                         onChange={(e) => setOutroSegmento(e.target.value)}
-                        placeholder="Ex.: Ótica, Joalheria, Papelaria, Suplementos..."
+                        placeholder="Ex.: Ótica, Joalheria, Papelaria..."
                         className="w-full px-3.5 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-xl outline-none focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937]"
                       />
                     </div>
                   )}
 
-                  {/* Modelos do segmento escolhido */}
+                  {/* Exemplos de rotinas */}
                   {segmento && (
-                    <div className="mt-3.5 p-4 rounded-xl bg-[#F7F7F5] border border-[#E5E7EB] animate-in fade-in duration-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full bg-[#0F766E]" />
-                          <span className="text-xs font-bold text-[#1F2937]">
-                            Exemplos de rotinas de{' '}
-                            {SEGMENT_OPTIONS.find((s) => s.id === segmento)?.label || segmento}:
-                          </span>
-                        </div>
-                        <span className="text-[10px] font-semibold text-[#0F766E] bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
-                          Modelo Operacional
+                    <div className="mt-3.5 p-4 rounded-xl bg-[#F7F7F5] border border-[#E5E7EB]">
+                      <div className="flex items-center justify-between mb-2.5">
+                        <span className="text-xs font-bold text-[#1F2937]">
+                          Exemplos de rotinas para{' '}
+                          {SEGMENT_OPTIONS.find((s) => s.id === segmento)?.label || segmento}:
+                        </span>
+                        <span className="text-[10px] font-semibold text-[#0F766E] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                          Modelo Pronto
                         </span>
                       </div>
 
@@ -844,48 +765,61 @@ export default function BemVindo() {
                 </div>
               )}
 
-              {/* Botão de Avanço / Continuar */}
-              <div className="pt-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-4">
+              {/* Botões de Ação */}
+              <div className="pt-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="text-xs text-[#4B5563]">
                   {!isStep1Complete ? (
-                    <span>Selecione Pessoa Física ou Pessoa Jurídica para avançar.</span>
+                    <span>Selecione PJ ou PF para continuar.</span>
                   ) : !isStep2Complete ? (
-                    <span>Selecione o segmento da sua loja para continuar.</span>
+                    <span>Escolha o segmento da sua loja para avançar.</span>
                   ) : (
                     <span className="text-emerald-700 font-semibold inline-flex items-center gap-1.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      Pronto! Clique em Continuar para configurar sua conta com esse perfil.
+                      Perfil selecionado. Clique em Continuar.
                     </span>
                   )}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleContinue}
-                  disabled={!canContinue}
-                  className="w-full sm:w-auto px-6 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-sm rounded-xl shadow-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
-                >
-                  <span>Continuar</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setModalEspecialistaOpen(true)}
+                    className="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-xl transition-colors inline-flex items-center justify-center gap-1.5"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5 text-[#0F766E]" />
+                    <span>Falar com especialista</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleContinue}
+                    disabled={!canContinue}
+                    className="w-full sm:w-auto px-6 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-xs sm:text-sm rounded-xl shadow-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                  >
+                    <span>Continuar</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Rodapé sóbrio tema claro */}
+      {/* Rodapé sóbrio */}
       <footer className="w-full border-t border-[#E5E7EB] bg-white py-8 mt-auto">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 space-y-6">
-          {/* Linha superior: Identificação da plataforma | Links de acesso */}
+          {/* Linha superior: Marca e links */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <span className="text-xs font-semibold text-[#1F2937] tracking-wider uppercase leading-snug">
-                VivaVarejo • Rotinas de Gestão
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-[#1F2937] tracking-wider uppercase">
+                VivaVarejo
+              </span>
+              <span className="text-xs text-[#6B7280]">
+                • A camada de execução entre o ERP e o chão de loja
               </span>
             </div>
 
-            {/* Links de navegação e acesso rápido */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[#6B7280]">
               <Link to="/login" className="hover:text-[#1F2937] font-medium transition-colors">
                 Já tenho conta
@@ -893,15 +827,23 @@ export default function BemVindo() {
               <span className="text-gray-300">•</span>
               <button
                 type="button"
+                onClick={() => setModalEspecialistaOpen(true)}
+                className="hover:text-[#1F2937] font-medium transition-colors"
+              >
+                Falar com especialista
+              </button>
+              <span className="text-gray-300">•</span>
+              <button
+                type="button"
                 onClick={handleScrollToInterest}
                 className="hover:text-[#1F2937] font-medium transition-colors"
               >
-                Tenho interesse
+                Cadastrar
               </button>
             </div>
           </div>
 
-          {/* Acionador discreto: Sobre proteção */}
+          {/* Acionador discreto: Sobre proteção (mantido conforme padrão existente) */}
           <div className="flex items-center justify-between py-1 text-xs">
             <button
               type="button"
@@ -913,8 +855,9 @@ export default function BemVindo() {
                 Sobre proteção
               </span>
             </button>
-            <span className="text-[11px] text-[#9CA3AF]">
-              Sigilo corporativo e isolamento de dados
+            <span className="text-[11px] text-[#9CA3AF] flex items-center gap-1">
+              <Lock className="w-3 h-3 text-[#9CA3AF]" />
+              Sigilo corporativo e isolamento estrito por rede
             </span>
           </div>
 
@@ -937,6 +880,13 @@ export default function BemVindo() {
               </div>
             </DialogContent>
           </Dialog>
+
+          {/* Modal Falar com Especialista */}
+          <FalarEspecialistaModal
+            open={modalEspecialistaOpen}
+            onOpenChange={setModalEspecialistaOpen}
+            assuntoContexto="Demonstração da camada de execução VivaVarejo"
+          />
 
           {/* Linha de contato e redes sociais */}
           <div className="pt-4 border-t border-[#E5E7EB] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-[#6B7280]">
@@ -995,10 +945,10 @@ export default function BemVindo() {
               <Mail className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
               <span className="text-[#6B7280]">Tire suas dúvidas:</span>
               <a
-                href="mailto:dfarias53@gmail.com"
+                href={`mailto:${contatos.email || 'dfarias53@gmail.com'}`}
                 className="font-medium text-[#1F2937] hover:text-[#0F766E] underline underline-offset-2 transition-colors"
               >
-                dfarias53@gmail.com
+                {contatos.email || 'dfarias53@gmail.com'}
               </a>
             </div>
           </div>
@@ -1011,9 +961,7 @@ export default function BemVindo() {
                 {APP_VERSION_LABEL}
               </span>
             </div>
-            <span>
-              Plataforma de execução operacional, processos e prevenção de perdas no varejo físico.
-            </span>
+            <span>A camada de execução operacional entre o ERP e o chão de loja.</span>
           </div>
         </div>
       </footer>
