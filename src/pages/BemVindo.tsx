@@ -291,7 +291,7 @@ export default function BemVindo() {
             {/* Posicionamento Principal */}
             <div className="space-y-4">
               <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[#1F2937] tracking-tight leading-tight">
-                A camada de execução entre o ERP e o chão de loja
+                Prioridades do dia definidas, acompanhadas e comprovadas na execução. Gestão.
               </h1>
               <p className="text-base sm:text-lg font-medium text-[#0F766E] max-w-2xl mx-auto leading-relaxed">
                 “Seu ERP mostra o que aconteceu. O VivaVarejo garante que seja feito.”
