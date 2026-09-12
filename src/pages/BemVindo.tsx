@@ -294,7 +294,7 @@ export default function BemVindo() {
                 Prioridades do dia definidas, acompanhadas e comprovadas na execução.
               </h1>
               <p className="text-base sm:text-lg font-medium text-[#0F766E] max-w-2xl mx-auto leading-relaxed">
-                “Seu ERP mostra o que aconteceu. O VivaVarejo garante que seja feito.”
+                “Seu ERP mostra o que aconteceu. O sistema garante que seja feito.”
               </p>
               <p className="text-sm sm:text-base text-[#4B5563] max-w-2xl mx-auto leading-relaxed">
                 Direcionamento de prioridades diárias, comprovação de rotinas com fotos, gestão de
@@ -307,7 +307,7 @@ export default function BemVindo() {
                 <div className="inline-flex items-start sm:items-center gap-2.5 text-left sm:text-center text-xs sm:text-sm text-[#1F2937] bg-white/70 border border-[#E5E7EB] border-l-4 border-l-[#0F766E] rounded-r-lg rounded-l-xs px-3.5 py-2.5 max-w-2xl shadow-2xs">
                   <p className="leading-snug">
                     <span className="font-semibold text-[#1F2937]">
-                      Cada rede configura o VivaVarejo conforme sua realidade:
+                      Cada rede configura o sistema conforme sua realidade:
                     </span>{' '}
                     <span className="text-[#4B5563]">
                       demandas, rotinas e indicadores definidos por você — e atualizados quando
