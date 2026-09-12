@@ -33,6 +33,8 @@ import { PwaInstallModal } from '@/components/PwaInstallModal'
 import { InactivityWarningModal } from '@/components/InactivityWarningModal'
 import { BottomNavMobile } from '@/components/BottomNavMobile'
 import { QuickAccessHubModal } from '@/components/QuickAccessHubModal'
+import { ModeloDemonstrativoBanner } from '@/components/ModeloDemonstrativoBanner'
+import { getUserProfileType } from '@/lib/perfil-utils'
 import { usePwaInstall } from '@/hooks/use-pwa-install'
 import { useAutoLogout } from '@/hooks/use-auto-logout'
 
@@ -101,39 +103,47 @@ export default function Layout() {
   }
 
   const perfil = user?.perfil || (user?.email === 'dfarias53@gmail.com' ? 'admin' : 'lider')
-  const isCampo =
-    perfil === 'funcionario' || emailLower.includes('promotor') || emailLower.includes('repositor')
+  const profileType = getUserProfileType(user)
+  const isGerente = profileType === 'gerente'
   const isAdminGeral = perfil === 'admin'
   const isAdmRede = perfil === 'adm_rede'
   const hasAdminAccess = isAdminGeral || isAdmRede
   const isLiderOrAdmin = perfil === 'admin' || perfil === 'adm_rede' || perfil === 'lider'
 
-  // Se for perfil campo, exibe navegação simples e operacional focada em execução no drawer lateral.
-  // Se for gestão, exibe navegação analítica completa.
-  const navLinks = isCampo
-    ? [
-        { to: '/meu-dia', label: 'Meu Dia', icon: Calendar },
-        { to: '/promotores', label: 'Visitas', icon: Handshake },
-        { to: '/validades', label: 'Validades', icon: CalendarCheck },
-      ]
-    : [
-        { to: '/agenda', label: 'Agenda', icon: Calendar },
-        { to: '/rotinas', label: 'Rotinas', icon: ListChecks },
-        { to: '/validades', label: 'Validade × Calendário', icon: CalendarCheck },
-        { to: '/comercial', label: 'Comercial', icon: TrendingUp },
-        { to: '/perdas', label: 'Perdas & Inventário', icon: ShieldAlert },
-        ...(isLiderOrAdmin ? [{ to: '/promotores', label: 'Promotores', icon: Handshake }] : []),
-        { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-        ...(hasAdminAccess
-          ? [
-              {
-                to: '/admin',
-                label: isAdmRede ? 'Workflow Rede' : 'Workflow Geral',
-                icon: GitBranch,
-              },
-            ]
-          : []),
-      ]
+  // Modelos de navegação definidos pelo usuário (Requisito 2):
+  // 1) CPF -> modelo GERENTE (enxuto, foco operação diária): Meu Dia, Agenda/tarefas da loja,
+  //    validações, Comercial essencial (sem módulos corporativos de gestão multi-rede / admin multi-lojas).
+  // 2) CNPJ -> modelo ADM DE REDE (amplo, parecido com a DEMO existente): multi-rede, lojas,
+  //    Comercial completo, negociações, layout/cronograma, gestão de usuários/Workflow.
+  const navLinksGerente = [
+    { to: '/meu-dia', label: 'Meu Dia', icon: Calendar },
+    { to: '/agenda', label: 'Agenda da Loja', icon: CalendarCheck },
+    { to: '/validades', label: 'Validades', icon: ShieldAlert },
+    { to: '/comercial', label: 'Comercial Loja', icon: TrendingUp },
+    { to: '/rotinas', label: 'Rotinas & Padrões', icon: ListChecks },
+    { to: '/', label: 'Indicadores', icon: LayoutDashboard },
+  ]
+
+  const navLinksRede = [
+    { to: '/agenda', label: 'Agenda da Rede', icon: Calendar },
+    { to: '/rotinas', label: 'Rotinas & Modelos', icon: ListChecks },
+    { to: '/validades', label: 'Validade × Calendário', icon: CalendarCheck },
+    { to: '/comercial', label: 'Comercial & Negociações', icon: TrendingUp },
+    { to: '/perdas', label: 'Perdas & Inventário', icon: ShieldAlert },
+    ...(isLiderOrAdmin ? [{ to: '/promotores', label: 'Promotores', icon: Handshake }] : []),
+    { to: '/', label: 'Painel Geral', icon: LayoutDashboard },
+    ...(hasAdminAccess
+      ? [
+          {
+            to: '/admin',
+            label: isAdmRede ? 'Gestão da Rede' : 'Workflow Geral',
+            icon: GitBranch,
+          },
+        ]
+      : []),
+  ]
+
+  const navLinks = isGerente ? navLinksGerente : navLinksRede
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F7F7F5] text-[#1F2937]">
@@ -375,6 +385,8 @@ export default function Layout() {
 
       {/* Main Content Area */}
       <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-6 py-6 md:py-8">
+        {/* Banner do Modelo Demonstrativo com as 2 ações de configuração (Requisitos 3 e 4) */}
+        {!isAuthPage && user && <ModeloDemonstrativoBanner />}
         <Outlet />
       </main>
 
@@ -436,7 +448,7 @@ export default function Layout() {
 
       {/* Navegação inferior fixa no mobile (Item 5 da especificação) */}
       {!isAuthPage && user && (
-        <BottomNavMobile isCampo={isCampo} onOpenMais={() => setMobileMenuOpen(true)} />
+        <BottomNavMobile isCampo={isGerente} onOpenMais={() => setMobileMenuOpen(true)} />
       )}
     </div>
   )

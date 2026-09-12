@@ -152,7 +152,7 @@ export default function ValidadesPage() {
 
   // Filtradas por busca, status e setor
   const tarefasFiltradas = useMemo(() => {
-    return tarefasDoDia.filter((t) => {
+    const list = tarefasDoDia.filter((t) => {
       if (searchTerm.trim()) {
         const q = searchTerm.toLowerCase()
         const setorNorm = normalizarNomeCanonico(t.setor_categoria).toLowerCase()
@@ -183,6 +183,18 @@ export default function ValidadesPage() {
 
       return true
     })
+
+    // Modelo demonstrativo enxuto: se não houver busca ativa, exibe até 3 tarefas do dia como exemplo
+    if (
+      !searchTerm.trim() &&
+      statusFilter === 'todas' &&
+      setorFilter === 'todos' &&
+      semanaFilter === 'todas'
+    ) {
+      return list.slice(0, 3)
+    }
+
+    return list
   }, [tarefasDoDia, searchTerm, statusFilter, setorFilter, semanaFilter])
 
   // Lista de setores disponíveis para o filtro (agrupada pela chave canônica unificada)

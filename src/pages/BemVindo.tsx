@@ -233,12 +233,16 @@ export default function BemVindo() {
     if (!canContinue) return
     const finalSegmento = segmento === 'Outro' ? outroSegmento.trim() || 'Outro' : segmento
     const params = new URLSearchParams()
-    if (tipoPessoa) params.set('tipo', tipoPessoa)
+    if (tipoPessoa) {
+      params.set('tipo', tipoPessoa)
+      params.set('perfil', tipoPessoa === 'PJ' ? 'rede' : 'gerente')
+    }
     if (finalSegmento) params.set('segmento', finalSegmento)
 
     navigate(`/signup?${params.toString()}`, {
       state: {
         tipoPessoa,
+        profileType: tipoPessoa === 'PJ' ? 'rede' : 'gerente',
         segmento: finalSegmento,
       },
     })
@@ -322,7 +326,7 @@ export default function BemVindo() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <button
                 type="button"
-                onClick={handleScrollToInterest}
+                onClick={() => navigate('/signup')}
                 className="w-full sm:w-auto px-6 py-3 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-sm rounded-xl shadow-xs transition-all hover:scale-[1.02] inline-flex items-center justify-center gap-2"
               >
                 <span>Criar conta</span>
@@ -338,7 +342,6 @@ export default function BemVindo() {
                 <span>Falar com especialista</span>
               </button>
             </div>
-
             {/* Benefícios rápidos */}
             <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-[#4B5563]">
               <span className="inline-flex items-center gap-1.5 font-medium">

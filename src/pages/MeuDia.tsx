@@ -763,6 +763,8 @@ export function MeuDiaPage() {
                   if (filtroStatus === 'concluidas') return isConc
                   return true
                 })
+                // Modelo de demonstração enxuto: mostra no máximo 3 rotinas exemplares na visão rápida para facilitar o entendimento
+                .slice(0, 3)
                 .map((rotina) => {
                   const isConc = execMap.has(rotina.id)
                   return (

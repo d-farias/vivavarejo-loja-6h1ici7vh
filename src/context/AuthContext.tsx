@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import pb from '@/lib/pocketbase/client'
-import type { User } from '@/types'
+import type { User, ProfileType } from '@/types'
 
 interface AuthContextType {
   user: User | null
@@ -17,6 +17,7 @@ interface AuthContextType {
     infoNegocio?: string,
     gargalos?: string,
     inventarioSituacao?: string,
+    profileType?: ProfileType,
   ) => Promise<void>
   logout: () => void
 }
@@ -118,37 +119,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     infoNegocio?: string,
     gargalos?: string,
     inventarioSituacao?: string,
+    profileType?: ProfileType,
   ) => {
+    // Determina profile_type: explícito ou derivado da escolha leiga (PJ = 'rede', PF = 'gerente')
+    const finalProfileType: ProfileType = profileType || (tipoPessoa === 'PF' ? 'gerente' : 'rede')
+
+    // Cria a entidade cliente levando os dados do negócio, enquadramento e diagnóstico operacional
+    const empresaTrimmed =
+      empresa?.trim() ||
+      (finalProfileType === 'gerente' ? `Operação ${name.trim()}` : `Rede / Loja de ${name.trim()}`)
+
+    let createdClienteId: string | undefined
+
+    try {
+      const clienteRecord = await pb.collection('clientes').create({
+        nome: empresaTrimmed,
+        contato: email.trim(),
+        tipo_pessoa: tipoPessoa || (finalProfileType === 'gerente' ? 'PF' : 'PJ'),
+        profile_type: finalProfileType,
+        segmento: segmento || 'Moda e Vestuário',
+        info_negocio: infoNegocio?.trim() || '',
+        gargalos: gargalos?.trim() || '',
+        inventario_situacao: inventarioSituacao?.trim() || '',
+        observacoes: `Criado no onboarding de ${name.trim()} (${finalProfileType === 'rede' ? 'Modelo ADM Rede' : 'Modelo Gerente'})`,
+      })
+      createdClienteId = clienteRecord.id
+    } catch (e) {
+      console.warn('Erro ao criar cliente automaticamente no onboarding:', e)
+    }
+
+    // Perfil técnico no banco: se for 'rede' cadastra como 'adm_rede' para ter acesso gerencial de rede;
+    // se for 'gerente' cadastra como 'lider' para foco em operação de loja
+    const perfilCargo = finalProfileType === 'rede' ? 'adm_rede' : 'lider'
+
     await pb.collection('users').create({
       email: email.trim(),
       password: pass,
       passwordConfirm: pass,
       name: name.trim(),
-      perfil: 'lider',
+      perfil: perfilCargo,
+      profile_type: finalProfileType,
+      cliente: createdClienteId || undefined,
       ativo: true,
     })
+
     // Auto login right after registration
     await login(email, pass)
-
-    // Cria a entidade cliente levando os dados do negócio, enquadramento e diagnóstico operacional
-    const empresaTrimmed =
-      empresa?.trim() ||
-      (tipoPessoa === 'PF' ? `Operação ${name.trim()}` : `Rede / Loja de ${name.trim()}`)
-
-    try {
-      await pb.collection('clientes').create({
-        nome: empresaTrimmed,
-        contato: email.trim(),
-        tipo_pessoa: tipoPessoa || 'PJ',
-        segmento: segmento || 'Moda e Vestuário',
-        info_negocio: infoNegocio?.trim() || '',
-        gargalos: gargalos?.trim() || '',
-        inventario_situacao: inventarioSituacao?.trim() || '',
-        observacoes: `Criado no onboarding de ${name.trim()}`,
-      })
-    } catch (e) {
-      console.warn('Erro ao criar cliente automaticamente no onboarding:', e)
-    }
   }
 
   const logout = () => {

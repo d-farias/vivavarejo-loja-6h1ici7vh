@@ -245,6 +245,8 @@ export function AgendaMinhaEquipeSecao({
         ...group,
         totalRotinas: group.items.length,
         totalColaboradores: group.colaboradores.length,
+        // Modelo demonstrativo enxuto: exibe no máximo 3 rotinas exemplares por área/função para não poluir
+        itemsExibicao: group.items.slice(0, 3),
       }))
       .sort((a, b) => b.totalRotinas - a.totalRotinas || a.funcaoNome.localeCompare(b.funcaoNome))
   }, [rotinas, colaboradoresPorFuncao])
@@ -448,7 +450,15 @@ export function AgendaMinhaEquipeSecao({
       {/* Area Groups List — Acordeão recolhido por função e quantidade */}
       <div className="space-y-3">
         {groupedData.map(
-          ({ chave, funcaoNome, items, colaboradores, totalRotinas, totalColaboradores }) => {
+          ({
+            chave,
+            funcaoNome,
+            items,
+            itemsExibicao,
+            colaboradores,
+            totalRotinas,
+            totalColaboradores,
+          }) => {
             const isExpanded = !!expandedKeys[chave]
 
             return (
@@ -535,7 +545,7 @@ export function AgendaMinhaEquipeSecao({
                         Nenhuma rotina cadastrada para esta função.
                       </div>
                     ) : (
-                      items.map((routine) => {
+                      itemsExibicao.map((routine) => {
                         const exec = execucoesMap.get(routine.id)
                         const hasFoto = Boolean(exec?.foto)
                         const isConcluida = Boolean(
@@ -680,6 +690,18 @@ export function AgendaMinhaEquipeSecao({
                           </div>
                         )
                       })
+                    )}
+
+                    {items.length > 3 && (
+                      <div className="p-3 bg-gray-50 border-t border-[#E5E7EB] text-center text-xs text-[#6B7280]">
+                        Mostrando 3 de {items.length} rotinas de exemplo desta função.{' '}
+                        <Link
+                          to="/rotinas"
+                          className="font-semibold text-[#0F766E] hover:underline ml-1"
+                        >
+                          Ver todas ou configurar rotinas →
+                        </Link>
+                      </div>
                     )}
                   </div>
                 )}

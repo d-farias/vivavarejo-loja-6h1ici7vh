@@ -1,21 +1,53 @@
-import type { User, PerfilUsuario } from '@/types'
+import type { User, ProfileType } from '@/types'
 
 export type ModoPerfil = 'campo' | 'gestao'
 
 /**
+ * Resolve o modelo do app do usuário:
+ * - 'rede': Modelo ADM de Rede (amplo, parecido com a DEMO: multi-rede, lojas, Comercial completo, negociações, layout, gestão de usuários)
+ * - 'gerente': Modelo GERENTE (enxuto, foco operação diária: Meu Dia/agenda, execução com evidência, validações e o essencial do Comercial da loja)
+ */
+export function getUserProfileType(user: User | null): ProfileType {
+  if (!user) return 'rede'
+  // Se tiver o campo profile_type salvo no usuário
+  if (user.profile_type === 'gerente') return 'gerente'
+  if (user.profile_type === 'rede') return 'rede'
+
+  // Se o perfil for estritamente admin ou adm_rede, é modelo rede
+  if (user.perfil === 'admin' || user.perfil === 'adm_rede') return 'rede'
+
+  // Se veio vinculado a cliente com tipo_pessoa = 'PF', modelo gerente
+  if (
+    user.expand?.cliente?.tipo_pessoa === 'PF' ||
+    user.expand?.cliente?.profile_type === 'gerente'
+  ) {
+    return 'gerente'
+  }
+
+  // Se for funcionário operacional ou email de promotor/gerente de campo
+  if (user.perfil === 'funcionario') return 'gerente'
+
+  // Por padrão compatível com a base existente: 'rede'
+  return 'rede'
+}
+
+/**
+ * Determina se o usuário opera no modelo Gerente (enxuto, chão de loja)
+ */
+export function isPerfilGerente(user: User | null): boolean {
+  return getUserProfileType(user) === 'gerente'
+}
+
+/**
+ * Determina se o usuário opera no modelo ADM de Rede (amplo, multi-loja, comercial)
+ */
+export function isPerfilRede(user: User | null): boolean {
+  return getUserProfileType(user) === 'rede'
+}
+
+/**
  * Determina se o usuário logado opera no perfil de CAMPO (operacional de loja/promotor)
  * ou no perfil de GESTÃO (analítico, estratégico, coordenação).
- *
- * Perfil CAMPO:
- * - Promotor de vendas / repositor externo
- * - Funções operacionais de loja: encarregado, repositor, líder de setor, fiscal de caixa
- * - User com perfil 'funcionario' ou explicitamente sinalizado
- *
- * Perfil GESTÃO:
- * - Admin geral
- * - Administrador de rede (adm_rede)
- * - Gerente geral de loja / Diretor
- * - Supervisor regional / Consultor
  */
 export function isPerfilCampo(user: User | null): boolean {
   if (!user) return false

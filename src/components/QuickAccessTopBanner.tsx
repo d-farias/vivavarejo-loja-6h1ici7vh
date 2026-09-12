@@ -14,7 +14,7 @@ import {
   Compass,
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
-import { isPerfilCampo } from '@/lib/perfil-utils'
+import { getUserProfileType } from '@/lib/perfil-utils'
 import type { HubShortcut } from './QuickAccessHubModal'
 
 interface QuickAccessTopBannerProps {
@@ -28,51 +28,48 @@ export function QuickAccessTopBanner({ className = '' }: QuickAccessTopBannerPro
   if (!user) return null
 
   const perfil = user?.perfil || (user?.email === 'dfarias53@gmail.com' ? 'admin' : 'lider')
-  const emailLower = (user?.email || '').toLowerCase()
-  const eCampo =
-    isPerfilCampo(user) ||
-    perfil === 'funcionario' ||
-    emailLower.includes('promotor') ||
-    emailLower.includes('repositor')
+  const profileType = getUserProfileType(user)
+  const isGerente = profileType === 'gerente'
   const isAdmin = perfil === 'admin'
   const isAdmRede = perfil === 'adm_rede'
   const hasAdminAccess = isAdmin || isAdmRede
 
-  // Atalhos para Perfil Operacional / Campo
-  const shortcutsCampo: HubShortcut[] = [
+  // Atalhos para Perfil Gerente (enxuto)
+  const shortcutsGerente: HubShortcut[] = [
     {
       to: '/meu-dia',
       label: 'Meu Dia',
       badge: 'Hoje',
-      description: 'Prioridades e check-in',
+      description: 'Prioridades do turno',
       icon: Home,
       highlight: true,
     },
     {
-      to: '/promotores',
-      label: 'Visitas',
-      badge: 'Loja',
-      description: 'Atendimentos de promotores',
-      icon: Handshake,
-    },
-    {
       to: '/agenda',
-      label: 'Tarefas',
-      badge: 'Agenda',
+      label: 'Agenda da Loja',
+      badge: 'Loja',
       description: 'Horários e evidências',
-      icon: CheckSquare,
+      icon: Calendar,
+      highlight: true,
     },
     {
       to: '/validades',
       label: 'Validades',
       badge: 'Auditoria',
-      description: 'Prevenção de vencimento',
+      description: 'Prevenção preventiva',
       icon: CalendarCheck,
+    },
+    {
+      to: '/comercial',
+      label: 'Comercial Loja',
+      badge: 'Gôndola',
+      description: 'Rupturas e sortimento',
+      icon: ListChecks,
     },
   ]
 
-  // Atalhos para Perfil Gestor / Líder / Admin
-  const shortcutsGestao: HubShortcut[] = [
+  // Atalhos para Perfil ADM de Rede (amplo)
+  const shortcutsRede: HubShortcut[] = [
     {
       to: '/agenda',
       label: 'Agenda',
@@ -129,7 +126,7 @@ export function QuickAccessTopBanner({ className = '' }: QuickAccessTopBannerPro
       : []),
   ]
 
-  const shortcuts = eCampo ? shortcutsCampo : shortcutsGestao
+  const shortcuts = isGerente ? shortcutsGerente : shortcutsRede
 
   return (
     <div
@@ -146,7 +143,8 @@ export function QuickAccessTopBanner({ className = '' }: QuickAccessTopBannerPro
               Acesso Rápido aos Módulos
             </h2>
             <p className="text-[11px] text-[#6B7280]">
-              Direcione direto sem perder tempo ({eCampo ? 'Operação de Campo' : 'Gestão'})
+              Direcione direto sem perder tempo (
+              {isGerente ? 'Modelo Gerente' : 'Modelo ADM de Rede'})
             </p>
           </div>
         </div>
@@ -154,7 +152,7 @@ export function QuickAccessTopBanner({ className = '' }: QuickAccessTopBannerPro
 
       <div
         className={`grid gap-2.5 ${
-          eCampo ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'
+          isGerente ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'
         }`}
       >
         {shortcuts.map((shortcut) => {

@@ -2,6 +2,8 @@ import type { RecordModel } from 'pocketbase'
 
 export type PerfilUsuario = 'admin' | 'adm_rede' | 'lider' | 'funcionario' | 'regional'
 
+export type ProfileType = 'rede' | 'gerente'
+
 export interface User extends RecordModel {
   id: string
   email: string
@@ -9,6 +11,7 @@ export interface User extends RecordModel {
   avatar?: string
   telefone?: string
   perfil?: PerfilUsuario
+  profile_type?: ProfileType
   cliente?: string // ID do Cliente/Rede vinculado (obrigatório para adm_rede)
   ativo?: boolean
   primeiro_acesso_notificado?: boolean
@@ -38,6 +41,7 @@ export interface Cliente extends RecordModel {
   observacoes?: string
   envio_semanal?: boolean
   tipo_pessoa?: TipoPessoaCliente
+  profile_type?: ProfileType
   segmento?: string
   info_negocio?: string
   gargalos?: string

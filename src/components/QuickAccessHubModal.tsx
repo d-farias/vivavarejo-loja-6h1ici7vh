@@ -17,7 +17,7 @@ import {
   TrendingUp,
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
-import { isPerfilCampo } from '@/lib/perfil-utils'
+import { getUserProfileType } from '@/lib/perfil-utils'
 
 interface QuickAccessHubModalProps {
   forceOpen?: boolean
@@ -52,12 +52,8 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
   const [naoMostrarNovamenteHoje, setNaoMostrarNovamenteHoje] = useState(false)
 
   const perfil = user?.perfil || (user?.email === 'dfarias53@gmail.com' ? 'admin' : 'lider')
-  const emailLower = (user?.email || '').toLowerCase()
-  const eCampo =
-    isPerfilCampo(user) ||
-    perfil === 'funcionario' ||
-    emailLower.includes('promotor') ||
-    emailLower.includes('repositor')
+  const profileType = getUserProfileType(user)
+  const isGerente = profileType === 'gerente'
   const isAdmin = perfil === 'admin'
   const isAdmRede = perfil === 'adm_rede'
   const hasAdminAccess = isAdmin || isAdmRede
@@ -125,41 +121,49 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
     navigate(to)
   }
 
-  // Atalhos para Perfil Operacional / Campo
-  const shortcutsCampo: HubShortcut[] = [
+  // Atalhos para Perfil Gerente (enxuto, foco na operação diária da loja)
+  const shortcutsGerente: HubShortcut[] = [
     {
       to: '/meu-dia',
       label: 'Meu Dia',
-      badge: 'Principal',
-      description: 'Prioridades de hoje, check-in e roteiro',
+      badge: 'Hoje',
+      description: 'Minhas tarefas imediatas e prioridades de turno',
       icon: Home,
       highlight: true,
     },
     {
-      to: '/promotores',
-      label: 'Visitas',
-      badge: 'Loja',
-      description: 'Atendimentos, promotores e fornecedores',
-      icon: Handshake,
-    },
-    {
       to: '/agenda',
-      label: 'Tarefas',
-      badge: 'Cronograma',
-      description: 'Lista de afazeres, horários e evidências',
-      icon: CheckSquare,
+      label: 'Agenda da Loja',
+      badge: 'Loja',
+      description: 'Horários, execução com evidência e validações',
+      icon: Calendar,
+      highlight: true,
     },
     {
       to: '/validades',
       label: 'Validades',
       badge: 'Auditoria',
-      description: 'Conferência de produtos e lotes críticos',
+      description: 'Conferência de lotes críticos e prevenção',
       icon: CalendarCheck,
+    },
+    {
+      to: '/comercial',
+      label: 'Comercial da Loja',
+      badge: 'Gôndola',
+      description: 'Rupturas, produtos sem venda e reposição',
+      icon: TrendingUp,
+    },
+    {
+      to: '/rotinas',
+      label: 'Rotinas & Padrões',
+      badge: 'Padrão',
+      description: 'Consulte os padrões de execução da loja',
+      icon: ListChecks,
     },
   ]
 
-  // Atalhos para Perfil Gestor / Líder / Admin
-  const shortcutsGestao: HubShortcut[] = [
+  // Atalhos para Perfil ADM de Rede (amplo, visão multi-lojas e comercial completo)
+  const shortcutsRede: HubShortcut[] = [
     {
       to: '/agenda',
       label: 'Agenda',
@@ -224,7 +228,7 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
       : []),
   ]
 
-  const shortcuts = eCampo ? shortcutsCampo : shortcutsGestao
+  const shortcuts = isGerente ? shortcutsGerente : shortcutsRede
 
   const primeFirstName = (user.name || '').trim().split(/\s+/)[0] || 'Líder'
 
@@ -248,7 +252,7 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
                   Acesso Rápido
                 </span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
-                  {eCampo ? 'Perfil Operacional' : 'Perfil Gestão'}
+                  {isGerente ? 'Modelo Gerente (CPF)' : 'Modelo ADM de Rede (CNPJ)'}
                 </span>
               </div>
               <h2
@@ -278,7 +282,7 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
         <div className="p-4 sm:p-6 overflow-y-auto">
           <div
             className={`grid gap-3 ${
-              eCampo ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+              isGerente ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
             }`}
           >
             {shortcuts.map((shortcut) => {

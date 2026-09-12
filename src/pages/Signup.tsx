@@ -1,17 +1,20 @@
 import React, { useState } from 'react'
 import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import type { ProfileType } from '@/types'
 import {
   AlertCircle,
   Building2,
   Lock,
   Mail,
   User,
+  UserCheck,
   CheckCircle2,
   ArrowLeft,
   Boxes,
   HelpCircle,
   AlertTriangle,
+  Info,
 } from 'lucide-react'
 import { VAREJO_SEGMENTOS } from '@/components/EnquadramentoClienteCard'
 import {
@@ -27,16 +30,25 @@ export default function Signup() {
   const location = useLocation()
 
   // State vindo da Landing Page (/bem-vindo) via query params ou history state
-  const stateData = (location.state as { tipoPessoa?: 'PF' | 'PJ'; segmento?: string }) || {}
+  const stateData =
+    (location.state as {
+      tipoPessoa?: 'PF' | 'PJ'
+      segmento?: string
+      profileType?: ProfileType
+    }) || {}
   const paramTipo = (searchParams.get('tipo') as 'PF' | 'PJ') || stateData.tipoPessoa
+  const paramProfileType = (searchParams.get('perfil') as ProfileType) || stateData.profileType
   const paramSegmento = searchParams.get('segmento') || stateData.segmento
 
   const initialTipoPessoa: 'PF' | 'PJ' = paramTipo === 'PF' ? 'PF' : 'PJ'
+  const initialProfileType: ProfileType =
+    paramProfileType || (paramTipo === 'PF' ? 'gerente' : 'rede')
   const initialSegmento = paramSegmento || 'Moda e Vestuário'
-  const hasPreselectedEnquadramento = Boolean(paramTipo || paramSegmento)
+  const hasPreselectedEnquadramento = Boolean(paramTipo || paramSegmento || paramProfileType)
 
   const [name, setName] = useState('')
   const [empresa, setEmpresa] = useState('')
+  const [profileType, setProfileType] = useState<ProfileType>(initialProfileType)
   const [tipoPessoa, setTipoPessoa] = useState<'PF' | 'PJ'>(initialTipoPessoa)
   const [segmento, setSegmento] = useState<string>(initialSegmento)
   const [outroSegmento, setOutroSegmento] = useState<string>(
@@ -106,22 +118,27 @@ export default function Signup() {
     try {
       // Se não preencheu explicitamente a empresa mas veio da landing com interesse definido,
       // usa o nome pessoal ou uma denominação padrão para que o cliente seja criado com o enquadramento
+      const finalTipoPessoa = profileType === 'gerente' ? 'PF' : 'PJ'
       const nomeEmpresaFinal =
         empresa.trim() ||
-        (tipoPessoa === 'PF' ? `Operação ${name.trim()}` : `Rede / Loja de ${name.trim()}`)
+        (profileType === 'gerente' ? `Operação ${name.trim()}` : `Rede / Loja de ${name.trim()}`)
 
       await signup(
         email,
         password,
         name,
         nomeEmpresaFinal,
-        tipoPessoa,
+        finalTipoPessoa,
         finalSegmento,
         infoNegocio,
         gargalos,
         inventarioSituacao,
+        profileType,
       )
-      navigate('/agenda', { replace: true })
+      // Direcionamento pós-cadastro conforme o perfil escolhido:
+      // Gerente -> /meu-dia (enxuto, chão de loja)
+      // Rede -> /agenda (amplo, administrativo)
+      navigate(profileType === 'gerente' ? '/meu-dia' : '/agenda', { replace: true })
     } catch (err: unknown) {
       const errorObj = err as {
         data?: { data?: Record<string, { message: string }> }
@@ -209,16 +226,18 @@ export default function Signup() {
             <div className="flex items-center justify-between">
               <span className="font-semibold text-[#0F766E] flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-[#0F766E]" />
-                Enquadramento definido na apresentação:
+                Perfil selecionado:
               </span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-[#0F766E]">
-                {tipoPessoa}
+                {profileType === 'rede' ? 'CNPJ • ADM de Rede' : 'CPF • Gerente'}
               </span>
             </div>
             <p className="text-[#374151] mt-1 text-[11px]">
-              Perfil:{' '}
+              Modelo do App:{' '}
               <strong className="text-[#1F2937]">
-                {tipoPessoa === 'PF' ? 'Pessoa Física (PF)' : 'Pessoa Jurídica (CNPJ)'}
+                {profileType === 'rede'
+                  ? 'ADM de Rede (amplo, multi-lojas e comercial)'
+                  : 'Gerente de Loja (enxuto, rotinas diárias e chão de loja)'}
               </strong>{' '}
               • Segmento:{' '}
               <strong className="text-[#1F2937]">
@@ -227,6 +246,16 @@ export default function Signup() {
             </p>
           </div>
         )}
+
+        {/* Aviso de modelo demonstrativo configurável */}
+        <div className="mb-5 p-3 rounded-xl bg-amber-50/70 border border-amber-200 text-xs text-amber-950 flex items-start gap-2">
+          <Info className="w-4 h-4 shrink-0 text-amber-700 mt-0.5" />
+          <p className="leading-relaxed text-[11px]">
+            <strong>Aviso importante:</strong> Você verá um modelo de demonstração inicial. Sendo
+            REDE ou profissional, você configura demandas, rotinas e indicadores conforme suas
+            opções e prioridades — ou nos envia que entregamos tudo pronto.
+          </p>
+        </div>
 
         {/* General Error Banner */}
         {fieldErrors.general && (
@@ -238,6 +267,82 @@ export default function Signup() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* SELETOR DE PERFIL: CNPJ vs CPF (Requisito 1) */}
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-2">
+              Como você irá usar o VivaVarejo?
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Opção 1: REDE / Empresa (CNPJ) */}
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileType('rede')
+                  setTipoPessoa('PJ')
+                }}
+                className={`p-3.5 rounded-xl border text-left transition-all ${
+                  profileType === 'rede'
+                    ? 'border-[#0F766E] bg-teal-50 ring-2 ring-[#0F766E]/20'
+                    : 'border-[#E5E7EB] bg-white hover:border-[#0F766E]/40'
+                }`}
+              >
+                <div className="flex items-start justify-between mb-1.5">
+                  <div
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      profileType === 'rede'
+                        ? 'bg-[#0F766E] text-white'
+                        : 'bg-teal-50 text-[#0F766E]'
+                    }`}
+                  >
+                    <Building2 className="w-4 h-4" />
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-[#0F766E]">
+                    CNPJ
+                  </span>
+                </div>
+                <div className="text-xs font-bold text-[#1F2937]">Sou REDE / empresa (CNPJ)</div>
+                <p className="text-[11px] text-[#4B5563] mt-1 leading-snug">
+                  Modelo ADM de Rede: multi-lojas, visão corporativa, Comercial completo e gestão de
+                  usuários.
+                </p>
+              </button>
+
+              {/* Opção 2: Profissional / Gerente (CPF) */}
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileType('gerente')
+                  setTipoPessoa('PF')
+                }}
+                className={`p-3.5 rounded-xl border text-left transition-all ${
+                  profileType === 'gerente'
+                    ? 'border-[#0F766E] bg-teal-50 ring-2 ring-[#0F766E]/20'
+                    : 'border-[#E5E7EB] bg-white hover:border-[#0F766E]/40'
+                }`}
+              >
+                <div className="flex items-start justify-between mb-1.5">
+                  <div
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      profileType === 'gerente'
+                        ? 'bg-[#0F766E] text-white'
+                        : 'bg-teal-50 text-[#0F766E]'
+                    }`}
+                  >
+                    <UserCheck className="w-4 h-4" />
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-[#0F766E]">
+                    CPF
+                  </span>
+                </div>
+                <div className="text-xs font-bold text-[#1F2937]">Sou profissional (CPF)</div>
+                <p className="text-[11px] text-[#4B5563] mt-1 leading-snug">
+                  Modelo GERENTE: enxuto, foco na operação diária da loja, agenda/Meu Dia e
+                  validações.
+                </p>
+              </button>
+            </div>
+          </div>
+
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
               Nome completo
@@ -283,67 +388,46 @@ export default function Signup() {
             </p>
           </div>
 
-          {/* Se veio com enquadramento da landing, os campos de enquadramento já estão preenchidos.
-              Mostramos os seletores se o usuário quiser alterar ou se não veio da landing */}
-          {(empresa.trim().length > 0 || !hasPreselectedEnquadramento) && (
-            <div className="space-y-2 p-3 bg-[#F7F7F5] rounded-xl border border-[#E5E7EB]">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#374151] mb-1">
-                    Tipo de Perfil
-                  </label>
-                  <select
-                    value={tipoPessoa}
-                    onChange={(e) => setTipoPessoa(e.target.value as 'PF' | 'PJ')}
-                    className="w-full px-2 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-lg outline-none text-[#1F2937]"
-                  >
-                    <option value="PJ">Pessoa Jurídica (PJ)</option>
-                    <option value="PF">Pessoa Física (PF)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#374151] mb-1">
-                    Segmento
-                  </label>
-                  <select
-                    value={
-                      (VAREJO_SEGMENTOS as readonly string[]).includes(segmento)
-                        ? segmento
-                        : 'Outro'
-                    }
-                    onChange={(e) => {
-                      const val = e.target.value
-                      setSegmento(val)
-                      if (val !== 'Outro') setOutroSegmento('')
-                    }}
-                    className="w-full px-2 py-1.5 text-xs bg-white border border-[#E5E7EB] rounded-lg outline-none text-[#1F2937]"
-                  >
-                    {VAREJO_SEGMENTOS.map((seg) => (
-                      <option key={seg} value={seg}>
-                        {seg}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {segmento === 'Outro' && (
-                <div className="pt-1">
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#374151] mb-1">
-                    Especifique o segmento
-                  </label>
-                  <input
-                    type="text"
-                    value={outroSegmento}
-                    onChange={(e) => setOutroSegmento(e.target.value)}
-                    placeholder="Ex: Ótica, Joalheria, etc."
-                    className="w-full px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-lg outline-none text-[#1F2937]"
-                  />
-                </div>
-              )}
+          {/* Segmento do varejo */}
+          <div className="space-y-2 p-3 bg-[#F7F7F5] rounded-xl border border-[#E5E7EB]">
+            <div>
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#374151] mb-1">
+                Segmento de Atuação
+              </label>
+              <select
+                value={
+                  (VAREJO_SEGMENTOS as readonly string[]).includes(segmento) ? segmento : 'Outro'
+                }
+                onChange={(e) => {
+                  const val = e.target.value
+                  setSegmento(val)
+                  if (val !== 'Outro') setOutroSegmento('')
+                }}
+                className="w-full px-2.5 py-2 text-xs bg-white border border-[#E5E7EB] rounded-lg outline-none text-[#1F2937]"
+              >
+                {VAREJO_SEGMENTOS.map((seg) => (
+                  <option key={seg} value={seg}>
+                    {seg}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
+
+            {segmento === 'Outro' && (
+              <div className="pt-1">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#374151] mb-1">
+                  Especifique o segmento
+                </label>
+                <input
+                  type="text"
+                  value={outroSegmento}
+                  onChange={(e) => setOutroSegmento(e.target.value)}
+                  placeholder="Ex: Ótica, Joalheria, etc."
+                  className="w-full px-2.5 py-1.5 text-xs bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-lg outline-none text-[#1F2937]"
+                />
+              </div>
+            )}
+          </div>
 
           {/* Seção de Diagnóstico Operacional: Informações do negócio, gargalos e inventário */}
           <div className="pt-2 border-t border-[#E5E7EB] space-y-3.5">

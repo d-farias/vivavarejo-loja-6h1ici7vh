@@ -2,9 +2,10 @@ import React, { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import pb from '@/lib/pocketbase/client'
-import { isPerfilCampo } from '@/lib/perfil-utils'
+import { getUserProfileType } from '@/lib/perfil-utils'
 import { triggerQuickAccessHub } from '@/components/QuickAccessHubModal'
 import { AlertCircle, Lock, Mail, CheckCircle2, KeyRound, ArrowLeft, Info } from 'lucide-react'
+import type { User } from '@/types'
 
 export default function Login() {
   const { login } = useAuth()
@@ -62,15 +63,15 @@ export default function Login() {
       // Dispara exibição do hub de acesso rápido logo após o login
       triggerQuickAccessHub()
 
-      // Direcionamento inteligente conforme item 4 da especificação:
-      // Gestores -> /agenda; Campo (promotores, repositores, funcionários operacionais) -> /meu-dia.
-      // Se o usuário tentava acessar uma página específica diretamente, honra essa rota.
+      // Direcionamento inteligente conforme modelo do perfil do cadastro:
+      // Gerente (CPF) -> /meu-dia (enxuto, chão de loja)
+      // Rede (CNPJ) -> /agenda (amplo, administrativo)
       if (hasSpecificFrom) {
         navigate(stateFrom!, { replace: true })
       } else {
-        const loggedUser = pb.authStore.record as any
-        const eCampo = isPerfilCampo(loggedUser)
-        navigate(eCampo ? '/meu-dia' : '/agenda', { replace: true })
+        const loggedUser = pb.authStore.record as unknown as User
+        const profileType = getUserProfileType(loggedUser)
+        navigate(profileType === 'gerente' ? '/meu-dia' : '/agenda', { replace: true })
       }
     } catch (err: unknown) {
       const errorObj = err as {
