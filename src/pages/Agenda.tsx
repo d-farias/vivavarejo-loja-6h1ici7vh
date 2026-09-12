@@ -9,6 +9,8 @@ import { ConcluirVisitaModal } from '@/components/ConcluirVisitaModal'
 import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
 import { isPlanoAtrasado } from '@/components/PlanosAcaoCard'
 import { isVisitaAtrasada } from '@/services/visitasPromotor'
+import { SeletorSegmentoModal, SegmentoAtivoBadge } from '@/components/SeletorSegmentoModal'
+import { segmentosService } from '@/services/segmentos'
 import { getHorarioStatus } from '@/lib/time-utils'
 import { AgendaMinhaEquipeSecao } from '@/components/AgendaMinhaEquipeSecao'
 import { OfflineStatusIndicator } from '@/components/OfflineStatusIndicator'
@@ -42,6 +44,8 @@ export default function AgendaDefault() {
 
   // Data atual da visualização da Agenda (padrão hoje)
   const [currentDateStr, setCurrentDateStr] = useState<string>(() => getTodayDateString())
+  const [seletorSegmentoOpen, setSeletorSegmentoOpen] = useState(false)
+  const segmentoAtivoUsuario = segmentosService.getSegmentoAtivo(user)
 
   // Estados de dados
   const [rotinas, setRotinas] = useState<Rotina[]>([])
@@ -89,8 +93,9 @@ export default function AgendaDefault() {
         return
       }
 
-      const [r, e, v, rp, p] = await Promise.all([
-        rotinasService.getAll(lojaSelecionadaId),
+      const segAtivo = segmentosService.getSegmentoAtivo(user)
+      const [allR, e, v, rp, p] = await Promise.all([
+        rotinasService.getAll(lojaSelecionadaId, { apenasAtivas: true }),
         execucoesService.getExecutionsByDate(currentDateStr).catch(() => [] as ExecucaoRotina[]),
         visitasPromotorService
           .getAll(lojaSelecionadaId || undefined)
@@ -100,6 +105,8 @@ export default function AgendaDefault() {
           .catch(() => [] as RotinaPromotor[]),
         planosAcaoService.getAll(lojaSelecionadaId).catch(() => [] as PlanoAcao[]),
       ])
+
+      const r = segmentosService.filtrarRotinasAtivasPorSegmento(allR, segAtivo)
 
       setRotinas(r)
       setExecucoes(e)
@@ -350,10 +357,11 @@ export default function AgendaDefault() {
       {/* Top Header & Store Selector */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-[#E5E7EB]">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F2937]">
               Agenda Operacional do Dia
             </h1>
+            <SegmentoAtivoBadge onTrocarSegmento={() => setSeletorSegmentoOpen(true)} />
           </div>
           <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">
             Ordem cronológica das rotinas, horários limite, visitas de promotores e planos de ação
@@ -834,6 +842,17 @@ export default function AgendaDefault() {
           subtitulo={visualizarFoto.subtitulo}
         />
       )}
+
+      {/* Modal de Escolha/Troca de Segmento do Varejo */}
+      <SeletorSegmentoModal
+        open={seletorSegmentoOpen || !segmentoAtivoUsuario}
+        obrigatorio={!segmentoAtivoUsuario}
+        onOpenChange={setSeletorSegmentoOpen}
+        onSuccess={async () => {
+          setSeletorSegmentoOpen(false)
+          await loadData()
+        }}
+      />
     </div>
   )
 }

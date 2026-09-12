@@ -15,10 +15,11 @@ export interface SignupExtraOptions {
   profileType?: ProfileType
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null
   token: string | null
   loading: boolean
+  refreshUser: () => Promise<User | null>
   login: (email: string, pass: string) => Promise<void>
   signup: (
     email: string,
@@ -194,6 +195,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await login(email, pass)
   }
 
+  const refreshUser = async (): Promise<User | null> => {
+    if (!pb.authStore.record?.id) return null
+    try {
+      const fresh = await pb.collection('users').getOne<User>(pb.authStore.record.id, {
+        expand: 'cliente',
+      })
+      setUser(fresh)
+      return fresh
+    } catch {
+      return user
+    }
+  }
+
   const logout = () => {
     pb.authStore.clear()
     setUser(null)
@@ -201,7 +215,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, refreshUser, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   )

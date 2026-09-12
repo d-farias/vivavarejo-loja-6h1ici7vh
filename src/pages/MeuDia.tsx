@@ -26,6 +26,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { CardTarefaEnxuto } from '@/components/CardTarefaEnxuto'
 import { ExecucaoGuiadaModal, ExecucaoGuiadaResult } from '@/components/ExecucaoGuiadaModal'
 import { ConcluirVisitaModal } from '@/components/ConcluirVisitaModal'
+import { SeletorSegmentoModal, SegmentoAtivoBadge } from '@/components/SeletorSegmentoModal'
+import { segmentosService } from '@/services/segmentos'
 import { StoreSelector } from '@/components/StoreSelector'
 import { OfflineStatusIndicator } from '@/components/OfflineStatusIndicator'
 import { useAuth } from '@/context/AuthContext'
@@ -48,6 +50,8 @@ export function MeuDiaPage() {
   const { user } = useAuth()
   const { lojaSelecionada, lojaSelecionadaId } = useStore()
   const navigate = useNavigate()
+  const [seletorSegmentoOpen, setSeletorSegmentoOpen] = useState(false)
+  const segmentoAtivoUsuario = segmentosService.getSegmentoAtivo(user)
 
   const [loading, setLoading] = useState(true)
   const [rotinas, setRotinas] = useState<Rotina[]>([])
@@ -127,13 +131,15 @@ export function MeuDiaPage() {
       }
 
       // 2. Busca dados frescos da rede
+      const segAtivo = segmentosService.getSegmentoAtivo(user)
       const [rotList, exList, visList] = await Promise.all([
-        rotinasService.getAll(lojaId),
+        rotinasService.getAll(lojaId, { apenasAtivas: true }),
         execucoesService.getExecutionsByDate(hojeStr),
         visitasPromotorService.getAll(lojaId),
       ])
 
-      const ativas = rotList.filter((r) => r.status === 'Ativa')
+      const rotinasDoSegmento = segmentosService.filtrarRotinasAtivasPorSegmento(rotList, segAtivo)
+      const ativas = rotinasDoSegmento.filter((r) => r.status === 'Ativa')
       setRotinas(ativas)
       setExecucoes(exList)
       setVisitas(visList)
@@ -944,6 +950,17 @@ export function MeuDiaPage() {
           }}
         />
       )}
+
+      {/* Modal de Escolha/Troca de Segmento do Varejo */}
+      <SeletorSegmentoModal
+        open={seletorSegmentoOpen || !segmentoAtivoUsuario}
+        obrigatorio={!segmentoAtivoUsuario}
+        onOpenChange={setSeletorSegmentoOpen}
+        onSuccess={async () => {
+          setSeletorSegmentoOpen(false)
+          await carregarDados()
+        }}
+      />
     </div>
   )
 }

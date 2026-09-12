@@ -10,12 +10,16 @@ export function getTodayDateString(): string {
 }
 
 export const rotinasService = {
-  async getAll(lojaId?: string | null): Promise<Rotina[]> {
-    let filter = ''
+  async getAll(lojaId?: string | null, options?: { apenasAtivas?: boolean }): Promise<Rotina[]> {
+    const filters: string[] = []
     if (lojaId && lojaId !== 'todas') {
-      // Rotinas da loja específica OU rotinas sem loja (compatibilidade legada)
-      filter = `loja = "${lojaId}" || loja = ""`
+      filters.push(`(loja = "${lojaId}" || loja = "")`)
     }
+    if (options?.apenasAtivas) {
+      filters.push(`ativo = true`)
+    }
+
+    const filter = filters.length > 0 ? filters.join(' && ') : ''
 
     const list = await pb.collection('rotinas').getFullList<Rotina>({
       filter: filter || undefined,

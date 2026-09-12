@@ -12,6 +12,8 @@ import { StoreSelector } from '@/components/StoreSelector'
 import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
 import { BotaoAvisoWhatsApp } from '@/components/BotaoAvisoWhatsApp'
 import { ModelosSegmentoVitrine } from '@/components/ModelosSegmentoVitrine'
+import { SeletorSegmentoModal, SegmentoAtivoBadge } from '@/components/SeletorSegmentoModal'
+import { segmentosService } from '@/services/segmentos'
 import { clientesService } from '@/services/clientes'
 import { funcoesService } from '@/services/funcoes'
 import { modelosRotinasService } from '@/services/modelosRotinas'
@@ -70,6 +72,10 @@ export default function Rotinas() {
   // Controle da seção recolhível de Departamentos e Funções (inicia recolhida para poupar espaço no mobile)
   const [departamentosAberto, setDepartamentosAberto] = useState<boolean>(false)
 
+  // Modal de escolha de segmento amigável
+  const [seletorSegmentoOpen, setSeletorSegmentoOpen] = useState(false)
+  const segmentoAtivoUsuario = segmentosService.getSegmentoAtivo(user)
+
   // Controle de escolha do modelo na biblioteca para exibir rotinas
   // Inicia sempre neutro (null): o usuário precisa tocar/escolher um modelo na biblioteca
   const [modeloSelecionado, setModeloSelecionado] = useState<ModeloComContagem | null>(null)
@@ -93,8 +99,9 @@ export default function Rotinas() {
     if (!user) return
     setError(false)
     try {
+      const segAtivo = segmentosService.getSegmentoAtivo(user)
       const [allRoutines, todayExecs, allClientes, funcs] = await Promise.all([
-        rotinasService.getAll(lojaSelecionadaId),
+        rotinasService.getAll(lojaSelecionadaId, { apenasAtivas: true }),
         execucoesService.getTodayExecutions(user.id),
         clientesService.getAll().catch(() => [] as Cliente[]),
         (lojaSelecionadaId && lojaSelecionadaId !== 'todas'
@@ -102,7 +109,12 @@ export default function Rotinas() {
           : funcoesService.getAll()
         ).catch(() => [] as Funcao[]),
       ])
-      setRotinas(allRoutines)
+      // Filtra estritamente pelo segmento ativo do usuário
+      const rotinasFiltradasPorSegmento = segmentosService.filtrarRotinasAtivasPorSegmento(
+        allRoutines,
+        segAtivo,
+      )
+      setRotinas(rotinasFiltradasPorSegmento)
       setExecucoes(todayExecs)
       setClientes(allClientes)
       setFuncoesLoja(funcs)
@@ -213,39 +225,32 @@ export default function Rotinas() {
   }, [modeloSelecionado])
 
   // CONCILIAÇÃO COM A LOJA:
-  // Rotinas EFETIVAMENTE CONCILIADAS com a loja para o modelo selecionado.
-  // Regra de negócio:
-  // - O usuário importou a planilha com as funções no contexto de Supermercado/Food.
-  // - Para Supermercado/Food: as rotinas cadastradas/importadas na loja são as rotinas conciliadas deste modelo.
-  // - Para os demais modelos (Farmácia, Moda, etc.): só há rotinas conciliadas se a loja tiver rotinas cadastradas
-  //   que correspondam explicitamente aos itens desse modelo (ou que foram geradas ao aplicar o modelo na loja).
-  // - NUNCA derivar rotinas da loja a partir do catálogo global do modelo.
+  // Rotinas do segmento ativo que combinam com o modelo selecionado na vitrine
+  // Se o modelo selecionado pertencer ao segmento ativo, exibe as rotinas ativas da loja.
   const rotinasConciliadas = useMemo(() => {
     if (!modeloSelecionado) return []
 
-    // Helper para verificar se o modelo selecionado é Supermercado/Food (ou alimentício padrão)
-    const seg = (modeloSelecionado.segmento || '').toLowerCase()
-    const nome = (modeloSelecionado.nome || '').toLowerCase()
-    const isModeloSupermercado =
-      seg.includes('supermercado') ||
-      seg.includes('food') ||
-      seg.includes('alimentar') ||
-      nome.includes('supermercado') ||
-      nome.includes('food')
+    const segAtivo = segmentosService.getSegmentoAtivo(user)
+    if (!segAtivo) return []
 
-    if (isModeloSupermercado) {
-      // No modelo Supermercado/Food, as rotinas operacionais cadastradas na loja (importadas da planilha)
-      // são as rotinas conciliadas de fato.
+    // Normaliza segmento do modelo e compara com o segmento ativo
+    const segModeloNorm =
+      segmentosService.getInfo(modeloSelecionado.segmento)?.id || modeloSelecionado.segmento
+
+    // Se o modelo for do segmento ativo, exibe as rotinas ativas da loja
+    if (
+      segmentosService.getInfo(segAtivo)?.id === segModeloNorm ||
+      (modeloSelecionado.segmento &&
+        modeloSelecionado.segmento.toLowerCase().includes(segAtivo.toLowerCase()))
+    ) {
       return rotinas
     }
 
-    // Para outros modelos de negócio: concilia APENAS rotinas que foram efetivamente aplicadas /
-    // pertencentes à loja e que correspondam aos itens deste modelo específico.
+    // Caso contrário, busca correspondência com os itens do catálogo
     if (itensCatalogoModelo.length === 0) return []
-
     const itensNomes = new Set(itensCatalogoModelo.map((it) => it.nome.trim().toLowerCase()))
     return rotinas.filter((r) => itensNomes.has((r.nome || '').trim().toLowerCase()))
-  }, [modeloSelecionado, rotinas, itensCatalogoModelo])
+  }, [modeloSelecionado, rotinas, user, itensCatalogoModelo])
 
   // Define se a loja já possui conciliação ativa para o modelo selecionado
   const isConciliado = rotinasConciliadas.length > 0
@@ -585,9 +590,12 @@ export default function Rotinas() {
       {/* Header Row: Título + Seletor de Loja + Ações de Gestão */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#1F2937] tracking-tight">
-            Rotinas Operacionais
-          </h1>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#1F2937] tracking-tight">
+              Rotinas Operacionais
+            </h1>
+            <SegmentoAtivoBadge onTrocarSegmento={() => setSeletorSegmentoOpen(true)} />
+          </div>
           <p className="text-sm text-[#6B7280] mt-1">
             {lojaSelecionada
               ? `Acompanhamento e catálogo de rotinas ativas para ${lojaSelecionada.nome}.`
@@ -1640,6 +1648,17 @@ export default function Rotinas() {
         execucao={visualizarFotoExecucao?.execucao || null}
         rotina={visualizarFotoExecucao?.rotina || null}
         onClose={() => setVisualizarFotoExecucao(null)}
+      />
+
+      {/* Modal de Escolha/Troca de Segmento do Varejo */}
+      <SeletorSegmentoModal
+        open={seletorSegmentoOpen || !segmentoAtivoUsuario}
+        obrigatorio={!segmentoAtivoUsuario}
+        onOpenChange={setSeletorSegmentoOpen}
+        onSuccess={async () => {
+          setSeletorSegmentoOpen(false)
+          await loadData()
+        }}
       />
     </div>
   )

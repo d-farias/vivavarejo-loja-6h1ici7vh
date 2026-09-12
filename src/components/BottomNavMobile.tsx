@@ -1,6 +1,8 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { CalendarDays, Store, CheckSquare, Menu, Home, Flame } from 'lucide-react'
+import { useAuth } from '@/context/AuthContext'
+import { segmentosService } from '@/services/segmentos'
 
 interface BottomNavMobileProps {
   isCampo: boolean
@@ -53,7 +55,15 @@ export function BottomNavMobile({ isCampo, onOpenMais }: BottomNavMobileProps) {
     },
   ]
 
-  const items = isCampo ? campoItems : gestaoItems
+  const { user } = useAuth()
+  const segmentoAtivo = segmentosService.getSegmentoAtivo(user)
+  const temSegmentoDefinido = Boolean(segmentoAtivo)
+
+  // Se não definiu o segmento, oculta rotinas/agenda/meu-dia da barra rápida
+  const baseItems = isCampo ? campoItems : gestaoItems
+  const items = temSegmentoDefinido
+    ? baseItems
+    : baseItems.filter((i) => i.to !== '/agenda' && i.to !== '/meu-dia' && i.to !== '/rotinas')
 
   return (
     <nav

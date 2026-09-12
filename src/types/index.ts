@@ -16,6 +16,7 @@ export interface User extends RecordModel {
   cliente?: string // ID do Cliente/Rede vinculado (obrigatório para adm_rede)
   ativo?: boolean
   primeiro_acesso_notificado?: boolean
+  segmento?: string // Segmento do varejo selecionado pelo usuário
   created: string
   updated: string
   expand?: {
@@ -135,6 +136,8 @@ export interface Rotina extends RecordModel {
   prioridade_dia?: number
   adiada_para_data?: string
   adiada_para_horario?: string
+  segmento?: string // Segmento de atuação vinculado (ex: Supermercado/Food, Farmácia & Drogaria)
+  ativo?: boolean // Status de ativação da rotina no segmento corrente
   expand?: {
     loja?: Loja
     funcao?: Funcao

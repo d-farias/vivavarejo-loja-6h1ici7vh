@@ -26,6 +26,7 @@ import {
   Smartphone,
   GitBranch,
   TrendingUp,
+  SlidersHorizontal,
 } from 'lucide-react'
 import { ChangePasswordModal } from '@/components/ChangePasswordModal'
 import { FalarEspecialistaModal } from '@/components/FalarEspecialistaModal'
@@ -36,6 +37,8 @@ import { QuickAccessHubModal } from '@/components/QuickAccessHubModal'
 import { ModeloDemonstrativoBanner } from '@/components/ModeloDemonstrativoBanner'
 import { getUserProfileType } from '@/lib/perfil-utils'
 import { usePwaInstall } from '@/hooks/use-pwa-install'
+import { segmentosService } from '@/services/segmentos'
+import { SeletorSegmentoModal } from '@/components/SeletorSegmentoModal'
 import { useAutoLogout } from '@/hooks/use-auto-logout'
 
 export default function Layout() {
@@ -46,6 +49,7 @@ export default function Layout() {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
   const [falarEspecialistaOpen, setFalarEspecialistaOpen] = useState(false)
   const [pwaModalOpen, setPwaModalOpen] = useState(false)
+  const [seletorSegmentoOpen, setSeletorSegmentoOpen] = useState(false)
 
   // Perfil operacional x gestão
   const emailLower = (user?.email || '').toLowerCase()
@@ -143,7 +147,18 @@ export default function Layout() {
       : []),
   ]
 
-  const navLinks = isGerente ? navLinksGerente : navLinksRede
+  const segmentoAtivo = segmentosService.getSegmentoAtivo(user)
+  const temSegmentoDefinido = Boolean(segmentoAtivo)
+
+  // Requisito 3: "Quando o usuário ainda não definiu o segmento, mostrar esse componente em destaque
+  // e OCULTAR do menu os módulos que dependem de definição (rotinas/agenda), conforme pedido:
+  // 'até definir mantenha links ocultos'."
+  const allNavLinks = isGerente ? navLinksGerente : navLinksRede
+  const navLinks = temSegmentoDefinido
+    ? allNavLinks
+    : allNavLinks.filter(
+        (link) => link.to !== '/rotinas' && link.to !== '/agenda' && link.to !== '/meu-dia',
+      )
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F7F7F5] text-[#1F2937]">
@@ -171,6 +186,21 @@ export default function Layout() {
               <>
                 {/* Indicador de status Offline / Online e fila de envio */}
                 <OfflineStatusIndicator compact />
+
+                {/* Botão de Trocar Segmento no Topo para Acesso Fácil */}
+                <button
+                  type="button"
+                  onClick={() => setSeletorSegmentoOpen(true)}
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] hover:text-[#0F766E] text-[#374151] shadow-2xs transition-colors"
+                  title={
+                    segmentoAtivo
+                      ? `Ramo: ${segmentoAtivo}. Clique para trocar.`
+                      : 'Escolha o ramo da sua loja'
+                  }
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#0F766E]" />
+                  <span>{segmentoAtivo ? `Ramo: ${segmentoAtivo}` : 'Definir Ramo'}</span>
+                </button>
 
                 <button
                   type="button"
@@ -397,6 +427,18 @@ export default function Layout() {
           onOpenChange={setChangePasswordOpen}
           userEmail={user.email}
           userId={user.id}
+        />
+      )}
+
+      {/* Modal de Escolha de Segmento (Obrigatório se não definido ou voluntário se clicado no botão) */}
+      {!isAuthPage && user && (
+        <SeletorSegmentoModal
+          open={seletorSegmentoOpen || !temSegmentoDefinido}
+          obrigatorio={!temSegmentoDefinido}
+          onOpenChange={setSeletorSegmentoOpen}
+          onSuccess={() => {
+            setSeletorSegmentoOpen(false)
+          }}
         />
       )}
 

@@ -234,6 +234,9 @@ export const modelosRotinasService = {
   ): Promise<{ totalAplicadas: number; ignoradasOuAtualizadas: number }> {
     const { modeloId, lojaId, modo, deduplicar = true, onProgress } = options
 
+    const modeloRecord = await pb.collection('modelos_rotinas').getOne<ModeloRotina>(modeloId)
+    const segmentoModelo = modeloRecord.segmento || 'Supermercado/Food'
+
     onProgress?.('Carregando itens do modelo...')
     const itens = await pb.collection('modelos_rotinas_itens').getFullList<ModeloRotinaItem>({
       filter: `modelo = "${modeloId}"`,
@@ -376,6 +379,8 @@ export const modelosRotinasService = {
         status: 'Ativa',
         loja: lojaId,
         funcao: funcaoId || undefined,
+        segmento: segmentoModelo,
+        ativo: true,
       })
 
       // Registrar nova assinatura criada para evitar duplicar itens repetidos no próprio modelo
