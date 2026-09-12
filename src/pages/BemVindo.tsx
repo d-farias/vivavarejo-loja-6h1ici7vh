@@ -301,6 +301,21 @@ export default function BemVindo() {
                 validades, visitas de promotores e sincronização de dados comerciais em uma só
                 plataforma.
               </p>
+
+              {/* Destaque de personalização autônoma pelo cliente */}
+              <div className="pt-1.5 flex justify-center">
+                <div className="inline-flex items-start sm:items-center gap-2.5 text-left sm:text-center text-xs sm:text-sm text-[#1F2937] bg-white/70 border border-[#E5E7EB] border-l-4 border-l-[#0F766E] rounded-r-lg rounded-l-xs px-3.5 py-2.5 max-w-2xl shadow-2xs">
+                  <p className="leading-snug">
+                    <span className="font-semibold text-[#1F2937]">
+                      Cada rede configura o VivaVarejo conforme sua realidade:
+                    </span>{' '}
+                    <span className="text-[#4B5563]">
+                      demandas, rotinas e indicadores definidos por você — e atualizados quando
+                      quiser, na hora que quiser.
+                    </span>
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* CTAs */}
