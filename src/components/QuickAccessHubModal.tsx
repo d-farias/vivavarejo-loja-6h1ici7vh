@@ -15,6 +15,7 @@ import {
   X,
   Compass,
   TrendingUp,
+  Users,
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { getUserProfileType } from '@/lib/perfil-utils'
@@ -154,6 +155,13 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
       icon: TrendingUp,
     },
     {
+      to: '/adm-rh',
+      label: 'Adm / RH',
+      badge: 'Loja',
+      description: 'Demandas com foto para RH, DP, ADM, Financeiro e Fiscal',
+      icon: Users,
+    },
+    {
       to: '/rotinas',
       label: 'Rotinas & Padrões',
       badge: 'Padrão',
@@ -179,6 +187,13 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
       description: 'Rupturas, vendas, curvas A/B/C+, margens e layout',
       icon: TrendingUp,
       highlight: true,
+    },
+    {
+      to: '/adm-rh',
+      label: 'Adm / RH',
+      badge: 'Corporativo',
+      description: 'Triagem e tratamento de demandas de RH, DP, ADM, Financeiro e Fiscal',
+      icon: Users,
     },
     {
       to: '/rotinas',

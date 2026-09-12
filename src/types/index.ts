@@ -696,3 +696,38 @@ export interface ComercialNegociacaoMarco extends RecordModel {
     negociacao?: ComercialNegociacao
   }
 }
+
+// ==================== ADM / RH ====================
+export type SubAreaAdmRh = 'rh' | 'dp' | 'adm' | 'financeiro' | 'fiscal'
+
+export type PrioridadeAdmRh = 'baixa' | 'media' | 'alta' | 'urgente'
+
+export type StatusAdmRh = 'pendente' | 'recebida' | 'em_tratamento' | 'resolvida' | 'cancelada'
+
+export interface AdmRhDemanda extends RecordModel {
+  rede?: string
+  loja?: string
+  sub_area: SubAreaAdmRh
+  titulo: string
+  descricao?: string
+  prioridade: PrioridadeAdmRh
+  prazo?: string // YYYY-MM-DD
+  status: StatusAdmRh
+  responsavel?: string
+  solicitante_nome?: string
+  solicitante_usuario?: string
+  foto?: string
+  resposta_area?: string
+  respondido_por?: string
+  respondido_em?: string
+  foto_resposta?: string
+  categoria_caso_uso?: string
+  is_exemplo?: boolean
+  created: string
+  updated: string
+  expand?: {
+    rede?: Cliente
+    loja?: Loja
+    solicitante_usuario?: User
+  }
+}

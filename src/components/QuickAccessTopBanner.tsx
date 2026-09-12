@@ -12,6 +12,7 @@ import {
   CheckSquare,
   ArrowRight,
   Compass,
+  Users,
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { getUserProfileType } from '@/lib/perfil-utils'
@@ -66,6 +67,13 @@ export function QuickAccessTopBanner({ className = '' }: QuickAccessTopBannerPro
       description: 'Rupturas e sortimento',
       icon: ListChecks,
     },
+    {
+      to: '/adm-rh',
+      label: 'Adm/RH',
+      badge: 'Loja',
+      description: 'Demandas RH, DP, ADM, Fin e Fiscal',
+      icon: Users,
+    },
   ]
 
   // Atalhos para Perfil ADM de Rede (amplo)
@@ -91,6 +99,13 @@ export function QuickAccessTopBanner({ className = '' }: QuickAccessTopBannerPro
       badge: 'Auditorias',
       description: 'Calendário e prevenção',
       icon: CalendarCheck,
+    },
+    {
+      to: '/adm-rh',
+      label: 'Adm / RH',
+      badge: 'Rede',
+      description: 'RH, DP, ADM, Fin e Fiscal',
+      icon: Users,
     },
     {
       to: '/perdas',

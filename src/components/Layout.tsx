@@ -27,6 +27,7 @@ import {
   GitBranch,
   TrendingUp,
   SlidersHorizontal,
+  Users,
 } from 'lucide-react'
 import { ChangePasswordModal } from '@/components/ChangePasswordModal'
 import { FalarEspecialistaModal } from '@/components/FalarEspecialistaModal'
@@ -124,6 +125,7 @@ export default function Layout() {
     { to: '/agenda', label: 'Agenda da Loja', icon: CalendarCheck },
     { to: '/validades', label: 'Validades', icon: ShieldAlert },
     { to: '/comercial', label: 'Comercial Loja', icon: TrendingUp },
+    { to: '/adm-rh', label: 'Adm/RH', icon: Users },
     { to: '/rotinas', label: 'Rotinas & Padrões', icon: ListChecks },
     { to: '/', label: 'Indicadores', icon: LayoutDashboard },
   ]
@@ -133,6 +135,7 @@ export default function Layout() {
     { to: '/rotinas', label: 'Rotinas & Modelos', icon: ListChecks },
     { to: '/validades', label: 'Validade × Calendário', icon: CalendarCheck },
     { to: '/comercial', label: 'Comercial & Negociações', icon: TrendingUp },
+    { to: '/adm-rh', label: 'Adm/RH', icon: Users },
     { to: '/perdas', label: 'Perdas & Inventário', icon: ShieldAlert },
     ...(isLiderOrAdmin ? [{ to: '/promotores', label: 'Promotores', icon: Handshake }] : []),
     { to: '/', label: 'Painel Geral', icon: LayoutDashboard },
@@ -166,8 +169,8 @@ export default function Layout() {
       <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-[#E5E7EB] shadow-2xs transition-colors">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           {/* Logo & Title */}
-          <div className="flex items-center gap-3">
-            <NavLink to="/" className="flex items-center gap-2.5 group">
+          <div className="flex items-center gap-6">
+            <NavLink to="/" className="flex items-center gap-2.5 group shrink-0">
               <div className="w-9 h-9 rounded-xl bg-[#0F766E] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
                 {/* Compact square diamond logo */}
                 <div className="w-4 h-4 border-2 border-white rotate-45 transform" />
@@ -178,6 +181,32 @@ export default function Layout() {
                 </span>
               </div>
             </NavLink>
+
+            {/* Desktop Navigation Links */}
+            {!isAuthPage && user && (
+              <nav className="hidden xl:flex items-center gap-1 overflow-x-auto py-1">
+                {navLinks.map((link) => {
+                  const Icon = link.icon
+                  return (
+                    <NavLink
+                      key={link.to}
+                      to={link.to}
+                      end={link.to === '/'}
+                      className={({ isActive }) =>
+                        `flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
+                          isActive
+                            ? 'bg-[#0F766E] text-white shadow-2xs'
+                            : 'text-[#4B5563] hover:text-[#1F2937] hover:bg-gray-100'
+                        }`
+                      }
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      <span>{link.label}</span>
+                    </NavLink>
+                  )
+                })}
+              </nav>
+            )}
           </div>
 
           {/* Right Action / Avatar */}

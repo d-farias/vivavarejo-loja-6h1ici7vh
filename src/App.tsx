@@ -21,6 +21,7 @@ import NotFound from './pages/NotFound'
 import Validades from './pages/Validades'
 import Perdas from './pages/Perdas'
 import Comercial from './pages/Comercial'
+import AdmRh from './pages/AdmRh'
 
 const DocumentTitleSync = () => {
   const location = useLocation()
@@ -115,6 +116,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Comercial />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/adm-rh"
+                element={
+                  <ProtectedRoute>
+                    <AdmRh />
                   </ProtectedRoute>
                 }
               />

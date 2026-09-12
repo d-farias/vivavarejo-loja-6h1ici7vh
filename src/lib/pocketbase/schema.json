@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-12T01:51:18.596Z",
+  "generatedAt": "2026-09-12T13:20:08.226Z",
   "collections": [
     {
       "name": "users",
@@ -2985,6 +2985,156 @@
         "CREATE INDEX idx_cneg_marco_neg ON comercial_negociacao_marcos (negociacao)",
         "CREATE INDEX idx_cneg_marco_status ON comercial_negociacao_marcos (status)",
         "CREATE INDEX idx_cneg_marco_data ON comercial_negociacao_marcos (data_limite)"
+      ]
+    },
+    {
+      "name": "adm_rh_demandas",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "rede",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "clientes"
+        },
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "sub_area",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["rh", "dp", "adm", "financeiro", "fiscal"]
+        },
+        {
+          "name": "titulo",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "descricao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "prioridade",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["baixa", "media", "alta", "urgente"]
+        },
+        {
+          "name": "prazo",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["pendente", "recebida", "em_tratamento", "resolvida", "cancelada"]
+        },
+        {
+          "name": "responsavel",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "solicitante_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "solicitante_usuario",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resposta_area",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "respondido_por",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "respondido_em",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "foto_resposta",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "categoria_caso_uso",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_exemplo",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_admrh_rede ON adm_rh_demandas (rede)",
+        "CREATE INDEX idx_admrh_loja ON adm_rh_demandas (loja)",
+        "CREATE INDEX idx_admrh_sub_area ON adm_rh_demandas (sub_area)",
+        "CREATE INDEX idx_admrh_status ON adm_rh_demandas (status)",
+        "CREATE INDEX idx_admrh_prioridade ON adm_rh_demandas (prioridade)",
+        "CREATE INDEX idx_admrh_prazo ON adm_rh_demandas (prazo)",
+        "CREATE INDEX idx_admrh_created ON adm_rh_demandas (created)"
       ]
     }
   ]
