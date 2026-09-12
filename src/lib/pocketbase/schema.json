@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-12T00:41:09.209Z",
+  "generatedAt": "2026-09-12T01:00:46.625Z",
   "collections": [
     {
       "name": "users",
@@ -76,6 +76,12 @@
           "required": false,
           "system": false,
           "selectValues": ["rede", "gerente"]
+        },
+        {
+          "name": "cargo",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -444,6 +450,18 @@
           "required": false,
           "system": false,
           "selectValues": ["rede", "gerente"]
+        },
+        {
+          "name": "cnpj",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cargo",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_clientes_nome ON clientes (nome)"]

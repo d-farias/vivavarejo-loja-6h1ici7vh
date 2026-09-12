@@ -10,6 +10,7 @@ export interface User extends RecordModel {
   name?: string
   avatar?: string
   telefone?: string
+  cargo?: string
   perfil?: PerfilUsuario
   profile_type?: ProfileType
   cliente?: string // ID do Cliente/Rede vinculado (obrigatório para adm_rede)
@@ -38,6 +39,8 @@ export type SituacaoInventario = 'rotativo' | 'anual' | 'sem_controle'
 export interface Cliente extends RecordModel {
   nome: string
   contato?: string
+  cnpj?: string
+  cargo?: string
   observacoes?: string
   envio_semanal?: boolean
   tipo_pessoa?: TipoPessoaCliente

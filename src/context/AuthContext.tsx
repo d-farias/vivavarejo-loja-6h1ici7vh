@@ -2,6 +2,19 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import pb from '@/lib/pocketbase/client'
 import type { User, ProfileType } from '@/types'
 
+export interface SignupExtraOptions {
+  telefone?: string
+  cargo?: string
+  cnpj?: string
+  empresa?: string
+  tipoPessoa?: 'PF' | 'PJ'
+  segmento?: string
+  infoNegocio?: string
+  gargalos?: string
+  inventarioSituacao?: string
+  profileType?: ProfileType
+}
+
 interface AuthContextType {
   user: User | null
   token: string | null
@@ -18,6 +31,11 @@ interface AuthContextType {
     gargalos?: string,
     inventarioSituacao?: string,
     profileType?: ProfileType,
+    extraOptions?: {
+      telefone?: string
+      cargo?: string
+      cnpj?: string
+    },
   ) => Promise<void>
   logout: () => void
 }
@@ -120,6 +138,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     gargalos?: string,
     inventarioSituacao?: string,
     profileType?: ProfileType,
+    extraOptions?: {
+      telefone?: string
+      cargo?: string
+      cnpj?: string
+    },
   ) => {
     // Determina profile_type: explícito ou derivado da escolha leiga (PJ = 'rede', PF = 'gerente')
     const finalProfileType: ProfileType = profileType || (tipoPessoa === 'PF' ? 'gerente' : 'rede')
@@ -135,6 +158,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const clienteRecord = await pb.collection('clientes').create({
         nome: empresaTrimmed,
         contato: email.trim(),
+        cnpj: extraOptions?.cnpj?.trim() || undefined,
+        cargo: extraOptions?.cargo?.trim() || undefined,
         tipo_pessoa: tipoPessoa || (finalProfileType === 'gerente' ? 'PF' : 'PJ'),
         profile_type: finalProfileType,
         segmento: segmento || 'Moda e Vestuário',
@@ -157,6 +182,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       password: pass,
       passwordConfirm: pass,
       name: name.trim(),
+      telefone: extraOptions?.telefone?.trim() || undefined,
+      cargo: extraOptions?.cargo?.trim() || undefined,
       perfil: perfilCargo,
       profile_type: finalProfileType,
       cliente: createdClienteId || undefined,
