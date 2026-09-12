@@ -129,6 +129,48 @@ export default function Rotinas() {
     loadData()
   }, [loadData])
 
+  // Escuta evento global de alteração de segmento:
+  // Recarrega os dados da página, reseta o modelo selecionado anterior
+  // e seleciona automaticamente o modelo correspondente ao novo segmento (se houver)
+  useEffect(() => {
+    const handleSegmentoAlterado = async (e: Event) => {
+      const custom = e as CustomEvent<{ segmento?: string }>
+      const novoSeg =
+        custom?.detail?.segmento || (user ? segmentosService.getSegmentoAtivo(user) : '')
+
+      // Reseta filtros e modelo selecionado
+      setSelectedDepartamento('Todos')
+      setSelectedFuncao('Todas')
+      setSelectedFreq('Todas')
+      setSearchTerm('')
+      setModeloSelecionado(null)
+
+      await loadData()
+
+      // Tenta selecionar automaticamente o modelo padrão do novo segmento
+      if (novoSeg) {
+        try {
+          const todosModelos = await modelosRotinasService.getAllComContagem()
+          const modeloDoSegmento = todosModelos.find((m) => {
+            if (m.segmento && m.segmento.toLowerCase() === novoSeg.toLowerCase()) return true
+            if (m.nome.toLowerCase().includes(novoSeg.toLowerCase())) return true
+            return false
+          })
+          if (modeloDoSegmento) {
+            setModeloSelecionado(modeloDoSegmento)
+          }
+        } catch (err) {
+          console.warn('Erro ao auto-selecionar modelo do novo segmento:', err)
+        }
+      }
+    }
+
+    window.addEventListener('vivavarejo:segmento_alterado', handleSegmentoAlterado)
+    return () => {
+      window.removeEventListener('vivavarejo:segmento_alterado', handleSegmentoAlterado)
+    }
+  }, [loadData, user])
+
   // Realtime updates em rotinas (reflete criações, updates, deletes e importações imediatamente)
   useRealtime<Rotina>(
     'rotinas',

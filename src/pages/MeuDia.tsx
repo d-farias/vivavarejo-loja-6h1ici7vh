@@ -176,6 +176,17 @@ export function MeuDiaPage() {
     carregarDados()
   }, [lojaSelecionadaId, hojeStr])
 
+  // Escutar evento global de troca de segmento para atualizar Meu Dia imediatamente
+  useEffect(() => {
+    const handleSegmentoAlterado = () => {
+      carregarDados()
+    }
+    window.addEventListener('vivavarejo:segmento_alterado', handleSegmentoAlterado)
+    return () => {
+      window.removeEventListener('vivavarejo:segmento_alterado', handleSegmentoAlterado)
+    }
+  }, [])
+
   // Mapa de execuções concluídas no dia
   const execMap = useMemo(() => {
     const map = new Map<string, ExecucaoRotina>()

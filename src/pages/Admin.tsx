@@ -916,10 +916,20 @@ export default function Admin() {
 
   const isAdmRede = perfil === 'adm_rede'
   const isAdminGeral = perfil === 'admin'
+  // Gestor Geral interno: dfarias53@gmail.com ou perfil admin interno
+  const isGestorGeral = isAdminGeral || user?.email === 'dfarias53@gmail.com'
 
   // Redireciona se não for admin geral nem adm de rede
   if (!isAdminGeral && !isAdmRede) {
     return <Navigate to="/" replace />
+  }
+
+  // Se o usuário adm_rede tentar acessar diretamente uma aba restrita ao gestor geral, redireciona para painel
+  if (
+    !isGestorGeral &&
+    (activeTab === 'material_venda' || activeTab === 'modelos' || activeTab === 'clientes')
+  ) {
+    setActiveTab('painel')
   }
 
   return (
@@ -1026,23 +1036,25 @@ export default function Admin() {
           <span>Relatórios Loja a Loja</span>
         </button>
 
-        {/* Nova aba: Proposta Comercial & Material de Venda */}
-        <button
-          onClick={() => {
-            setActiveTab('material_venda')
-            setSearchTerm('')
-          }}
-          className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === 'material_venda'
-              ? 'border-[#0F766E] text-[#0F766E]'
-              : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
-          }`}
-        >
-          <Presentation className="w-4 h-4" />
-          <span>Proposta Comercial</span>
-        </button>
+        {/* Nova aba: Proposta Comercial & Material de Venda (Restrito ao Gestor Geral) */}
+        {isGestorGeral && (
+          <button
+            onClick={() => {
+              setActiveTab('material_venda')
+              setSearchTerm('')
+            }}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+              activeTab === 'material_venda'
+                ? 'border-[#0F766E] text-[#0F766E]'
+                : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
+            }`}
+          >
+            <Presentation className="w-4 h-4" />
+            <span>Proposta Comercial</span>
+          </button>
+        )}
 
-        {/* Nova aba: Modelos de Rotinas */}
+        {/* Nova aba: Planos de Ação */}
         <button
           onClick={() => {
             setActiveTab('planos')
@@ -1058,36 +1070,41 @@ export default function Admin() {
           <span>Planos de Ação ({planosAcao.length})</span>
         </button>
 
-        <button
-          onClick={() => {
-            setActiveTab('modelos')
-            setSearchTerm('')
-          }}
-          className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === 'modelos'
-              ? 'border-[#0F766E] text-[#0F766E]'
-              : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
-          }`}
-        >
-          <Layers className="w-4 h-4" />
-          <span>Modelos ({modelos.length})</span>
-        </button>
+        {/* Modelos de Rotinas (Restrito ao Gestor Geral) */}
+        {isGestorGeral && (
+          <button
+            onClick={() => {
+              setActiveTab('modelos')
+              setSearchTerm('')
+            }}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+              activeTab === 'modelos'
+                ? 'border-[#0F766E] text-[#0F766E]'
+                : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
+            }`}
+          >
+            <Layers className="w-4 h-4" />
+            <span>Modelos ({modelos.length})</span>
+          </button>
+        )}
 
-        {/* Clientes: Apenas ADM Geral pode ver lista de todas as redes/clientes; ADM de Rede vê como "Dados da Rede" */}
-        <button
-          onClick={() => {
-            setActiveTab('clientes')
-            setSearchTerm('')
-          }}
-          className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === 'clientes'
-              ? 'border-[#0F766E] text-[#0F766E]'
-              : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
-          }`}
-        >
-          <Building2 className="w-4 h-4" />
-          <span>{isAdmRede ? 'Dados da Rede' : `Clientes (${clientes.length})`}</span>
-        </button>
+        {/* Clientes / Dados da Rede: Apenas Gestor Geral tem acesso à gestão de Clientes/Dados da Rede */}
+        {isGestorGeral && (
+          <button
+            onClick={() => {
+              setActiveTab('clientes')
+              setSearchTerm('')
+            }}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+              activeTab === 'clientes'
+                ? 'border-[#0F766E] text-[#0F766E]'
+                : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
+            }`}
+          >
+            <Building2 className="w-4 h-4" />
+            <span>{isAdmRede ? 'Dados da Rede' : `Clientes (${clientes.length})`}</span>
+          </button>
+        )}
 
         <button
           onClick={() => {
@@ -1277,7 +1294,7 @@ export default function Admin() {
           )}
 
           {/* ======================= ABA MATERIAL DE VENDA ======================= */}
-          {activeTab === 'material_venda' && <MaterialVendaAba />}
+          {activeTab === 'material_venda' && isGestorGeral && <MaterialVendaAba />}
 
           {/* ======================= ABA PLANOS DE AÇÃO ======================= */}
           {activeTab === 'planos' && (
@@ -1309,7 +1326,7 @@ export default function Admin() {
           )}
 
           {/* ======================= ABA MODELOS DE ROTINAS ======================= */}
-          {activeTab === 'modelos' && (
+          {activeTab === 'modelos' && isGestorGeral && (
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 flex-1">
@@ -1510,7 +1527,7 @@ export default function Admin() {
           )}
 
           {/* ======================= ABA CLIENTES ======================= */}
-          {activeTab === 'clientes' && (
+          {activeTab === 'clientes' && isGestorGeral && (
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="relative w-full sm:w-80">

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import type { ModeloComContagem, Cliente, Loja, ModeloRotinaItem, PerfilUsuario } from '@/types'
+import { useAuth } from '@/context/AuthContext'
 import { modelosRotinasService } from '@/services/modelosRotinas'
+import { segmentosService } from '@/services/segmentos'
 import { VAREJO_SEGMENTOS } from '@/components/EnquadramentoClienteCard'
 import { ModeloDetalhesModal } from '@/components/ModeloDetalhesModal'
 import { AplicarModeloModal } from '@/components/AplicarModeloModal'
@@ -42,18 +44,32 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
   // A biblioteca volta a ficar aberta/visível normalmente na tela (revertido para como era antes da v0.0.60)
   const [isAberta, setIsAberta] = useState<boolean>(true)
 
-  // Segmento neutro por padrão: nenhum segmento pré-selecionado nem fallback fixo
-  // Torna-se ativo apenas quando o usuário filtra pelos pills ou escolhe um modelo
-  const [selectedSegmento, setSelectedSegmento] = useState<string>('Todos')
+  // Segmento sincronizado com o segmento ativo do usuário, com fallback para 'Todos'
+  const { user } = useAuth()
+  const segmentoAtivoInicial = segmentosService.getSegmentoAtivo(user)
+  const [selectedSegmento, setSelectedSegmento] = useState<string>(segmentoAtivoInicial || 'Todos')
 
-  // Limpeza proativa de qualquer segmento legado gravado anteriormente
+  // Sincroniza selectedSegmento quando o segmento do usuário mudar ou quando o evento de troca for disparado
   useEffect(() => {
-    try {
-      localStorage.removeItem('vivavarejo_vitrine_segmento')
-    } catch {
-      // noop
+    const segAtivo = segmentosService.getSegmentoAtivo(user)
+    if (segAtivo) {
+      setSelectedSegmento(segAtivo)
     }
-  }, [])
+  }, [user?.segmento, user?.cliente])
+
+  useEffect(() => {
+    const handleSegmentoAlterado = (e: Event) => {
+      const custom = e as CustomEvent<{ segmento?: string }>
+      const novoSeg = custom?.detail?.segmento || segmentosService.getSegmentoAtivo(user)
+      if (novoSeg) {
+        setSelectedSegmento(novoSeg)
+      }
+    }
+    window.addEventListener('vivavarejo:segmento_alterado', handleSegmentoAlterado)
+    return () => {
+      window.removeEventListener('vivavarejo:segmento_alterado', handleSegmentoAlterado)
+    }
+  }, [user])
 
   const [modelos, setModelos] = useState<ModeloComContagem[]>([])
   const [loading, setLoading] = useState(false)
@@ -91,6 +107,17 @@ export const ModelosSegmentoVitrine: React.FC<ModelosSegmentoVitrineProps> = ({
       carregarModelos()
     }
   }, [hasLoadedOnce])
+
+  // Recarrega modelos quando o segmento for alterado globalmente
+  useEffect(() => {
+    const handleSegmentoAlterado = () => {
+      carregarModelos()
+    }
+    window.addEventListener('vivavarejo:segmento_alterado', handleSegmentoAlterado)
+    return () => {
+      window.removeEventListener('vivavarejo:segmento_alterado', handleSegmentoAlterado)
+    }
+  }, [])
 
   const handleSelectSegmento = (seg: string) => {
     setSelectedSegmento(seg)

@@ -148,6 +148,17 @@ export default function AgendaDefault() {
     loadData()
   }, [loadData])
 
+  // Escutar evento global de troca de segmento para atualizar Agenda imediatamente
+  useEffect(() => {
+    const handleSegmentoAlterado = () => {
+      loadData()
+    }
+    window.addEventListener('vivavarejo:segmento_alterado', handleSegmentoAlterado)
+    return () => {
+      window.removeEventListener('vivavarejo:segmento_alterado', handleSegmentoAlterado)
+    }
+  }, [loadData])
+
   // Navegação de dias
   const isToday = currentDateStr === getTodayDateString()
 

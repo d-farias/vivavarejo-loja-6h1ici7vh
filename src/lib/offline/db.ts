@@ -155,6 +155,58 @@ export async function getLocalCache<T>(key: string): Promise<T | null> {
   }
 }
 
+export async function clearLocalCache(keyPrefix?: string): Promise<void> {
+  try {
+    const db = await getDB()
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(STORE_CACHE, 'readwrite')
+      const store = tx.objectStore(STORE_CACHE)
+      if (!keyPrefix) {
+        const req = store.clear()
+        req.onsuccess = () => resolve()
+        req.onerror = () => reject(req.error)
+      } else {
+        const req = store.openCursor()
+        req.onsuccess = () => {
+          const cursor = req.result
+          if (cursor) {
+            const keyStr = String(cursor.key)
+            if (keyStr.startsWith(keyPrefix)) {
+              cursor.delete()
+            }
+            cursor.continue()
+          } else {
+            resolve()
+          }
+        }
+        req.onerror = () => reject(req.error)
+      }
+    })
+  } catch (err) {
+    console.warn('[OfflineDB] Erro ao limpar cache IndexedDB:', err)
+  }
+
+  // Limpa também do sessionStorage
+  if (typeof window !== 'undefined' && window.sessionStorage) {
+    try {
+      const keysToRemove: string[] = []
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const k = sessionStorage.key(i)
+        if (k && k.startsWith('offline_')) {
+          if (!keyPrefix || k.includes(keyPrefix)) {
+            keysToRemove.push(k)
+          }
+        }
+      }
+      for (const k of keysToRemove) {
+        sessionStorage.removeItem(k)
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
 // ==========================================
 // FILA DE SINCRONIZAÇÃO (STORE_QUEUE)
 // ==========================================

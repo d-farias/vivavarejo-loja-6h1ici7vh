@@ -221,7 +221,9 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
             to: '/admin',
             label: isAdmRede ? 'Workflow Rede' : 'Workflow Geral',
             badge: 'Admin',
-            description: 'Painel gerencial, auditoria e usuários',
+            description: isAdmRede
+              ? 'Painel gerencial, relatórios, promotores e equipe da rede'
+              : 'Painel gerencial, auditoria e usuários',
             icon: GitBranch,
           },
         ]

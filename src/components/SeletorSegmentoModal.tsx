@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useStore } from '@/context/StoreContext'
+import { clearLocalCache } from '@/lib/offline/db'
 import {
   SEGMENTOS_DISPONIVEIS,
   SegmentoInfo,
@@ -84,6 +85,18 @@ export function SeletorSegmentoModal({
       })
 
       await refreshUser()
+
+      // Limpa cache offline local para recarga total
+      await clearLocalCache('vivavarejo_')
+
+      // Dispara evento global para recarga instantânea em todas as telas
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('vivavarejo:segmento_alterado', {
+            detail: { segmento: selectedSegId },
+          }),
+        )
+      }
 
       toast({
         title: 'Ramo configurado com sucesso!',

@@ -30,6 +30,7 @@ import { AtendimentoPosAcessoModal } from '@/components/AtendimentoPosAcessoModa
 import { planosAcaoService } from '@/services/planosAcao'
 import { clientesService } from '@/services/clientes'
 import { atendimentosService } from '@/services/atendimentos'
+import { segmentosService } from '@/services/segmentos'
 import {
   CheckCircle2,
   Clock,
@@ -150,9 +151,10 @@ export default function Index() {
     if (!user) return
     setError(false)
     try {
+      const segmentoAtivo = segmentosService.getSegmentoAtivo(user)
       const [allRoutines, execs, planos, validades, perdasData, visitas, lojas, clientes] =
         await Promise.all([
-          rotinasService.getAll(lojaSelecionadaId),
+          rotinasService.getAll(lojaSelecionadaId, { apenasAtivas: true }),
           periodo === 'hoje'
             ? execucoesService.getTodayExecutions(user.id)
             : execucoesService.getExecutionsBetween(dateRange.startStr, dateRange.endStr),
@@ -166,7 +168,12 @@ export default function Index() {
             : Promise.resolve([] as Cliente[]),
         ])
 
-      setRotinas(allRoutines)
+      const rotinasFiltradas = segmentosService.filtrarRotinasAtivasPorSegmento(
+        allRoutines,
+        segmentoAtivo,
+      )
+
+      setRotinas(rotinasFiltradas)
       setExecucoesPeriodo(execs)
       setPlanosAcao(planos)
       setTarefasValidade(validades)
@@ -183,6 +190,17 @@ export default function Index() {
 
   useEffect(() => {
     loadData()
+  }, [loadData])
+
+  // Escutar evento global de troca de segmento para atualizar indicadores imediatamente
+  useEffect(() => {
+    const handleSegmentoAlterado = () => {
+      loadData()
+    }
+    window.addEventListener('vivavarejo:segmento_alterado', handleSegmentoAlterado)
+    return () => {
+      window.removeEventListener('vivavarejo:segmento_alterado', handleSegmentoAlterado)
+    }
   }, [loadData])
 
   // Verificação e exibição do Atendimento Pós-Acesso Inteligente

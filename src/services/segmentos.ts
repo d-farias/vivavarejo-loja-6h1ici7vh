@@ -1,4 +1,5 @@
 import pb from '@/lib/pocketbase/client'
+import { clearLocalCache } from '@/lib/offline/db'
 import type { ModeloRotina, ModeloRotinaItem, Rotina, User, Cliente, Funcao } from '@/types'
 
 export interface SegmentoInfo {
@@ -335,6 +336,22 @@ export const segmentosService = {
           }
         }
       }
+    }
+
+    // 6. Invalida o cache local offline para garantir recarga limpa do novo formato
+    try {
+      await clearLocalCache('vivavarejo_')
+    } catch (e) {
+      console.warn('Erro ao limpar cache offline ao ativar segmento:', e)
+    }
+
+    // 7. Dispara evento global para que todas as telas atualizem em tempo real
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('vivavarejo:segmento_alterado', {
+          detail: { segmento: segmentoCanônico },
+        }),
+      )
     }
 
     onProgress?.('Tudo pronto! Seu ambiente de rotinas está configurado.')
