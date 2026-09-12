@@ -10,6 +10,8 @@
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <!-- Biblioteca para renderizar e baixar o canvas 1200×628 como PNG real -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
       /* Reset & base styling */
       *,
@@ -24,7 +26,8 @@
       body {
         width: 100%;
         min-height: 100vh;
-        background-color: #f1f5f9;
+        background-color: #0f172a;
+        background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 75%);
         font-family:
           'Plus Jakarta Sans',
           'Inter',
@@ -33,95 +36,461 @@
           'Segoe UI',
           Roboto,
           sans-serif;
-        color: #1f2937;
+        color: #f1f5f9;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 40px 16px 80px 16px;
+        padding: 16px 12px 64px 12px;
+        touch-action: pan-y;
       }
 
       /* Barra de navegação e atalhos de exportação no topo */
       .top-nav {
-        width: 1200px;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 16px 24px;
-        margin-bottom: 28px;
+        width: 100%;
+        max-width: 1200px;
+        background: rgba(30, 41, 59, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 14px 20px;
+        margin-bottom: 16px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        gap: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        flex-wrap: wrap;
       }
 
       .top-nav-brand {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
       }
 
       .top-nav-icon {
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
         background: #0f766e;
-        border-radius: 6px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
+        box-shadow: 0 4px 12px rgba(15, 118, 110, 0.4);
       }
 
       .top-nav-diamond {
-        width: 10px;
-        height: 10px;
+        width: 11px;
+        height: 11px;
         border: 2px solid #ffffff;
         border-radius: 2px;
         transform: rotate(45deg);
       }
 
       .top-nav-title {
-        font-size: 17px;
+        font-size: 16px;
         font-weight: 800;
-        color: #1f2937;
+        color: #f8fafc;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .top-nav-badge-res {
+        font-size: 11px;
+        font-weight: 700;
+        background: rgba(15, 118, 110, 0.25);
+        color: #5eead4;
+        border: 1px solid rgba(94, 234, 212, 0.3);
+        padding: 2px 8px;
+        border-radius: 6px;
+        letter-spacing: 0.02em;
       }
 
       .top-nav-meta {
-        font-size: 13px;
-        font-weight: 600;
-        color: #64748b;
+        font-size: 12px;
+        font-weight: 500;
+        color: #94a3b8;
       }
 
-      .top-nav-jump {
+      .top-actions {
         display: flex;
-        gap: 6px;
         align-items: center;
+        gap: 10px;
         flex-wrap: wrap;
       }
 
-      .jump-pill {
-        padding: 5px 10px;
-        font-size: 12px;
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 9px 16px;
+        font-size: 13px;
         font-weight: 700;
-        color: #0f766e;
-        background-color: #f0fdfa;
-        border: 1px solid #ccfbf1;
-        border-radius: 6px;
-        text-decoration: none;
+        border-radius: 8px;
+        cursor: pointer;
         transition: all 0.2s ease;
+        border: 1px solid transparent;
+        text-decoration: none;
+        white-space: nowrap;
+        font-family: inherit;
       }
 
-      .jump-pill:hover {
-        background-color: #0f766e;
+      .btn svg {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+
+      .btn-primary {
+        background: #0f766e;
+        color: #ffffff;
+        border-color: #14b8a6;
+        box-shadow: 0 4px 14px rgba(15, 118, 110, 0.35);
+      }
+      .btn-primary:hover:not(:disabled) {
+        background: #115e59;
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.06);
+        color: #e2e8f0;
+        border-color: rgba(255, 255, 255, 0.12);
+      }
+      .btn-secondary:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.12);
         color: #ffffff;
       }
 
-      /* Container de slides */
-      .slides-stack {
+      .btn-accent {
+        background: #0284c7;
+        color: #ffffff;
+        border-color: #38bdf8;
+      }
+      .btn-accent:hover:not(:disabled) {
+        background: #0369a1;
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      /* Card de Instruções / Ajuda (simples para usuário leigo) */
+      .help-card {
+        width: 100%;
+        max-width: 1200px;
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(94, 234, 212, 0.2);
+        border-radius: 12px;
+        padding: 14px 18px;
+        margin-bottom: 16px;
+        display: none; /* toggle via JS */
+        animation: fadeIn 0.25s ease;
+      }
+      .help-card.active {
+        display: block;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .help-title {
+        font-size: 13.5px;
+        font-weight: 800;
+        color: #5eead4;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .help-steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+      }
+
+      .help-step-box {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 8px;
+        padding: 10px 12px;
         display: flex;
         flex-direction: column;
-        gap: 48px;
+        gap: 4px;
+      }
+
+      .help-step-num {
+        font-size: 11px;
+        font-weight: 800;
+        color: #5eead4;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .help-step-text {
+        font-size: 12.5px;
+        font-weight: 500;
+        color: #cbd5e1;
+        line-height: 1.4;
+      }
+
+      /* Notificação Flutuante / Toast de Status */
+      .toast-msg {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: #0f172a;
+        color: #f8fafc;
+        border: 1px solid #14b8a6;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 13.5px;
+        font-weight: 600;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        z-index: 9999;
+        display: flex;
         align-items: center;
+        gap: 10px;
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+        max-width: 90vw;
+        text-align: center;
+      }
+      .toast-msg.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* ÁREA DO VISUALIZADOR DE SLIDE ÚNICO (PALCO) */
+      .stage-wrapper {
+        width: 100%;
+        max-width: 1200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+
+      /* Barra de status e controles acima do slide */
+      .stage-toolbar {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 0 4px;
+        flex-wrap: wrap;
+      }
+
+      .slide-counter {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 800;
+        color: #5eead4;
+        background: rgba(15, 118, 110, 0.2);
+        border: 1px solid rgba(94, 234, 212, 0.3);
+        padding: 6px 14px;
+        border-radius: 20px;
+        letter-spacing: 0.04em;
+      }
+
+      .slide-counter-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #14b8a6;
+        box-shadow: 0 0 10px #14b8a6;
+      }
+
+      .stage-nav-buttons {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-arrow-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: rgba(30, 41, 59, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .nav-arrow-btn:hover:not(:disabled) {
+        background: #0f766e;
+        border-color: #14b8a6;
+        color: #ffffff;
+        transform: scale(1.05);
+      }
+      .nav-arrow-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+      .nav-arrow-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .stage-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      /* MOLDURA RESPONSIVA DO SLIDE:
+         Cria a proporção exata 1200×628 (52.33%) e escala o slide 1200x628 perfeitamente
+         para caber em qualquer celular ou monitor, sem cortes nem distorção. */
+      .slide-viewport {
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        background: #020617;
+        box-shadow:
+          0 25px 50px -12px rgba(0, 0, 0, 0.7),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: pan-y;
+      }
+
+      /* Proporção 1200×628 = (628 / 1200) * 100% = 52.3333% */
+      .slide-aspect-keeper {
+        width: 100%;
+        padding-top: 52.3333%;
+        position: relative;
+      }
+
+      /* Contêiner de escala: tem tamanho fixo 1200x628 e é transform: scale(...) */
+      .slide-scaler {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1200px;
+        height: 628px;
+        transform-origin: top left;
+        pointer-events: auto;
+      }
+
+      /* Tira de Miniaturas (Thumbnails) */
+      .thumbs-container {
+        width: 100%;
+        margin-top: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .thumbs-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 700;
+        color: #94a3b8;
+        padding: 0 4px;
+      }
+
+      .thumbs-strip {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 4px 2px 12px 2px;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .thumbs-strip::-webkit-scrollbar {
+        height: 6px;
+      }
+      .thumbs-strip::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 3px;
+      }
+      .thumbs-strip::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.18);
+        border-radius: 3px;
+      }
+      .thumbs-strip::-webkit-scrollbar-thumb:hover {
+        background: #0f766e;
+      }
+
+      .thumb-card {
+        flex: 0 0 130px;
+        background: rgba(30, 41, 59, 0.7);
+        border: 2px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 8px 10px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        transition: all 0.2s ease;
+        text-align: left;
+      }
+      .thumb-card:hover {
+        background: rgba(51, 65, 85, 0.8);
+        border-color: rgba(94, 234, 212, 0.4);
+        transform: translateY(-2px);
+      }
+      .thumb-card.active {
+        background: rgba(15, 118, 110, 0.25);
+        border-color: #14b8a6;
+        box-shadow: 0 0 16px rgba(20, 184, 166, 0.35);
+      }
+
+      .thumb-num {
+        font-size: 11px;
+        font-weight: 800;
+        color: #5eead4;
+        letter-spacing: 0.04em;
+      }
+      .thumb-title {
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #f1f5f9;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .thumb-meta {
+        font-size: 10px;
+        color: #94a3b8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* Container de slides nativos (armazenamento de todos os slides no DOM) */
+      .slides-stack {
+        display: none; /* Mantidos no DOM para renderização e clonagem no palco */
       }
 
       /* Bloco de cada slide: legenda + moldura 1200x628 */
@@ -620,26 +989,200 @@
           <div class="top-nav-diamond"></div>
         </div>
         <div>
-          <span class="top-nav-title">VivaVarejo · Carrossel Publicitário (1200×628)</span>
+          <div class="top-nav-title">
+            <span>VivaVarejo · Carrossel de Mídias</span>
+            <span class="top-nav-badge-res">1200×628</span>
+          </div>
           <div class="top-nav-meta">
-            8 slides otimizados para anúncios e pitch (LinkedIn / Instagram / Varejo Geral)
+            8 slides prontos para anúncio e post (LinkedIn, Instagram e Redes)
           </div>
         </div>
       </div>
-      <div class="top-nav-jump">
-        <a href="#slide-1" class="jump-pill">01 Capa</a>
-        <a href="#slide-2" class="jump-pill">02 Meu Dia</a>
-        <a href="#slide-3" class="jump-pill">03 Execução & Validação</a>
-        <a href="#slide-4" class="jump-pill">04 Agenda da Equipe</a>
-        <a href="#slide-5" class="jump-pill">05 Comercial & Rupturas</a>
-        <a href="#slide-6" class="jump-pill">06 Negociações & Parcerias</a>
-        <a href="#slide-7" class="jump-pill">07 Layout & Resiliência</a>
-        <a href="#slide-8" class="jump-pill">08 CTA Final</a>
+      <div class="top-actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="btnToggleHelp"
+          title="Instruções de uso"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span>Como Usar</span>
+        </button>
+        <button type="button" class="btn btn-primary" id="btnDownloadAll">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span id="btnDownloadAllLabel">Baixar todos (8 PNGs)</span>
+        </button>
       </div>
     </header>
 
-    <!-- PILHA DE SLIDES (8 SLIDES NO FORMATO ANÚNCIO) -->
-    <main class="slides-stack">
+    <!-- CARD DE INSTRUÇÕES (EXPLICATIVO EM PORTUGUÊS SIMPLES) -->
+    <aside class="help-card" id="helpCard">
+      <div class="help-title">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span>Guia Rápido: Como visualizar, salvar e postar nas suas redes</span>
+      </div>
+      <div class="help-steps">
+        <div class="help-step-box">
+          <span class="help-step-num">Passo 1 · Navegar</span>
+          <p class="help-step-text">
+            Use as setas <strong>&larr; Anterior / Próximo &rarr;</strong>, deslize o dedo na tela
+            do celular (swipe) ou clique nas miniaturas abaixo para ver cada slide completo.
+          </p>
+        </div>
+        <div class="help-step-box">
+          <span class="help-step-num">Passo 2 · Baixar Imagens</span>
+          <p class="help-step-text">
+            Clique em <strong>"Baixar este slide (PNG)"</strong> para salvar a arte atual, ou em
+            <strong>"Baixar todos (8 PNGs)"</strong> para baixar a sequência completa em alta
+            qualidade.
+          </p>
+        </div>
+        <div class="help-step-box">
+          <span class="help-step-num">Passo 3 · Publicar no LinkedIn</span>
+          <p class="help-step-text">
+            No LinkedIn, inicie uma publicação, escolha <strong>Documento</strong> ou adicione as 8
+            fotos em ordem (01 até 08). Fica em formato carrossel horizontal de arraste!
+          </p>
+        </div>
+        <div class="help-step-box">
+          <span class="help-step-num">Passo 4 · Publicar no Instagram</span>
+          <p class="help-step-text">
+            No Instagram, crie uma nova publicação, toque no ícone de
+            <strong>várias fotos (carrossel)</strong> e selecione do slide 01 ao 08 na ordem
+            correta.
+          </p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- PALCO DO SLIDE ATUAL NAVEGÁVEL -->
+    <section class="stage-wrapper" aria-label="Visualizador do Carrossel">
+      <div class="stage-toolbar">
+        <div class="stage-nav-buttons">
+          <button
+            type="button"
+            class="nav-arrow-btn"
+            id="btnPrev"
+            title="Slide Anterior (Seta Esquerda)"
+            aria-label="Slide Anterior"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <div class="slide-counter" id="slideCounter">
+            <span class="slide-counter-dot"></span>
+            <span id="slideCounterText">Slide 1 de 8</span>
+          </div>
+          <button
+            type="button"
+            class="nav-arrow-btn"
+            id="btnNext"
+            title="Próximo Slide (Seta Direita)"
+            aria-label="Próximo Slide"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <div class="stage-actions">
+          <button type="button" class="btn btn-secondary" id="btnDownloadSingle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span id="btnDownloadSingleLabel">Baixar este slide (PNG)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- MOLDURA RESPONSIVA QUE ESCALA O SLIDE 1200×628 NO CELULAR E DESKTOP -->
+      <div class="slide-viewport" id="slideViewport">
+        <div class="slide-aspect-keeper">
+          <div class="slide-scaler" id="slideScaler">
+            <!-- O slide atual é montado aqui via JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TIRA DE MINIATURAS (THUMBNAILS) -->
+      <div class="thumbs-container">
+        <div class="thumbs-header">
+          <span>Pular direto para o slide:</span>
+          <span>Dica: Use as setas do teclado ou deslize o dedo &harr;</span>
+        </div>
+        <div class="thumbs-strip" id="thumbsStrip">
+          <button type="button" class="thumb-card active" data-index="0">
+            <span class="thumb-num">01 · Capa</span>
+            <span class="thumb-title">Plataforma</span>
+            <span class="thumb-meta">Visão executiva</span>
+          </button>
+          <button type="button" class="thumb-card" data-index="1">
+            <span class="thumb-num">02 · Meu Dia</span>
+            <span class="thumb-title">Prioridades</span>
+            <span class="thumb-meta">Agora, Depois, Em seguida</span>
+          </button>
+          <button type="button" class="thumb-card" data-index="2">
+            <span class="thumb-num">03 · Execução</span>
+            <span class="thumb-title">Foto & Validação</span>
+            <span class="thumb-meta">Aprovação em 1 clique</span>
+          </button>
+          <button type="button" class="thumb-card" data-index="3">
+            <span class="thumb-num">04 · Agenda</span>
+            <span class="thumb-title">Minha Equipe</span>
+            <span class="thumb-meta">Escala do dia</span>
+          </button>
+          <button type="button" class="thumb-card" data-index="4">
+            <span class="thumb-num">05 · Comercial</span>
+            <span class="thumb-title">Ruptura & Curvas</span>
+            <span class="thumb-meta">Curvas A/B/C e Negativos</span>
+          </button>
+          <button type="button" class="thumb-card" data-index="5">
+            <span class="thumb-num">06 · Parcerias</span>
+            <span class="thumb-title">Negociações</span>
+            <span class="thumb-meta">Marcos e Comprovação</span>
+          </button>
+          <button type="button" class="thumb-card" data-index="6">
+            <span class="thumb-num">07 · Layout</span>
+            <span class="thumb-title">Multi-Rede</span>
+            <span class="thumb-meta">Offline & Sincronização</span>
+          </button>
+          <button type="button" class="thumb-card" data-index="7">
+            <span class="thumb-num">08 · CTA</span>
+            <span class="thumb-title">Comece Agora</span>
+            <span class="thumb-meta">Demonstração & Conta</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOTIFICAÇÃO / TOAST -->
+    <div class="toast-msg" id="toastMsg" role="status" aria-live="polite"></div>
+
+    <!-- PILHA DE SLIDES (MANTIDA NO DOM PARA EXPORTAÇÃO E RENDERIZAÇÃO REAL 1200×628) -->
+    <main class="slides-stack" id="slidesSource">
       <!-- =========================================================
            SLIDE 1: CAPA OFICIAL
            ========================================================= -->
@@ -2084,5 +2627,353 @@
         </div>
       </section>
     </main>
+
+    <!-- SCRIPT DE INTERAÇÃO, RESPONSIVIDADE, NAVEGAÇÃO E EXPORTAÇÃO PNG -->
+    <script>
+      ;(function () {
+        'use strict'
+
+        // 1. Estado da aplicação
+        let currentIndex = 0
+        const totalSlides = 8
+        let isExporting = false
+
+        // 2. Elementos DOM
+        const slideScaler = document.getElementById('slideScaler')
+        const slideViewport = document.getElementById('slideViewport')
+        const slideCounterText = document.getElementById('slideCounterText')
+        const btnPrev = document.getElementById('btnPrev')
+        const btnNext = document.getElementById('btnNext')
+        const btnDownloadSingle = document.getElementById('btnDownloadSingle')
+        const btnDownloadSingleLabel = document.getElementById('btnDownloadSingleLabel')
+        const btnDownloadAll = document.getElementById('btnDownloadAll')
+        const btnDownloadAllLabel = document.getElementById('btnDownloadAllLabel')
+        const btnToggleHelp = document.getElementById('btnToggleHelp')
+        const helpCard = document.getElementById('helpCard')
+        const toastMsg = document.getElementById('toastMsg')
+        const thumbCards = Array.from(document.querySelectorAll('.thumb-card'))
+
+        // Lista de elementos originais de cada slide (mantidos intactos no DOM)
+        const slideCanvases = Array.from(document.querySelectorAll('#slidesSource .slide-canvas'))
+
+        // Nomes para arquivos exportados
+        const slideFileNames = [
+          'vivavarejo-slide-01-capa.png',
+          'vivavarejo-slide-02-meu-dia.png',
+          'vivavarejo-slide-03-execucao-validacao.png',
+          'vivavarejo-slide-04-agenda-equipe.png',
+          'vivavarejo-slide-05-comercial-rupturas.png',
+          'vivavarejo-slide-06-negociacoes-parcerias.png',
+          'vivavarejo-slide-07-layout-offline.png',
+          'vivavarejo-slide-08-cta-final.png',
+        ]
+
+        // 3. Sistema de Notificação / Toast
+        let toastTimeout = null
+        function showToast(message, duration = 4000) {
+          if (!toastMsg) return
+          toastMsg.innerHTML = message
+          toastMsg.classList.add('show')
+          if (toastTimeout) clearTimeout(toastTimeout)
+          toastTimeout = setTimeout(() => {
+            toastMsg.classList.remove('show')
+          }, duration)
+        }
+
+        // 4. Responsividade: Redimensionar o palco (transform: scale) baseado na largura real da tela
+        function updateScale() {
+          if (!slideViewport || !slideScaler) return
+          const currentWidth = slideViewport.clientWidth
+          const scale = currentWidth / 1200
+          slideScaler.style.transform = `scale(${scale})`
+        }
+
+        window.addEventListener('resize', updateScale)
+        window.addEventListener('orientationchange', () => {
+          setTimeout(updateScale, 150)
+        })
+
+        // 5. Renderização do slide atual no palco
+        function renderSlide(index) {
+          if (index < 0) index = 0
+          if (index >= totalSlides) index = totalSlides - 1
+          currentIndex = index
+
+          const sourceCanvas = slideCanvases[currentIndex]
+          if (!sourceCanvas) return
+
+          // Clona o nó para colocar dentro do palco escalado sem mexer no nó original
+          slideScaler.innerHTML = ''
+          const clonedNode = sourceCanvas.cloneNode(true)
+          // Remove sombras pesadas internas para que se encaixe limpo no viewport
+          clonedNode.style.boxShadow = 'none'
+          clonedNode.style.borderRadius = '0'
+          slideScaler.appendChild(clonedNode)
+
+          // Atualiza contador e botões de navegação
+          if (slideCounterText) {
+            slideCounterText.textContent = `Slide ${currentIndex + 1} de ${totalSlides}`
+          }
+          if (btnPrev) btnPrev.disabled = currentIndex === 0
+          if (btnNext) btnNext.disabled = currentIndex === totalSlides - 1
+
+          // Atualiza miniaturas
+          thumbCards.forEach((card, idx) => {
+            if (idx === currentIndex) {
+              card.classList.add('active')
+              // Garante que a miniatura ativa esteja visível na rolagem
+              card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+            } else {
+              card.classList.remove('active')
+            }
+          })
+
+          // Atualiza rótulo do botão de download individual
+          if (btnDownloadSingleLabel) {
+            btnDownloadSingleLabel.textContent = `Baixar slide ${String(currentIndex + 1).padStart(2, '0')} (PNG)`
+          }
+
+          updateScale()
+        }
+
+        // 6. Navegação
+        function goToNext() {
+          if (currentIndex < totalSlides - 1) {
+            renderSlide(currentIndex + 1)
+          }
+        }
+
+        function goToPrev() {
+          if (currentIndex > 0) {
+            renderSlide(currentIndex - 1)
+          }
+        }
+
+        if (btnPrev) btnPrev.addEventListener('click', goToPrev)
+        if (btnNext) btnNext.addEventListener('click', goToNext)
+
+        // Clique nas miniaturas
+        thumbCards.forEach((card) => {
+          card.addEventListener('click', () => {
+            const idx = parseInt(card.getAttribute('data-index') || '0', 10)
+            renderSlide(idx)
+          })
+        })
+
+        // Navegação por teclado (Setas esquerda / direita)
+        window.addEventListener('keydown', (e) => {
+          // Ignora se estiver digitando em input/textarea
+          if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return
+          if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+            goToNext()
+          } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+            goToPrev()
+          } else if (e.key === 'Home') {
+            renderSlide(0)
+          } else if (e.key === 'End') {
+            renderSlide(totalSlides - 1)
+          }
+        })
+
+        // Navegação por gestos de toque (Swipe no celular)
+        let touchStartX = 0
+        let touchStartY = 0
+        let touchEndX = 0
+        let touchEndY = 0
+
+        if (slideViewport) {
+          slideViewport.addEventListener(
+            'touchstart',
+            (e) => {
+              if (e.touches && e.touches.length > 0) {
+                touchStartX = e.touches[0].clientX
+                touchStartY = e.touches[0].clientY
+              }
+            },
+            { passive: true },
+          )
+
+          slideViewport.addEventListener(
+            'touchend',
+            (e) => {
+              if (e.changedTouches && e.changedTouches.length > 0) {
+                touchEndX = e.changedTouches[0].clientX
+                touchEndY = e.changedTouches[0].clientY
+                handleSwipe()
+              }
+            },
+            { passive: true },
+          )
+        }
+
+        function handleSwipe() {
+          const deltaX = touchEndX - touchStartX
+          const deltaY = touchEndY - touchStartY
+          // Se o movimento horizontal for maior que o vertical e tiver pelo menos 40px
+          if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
+            if (deltaX < 0) {
+              goToNext() // arrastou pra esquerda -> próximo slide
+            } else {
+              goToPrev() // arrastou pra direita -> slide anterior
+            }
+          }
+        }
+
+        // Toggle do guia "Como Usar"
+        if (btnToggleHelp && helpCard) {
+          btnToggleHelp.addEventListener('click', () => {
+            helpCard.classList.toggle('active')
+            if (helpCard.classList.contains('active')) {
+              helpCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            }
+          })
+        }
+
+        // 7. EXPORTAÇÃO COMO IMAGEM PNG (HTML2CANVAS COM FALLBACK ROBUSTO)
+        function triggerDownload(dataUrl, filename) {
+          const a = document.createElement('a')
+          a.href = dataUrl
+          a.download = filename
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+        }
+
+        async function renderCanvasToPng(element, filename) {
+          // Verifica se a biblioteca html2canvas está carregada
+          if (typeof window.html2canvas !== 'function') {
+            throw new Error('html2canvas_unavailable')
+          }
+
+          // Para garantir renderização perfeita em 1200×628 sem cortes:
+          // Clona temporariamente o elemento em um contêiner invisível com tamanho fixo
+          const tempContainer = document.createElement('div')
+          tempContainer.style.position = 'fixed'
+          tempContainer.style.top = '-99999px'
+          tempContainer.style.left = '-99999px'
+          tempContainer.style.width = '1200px'
+          tempContainer.style.height = '628px'
+          tempContainer.style.zIndex = '-999'
+          tempContainer.style.overflow = 'hidden'
+          tempContainer.style.background = '#ffffff'
+
+          const clone = element.cloneNode(true)
+          clone.style.width = '1200px'
+          clone.style.height = '628px'
+          clone.style.minWidth = '1200px'
+          clone.style.minHeight = '628px'
+          clone.style.maxWidth = '1200px'
+          clone.style.maxHeight = '628px'
+          clone.style.transform = 'none'
+          clone.style.boxShadow = 'none'
+
+          tempContainer.appendChild(clone)
+          document.body.appendChild(tempContainer)
+
+          try {
+            // Aguarda imagens/fontes prontas
+            if (document.fonts && document.fonts.ready) {
+              await document.fonts.ready
+            }
+
+            const canvas = await window.html2canvas(clone, {
+              width: 1200,
+              height: 628,
+              windowWidth: 1200,
+              windowHeight: 628,
+              scale: 2, // 2x para nitidez ultra-alta no LinkedIn/Instagram
+              useCORS: true,
+              backgroundColor: '#ffffff',
+              logging: false,
+            })
+
+            const dataUrl = canvas.toDataURL('image/png', 1.0)
+            triggerDownload(dataUrl, filename)
+            return true
+          } finally {
+            document.body.removeChild(tempContainer)
+          }
+        }
+
+        // Download de um slide individual
+        async function downloadSingleSlide(index) {
+          if (isExporting) return
+          const target = slideCanvases[index]
+          if (!target) return
+
+          const filename =
+            slideFileNames[index] || `vivavarejo-slide-${String(index + 1).padStart(2, '0')}.png`
+
+          isExporting = true
+          const originalText = btnDownloadSingleLabel.textContent
+          btnDownloadSingle.disabled = true
+          btnDownloadSingleLabel.textContent = 'Gerando PNG...'
+          showToast(`⏳ Gerando imagem do Slide ${index + 1} em alta resolução...`, 3000)
+
+          try {
+            await renderCanvasToPng(target, filename)
+            showToast(`✅ Slide ${index + 1} baixado com sucesso! (${filename})`, 4000)
+          } catch (err) {
+            console.error('Falha ao exportar slide:', err)
+            showToast(
+              '⚠️ Não foi possível gerar o download automático. Dica: você pode tirar um print recortado ou abrir em modo tela cheia.',
+              6000,
+            )
+          } finally {
+            isExporting = false
+            btnDownloadSingle.disabled = false
+            btnDownloadSingleLabel.textContent = originalText
+          }
+        }
+
+        // Download de todos os 8 slides em lote
+        async function downloadAllSlides() {
+          if (isExporting) return
+          isExporting = true
+          btnDownloadAll.disabled = true
+          const originalText = btnDownloadAllLabel.textContent
+
+          showToast('⏳ Iniciando geração dos 8 slides PNG em sequência...', 3000)
+
+          let successCount = 0
+          try {
+            for (let i = 0; i < totalSlides; i++) {
+              btnDownloadAllLabel.textContent = `Baixando ${i + 1} de 8...`
+              const target = slideCanvases[i]
+              const filename = slideFileNames[i]
+              await renderCanvasToPng(target, filename)
+              successCount++
+              // Pausa de 350ms entre downloads para evitar bloqueio pelo navegador
+              await new Promise((r) => setTimeout(r, 350))
+            }
+            showToast(`🎉 Todos os ${successCount} slides foram salvos em PNG com sucesso!`, 5000)
+          } catch (err) {
+            console.error('Falha ao exportar lote de slides:', err)
+            showToast(
+              `⚠️ ${successCount} de ${totalSlides} slides baixados. O navegador pode ter pausado múltiplos downloads.`,
+              6000,
+            )
+          } finally {
+            isExporting = false
+            btnDownloadAll.disabled = false
+            btnDownloadAllLabel.textContent = originalText
+          }
+        }
+
+        if (btnDownloadSingle) {
+          btnDownloadSingle.addEventListener('click', () => {
+            downloadSingleSlide(currentIndex)
+          })
+        }
+
+        if (btnDownloadAll) {
+          btnDownloadAll.addEventListener('click', downloadAllSlides)
+        }
+
+        // 8. Inicialização
+        renderSlide(0)
+        updateScale()
+      })()
+    </script>
   </body>
 </html>
