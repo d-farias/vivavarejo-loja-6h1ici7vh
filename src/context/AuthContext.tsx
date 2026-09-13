@@ -191,6 +191,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ativo: true,
     })
 
+    // Marca conversão da visita atual (sessão concluiu cadastro)
+    try {
+      const { analyticsService } = await import('@/services/analyticsService')
+      await analyticsService.marcarCadastroConcluido(email.trim())
+    } catch {
+      // silent
+    }
+
     // Auto login right after registration
     await login(email, pass)
   }

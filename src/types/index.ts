@@ -731,3 +731,50 @@ export interface AdmRhDemanda extends RecordModel {
     solicitante_usuario?: User
   }
 }
+
+export interface VisitaAnalytics {
+  id: string
+  pagina: string
+  origem: string
+  utm_source?: string
+  utm_medium?: string
+  utm_campaign?: string
+  dispositivo: 'mobile' | 'desktop'
+  sessao_id: string
+  user_email?: string
+  cadastrou?: boolean
+  is_admin?: boolean
+  referrer?: string
+  user_agent?: string
+  created: string
+  updated: string
+}
+
+export interface ResumoAnalytics {
+  totalAcessos: number
+  visitantesUnicos: number
+  totalCadastros: number
+  taxaConversao: number // percentual ex: 4.5
+  origensRanking: {
+    origem: string
+    nomeAmigavel: string
+    quantidade: number
+    percentual: number
+  }[]
+  paginasRanking: {
+    pagina: string
+    nomeAmigavel: string
+    quantidade: number
+    percentual: number
+  }[]
+  acessosPorDia: {
+    data: string // YYYY-MM-DD
+    dataLabel: string // '12/09' ou 'Hoje'
+    quantidade: number
+    visitantesUnicos: number
+  }[]
+  dispositivos: {
+    mobile: number
+    desktop: number
+  }
+}

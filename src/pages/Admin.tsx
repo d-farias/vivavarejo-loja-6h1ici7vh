@@ -75,10 +75,12 @@ import { Presentation, Headphones } from 'lucide-react'
 import { ContatosAtendimentoModal } from '../components/ContatosAtendimentoModal'
 import { AuditoriaAba } from '../components/AuditoriaAba'
 import { ProtecaoDadosSecao } from '../components/ProtecaoDadosSecao'
-import { ShieldCheck, History } from 'lucide-react'
+import { PainelAcessosAnalytics } from '../components/PainelAcessosAnalytics'
+import { ShieldCheck, History, Activity } from 'lucide-react'
 
 type TabType =
   | 'painel'
+  | 'acessos'
   | 'relatorios'
   | 'material_venda'
   | 'planos'
@@ -927,7 +929,10 @@ export default function Admin() {
   // Se o usuário adm_rede tentar acessar diretamente uma aba restrita ao gestor geral, redireciona para painel
   if (
     !isGestorGeral &&
-    (activeTab === 'material_venda' || activeTab === 'modelos' || activeTab === 'clientes')
+    (activeTab === 'acessos' ||
+      activeTab === 'material_venda' ||
+      activeTab === 'modelos' ||
+      activeTab === 'clientes')
   ) {
     setActiveTab('painel')
   }
@@ -1019,6 +1024,24 @@ export default function Admin() {
           <BarChart3 className="w-4 h-4" />
           <span>{isAdmRede ? 'Visão da Minha Rede' : 'Painel Gerencial'}</span>
         </button>
+
+        {/* Nova aba: Acessos & Analytics (Restrito exclusivamente ao Gestor Geral Dfarias) */}
+        {isGestorGeral && (
+          <button
+            onClick={() => {
+              setActiveTab('acessos')
+              setSearchTerm('')
+            }}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+              activeTab === 'acessos'
+                ? 'border-[#0F766E] text-[#0F766E]'
+                : 'border-transparent text-[#6B7280] hover:text-[#1F2937]'
+            }`}
+          >
+            <Activity className="w-4 h-4" />
+            <span>Acessos & Visitas</span>
+          </button>
+        )}
 
         {/* Nova aba: Relatórios Loja a Loja */}
         <button
@@ -1277,6 +1300,9 @@ export default function Admin() {
               />
             </div>
           )}
+
+          {/* ======================= ABA ACESSOS & VISITAS (ANALYTICS) ======================= */}
+          {activeTab === 'acessos' && isGestorGeral && <PainelAcessosAnalytics />}
 
           {/* ======================= ABA RELATÓRIOS LOJA A LOJA ======================= */}
           {activeTab === 'relatorios' && (

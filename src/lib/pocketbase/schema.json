@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-12T15:33:34.498Z",
+  "generatedAt": "2026-09-13T22:43:57.759Z",
   "collections": [
     {
       "name": "users",
@@ -3135,6 +3135,112 @@
         "CREATE INDEX idx_admrh_prioridade ON adm_rh_demandas (prioridade)",
         "CREATE INDEX idx_admrh_prazo ON adm_rh_demandas (prazo)",
         "CREATE INDEX idx_admrh_created ON adm_rh_demandas (created)"
+      ]
+    },
+    {
+      "name": "visitas",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "view": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "create": "",
+        "update": "@request.auth.id != '' && @request.auth.perfil = 'admin'",
+        "delete": "@request.auth.id != '' && @request.auth.perfil = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "pagina",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "origem",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "utm_source",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "utm_medium",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "utm_campaign",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dispositivo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "sessao_id",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "user_email",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cadastrou",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_admin",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "referrer",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_agent",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_visitas_created ON visitas (created)",
+        "CREATE INDEX idx_visitas_origem ON visitas (origem)",
+        "CREATE INDEX idx_visitas_sessao_id ON visitas (sessao_id)",
+        "CREATE INDEX idx_visitas_pagina ON visitas (pagina)",
+        "CREATE INDEX idx_visitas_user_email ON visitas (user_email)"
       ]
     }
   ]

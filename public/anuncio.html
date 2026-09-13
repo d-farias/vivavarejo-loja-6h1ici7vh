@@ -1085,5 +1085,54 @@
         </footer>
       </div>
     </div>
+
+    <!-- Rastreamento anônimo inline de visualização do anúncio -->
+    <script>
+      ;(function () {
+        try {
+          var SESSAO_KEY = 'vivavarejo_sessao_id'
+          var sessaoId = localStorage.getItem(SESSAO_KEY)
+          if (!sessaoId) {
+            sessaoId =
+              'ses_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36)
+            localStorage.setItem(SESSAO_KEY, sessaoId)
+          }
+          var params = new URLSearchParams(window.location.search)
+          var utm_source = params.get('utm_source') || ''
+          var utm_medium = params.get('utm_medium') || ''
+          var utm_campaign = params.get('utm_campaign') || ''
+          var ref = document.referrer ? document.referrer.toLowerCase() : ''
+          var origem = 'direto'
+          if (utm_source) {
+            origem = utm_source.toLowerCase()
+          } else if (ref) {
+            if (ref.includes('linkedin.com')) origem = 'linkedin'
+            else if (ref.includes('instagram.com')) origem = 'instagram'
+            else if (ref.includes('facebook.com')) origem = 'facebook'
+            else if (ref.includes('whatsapp.com')) origem = 'whatsapp'
+            else if (ref.includes('google.com')) origem = 'google'
+            else origem = 'referral'
+          }
+          var isMobile =
+            /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 768
+          var pbUrl = 'https://guia-para-lideres-do-varejo-921a5.shrd00.internal.goskip.dev'
+          fetch(pbUrl + '/api/collections/visitas/records', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              pagina: '/anuncio.html',
+              origem: origem,
+              utm_source: utm_source,
+              utm_medium: utm_medium,
+              utm_campaign: utm_campaign,
+              dispositivo: isMobile ? 'mobile' : 'desktop',
+              sessao_id: sessaoId,
+              referrer: document.referrer ? document.referrer.substring(0, 250) : '',
+              user_agent: navigator.userAgent ? navigator.userAgent.substring(0, 250) : '',
+            }),
+          }).catch(function () {})
+        } catch (e) {}
+      })()
+    </script>
   </body>
 </html>
