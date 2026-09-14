@@ -18,7 +18,7 @@ import {
   Users,
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
-import { getUserProfileType } from '@/lib/perfil-utils'
+import { getUserProfileType, isGestorGeralUser } from '@/lib/perfil-utils'
 
 interface QuickAccessHubModalProps {
   forceOpen?: boolean
@@ -52,6 +52,7 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
   const [open, setOpen] = useState(false)
   const [naoMostrarNovamenteHoje, setNaoMostrarNovamenteHoje] = useState(false)
 
+  const isGestorGeral = isGestorGeralUser(user)
   const perfil = user?.perfil || (user?.email === 'dfarias53@gmail.com' ? 'admin' : 'lider')
   const profileType = getUserProfileType(user)
   const isGerente = profileType === 'gerente'
@@ -60,6 +61,12 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
   const hasAdminAccess = isAdmin || isAdmRede
 
   useEffect(() => {
+    // Gestor Geral (Dfarias) não deve ver atalhos de forma alguma
+    if (isGestorGeral) {
+      setOpen(false)
+      return
+    }
+
     if (forceOpen !== undefined) {
       setOpen(forceOpen)
       return
@@ -102,7 +109,7 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
     }
   }, [user, location.pathname, forceOpen])
 
-  if (!open || !user) return null
+  if (!open || !user || isGestorGeral) return null
 
   const handleClose = () => {
     if (naoMostrarNovamenteHoje && user) {

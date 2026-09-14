@@ -283,16 +283,9 @@ export default function BemVindo() {
             </span>
           </Link>
 
-          {/* Apenas botão Entrar ou link para Painel se Gestor Geral */}
+          {/* Botão Entrar para visitantes anônimos (ocultado para Gestor Geral logado para manter a capa limpa) */}
           <nav className="flex items-center gap-2 sm:gap-4 text-xs font-medium">
-            {isGestorGeral ? (
-              <Link
-                to="/admin"
-                className="px-3.5 py-1.5 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-lg transition-colors font-semibold shadow-2xs"
-              >
-                Ir ao Painel Geral
-              </Link>
-            ) : (
+            {!isGestorGeral && (
               <Link
                 to="/login"
                 className="px-3.5 py-1.5 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] hover:text-[#0F766E] rounded-lg transition-colors font-semibold shadow-2xs"
@@ -872,14 +865,7 @@ export default function BemVindo() {
             </div>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[#6B7280]">
-              {isGestorGeral ? (
-                <Link
-                  to="/admin"
-                  className="hover:text-[#1F2937] font-medium transition-colors text-[#0F766E]"
-                >
-                  Painel de Gestão Geral
-                </Link>
-              ) : (
+              {!isGestorGeral && (
                 <>
                   <Link to="/login" className="hover:text-[#1F2937] font-medium transition-colors">
                     Já tenho conta

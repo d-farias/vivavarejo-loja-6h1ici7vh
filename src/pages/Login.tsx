@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import pb from '@/lib/pocketbase/client'
-import { getUserProfileType } from '@/lib/perfil-utils'
+import { getUserProfileType, isGestorGeralUser } from '@/lib/perfil-utils'
 import { triggerQuickAccessHub } from '@/components/QuickAccessHubModal'
 import { AlertCircle, Lock, Mail, CheckCircle2, KeyRound, ArrowLeft, Info } from 'lucide-react'
 import type { User } from '@/types'
@@ -60,16 +60,23 @@ export default function Login() {
 
     try {
       await login(email, password)
-      // Dispara exibição do hub de acesso rápido logo após o login
-      triggerQuickAccessHub()
+      const loggedUser = pb.authStore.record as unknown as User
+      const isGestor = isGestorGeralUser(loggedUser)
+
+      // Atalhos rápidos pós-login não devem ser disparados para o Gestor Geral (Dfarias)
+      if (!isGestor) {
+        triggerQuickAccessHub()
+      }
 
       // Direcionamento inteligente conforme modelo do perfil do cadastro:
+      // Gestor Geral -> cai direto no painel de gestão (/admin) ou respeita intercepted route
       // Gerente (CPF) -> /meu-dia (enxuto, chão de loja)
       // Rede (CNPJ) -> /agenda (amplo, administrativo)
       if (hasSpecificFrom) {
         navigate(stateFrom!, { replace: true })
+      } else if (isGestor) {
+        navigate('/admin', { replace: true })
       } else {
-        const loggedUser = pb.authStore.record as unknown as User
         const profileType = getUserProfileType(loggedUser)
         navigate(profileType === 'gerente' ? '/meu-dia' : '/agenda', { replace: true })
       }

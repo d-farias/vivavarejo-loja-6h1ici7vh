@@ -15,7 +15,7 @@ import {
   Users,
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
-import { getUserProfileType } from '@/lib/perfil-utils'
+import { getUserProfileType, isGestorGeralUser } from '@/lib/perfil-utils'
 import type { HubShortcut } from './QuickAccessHubModal'
 
 interface QuickAccessTopBannerProps {
@@ -26,7 +26,7 @@ export function QuickAccessTopBanner({ className = '' }: QuickAccessTopBannerPro
   const { user } = useAuth()
   const navigate = useNavigate()
 
-  if (!user) return null
+  if (!user || isGestorGeralUser(user)) return null
 
   const perfil = user?.perfil || (user?.email === 'dfarias53@gmail.com' ? 'admin' : 'lider')
   const profileType = getUserProfileType(user)

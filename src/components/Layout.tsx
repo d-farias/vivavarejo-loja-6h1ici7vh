@@ -36,7 +36,7 @@ import { InactivityWarningModal } from '@/components/InactivityWarningModal'
 import { BottomNavMobile } from '@/components/BottomNavMobile'
 import { QuickAccessHubModal } from '@/components/QuickAccessHubModal'
 import { ModeloDemonstrativoBanner } from '@/components/ModeloDemonstrativoBanner'
-import { getUserProfileType } from '@/lib/perfil-utils'
+import { getUserProfileType, isGestorGeralUser } from '@/lib/perfil-utils'
 import { usePwaInstall } from '@/hooks/use-pwa-install'
 import { segmentosService } from '@/services/segmentos'
 import { SeletorSegmentoModal } from '@/components/SeletorSegmentoModal'
@@ -472,8 +472,8 @@ export default function Layout() {
         />
       )}
 
-      {/* Hub de Acesso Rápido (Logo após o login e na entrada do sistema) */}
-      {!isAuthPage && user && <QuickAccessHubModal />}
+      {/* Hub de Acesso Rápido (Logo após o login e na entrada do sistema, oculto para Gestor Geral) */}
+      {!isAuthPage && user && !isGestorGeralUser(user) && <QuickAccessHubModal />}
 
       {/* Modal Falar com Especialista */}
       <FalarEspecialistaModal

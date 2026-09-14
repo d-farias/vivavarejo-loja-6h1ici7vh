@@ -95,3 +95,16 @@ export function getModoPerfil(user: User | null): ModoPerfil {
 export function setModoPerfilOverride(userId: string, modo: ModoPerfil) {
   localStorage.setItem(`vivavarejo_modo_perfil_${userId}`, modo)
 }
+
+/**
+ * Identifica se o usuário é o Gestor Geral (Dfarias):
+ * critério padrão do sistema: perfil 'admin' ou email 'dfarias53@gmail.com'.
+ */
+export function isGestorGeralUser(
+  user: { email?: string | null; perfil?: string | null } | null | undefined,
+): boolean {
+  if (!user) return false
+  const emailLower = (user.email || '').toLowerCase().trim()
+  const perfil = user.perfil || (emailLower === 'dfarias53@gmail.com' ? 'admin' : '')
+  return perfil === 'admin' || emailLower === 'dfarias53@gmail.com'
+}
