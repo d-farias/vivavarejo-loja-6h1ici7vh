@@ -127,7 +127,6 @@ export default function Layout() {
     { to: '/comercial', label: 'Comercial Loja', icon: TrendingUp },
     { to: '/adm-rh', label: 'Adm/RH', icon: Users },
     { to: '/rotinas', label: 'Rotinas & Padrões', icon: ListChecks },
-    { to: '/', label: 'Indicadores', icon: LayoutDashboard },
   ]
 
   const navLinksRede = [
@@ -138,7 +137,6 @@ export default function Layout() {
     { to: '/adm-rh', label: 'Adm/RH', icon: Users },
     { to: '/perdas', label: 'Perdas & Inventário', icon: ShieldAlert },
     ...(isLiderOrAdmin ? [{ to: '/promotores', label: 'Promotores', icon: Handshake }] : []),
-    { to: '/', label: 'Painel Geral', icon: LayoutDashboard },
     ...(hasAdminAccess
       ? [
           {
@@ -170,7 +168,10 @@ export default function Layout() {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           {/* Logo & Title */}
           <div className="flex items-center gap-6">
-            <NavLink to="/" className="flex items-center gap-2.5 group shrink-0">
+            <NavLink
+              to={isGerente ? '/meu-dia' : '/agenda'}
+              className="flex items-center gap-2.5 group shrink-0"
+            >
               <div className="w-9 h-9 rounded-xl bg-[#0F766E] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
                 {/* Compact square diamond logo */}
                 <div className="w-4 h-4 border-2 border-white rotate-45 transform" />

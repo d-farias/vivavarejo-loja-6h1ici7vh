@@ -223,13 +223,6 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
       description: 'Controle de promotores e fornecedores',
       icon: Handshake,
     },
-    {
-      to: '/',
-      label: 'Dashboard',
-      badge: 'Geral',
-      description: 'Indicadores de eficiência e cumprimento',
-      icon: LayoutDashboard,
-    },
     ...(hasAdminAccess
       ? [
           {

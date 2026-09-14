@@ -121,13 +121,6 @@ export function QuickAccessTopBanner({ className = '' }: QuickAccessTopBannerPro
       description: 'Controle de promotores',
       icon: Handshake,
     },
-    {
-      to: '/',
-      label: 'Dashboard',
-      badge: 'Geral',
-      description: 'Indicadores e cumprimento',
-      icon: LayoutDashboard,
-    },
     ...(hasAdminAccess
       ? [
           {

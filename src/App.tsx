@@ -1,12 +1,13 @@
 import { useEffect } from 'react'
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import { analyticsService } from '@/services/analyticsService'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import { StoreProvider } from './context/StoreContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { getUserProfileType } from '@/lib/perfil-utils'
 import Layout from './components/Layout'
 import Index from './pages/Index'
 import Rotinas from './pages/Rotinas'
@@ -61,6 +62,13 @@ const DocumentTitleSync = () => {
   return null
 }
 
+function RootRouteRedirect() {
+  const { user } = useAuth()
+  const profileType = getUserProfileType(user)
+  const targetPath = profileType === 'gerente' ? '/meu-dia' : '/agenda'
+  return <Navigate to={targetPath} replace />
+}
+
 const App = () => (
   <BrowserRouter>
     <DocumentTitleSync />
@@ -76,7 +84,7 @@ const App = () => (
                 path="/"
                 element={
                   <ProtectedRoute>
-                    <Index />
+                    <RootRouteRedirect />
                   </ProtectedRoute>
                 }
               />

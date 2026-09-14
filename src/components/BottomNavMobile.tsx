@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { CalendarDays, Store, CheckSquare, Menu, Home, Flame } from 'lucide-react'
+import { CalendarDays, Store, CheckSquare, Menu, Home, TrendingUp } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { segmentosService } from '@/services/segmentos'
 
@@ -44,9 +44,9 @@ export function BottomNavMobile({ isCampo, onOpenMais }: BottomNavMobileProps) {
       icon: CalendarDays,
     },
     {
-      to: '/',
-      label: 'Painel',
-      icon: Home,
+      to: '/comercial',
+      label: 'Comercial',
+      icon: TrendingUp,
     },
     {
       to: '/promotores',
