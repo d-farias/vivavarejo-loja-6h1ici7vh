@@ -28,6 +28,8 @@ import {
   Lock,
   MessageSquare,
 } from 'lucide-react'
+import pb from '@/lib/pocketbase/client'
+import { useAuth } from '@/context/AuthContext'
 import { TipoPessoaCliente } from '@/types'
 import { useContatosAtendimento } from '@/hooks/use-contatos-atendimento'
 import { APP_VERSION_LABEL } from '@/lib/version'
@@ -212,7 +214,19 @@ const SEGMENT_OPTIONS: SegmentOption[] = [
 
 export default function BemVindo() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const { contatos } = useContatosAtendimento()
+
+  // Detecta se o visitante é o Gestor Geral (Dfarias — perfil 'admin' ou email dfarias53@gmail.com)
+  // Usa o mesmo critério leve do analyticsService: checa useAuth e PocketBase authStore
+  const authRecord =
+    pb.authStore.isValid && pb.authStore.record
+      ? (pb.authStore.record as { email?: string; perfil?: string })
+      : null
+  const currentUserEmail = user?.email || authRecord?.email || ''
+  const currentUserPerfil = user?.perfil || authRecord?.perfil || ''
+  const isGestorGeral =
+    currentUserPerfil === 'admin' || currentUserEmail.toLowerCase() === 'dfarias53@gmail.com'
 
   // Modal de Proteção de Dados
   const [modalProtecaoOpen, setModalProtecaoOpen] = useState(false)
@@ -269,14 +283,23 @@ export default function BemVindo() {
             </span>
           </Link>
 
-          {/* Apenas botão Entrar */}
+          {/* Apenas botão Entrar ou link para Painel se Gestor Geral */}
           <nav className="flex items-center gap-2 sm:gap-4 text-xs font-medium">
-            <Link
-              to="/login"
-              className="px-3.5 py-1.5 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] hover:text-[#0F766E] rounded-lg transition-colors font-semibold shadow-2xs"
-            >
-              Entrar
-            </Link>
+            {isGestorGeral ? (
+              <Link
+                to="/admin"
+                className="px-3.5 py-1.5 bg-[#0F766E] hover:bg-[#115E59] text-white rounded-lg transition-colors font-semibold shadow-2xs"
+              >
+                Ir ao Painel Geral
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="px-3.5 py-1.5 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] hover:text-[#0F766E] rounded-lg transition-colors font-semibold shadow-2xs"
+              >
+                Entrar
+              </Link>
+            )}
           </nav>
         </div>
       </header>
@@ -322,41 +345,45 @@ export default function BemVindo() {
               </div>
             </div>
 
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => navigate('/signup')}
-                className="w-full sm:w-auto px-6 py-3 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-sm rounded-xl shadow-xs transition-all hover:scale-[1.02] inline-flex items-center justify-center gap-2"
-              >
-                <span>Criar conta</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+            {/* CTAs comerciais (ocultados para o Gestor Geral) */}
+            {!isGestorGeral && (
+              <>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/signup')}
+                    className="w-full sm:w-auto px-6 py-3 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-sm rounded-xl shadow-xs transition-all hover:scale-[1.02] inline-flex items-center justify-center gap-2"
+                  >
+                    <span>Criar conta</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
 
-              <button
-                type="button"
-                onClick={() => setModalEspecialistaOpen(true)}
-                className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] hover:text-[#0F766E] font-semibold text-sm rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-2xs"
-              >
-                <MessageSquare className="w-4 h-4 text-[#0F766E]" />
-                <span>Falar com especialista</span>
-              </button>
-            </div>
-            {/* Benefícios rápidos */}
-            <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-[#4B5563]">
-              <span className="inline-flex items-center gap-1.5 font-medium">
-                <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-                Sem necessidade de cartão
-              </span>
-              <span className="inline-flex items-center gap-1.5 font-medium">
-                <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-                Modo offline com fila segura
-              </span>
-              <span className="inline-flex items-center gap-1.5 font-medium">
-                <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-                Celular e desktop
-              </span>
-            </div>
+                  <button
+                    type="button"
+                    onClick={() => setModalEspecialistaOpen(true)}
+                    className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] hover:text-[#0F766E] font-semibold text-sm rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-2xs"
+                  >
+                    <MessageSquare className="w-4 h-4 text-[#0F766E]" />
+                    <span>Falar com especialista</span>
+                  </button>
+                </div>
+                {/* Benefícios rápidos */}
+                <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-[#4B5563]">
+                  <span className="inline-flex items-center gap-1.5 font-medium">
+                    <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
+                    Sem necessidade de cartão
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 font-medium">
+                    <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
+                    Modo offline com fila segura
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 font-medium">
+                    <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
+                    Celular e desktop
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         </section>
 
@@ -573,255 +600,261 @@ export default function BemVindo() {
           </div>
         </section>
 
-        {/* Funil de interesse em 2 passos: PF/PJ e Segmento */}
-        <section id="opcao-interesse" className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5]">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
-              {/* Cabeçalho do Funil */}
-              <div className="border-b border-[#E5E7EB] pb-4 space-y-1">
-                <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#0F766E]">
-                  <span>Perfil de Atuação</span>
-                  <span>•</span>
-                  <span>Passo {isStep1Complete ? '2 de 2' : '1 de 2'}</span>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-extrabold text-[#1F2937] tracking-tight">
-                  Comece pelo seu segmento
-                </h2>
-                <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                  Adaptamos os modelos de rotinas e prioridades de acordo com o formato da sua
-                  operação.
-                </p>
-              </div>
-
-              {/* Passo 1: PF ou PJ */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold uppercase tracking-wider text-[#1F2937] flex items-center gap-2">
-                    <span
-                      className={`w-5 h-5 rounded-full text-[11px] font-bold flex items-center justify-center ${
-                        isStep1Complete ? 'bg-[#0F766E] text-white' : 'bg-gray-200 text-[#4B5563]'
-                      }`}
-                    >
-                      1
-                    </span>
-                    <span>Tipo de empresa:</span>
-                  </label>
-                  {tipoPessoa && (
-                    <span className="text-xs font-medium text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 inline-flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                      {tipoPessoa === 'PJ' ? 'Pessoa Jurídica' : 'Pessoa Física'}
-                    </span>
-                  )}
+        {/* Funil de interesse em 2 passos: PF/PJ e Segmento (ocultado para o Gestor Geral) */}
+        {!isGestorGeral && (
+          <section id="opcao-interesse" className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5]">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+                {/* Cabeçalho do Funil */}
+                <div className="border-b border-[#E5E7EB] pb-4 space-y-1">
+                  <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#0F766E]">
+                    <span>Perfil de Atuação</span>
+                    <span>•</span>
+                    <span>Passo {isStep1Complete ? '2 de 2' : '1 de 2'}</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-[#1F2937] tracking-tight">
+                    Comece pelo seu segmento
+                  </h2>
+                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+                    Adaptamos os modelos de rotinas e prioridades de acordo com o formato da sua
+                    operação.
+                  </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Cartão PJ */}
-                  <button
-                    type="button"
-                    onClick={() => setTipoPessoa('PJ')}
-                    className={`p-4 rounded-xl border text-left transition-all ${
-                      tipoPessoa === 'PJ'
-                        ? 'border-[#0F766E] bg-teal-50 ring-2 ring-[#0F766E]/20'
-                        : 'border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 hover:bg-gray-50'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
-                        <Building2 className="w-5 h-5" />
-                      </div>
-                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-[#0F766E]">
-                        CNPJ
-                      </span>
-                    </div>
-                    <div className="text-sm font-bold text-[#1F2937]">Pessoa Jurídica / Rede</div>
-                    <p className="text-xs text-[#4B5563] mt-1 leading-relaxed">
-                      Lojas físicas, redes de supermercados, franquias ou operações com filiais.
-                    </p>
-                  </button>
-
-                  {/* Cartão PF */}
-                  <button
-                    type="button"
-                    onClick={() => setTipoPessoa('PF')}
-                    className={`p-4 rounded-xl border text-left transition-all ${
-                      tipoPessoa === 'PF'
-                        ? 'border-[#0F766E] bg-teal-50 ring-2 ring-[#0F766E]/20'
-                        : 'border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 hover:bg-gray-50'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
-                        <User className="w-5 h-5" />
-                      </div>
-                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-[#0F766E]">
-                        PF / MEI
-                      </span>
-                    </div>
-                    <div className="text-sm font-bold text-[#1F2937]">Pessoa Física / Lojista</div>
-                    <p className="text-xs text-[#4B5563] mt-1 leading-relaxed">
-                      Lojista independente, MEI ou consultor de varejo autônomo.
-                    </p>
-                  </button>
-                </div>
-              </div>
-
-              {/* Passo 2: Segmento */}
-              {isStep1Complete && (
-                <div className="space-y-3 pt-4 border-t border-[#E5E7EB]">
+                {/* Passo 1: PF ou PJ */}
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold uppercase tracking-wider text-[#1F2937] flex items-center gap-2">
                       <span
                         className={`w-5 h-5 rounded-full text-[11px] font-bold flex items-center justify-center ${
-                          isStep2Complete ? 'bg-[#0F766E] text-white' : 'bg-gray-200 text-[#4B5563]'
+                          isStep1Complete ? 'bg-[#0F766E] text-white' : 'bg-gray-200 text-[#4B5563]'
                         }`}
                       >
-                        2
+                        1
                       </span>
-                      <span>Selecione o segmento:</span>
+                      <span>Tipo de empresa:</span>
                     </label>
-                    {segmento && (
+                    {tipoPessoa && (
                       <span className="text-xs font-medium text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 inline-flex items-center gap-1">
                         <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        {segmento === 'Outro' && outroSegmento ? outroSegmento : segmento}
+                        {tipoPessoa === 'PJ' ? 'Pessoa Jurídica' : 'Pessoa Física'}
                       </span>
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    {SEGMENT_OPTIONS.map((seg) => {
-                      const Icon = seg.icon
-                      const isSelected = segmento === seg.id
-                      return (
-                        <button
-                          key={seg.id}
-                          type="button"
-                          onClick={() => setSegmento(seg.id)}
-                          className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between ${
-                            isSelected
-                              ? 'border-[#0F766E] bg-teal-50 ring-2 ring-[#0F766E]/20'
-                              : 'border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 hover:bg-gray-50'
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Cartão PJ */}
+                    <button
+                      type="button"
+                      onClick={() => setTipoPessoa('PJ')}
+                      className={`p-4 rounded-xl border text-left transition-all ${
+                        tipoPessoa === 'PJ'
+                          ? 'border-[#0F766E] bg-teal-50 ring-2 ring-[#0F766E]/20'
+                          : 'border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+                          <Building2 className="w-5 h-5" />
+                        </div>
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-[#0F766E]">
+                          CNPJ
+                        </span>
+                      </div>
+                      <div className="text-sm font-bold text-[#1F2937]">Pessoa Jurídica / Rede</div>
+                      <p className="text-xs text-[#4B5563] mt-1 leading-relaxed">
+                        Lojas físicas, redes de supermercados, franquias ou operações com filiais.
+                      </p>
+                    </button>
+
+                    {/* Cartão PF */}
+                    <button
+                      type="button"
+                      onClick={() => setTipoPessoa('PF')}
+                      className={`p-4 rounded-xl border text-left transition-all ${
+                        tipoPessoa === 'PF'
+                          ? 'border-[#0F766E] bg-teal-50 ring-2 ring-[#0F766E]/20'
+                          : 'border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+                          <User className="w-5 h-5" />
+                        </div>
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-[#0F766E]">
+                          PF / MEI
+                        </span>
+                      </div>
+                      <div className="text-sm font-bold text-[#1F2937]">
+                        Pessoa Física / Lojista
+                      </div>
+                      <p className="text-xs text-[#4B5563] mt-1 leading-relaxed">
+                        Lojista independente, MEI ou consultor de varejo autônomo.
+                      </p>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Passo 2: Segmento */}
+                {isStep1Complete && (
+                  <div className="space-y-3 pt-4 border-t border-[#E5E7EB]">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold uppercase tracking-wider text-[#1F2937] flex items-center gap-2">
+                        <span
+                          className={`w-5 h-5 rounded-full text-[11px] font-bold flex items-center justify-center ${
+                            isStep2Complete
+                              ? 'bg-[#0F766E] text-white'
+                              : 'bg-gray-200 text-[#4B5563]'
                           }`}
                         >
-                          <div className="flex items-center justify-between mb-2">
-                            <div
-                              className={`w-8 h-8 rounded-lg flex items-center justify-center border ${
-                                isSelected
-                                  ? 'bg-[#0F766E] text-white border-[#0F766E]'
-                                  : 'bg-[#F7F7F5] border-[#E5E7EB] text-[#4B5563]'
-                              }`}
-                            >
-                              <Icon className="w-4 h-4" />
+                          2
+                        </span>
+                        <span>Selecione o segmento:</span>
+                      </label>
+                      {segmento && (
+                        <span className="text-xs font-medium text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 inline-flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          {segmento === 'Outro' && outroSegmento ? outroSegmento : segmento}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      {SEGMENT_OPTIONS.map((seg) => {
+                        const Icon = seg.icon
+                        const isSelected = segmento === seg.id
+                        return (
+                          <button
+                            key={seg.id}
+                            type="button"
+                            onClick={() => setSegmento(seg.id)}
+                            className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between ${
+                              isSelected
+                                ? 'border-[#0F766E] bg-teal-50 ring-2 ring-[#0F766E]/20'
+                                : 'border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 hover:bg-gray-50'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div
+                                className={`w-8 h-8 rounded-lg flex items-center justify-center border ${
+                                  isSelected
+                                    ? 'bg-[#0F766E] text-white border-[#0F766E]'
+                                    : 'bg-[#F7F7F5] border-[#E5E7EB] text-[#4B5563]'
+                                }`}
+                              >
+                                <Icon className="w-4 h-4" />
+                              </div>
+                              {isSelected && (
+                                <CheckCircle2 className="w-4 h-4 text-[#0F766E] shrink-0" />
+                              )}
                             </div>
-                            {isSelected && (
-                              <CheckCircle2 className="w-4 h-4 text-[#0F766E] shrink-0" />
-                            )}
-                          </div>
-                          <div>
-                            <div
-                              className={`text-xs font-bold leading-tight ${
-                                isSelected ? 'text-[#0F766E]' : 'text-[#1F2937]'
-                              }`}
-                            >
-                              {seg.label}
+                            <div>
+                              <div
+                                className={`text-xs font-bold leading-tight ${
+                                  isSelected ? 'text-[#0F766E]' : 'text-[#1F2937]'
+                                }`}
+                              >
+                                {seg.label}
+                              </div>
+                              <p className="text-[10px] text-[#6B7280] mt-1 line-clamp-2">
+                                {seg.description}
+                              </p>
                             </div>
-                            <p className="text-[10px] text-[#6B7280] mt-1 line-clamp-2">
-                              {seg.description}
-                            </p>
-                          </div>
-                        </button>
-                      )
-                    })}
+                          </button>
+                        )
+                      })}
+                    </div>
+
+                    {segmento === 'Outro' && (
+                      <div className="pt-2">
+                        <label className="block text-xs font-semibold uppercase tracking-wider text-[#1F2937] mb-1">
+                          Especifique o segmento:
+                        </label>
+                        <input
+                          type="text"
+                          value={outroSegmento}
+                          onChange={(e) => setOutroSegmento(e.target.value)}
+                          placeholder="Ex.: Ótica, Joalheria, Papelaria..."
+                          className="w-full px-3.5 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-xl outline-none focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937]"
+                        />
+                      </div>
+                    )}
+
+                    {/* Exemplos de rotinas */}
+                    {segmento && (
+                      <div className="mt-3.5 p-4 rounded-xl bg-[#F7F7F5] border border-[#E5E7EB]">
+                        <div className="flex items-center justify-between mb-2.5">
+                          <span className="text-xs font-bold text-[#1F2937]">
+                            Exemplos de rotinas para{' '}
+                            {SEGMENT_OPTIONS.find((s) => s.id === segmento)?.label || segmento}:
+                          </span>
+                          <span className="text-[10px] font-semibold text-[#0F766E] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                            Modelo Pronto
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                          {(EXEMPLOS_ROTINAS_POR_SEGMENTO[segmento] || EXEMPLO_GENERICO_LOJA).map(
+                            (ex, idx) => (
+                              <div
+                                key={idx}
+                                className="bg-white p-3 rounded-xl border border-[#E5E7EB]"
+                              >
+                                <div className="text-xs font-bold text-[#1F2937] leading-snug">
+                                  {ex.titulo}
+                                </div>
+                                <div className="text-[11px] text-[#6B7280] mt-1 leading-normal">
+                                  {ex.descricao}
+                                </div>
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Botões de Ação */}
+                <div className="pt-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="text-xs text-[#4B5563]">
+                    {!isStep1Complete ? (
+                      <span>Selecione PJ ou PF para continuar.</span>
+                    ) : !isStep2Complete ? (
+                      <span>Escolha o segmento da sua loja para avançar.</span>
+                    ) : (
+                      <span className="text-emerald-700 font-semibold inline-flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        Perfil selecionado. Clique em Continuar.
+                      </span>
+                    )}
                   </div>
 
-                  {segmento === 'Outro' && (
-                    <div className="pt-2">
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-[#1F2937] mb-1">
-                        Especifique o segmento:
-                      </label>
-                      <input
-                        type="text"
-                        value={outroSegmento}
-                        onChange={(e) => setOutroSegmento(e.target.value)}
-                        placeholder="Ex.: Ótica, Joalheria, Papelaria..."
-                        className="w-full px-3.5 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-xl outline-none focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937]"
-                      />
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <button
+                      type="button"
+                      onClick={() => setModalEspecialistaOpen(true)}
+                      className="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-xl transition-colors inline-flex items-center justify-center gap-1.5"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5 text-[#0F766E]" />
+                      <span>Falar com especialista</span>
+                    </button>
 
-                  {/* Exemplos de rotinas */}
-                  {segmento && (
-                    <div className="mt-3.5 p-4 rounded-xl bg-[#F7F7F5] border border-[#E5E7EB]">
-                      <div className="flex items-center justify-between mb-2.5">
-                        <span className="text-xs font-bold text-[#1F2937]">
-                          Exemplos de rotinas para{' '}
-                          {SEGMENT_OPTIONS.find((s) => s.id === segmento)?.label || segmento}:
-                        </span>
-                        <span className="text-[10px] font-semibold text-[#0F766E] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
-                          Modelo Pronto
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                        {(EXEMPLOS_ROTINAS_POR_SEGMENTO[segmento] || EXEMPLO_GENERICO_LOJA).map(
-                          (ex, idx) => (
-                            <div
-                              key={idx}
-                              className="bg-white p-3 rounded-xl border border-[#E5E7EB]"
-                            >
-                              <div className="text-xs font-bold text-[#1F2937] leading-snug">
-                                {ex.titulo}
-                              </div>
-                              <div className="text-[11px] text-[#6B7280] mt-1 leading-normal">
-                                {ex.descricao}
-                              </div>
-                            </div>
-                          ),
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Botões de Ação */}
-              <div className="pt-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div className="text-xs text-[#4B5563]">
-                  {!isStep1Complete ? (
-                    <span>Selecione PJ ou PF para continuar.</span>
-                  ) : !isStep2Complete ? (
-                    <span>Escolha o segmento da sua loja para avançar.</span>
-                  ) : (
-                    <span className="text-emerald-700 font-semibold inline-flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      Perfil selecionado. Clique em Continuar.
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <button
-                    type="button"
-                    onClick={() => setModalEspecialistaOpen(true)}
-                    className="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-xl transition-colors inline-flex items-center justify-center gap-1.5"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5 text-[#0F766E]" />
-                    <span>Falar com especialista</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleContinue}
-                    disabled={!canContinue}
-                    className="w-full sm:w-auto px-6 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-xs sm:text-sm rounded-xl shadow-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
-                  >
-                    <span>Continuar</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
+                    <button
+                      type="button"
+                      onClick={handleContinue}
+                      disabled={!canContinue}
+                      className="w-full sm:w-auto px-6 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-xs sm:text-sm rounded-xl shadow-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                    >
+                      <span>Continuar</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
       </main>
 
       {/* Rodapé sóbrio */}
@@ -839,25 +872,36 @@ export default function BemVindo() {
             </div>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[#6B7280]">
-              <Link to="/login" className="hover:text-[#1F2937] font-medium transition-colors">
-                Já tenho conta
-              </Link>
-              <span className="text-gray-300">•</span>
-              <button
-                type="button"
-                onClick={() => setModalEspecialistaOpen(true)}
-                className="hover:text-[#1F2937] font-medium transition-colors"
-              >
-                Falar com especialista
-              </button>
-              <span className="text-gray-300">•</span>
-              <button
-                type="button"
-                onClick={handleScrollToInterest}
-                className="hover:text-[#1F2937] font-medium transition-colors"
-              >
-                Cadastrar
-              </button>
+              {isGestorGeral ? (
+                <Link
+                  to="/admin"
+                  className="hover:text-[#1F2937] font-medium transition-colors text-[#0F766E]"
+                >
+                  Painel de Gestão Geral
+                </Link>
+              ) : (
+                <>
+                  <Link to="/login" className="hover:text-[#1F2937] font-medium transition-colors">
+                    Já tenho conta
+                  </Link>
+                  <span className="text-gray-300">•</span>
+                  <button
+                    type="button"
+                    onClick={() => setModalEspecialistaOpen(true)}
+                    className="hover:text-[#1F2937] font-medium transition-colors"
+                  >
+                    Falar com especialista
+                  </button>
+                  <span className="text-gray-300">•</span>
+                  <button
+                    type="button"
+                    onClick={handleScrollToInterest}
+                    className="hover:text-[#1F2937] font-medium transition-colors"
+                  >
+                    Cadastrar
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
