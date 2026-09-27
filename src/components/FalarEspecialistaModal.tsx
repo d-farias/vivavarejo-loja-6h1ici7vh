@@ -30,7 +30,10 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
   if (!open) return null
 
   const specialistName = contatos.nomeAtendente || 'Especialista'
-  const specialistEmail = contatos.email
+  const specialistEmail =
+    contatos.email && contatos.email.toLowerCase() !== 'dfarias53@gmail.com'
+      ? contatos.email
+      : 'contato@vivavarejo.com'
   const whatsappPhoneLabel = contatos.whatsapp
   const whatsappNumberClean = contatos.whatsappRaw
   const whatsappUrl = whatsappNumberClean

@@ -992,12 +992,20 @@ export default function BemVindo() {
             <div className="flex items-center gap-1.5">
               <Mail className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
               <span className="text-[#6B7280]">Tire suas dúvidas:</span>
-              <a
-                href={`mailto:${contatos.email || 'contato@vivavarejo.com'}`}
-                className="font-medium text-[#1F2937] hover:text-[#0F766E] underline underline-offset-2 transition-colors"
-              >
-                {contatos.email || 'contato@vivavarejo.com'}
-              </a>
+              {(() => {
+                const emailExibido =
+                  contatos.email && contatos.email.toLowerCase() !== 'dfarias53@gmail.com'
+                    ? contatos.email
+                    : 'contato@vivavarejo.com'
+                return (
+                  <a
+                    href={`mailto:${emailExibido}`}
+                    className="font-medium text-[#1F2937] hover:text-[#0F766E] underline underline-offset-2 transition-colors"
+                  >
+                    {emailExibido}
+                  </a>
+                )
+              })()}
             </div>
           </div>
 

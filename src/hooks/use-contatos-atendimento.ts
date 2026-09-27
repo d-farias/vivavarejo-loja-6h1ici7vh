@@ -33,7 +33,12 @@ export function useContatosAtendimento(clienteIdParam?: string): {
 
       // Busca configuração global primeiro (ou em paralelo)
       const globalConfig = await configuracoesService.getGlobal().catch(() => null)
-      const globalEmail = globalConfig?.email_suporte?.trim() || DEFAULT_CONTATO_EMAIL
+      const rawGlobalEmail = globalConfig?.email_suporte?.trim()
+      // Blindagem estrita: nunca expor e-mail pessoal do gestor dfarias53@gmail.com como contato
+      const globalEmail =
+        rawGlobalEmail && rawGlobalEmail.toLowerCase() !== 'dfarias53@gmail.com'
+          ? rawGlobalEmail
+          : DEFAULT_CONTATO_EMAIL
       const globalWhatsapp = globalConfig?.whatsapp_suporte?.trim() || DEFAULT_CONTATO_WHATSAPP
       const globalNome = globalConfig?.nome_atendimento?.trim() || DEFAULT_CONTATO_NOME
 
@@ -41,7 +46,11 @@ export function useContatosAtendimento(clienteIdParam?: string): {
         try {
           const cliente = await clientesService.getById(targetClienteId)
           // Se o cliente/rede tiver contatos próprios configurados, prioriza-os
-          const emailRede = cliente.email_suporte?.trim()
+          const rawEmailRede = cliente.email_suporte?.trim()
+          const emailRede =
+            rawEmailRede && rawEmailRede.toLowerCase() !== 'dfarias53@gmail.com'
+              ? rawEmailRede
+              : undefined
           const whatsappRede = cliente.whatsapp_suporte?.trim()
           const nomeRedeAtendente = cliente.nome_atendimento?.trim()
 
@@ -51,7 +60,10 @@ export function useContatosAtendimento(clienteIdParam?: string): {
             const finalNome = nomeRedeAtendente || cliente.nome || globalNome
 
             setContatos({
-              email: finalEmail,
+              email:
+                finalEmail.toLowerCase() === 'dfarias53@gmail.com'
+                  ? DEFAULT_CONTATO_EMAIL
+                  : finalEmail,
               whatsapp: formatPhoneBR(finalWhatsapp),
               whatsappRaw: sanitizePhoneForWaMe(finalWhatsapp),
               nomeAtendente: finalNome,
@@ -68,7 +80,8 @@ export function useContatosAtendimento(clienteIdParam?: string): {
 
       // Fallback global
       setContatos({
-        email: globalEmail,
+        email:
+          globalEmail.toLowerCase() === 'dfarias53@gmail.com' ? DEFAULT_CONTATO_EMAIL : globalEmail,
         whatsapp: formatPhoneBR(globalWhatsapp),
         whatsappRaw: sanitizePhoneForWaMe(globalWhatsapp),
         nomeAtendente: globalNome,

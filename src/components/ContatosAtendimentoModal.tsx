@@ -87,13 +87,19 @@ export const ContatosAtendimentoModal: React.FC<ContatosAtendimentoModalProps> =
   // Preenche os campos conforme o target selecionado
   useEffect(() => {
     if (selectedTarget === 'global') {
-      setEmailSuporte(globalConfig?.email_suporte || 'contato@vivavarejo.com')
+      const gEmail = globalConfig?.email_suporte?.trim()
+      setEmailSuporte(
+        gEmail && gEmail.toLowerCase() !== 'dfarias53@gmail.com'
+          ? gEmail
+          : 'contato@vivavarejo.com',
+      )
       setWhatsappSuporte(formatPhoneBR(globalConfig?.whatsapp_suporte || '(48) 99181-7542'))
       setNomeAtendimento(globalConfig?.nome_atendimento || 'Dalvani Farias')
     } else {
       const cli = clientes.find((c) => c.id === selectedTarget)
       if (cli) {
-        setEmailSuporte(cli.email_suporte || '')
+        const cEmail = cli.email_suporte?.trim() || ''
+        setEmailSuporte(cEmail.toLowerCase() === 'dfarias53@gmail.com' ? '' : cEmail)
         setWhatsappSuporte(formatPhoneBR(cli.whatsapp_suporte || ''))
         setNomeAtendimento(cli.nome_atendimento || '')
       }
