@@ -736,6 +736,131 @@ export interface AdmRhDemanda extends RecordModel {
   }
 }
 
+// ==================== VIVAVAREJO MATCH ====================
+export type SituacaoMatch =
+  | 'ruptura'
+  | 'risco_ruptura'
+  | 'pedido_aberto'
+  | 'excesso_estoque'
+  | 'oportunidade'
+
+export type StatusMatchDemanda =
+  | 'aberta'
+  | 'em_analise'
+  | 'cd_abastecimento'
+  | 'fornecedor'
+  | 'entrega_programada'
+  | 'recebida'
+  | 'disponivel_venda'
+  | 'resolvida'
+
+export type PrioridadeMatch = 'alta' | 'media' | 'baixa'
+
+export type RespostaPadraoMatch =
+  | 'tenho_estoque'
+  | 'pedido_confirmado'
+  | 'entrega_programada'
+  | 'nao_tenho_estoque'
+  | 'previsao_disponibilidade'
+  | 'problema_atendimento'
+  | 'observacao_justificativa'
+
+export type OrigemResolucaoMatch =
+  | 'cd'
+  | 'fornecedor'
+  | 'transferencia'
+  | 'ajuste_local'
+  | 'nenhuma'
+
+export interface MatchHistoricoItem {
+  data: string
+  autor: string
+  status: StatusMatchDemanda
+  mensagem: string
+}
+
+export interface MatchDemanda extends RecordModel {
+  rede?: string
+  loja?: string
+  fornecedor?: string
+  fornecedor_nome?: string
+  produto_codigo?: string
+  produto_descricao: string
+  curva: CurvaAbc
+  estoque_loja?: number
+  estoque_cd?: number
+  estoque_transito?: boolean
+  previsao_entrega_transito?: string
+  venda_media_diaria?: number
+  preco_venda?: number
+  ultima_venda_em?: string
+  lead_time_dias?: number
+  potencial_venda_perdida?: number
+  situacao: SituacaoMatch
+  acao_sugerida: string
+  status: StatusMatchDemanda
+  prioridade: PrioridadeMatch
+  origem_resolucao?: OrigemResolucaoMatch
+  valor_recuperado?: number
+  resposta_padrao?: RespostaPadraoMatch
+  observacao_resposta?: string
+  historico_andamento?: MatchHistoricoItem[]
+  registrado_por_nome?: string
+  registrado_por_usuario?: string
+  resolvido_em?: string
+  tempo_resolucao_dias?: number
+  dentro_sla?: boolean
+  is_exemplo?: boolean
+  created: string
+  updated: string
+  expand?: {
+    rede?: Cliente
+    loja?: Loja
+    fornecedor?: Fornecedor
+    registrado_por_usuario?: User
+  }
+}
+
+export type StatusMatchOportunidade =
+  | 'identificada'
+  | 'em_negociacao'
+  | 'acao_em_loja'
+  | 'convertida'
+  | 'descartada'
+
+export interface MatchOportunidade extends RecordModel {
+  rede?: string
+  produto_codigo?: string
+  produto_descricao: string
+  categoria?: string
+  fornecedor_nome?: string
+  lojas_referencia?: string
+  lojas_com_gap?: string
+  venda_referencia_mensal?: number
+  venda_atual_mensal?: number
+  gap_estimado_reais?: number
+  acao_sugerida?: string
+  status: StatusMatchOportunidade
+  valor_convertido_reais?: number
+  observacao?: string
+  is_exemplo?: boolean
+  created: string
+  updated: string
+  expand?: {
+    rede?: Cliente
+  }
+}
+
+export interface MatchConfiguracao extends RecordModel {
+  rede?: string
+  sla_dias_padrao?: number
+  estoque_critico_padrao?: number
+  metodologia_potencial?: string
+  dias_historico_venda?: number
+  created: string
+  updated: string
+}
+
 export interface VisitaAnalytics {
   id: string
   pagina: string

@@ -470,6 +470,27 @@ export default function BemVindo() {
                 </p>
               </div>
             </div>
+
+            {/* Destaque VivaVarejo Match na Seção de Módulos */}
+            <div className="mt-4 p-5 rounded-2xl bg-gradient-to-r from-teal-50 via-white to-gray-50 border border-teal-200 shadow-2xs space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-[#0F766E] text-white">
+                  Diferencial Exclusivo
+                </span>
+                <span className="text-xs font-bold text-[#0F766E]">
+                  VivaVarejo Match • Loja, CD, Abastecimento e Fornecedor
+                </span>
+              </div>
+              <h3 className="text-sm sm:text-base font-bold text-[#1F2937]">
+                Identifica a ruptura, verifica se a solução está dentro de casa e só aciona o
+                fornecedor quando necessário
+              </h3>
+              <p className="text-xs text-[#4B5563] leading-relaxed max-w-3xl">
+                Antes de procurar fora, o sistema cruza estoque de loja, saldos do Centro de
+                Distribuição e pedidos em trânsito. Conecta a equipe de loja à central e ao
+                fornecedor de ponta a ponta com cálculo do valor de venda em risco e recuperado.
+              </p>
+            </div>
           </div>
         </section>
 

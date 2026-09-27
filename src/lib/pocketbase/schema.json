@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-27T15:25:55.655Z",
+  "generatedAt": "2026-09-27T22:06:53.796Z",
   "collections": [
     {
       "name": "users",
@@ -3295,6 +3295,450 @@
         "CREATE INDEX idx_visitas_sessao_id ON visitas (sessao_id)",
         "CREATE INDEX idx_visitas_pagina ON visitas (pagina)",
         "CREATE INDEX idx_visitas_user_email ON visitas (user_email)"
+      ]
+    },
+    {
+      "name": "match_configuracoes",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "rede",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "clientes"
+        },
+        {
+          "name": "sla_dias_padrao",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "estoque_critico_padrao",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "metodologia_potencial",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dias_historico_venda",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_match_cfg_rede ON match_configuracoes (rede)"]
+    },
+    {
+      "name": "match_demandas",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "rede",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "clientes"
+        },
+        {
+          "name": "loja",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "fornecedor",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "fornecedores"
+        },
+        {
+          "name": "fornecedor_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_codigo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_descricao",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "curva",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["A", "B", "C", "C+"]
+        },
+        {
+          "name": "estoque_loja",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "estoque_cd",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "estoque_transito",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "previsao_entrega_transito",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "venda_media_diaria",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "preco_venda",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ultima_venda_em",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "lead_time_dias",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "potencial_venda_perdida",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "situacao",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "ruptura",
+            "risco_ruptura",
+            "pedido_aberto",
+            "excesso_estoque",
+            "oportunidade"
+          ]
+        },
+        {
+          "name": "acao_sugerida",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "aberta",
+            "em_analise",
+            "cd_abastecimento",
+            "fornecedor",
+            "entrega_programada",
+            "recebida",
+            "disponivel_venda",
+            "resolvida"
+          ]
+        },
+        {
+          "name": "prioridade",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["alta", "media", "baixa"]
+        },
+        {
+          "name": "origem_resolucao",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["cd", "fornecedor", "transferencia", "ajuste_local", "nenhuma"]
+        },
+        {
+          "name": "valor_recuperado",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resposta_padrao",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "tenho_estoque",
+            "pedido_confirmado",
+            "entrega_programada",
+            "nao_tenho_estoque",
+            "previsao_disponibilidade",
+            "problema_atendimento",
+            "observacao_justificativa"
+          ]
+        },
+        {
+          "name": "observacao_resposta",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "historico_andamento",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "registrado_por_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "registrado_por_usuario",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "resolvido_em",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tempo_resolucao_dias",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dentro_sla",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_exemplo",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_match_dem_rede ON match_demandas (rede)",
+        "CREATE INDEX idx_match_dem_loja ON match_demandas (loja)",
+        "CREATE INDEX idx_match_dem_status ON match_demandas (status)",
+        "CREATE INDEX idx_match_dem_situacao ON match_demandas (situacao)",
+        "CREATE INDEX idx_match_dem_curva ON match_demandas (curva)",
+        "CREATE INDEX idx_match_dem_prioridade ON match_demandas (prioridade)",
+        "CREATE INDEX idx_match_dem_created ON match_demandas (created)"
+      ]
+    },
+    {
+      "name": "match_oportunidades",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "rede",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "clientes"
+        },
+        {
+          "name": "produto_codigo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto_descricao",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "categoria",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "fornecedor_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "lojas_referencia",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "lojas_com_gap",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "venda_referencia_mensal",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "venda_atual_mensal",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "gap_estimado_reais",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "acao_sugerida",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "identificada",
+            "em_negociacao",
+            "acao_em_loja",
+            "convertida",
+            "descartada"
+          ]
+        },
+        {
+          "name": "valor_convertido_reais",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observacao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_exemplo",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_match_opp_rede ON match_oportunidades (rede)",
+        "CREATE INDEX idx_match_opp_status ON match_oportunidades (status)",
+        "CREATE INDEX idx_match_opp_created ON match_oportunidades (created)"
       ]
     }
   ]

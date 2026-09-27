@@ -37,6 +37,9 @@ import { NovaNegociacaoModal } from '@/components/NovaNegociacaoModal'
 import { NovoMarcoNegociacaoModal } from '@/components/NovoMarcoNegociacaoModal'
 import { RegistrarEvidenciaMarcoModal } from '@/components/RegistrarEvidenciaMarcoModal'
 import { FotoVisualizadorModal } from '@/components/FotoVisualizadorModal'
+import { AbastecimentoMatchSecao } from '@/components/AbastecimentoMatchSecao'
+import { fornecedoresService } from '@/services/fornecedores'
+import { isPerfilGerente, isPerfilRede, isGestorGeralUser } from '@/lib/perfil-utils'
 import { useAuth } from '@/context/AuthContext'
 import type {
   ComercialProduto,
@@ -45,6 +48,7 @@ import type {
   ComercialImplantacao,
   ComercialNegociacao,
   ComercialNegociacaoMarco,
+  Fornecedor,
 } from '@/types'
 
 export type AbaComercial =
@@ -64,7 +68,20 @@ export default function ComercialPage() {
   const { user } = useAuth()
   const { lojaSelecionadaId, lojas } = useStore()
 
-  // Estado dos acordeões (flags): por padrão apenas a primeira seção (rupturas) expandida
+  // Seletor principal do Comercial: Gestão Comercial x Abastecimento & Match
+  // Mantém menu enxuto e sem poluição, perfeito para mobile
+  const [visaoComercial, setVisaoComercial] = useState<'match' | 'gestao'>('match')
+
+  // Lista de fornecedores para o Match
+  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([])
+
+  // Identificação de perfis
+  const isGerente = isPerfilGerente(user)
+  const isRede = isPerfilRede(user)
+  const isDfarias = isGestorGeralUser(user)
+  const isRedeOuAdmin = isRede || isDfarias || Boolean(user?.is_admin)
+
+  // Estado dos acordeões (flags) da gestão comercial
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     rupturas: true,
   })
@@ -169,6 +186,10 @@ export default function ComercialPage() {
 
   useEffect(() => {
     carregarDados()
+    fornecedoresService
+      .listar()
+      .then((data) => setFornecedores(data))
+      .catch((err) => console.warn('Falha ao listar fornecedores:', err))
   }, [lojaId, competencia])
 
   // ==================== CÁLCULOS E RESUMO EXECUTIVO ====================
@@ -444,46 +465,114 @@ export default function ComercialPage() {
 
   return (
     <div className="space-y-6">
-      {/* Cabeçalho da Página */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-teal-50 text-[#0F766E] border border-teal-200">
-              Gestão Comercial & Negócio
+              Módulo Comercial • VivaVarejo
             </span>
+            {isGerente && (
+              <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                Chão de Loja (Gerente)
+              </span>
+            )}
+            {isRedeOuAdmin && (
+              <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-teal-100/70 text-[#0F766E] border border-teal-300">
+                Visão de Rede (ADM)
+              </span>
+            )}
           </div>
           <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937] tracking-tight mt-1 flex items-center gap-2.5">
             <TrendingUp className="w-6 h-6 text-[#0F766E]" />
-            <span>Módulo Comercial</span>
+            <span>Comercial & Negociações</span>
           </h1>
           <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">
-            Rupturas, sortimento, vendas, curvas A/B/C+, margens, layout e sincronização de dados
+            {visaoComercial === 'match'
+              ? 'VivaVarejo Match: conexão Loja, CD, Abastecimento e Fornecedor com decisão em cascata.'
+              : 'Sortimento, vendas, curvas A/B/C+, margens, layout, rebaixas e sincronização ERP.'}
           </p>
         </div>
 
-        {/* Ações Rápidas: StoreSelector + Importar Planilha + Exportar */}
+        {/* Seletor de Loja & Ações */}
         <div className="flex items-center gap-2 flex-wrap">
           <StoreSelector />
 
-          <button
-            onClick={handleExportarCsv}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#374151] hover:text-[#0F766E] text-xs font-semibold rounded-xl shadow-2xs transition-colors"
-            title="Exportar dados da visão atual em planilha CSV"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Exportar CSV</span>
-          </button>
+          {visaoComercial === 'gestao' && (
+            <>
+              <button
+                onClick={handleExportarCsv}
+                className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#374151] hover:text-[#0F766E] text-xs font-semibold rounded-xl shadow-2xs transition-colors"
+                title="Exportar dados da visão atual em planilha CSV"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Exportar CSV</span>
+              </button>
 
-          <Button
-            size="sm"
-            onClick={() => setImportarModalOpen(true)}
-            className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs"
-          >
-            <UploadCloud className="w-4 h-4" />
-            <span>Importar Planilha</span>
-          </Button>
+              <Button
+                size="sm"
+                onClick={() => setImportarModalOpen(true)}
+                className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs"
+              >
+                <UploadCloud className="w-4 h-4" />
+                <span>Importar Planilha</span>
+              </Button>
+            </>
+          )}
         </div>
       </div>
+
+      {/* SELETOR ENXUTO DE VISÃO: ABASTECIMENTO & MATCH x GESTÃO COMERCIAL */}
+      {/* Design sóbrio, 1 toque, limpo no celular (sem menu poluído) */}
+      <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
+        <div className="inline-flex p-1 rounded-xl bg-gray-100 border border-[#E5E7EB] text-xs font-semibold">
+          <button
+            type="button"
+            onClick={() => setVisaoComercial('match')}
+            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+              visaoComercial === 'match'
+                ? 'bg-white text-[#0F766E] shadow-2xs font-bold border border-teal-200'
+                : 'text-[#4B5563] hover:text-[#1F2937]'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
+            <span>Abastecimento & Match</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setVisaoComercial('gestao')}
+            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+              visaoComercial === 'gestao'
+                ? 'bg-white text-[#0F766E] shadow-2xs font-bold border border-teal-200'
+                : 'text-[#4B5563] hover:text-[#1F2937]'
+            }`}
+          >
+            <span>Gestão & Sortimento</span>
+          </button>
+        </div>
+
+        <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#6B7280]">
+          <span className="font-semibold text-[#1F2937]">VivaVarejo Match</span>
+          <span>• Fluxo em cascata anti-ruptura</span>
+        </div>
+      </div>
+
+      {/* VISÃO 1: ABASTECIMENTO & MATCH (CONCEITO CENTRAL DO MATCH) */}
+      {visaoComercial === 'match' && (
+        <AbastecimentoMatchSecao
+          lojas={lojas}
+          lojaSelecionadaId={lojaId}
+          fornecedores={fornecedores}
+          user={user}
+          isGerente={isGerente}
+          isRedeOuAdmin={isRedeOuAdmin}
+          redeId={user?.cliente}
+        />
+      )}
+
+      {/* VISÃO 2: GESTÃO & SORTIMENTO (ESTRUTURA ORIGINAL PRESERVADA 100%) */}
+      {visaoComercial === 'gestao' && (
+        <div className="space-y-6">
 
       {/* Sincronização ERP Banner Discreto (Requisito 3) */}
       <div className="p-3 bg-white border border-[#E5E7EB] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-[#4B5563] shadow-2xs">
@@ -3025,6 +3114,7 @@ export default function ComercialPage() {
             </div>
           </div>
         </div>
+      </div>
       )}
 
       {/* Modais de Suporte */}

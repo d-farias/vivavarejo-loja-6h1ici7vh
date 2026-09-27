@@ -598,6 +598,43 @@ const SOLUCOES_PLATAFORMA: SolucaoPilar[] = [
     dicaVendaInterna:
       'Faça a demonstração no próprio celular do cliente. Ao ver que é rápido, não precisa baixar nada na Google Play/App Store e funciona na vertical, a aceitação é unânime.',
   },
+  {
+    id: 'vivavarejo_match',
+    numero: 10,
+    titulo: 'VivaVarejo Match: Conexão Loja, CD, Abastecimento e Fornecedor',
+    subtitulo:
+      'Motor de decisão em cascata inteligente que verifica a solução dentro de casa antes de procurar fora',
+    icone: Zap,
+    destaqueBadge: 'Diferencial Exclusivo Match',
+    beneficioPrincipal:
+      'Elimina rupturas de gôndola e transforma produtos faltantes em valor financeiro recuperado, conectando o chão de loja ao CD e ao comprador em tempo real.',
+    itensDetalhados: [
+      {
+        titulo: 'Regra Fundamental em Cascata: Solução Interna Primeiro',
+        descricao:
+          'O sistema cruza dados da loja com saldo do CD e pedidos em trânsito. O fornecedor NUNCA é o primeiro destino: se o CD tiver estoque, gera demanda de abastecimento interno imediata.',
+      },
+      {
+        titulo: 'Transformação de Ruptura em Dinheiro (R$ em Risco e Recuperado)',
+        descricao:
+          'O varejista visualiza na hora o valor financeiro da venda perdida projetada por SKU Curva A/B e o total de dinheiro recuperado após o atendimento.',
+      },
+      {
+        titulo: 'Rastreabilidade Ponta a Ponta com Respostas Estruturadas',
+        descricao:
+          'Ciclo transparente: Aberta → Em Análise → CD/Abastecimento → Fornecedor → Entrega Programada → Recebida → Disponível → Resolvida, com SLA e histórico auditável.',
+      },
+      {
+        titulo: 'Oportunidades Comerciais Entre Lojas Comparáveis',
+        descricao:
+          'Identifica SKUs com alto volume em lojas de referência e baixo giro em filiais similares, apontando o gap financeiro e gerando ações imediatas de expansão de mix.',
+      },
+    ],
+    diferencialExclusivo:
+      'Diferencial exclusivo: nenhuma ferramenta do mercado une a fiscalização de piso de loja com a cascata de abastecimento (CD → Trânsito → Fornecedor) e cálculo financeiro de venda recuperada.',
+    dicaVendaInterna:
+      'Apresente os 3 modelos comerciais: 1) Varejista contrata a suíte completa; 2) Ecossistema: fornecedores contratam o módulo para acompanhar seus SKUs; 3) Patrocínio de monitoramento pelas grandes indústrias.',
+  },
 ]
 
 export function MaterialVendaAba() {
@@ -1078,10 +1115,59 @@ export function MaterialVendaAba() {
               </div>
             </div>
 
-            {/* Nova Seção: Funcionalidades Operacionais da v0.0.92 */}
+            {/* Bloco Destaque VivaVarejo Match na Proposta Comercial */}
+            <div className="bg-gradient-to-r from-teal-50 via-white to-emerald-50 border border-teal-200 rounded-xl p-5 print:p-3 space-y-3 print:space-y-1.5 print-break-inside-avoid shadow-2xs">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[#0F766E] text-white">
+                  VivaVarejo Match • Diferencial de Abastecimento
+                </span>
+                <span className="text-xs font-semibold text-[#0F766E]">
+                  Loja • CD • Abastecimento • Fornecedor
+                </span>
+              </div>
+              <h2 className="text-base sm:text-lg print:text-sm font-extrabold text-[#1F2937] tracking-tight">
+                Antes de procurar fora, o sistema verifica se a solução está dentro de casa
+              </h2>
+              <p className="text-xs sm:text-sm print:text-xs text-[#374151] leading-relaxed">
+                O <strong>VivaVarejo Match</strong> conecta o chão de loja à central de
+                abastecimento e aos fornecedores. Ao identificar uma ruptura no PDV, o motor em
+                cascata cruza os dados na hora: se o CD tiver saldo, gera ordem interna de
+                abastecimento; se houver carga em trânsito, acompanha a entrega; e só aciona o
+                fornecedor se não houver cobertura na rede.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2 text-xs">
+                <div className="p-2.5 rounded-lg bg-white border border-teal-200">
+                  <div className="font-bold text-[#0F766E]">R$ em Risco e Recuperado</div>
+                  <div className="text-[11px] text-[#4B5563] mt-0.5">
+                    Transforma gôndola vazia em valor financeiro visível por Curva ABC.
+                  </div>
+                </div>
+                <div className="p-2.5 rounded-lg bg-white border border-teal-200">
+                  <div className="font-bold text-[#0F766E]">Rastreabilidade com SLA</div>
+                  <div className="text-[11px] text-[#4B5563] mt-0.5">
+                    Ciclo de 8 etapas do registro à reposição com respostas estruturadas.
+                  </div>
+                </div>
+                <div className="p-2.5 rounded-lg bg-white border border-teal-200">
+                  <div className="font-bold text-[#0F766E]">Oportunidades Comerciais</div>
+                  <div className="text-[11px] text-[#4B5563] mt-0.5">
+                    Comparativo entre filiais para capturar gaps de venda de produtos líderes.
+                  </div>
+                </div>
+              </div>
+              <div className="text-[11px] text-[#0F766E] pt-1 font-semibold flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                <span>
+                  Modelos Comerciais Flexíveis: Contratação pelo Varejista, Módulo Ecossistema ou
+                  Patrocínio pelas Indústrias Parceiras.
+                </span>
+              </div>
+            </div>
+
+            {/* Nova Seção: Funcionalidades Operacionais */}
             <div className="space-y-3 pt-2 border-t border-[#E5E7EB] print-break-inside-avoid">
               <span className="text-[11px] print:text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
-                Capacidades Reais da Plataforma (v0.0.92)
+                Capacidades Reais da Plataforma
               </span>
               <h2 className="text-base sm:text-lg print:text-sm font-extrabold text-[#1F2937] tracking-tight">
                 Como a plataforma opera na prática do dia a dia
