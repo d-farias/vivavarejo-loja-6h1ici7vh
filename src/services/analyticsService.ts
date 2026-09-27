@@ -3,6 +3,57 @@ import type { VisitaAnalytics, ResumoAnalytics } from '@/types'
 
 const SESSAO_STORAGE_KEY = 'vivavarejo_sessao_id'
 const DEBOUNCE_VISITA_KEY = 'vivavarejo_last_visita'
+const GESTOR_STORAGE_FLAG = 'vivavarejo_gestor_logado'
+
+/**
+ * Lista explícita de e-mails de Gestor Geral / Admin Interno que NUNCA devem ter acessos
+ * gravados ou exibidos no Analytics de visitas.
+ */
+export const EMAILS_GESTOR_EXCLUIDOS: string[] = ['dfarias53@gmail.com']
+
+/**
+ * Lista de e-mails conhecidos de demonstração e teste liberados.
+ * Devem ser SEMPRE contabilizados como visitantes identificados ("Demo").
+ */
+export const EMAILS_DEMO_LIBERADOS: string[] = ['demo@vivavarejo.com.br', 'teste@vivavarejo.com.br']
+
+/**
+ * Determina se um e-mail é de conta de demonstração/teste liberada.
+ */
+export function isDemoEmail(email?: string | null): boolean {
+  if (!email) return false
+  const em = email.toLowerCase().trim()
+  return (
+    EMAILS_DEMO_LIBERADOS.some((demo) => demo === em) ||
+    em.startsWith('demo@') ||
+    em.startsWith('teste@')
+  )
+}
+
+/**
+ * Determina se o usuário atual é o Gestor Geral Dfarias ou tem perfil de administrador geral interno.
+ */
+export function isGestorOuAdminGeral(
+  user?: {
+    email?: string | null
+    perfil?: string | null
+    name?: string | null
+  } | null,
+): boolean {
+  if (!user) return false
+  const emailLower = (user.email || '').toLowerCase().trim()
+  if (EMAILS_GESTOR_EXCLUIDOS.includes(emailLower) || emailLower.includes('dfarias')) {
+    return true
+  }
+  if (user.perfil === 'admin') {
+    return true
+  }
+  const nomeLower = (user.name || '').toLowerCase()
+  if (nomeLower.includes('dfarias') && (user.perfil === 'admin' || !user.perfil)) {
+    return true
+  }
+  return false
+}
 
 /**
  * Obtém ou inicializa um ID de sessão único e persistente no navegador.
@@ -149,7 +200,16 @@ export const analyticsService = {
       let userEmail = options?.userEmail
       let userNome = options?.userName
       let userPerfil = options?.userPerfil
-      let isAdmin = options?.isAdmin
+      let isAdmin = options?.isAdmin || false
+
+      // Verifica sessão salva previamente como gestor
+      try {
+        if (sessionStorage.getItem(GESTOR_STORAGE_FLAG) === 'true') {
+          return // Acesso do gestor geral Dfarias — desconsiderar totalmente
+        }
+      } catch {
+        // ignore
+      }
 
       if (pb.authStore.isValid && pb.authStore.record) {
         const rec = pb.authStore.record as {
@@ -161,19 +221,25 @@ export const analyticsService = {
         if (!userEmail) userEmail = rec.email
         if (!userNome) userNome = rec.name
         if (!userPerfil) userPerfil = rec.perfil || rec.cargo
+
         if (
-          rec.perfil === 'admin' ||
-          rec.email === 'dfarias53@gmail.com' ||
-          userEmail === 'dfarias53@gmail.com'
+          isGestorOuAdminGeral(rec) ||
+          isGestorOuAdminGeral({ email: userEmail, perfil: userPerfil, name: userNome })
         ) {
           isAdmin = true
+          try {
+            sessionStorage.setItem(GESTOR_STORAGE_FLAG, 'true')
+          } catch {
+            // ignore
+          }
         }
       }
 
-      // Se o usuário logado for gestor geral/admin, ignorar ou marcar como admin
-      // O prompt diz: "NÃO registrar visitas do próprio gestor logado como gestor (ou marcá-las), para não poluir os números — se simples, excluir"
-      if (isAdmin || userEmail === 'dfarias53@gmail.com') {
-        // Não registrar navegação do próprio gestor geral
+      // Se o usuário for gestor geral/admin, NÃO registrar para não poluir os dados do painel
+      if (
+        isAdmin ||
+        isGestorOuAdminGeral({ email: userEmail, perfil: userPerfil, name: userNome })
+      ) {
         return
       }
 
@@ -259,21 +325,31 @@ export const analyticsService = {
 
     const isoCorte = dataCorte.toISOString().replace('T', ' ').substring(0, 19)
 
-    // Filtro PocketBase: excluir visitas marcadas como is_admin = true
-    const filter = `created >= '${isoCorte}' && is_admin != true`
+    // Filtro PocketBase: excluir visitas marcadas como is_admin = true e e-mail dfarias
+    const filter = `created >= '${isoCorte}' && is_admin != true && user_email !~ 'dfarias'`
 
     // Busca até 5000 registros para o período (paginado em lote completo)
-    const visitas = await pb.collection('visitas').getFullList<VisitaAnalytics>({
+    const todasVisitas = await pb.collection('visitas').getFullList<VisitaAnalytics>({
       filter,
       sort: '-created',
       requestKey: null,
+    })
+
+    // Filtro em memória estrito para garantir que NENHUM acesso do gestor Dfarias ou admin apareça:
+    // Contas DEMO e TESTE (demo@vivavarejo.com.br, teste@vivavarejo.com.br) e visitantes externos/anônimos são MANTIDOS e contabilizados normalmente.
+    const visitas = todasVisitas.filter((v) => {
+      if (v.is_admin) return false
+      if (isGestorOuAdminGeral({ email: v.user_email, perfil: v.user_perfil, name: v.user_nome })) {
+        return false
+      }
+      return true
     })
 
     // Contagem de signups no período diretamente da collection users para precisão real
     let totalCadastros = 0
     try {
       const usersPeriodo = await pb.collection('users').getFullList({
-        filter: `created >= '${isoCorte}' && email != 'dfarias53@gmail.com'`,
+        filter: `created >= '${isoCorte}' && email != 'dfarias53@gmail.com' && email !~ 'dfarias'`,
         requestKey: null,
       })
       totalCadastros = usersPeriodo.length

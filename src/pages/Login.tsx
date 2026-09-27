@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext'
 import pb from '@/lib/pocketbase/client'
 import { getUserProfileType, isGestorGeralUser } from '@/lib/perfil-utils'
 import { triggerQuickAccessHub } from '@/components/QuickAccessHubModal'
+import { analyticsService } from '@/services/analyticsService'
 import { AlertCircle, Lock, Mail, CheckCircle2, KeyRound, ArrowLeft, Info } from 'lucide-react'
 import type { User } from '@/types'
 
@@ -63,11 +64,21 @@ export default function Login() {
       const loggedUser = pb.authStore.record as unknown as User
       const isGestor = isGestorGeralUser(loggedUser)
 
-      // Atalhos rápidos pós-login não devem ser disparados para o Gestor Geral (Dfarias)
-      if (!isGestor) {
+      // Rastreamento explícito do login bem-sucedido
+      // Se for o Gestor Geral (Dfarias/admin), marca no storage da sessão e descarta analytics
+      if (isGestor) {
+        sessionStorage.setItem('vivavarejo_gestor_logado', 'true')
+      } else {
+        sessionStorage.removeItem('vivavarejo_gestor_logado')
         triggerQuickAccessHub()
+        // Notifica analytics do usuário autenticado (demo, cliente externo ou líder)
+        analyticsService.registrarVisita({
+          pagina: '/login',
+          userEmail: loggedUser.email,
+          userName: loggedUser.name,
+          userPerfil: loggedUser.perfil,
+        })
       }
-
       // Direcionamento inteligente conforme modelo do perfil do cadastro:
       // Gestor Geral -> cai direto no painel de gestão (/admin) ou respeita intercepted route
       // Gerente (CPF) -> /meu-dia (enxuto, chão de loja)

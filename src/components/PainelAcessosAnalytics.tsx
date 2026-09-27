@@ -20,8 +20,10 @@ import {
   Search,
   ExternalLink,
 } from 'lucide-react'
-import { analyticsService } from '@/services/analyticsService'
+import { analyticsService, isDemoEmail } from '@/services/analyticsService'
 import type { ResumoAnalytics } from '@/types'
+import { Badge } from '@/components/ui/badge'
+import { Sparkles } from 'lucide-react'
 
 export const PainelAcessosAnalytics: React.FC = () => {
   const [periodo, setPeriodo] = useState<'hoje' | '7dias' | '30dias'>('7dias')
@@ -675,22 +677,44 @@ export const PainelAcessosAnalytics: React.FC = () => {
                         {/* Identificação */}
                         <td className="py-2.5 px-4 whitespace-nowrap">
                           {isIdent ? (
-                            <div className="flex items-center gap-2">
-                              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                              <div className="flex flex-col">
-                                <span className="font-semibold text-[#1F2937] leading-tight">
-                                  {v.user_nome || v.user_email}
-                                </span>
-                                <span className="text-[10px] text-[#6B7280] leading-tight">
-                                  {v.user_email && v.user_nome ? v.user_email : ''}
-                                  {v.user_perfil ? ` • perfil: ${v.user_perfil}` : ''}
-                                </span>
-                              </div>
-                            </div>
+                            (() => {
+                              const isDemo = isDemoEmail(v.user_email)
+                              return (
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={`w-2 h-2 rounded-full shrink-0 ${
+                                      isDemo ? 'bg-amber-500' : 'bg-emerald-500'
+                                    }`}
+                                  />
+                                  <div className="flex flex-col">
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="font-semibold text-[#1F2937] leading-tight">
+                                        {v.user_nome || v.user_email}
+                                      </span>
+                                      {isDemo && (
+                                        <Badge
+                                          variant="outline"
+                                          className="text-[9px] px-1.5 py-0 h-4 bg-amber-50 text-amber-800 border-amber-300 font-bold inline-flex items-center gap-0.5"
+                                        >
+                                          <Sparkles className="w-2.5 h-2.5 text-amber-600" />
+                                          Demo
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    <span className="text-[10px] text-[#6B7280] leading-tight">
+                                      {v.user_email && v.user_nome ? v.user_email : ''}
+                                      {v.user_perfil ? ` • perfil: ${v.user_perfil}` : ''}
+                                    </span>
+                                  </div>
+                                </div>
+                              )
+                            })()
                           ) : (
                             <div className="flex items-center gap-1.5 text-[#6B7280]">
                               <span className="w-2 h-2 rounded-full bg-gray-300 shrink-0" />
-                              <span className="font-medium italic text-[11px]">Anônimo</span>
+                              <span className="font-medium italic text-[11px]">
+                                Anônimo (Visitante Externo)
+                              </span>
                               <span className="text-[10px] font-mono text-[#9CA3AF]">
                                 ({v.sessao_id.substring(0, 10)})
                               </span>

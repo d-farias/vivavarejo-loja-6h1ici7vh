@@ -217,6 +217,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const logout = () => {
+    try {
+      sessionStorage.removeItem('vivavarejo_gestor_logado')
+    } catch {
+      // ignore
+    }
     pb.authStore.clear()
     setUser(null)
     setToken(null)

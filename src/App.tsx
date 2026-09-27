@@ -51,13 +51,18 @@ const DocumentTitleSync = () => {
     return () => observer.disconnect()
   }, [])
 
-  // Rastreamento automático de acessos/visitas (inclui visitantes anônimos e logados)
+  // Rastreamento automático de acessos/visitas (inclui visitantes anônimos, contas demo e externos)
+  // Desconsidera completamente o Gestor Geral (Dfarias)
+  const { user } = useAuth()
   useEffect(() => {
     analyticsService.registrarVisita({
       pagina: location.pathname,
       search: location.search,
+      userEmail: user?.email,
+      userName: user?.name,
+      userPerfil: user?.perfil,
     })
-  }, [location.pathname, location.search])
+  }, [location.pathname, location.search, user])
 
   return null
 }
@@ -71,8 +76,8 @@ function RootRouteRedirect() {
 
 const App = () => (
   <BrowserRouter>
-    <DocumentTitleSync />
     <AuthProvider>
+      <DocumentTitleSync />
       <StoreProvider>
         <TooltipProvider>
           <Toaster />
