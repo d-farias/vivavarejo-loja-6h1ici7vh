@@ -602,11 +602,11 @@ const SOLUCOES_PLATAFORMA: SolucaoPilar[] = [
   {
     id: 'vivavarejo_match',
     numero: 10,
-    titulo: 'VivaVarejo Match: Conexão Loja, CD, Abastecimento e Fornecedor',
+    titulo: 'VivaVarejo Integração: Conexão Loja, CD, Abastecimento e Fornecedor',
     subtitulo:
       'Motor de decisão em cascata inteligente que verifica a solução dentro de casa antes de procurar fora',
     icone: Zap,
-    destaqueBadge: 'Diferencial Exclusivo Match',
+    destaqueBadge: 'Diferencial Exclusivo Integração',
     beneficioPrincipal:
       'Elimina rupturas de gôndola e transforma produtos faltantes em valor financeiro recuperado, conectando o chão de loja ao CD e ao comprador em tempo real.',
     itensDetalhados: [
@@ -1116,11 +1116,11 @@ export function MaterialVendaAba() {
               </div>
             </div>
 
-            {/* Bloco Destaque VivaVarejo Match na Proposta Comercial */}
+            {/* Bloco Destaque VivaVarejo Integração na Proposta Comercial */}
             <div className="bg-gradient-to-r from-teal-50 via-white to-emerald-50 border border-teal-200 rounded-xl p-5 print:p-3 space-y-3 print:space-y-1.5 print-break-inside-avoid shadow-2xs">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[#0F766E] text-white">
-                  VivaVarejo Match • Diferencial de Abastecimento
+                  VivaVarejo Integração • Diferencial de Abastecimento
                 </span>
                 <span className="text-xs font-semibold text-[#0F766E]">
                   Loja • CD • Abastecimento • Fornecedor
@@ -1130,7 +1130,7 @@ export function MaterialVendaAba() {
                 Antes de procurar fora, o sistema verifica se a solução está dentro de casa
               </h2>
               <p className="text-xs sm:text-sm print:text-xs text-[#374151] leading-relaxed">
-                O <strong>VivaVarejo Match</strong> conecta o chão de loja à central de
+                O <strong>VivaVarejo Integração</strong> conecta o chão de loja à central de
                 abastecimento e aos fornecedores. Ao identificar uma ruptura no PDV, o motor em
                 cascata cruza os dados na hora: se o CD tiver saldo, gera ordem interna de
                 abastecimento; se houver carga em trânsito, acompanha a entrega; e só aciona o
