@@ -16,6 +16,7 @@ import {
   Clock,
   Search,
   Sparkles,
+  FileText,
 } from 'lucide-react'
 import { analyticsService, isDemoEmail } from '@/services/analyticsService'
 import type { ResumoAnalytics } from '@/types'

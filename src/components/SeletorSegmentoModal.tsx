@@ -362,7 +362,13 @@ export function SegmentoAtivoBadge({ onTrocarSegmento }: SegmentoAtivoBadgeProps
 
   return (
     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-[#E5E7EB] shadow-2xs text-xs">
-      <div className="w-5 h-5 rounded-md bg-teal-50 text-[#0F766E] flex items-center justify-center shrink-0">
+      <div
+        className="w-5 h-5 rounded-md flex items-center justify-center shrink-0 bg-teal-50 text-[#0F766E]"
+        style={{
+          backgroundColor: 'var(--brand-primary, #0F766E)1a',
+          color: 'var(--brand-primary, #0F766E)',
+        }}
+      >
         <Icon className="w-3.5 h-3.5" />
       </div>
       <div className="flex items-center gap-1.5">
@@ -372,7 +378,8 @@ export function SegmentoAtivoBadge({ onTrocarSegmento }: SegmentoAtivoBadgeProps
       <button
         type="button"
         onClick={onTrocarSegmento}
-        className="ml-1 text-[11px] font-semibold text-[#0F766E] hover:underline inline-flex items-center gap-1 hover:text-[#115E59]"
+        style={{ color: 'var(--brand-primary, #0F766E)' }}
+        className="ml-1 text-[11px] font-semibold hover:underline inline-flex items-center gap-1 hover:opacity-80"
         title="Trocar ramo da loja"
       >
         <SlidersHorizontal className="w-3 h-3" />

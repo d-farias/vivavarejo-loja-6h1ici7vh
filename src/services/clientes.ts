@@ -12,11 +12,11 @@ export const clientesService = {
     return await pb.collection('clientes').getOne<Cliente>(id)
   },
 
-  async create(data: Partial<Cliente>): Promise<Cliente> {
+  async create(data: Partial<Cliente> | FormData): Promise<Cliente> {
     return await pb.collection('clientes').create<Cliente>(data)
   },
 
-  async update(id: string, data: Partial<Cliente>): Promise<Cliente> {
+  async update(id: string, data: Partial<Cliente> | FormData): Promise<Cliente> {
     return await pb.collection('clientes').update<Cliente>(id, data)
   },
 

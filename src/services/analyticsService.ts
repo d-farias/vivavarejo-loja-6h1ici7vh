@@ -680,7 +680,7 @@ export const analyticsService = {
         mobile: mobileCount,
         desktop: desktopCount,
       },
-      visitasRecentes: visitasValidas.slice(0, 100),
+      visitasRecentes: visitasRecentes.slice(0, 100),
     }
   },
 }

@@ -221,10 +221,17 @@ export default function Layout() {
                       key={link.to}
                       to={link.to}
                       end={link.to === '/'}
+                      style={({ isActive }) =>
+                        isActive && brand.isWhiteLabelActive && brand.corPrimaria
+                          ? { backgroundColor: brand.corPrimaria, color: '#ffffff' }
+                          : undefined
+                      }
                       className={({ isActive }) =>
                         `flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
                           isActive
-                            ? 'bg-[#0F766E] text-white shadow-2xs'
+                            ? brand.isWhiteLabelActive && brand.corPrimaria
+                              ? 'text-white shadow-2xs'
+                              : 'bg-[#0F766E] text-white shadow-2xs'
                             : 'text-[#4B5563] hover:text-[#1F2937] hover:bg-gray-100'
                         }`
                       }
@@ -249,6 +256,11 @@ export default function Layout() {
                 <button
                   type="button"
                   onClick={() => setSeletorSegmentoOpen(true)}
+                  style={
+                    brand.isWhiteLabelActive && brand.corPrimaria
+                      ? { borderColor: brand.corPrimaria, color: brand.corPrimaria }
+                      : undefined
+                  }
                   className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] hover:text-[#0F766E] text-[#374151] shadow-2xs transition-colors"
                   title={
                     segmentoAtivo
@@ -256,17 +268,45 @@ export default function Layout() {
                       : 'Escolha o ramo da sua loja'
                   }
                 >
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#0F766E]" />
+                  <SlidersHorizontal
+                    className="w-3.5 h-3.5"
+                    style={{
+                      color:
+                        brand.isWhiteLabelActive && brand.corPrimaria
+                          ? brand.corPrimaria
+                          : '#0F766E',
+                    }}
+                  />
                   <span>{segmentoAtivo ? `Ramo: ${segmentoAtivo}` : 'Definir Ramo'}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setFalarEspecialistaOpen(true)}
-                  className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] hover:text-[#0F766E] text-[#374151] shadow-2xs transition-colors"
+                  style={
+                    brand.isWhiteLabelActive && brand.corPrimaria
+                      ? {
+                          backgroundColor: brand.corPrimaria,
+                          borderColor: brand.corPrimaria,
+                          color: '#ffffff',
+                        }
+                      : undefined
+                  }
+                  className={`hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold shadow-2xs transition-colors ${
+                    brand.isWhiteLabelActive && brand.corPrimaria
+                      ? 'border hover:opacity-90'
+                      : 'bg-white border border-[#E5E7EB] hover:border-[#0F766E] hover:text-[#0F766E] text-[#374151]'
+                  }`}
                   title="Fale diretamente com o consultor especialista"
                 >
-                  <MessageSquare className="w-3.5 h-3.5 text-[#0F766E]" />
+                  <MessageSquare
+                    className="w-3.5 h-3.5"
+                    style={
+                      brand.isWhiteLabelActive && brand.corPrimaria
+                        ? { color: '#ffffff' }
+                        : { color: '#0F766E' }
+                    }
+                  />
                   <span>Falar com especialista</span>
                 </button>
               </>
@@ -420,10 +460,17 @@ export default function Layout() {
                     to={link.to}
                     end={link.to === '/'}
                     onClick={() => setMobileMenuOpen(false)}
+                    style={({ isActive }) =>
+                      isActive && brand.isWhiteLabelActive && brand.corPrimaria
+                        ? { backgroundColor: brand.corPrimaria, color: '#ffffff' }
+                        : undefined
+                    }
                     className={({ isActive }) =>
                       `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                         isActive
-                          ? 'bg-[#0F766E] text-white font-bold shadow-sm'
+                          ? brand.isWhiteLabelActive && brand.corPrimaria
+                            ? 'text-white font-bold shadow-sm'
+                            : 'bg-[#0F766E] text-white font-bold shadow-sm'
                           : 'text-[#4B5563] hover:bg-gray-100 hover:text-[#1F2937]'
                       }`
                     }
@@ -455,6 +502,11 @@ export default function Layout() {
                     setMobileMenuOpen(false)
                     setFalarEspecialistaOpen(true)
                   }}
+                  style={
+                    brand.isWhiteLabelActive && brand.corPrimaria
+                      ? { backgroundColor: brand.corPrimaria }
+                      : undefined
+                  }
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0F766E] hover:bg-[#115E59] shadow-sm transition-colors"
                 >
                   <MessageSquare className="w-4 h-4" />

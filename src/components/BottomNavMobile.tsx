@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { CalendarDays, Store, CheckSquare, Menu, Home, TrendingUp } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { segmentosService } from '@/services/segmentos'
+import { useBrand } from '@/hooks/use-brand'
 
 interface BottomNavMobileProps {
   isCampo: boolean
@@ -56,6 +57,7 @@ export function BottomNavMobile({ isCampo, onOpenMais }: BottomNavMobileProps) {
   ]
 
   const { user } = useAuth()
+  const brand = useBrand()
   const segmentoAtivo = segmentosService.getSegmentoAtivo(user)
   const temSegmentoDefinido = Boolean(segmentoAtivo)
 
@@ -75,10 +77,19 @@ export function BottomNavMobile({ isCampo, onOpenMais }: BottomNavMobileProps) {
           <NavLink
             key={item.to}
             to={item.to}
+            style={({ isActive }) =>
+              isActive && brand.isWhiteLabelActive && brand.corPrimaria
+                ? {
+                    color: brand.corPrimaria,
+                    backgroundColor: `${brand.corPrimaria}15`,
+                    borderColor: `${brand.corPrimaria}40`,
+                  }
+                : undefined
+            }
             className={({ isActive }) =>
               `flex flex-col items-center justify-center h-full py-1 rounded-xl transition-all ${
                 isActive
-                  ? 'text-[#0F766E] bg-teal-50 border border-teal-200 font-bold'
+                  ? 'border font-bold text-[#0F766E] bg-teal-50 border-teal-200'
                   : 'text-[#6B7280] hover:text-[#1F2937] hover:bg-gray-100/70 font-medium'
               }`
             }
@@ -87,11 +98,27 @@ export function BottomNavMobile({ isCampo, onOpenMais }: BottomNavMobileProps) {
               <>
                 <item.icon
                   className={`w-5 h-5 transition-transform ${
-                    isActive ? 'scale-110 text-[#0F766E]' : 'text-[#6B7280]'
+                    isActive ? 'scale-110' : 'text-[#6B7280]'
                   }`}
+                  style={
+                    isActive && brand.isWhiteLabelActive && brand.corPrimaria
+                      ? { color: brand.corPrimaria }
+                      : isActive
+                        ? { color: '#0F766E' }
+                        : undefined
+                  }
                 />
                 <span
-                  className={`text-[11px] mt-0.5 leading-none tracking-tight ${isActive ? 'text-[#0F766E] font-bold' : 'text-[#6B7280]'}`}
+                  className={`text-[11px] mt-0.5 leading-none tracking-tight ${
+                    isActive ? 'font-bold' : 'text-[#6B7280]'
+                  }`}
+                  style={
+                    isActive && brand.isWhiteLabelActive && brand.corPrimaria
+                      ? { color: brand.corPrimaria }
+                      : isActive
+                        ? { color: '#0F766E' }
+                        : undefined
+                  }
                 >
                   {item.label}
                 </span>

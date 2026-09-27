@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { Navigate } from 'react-router-dom'
+import { pb } from '@/lib/pocketbase/client'
 import { clientesService } from '@/services/clientes'
 import { lojasService } from '@/services/lojas'
 import { normalizarNomeCanonico, formatarCargoOuResponsavel } from '@/lib/cargos'
@@ -345,56 +346,59 @@ export default function Admin() {
   }
 
   // ==================== GESTÃO DE CLIENTES ====================
+  const [clienteLogoFile, setClienteLogoFile] = useState<File | null>(null)
+
   const handleSaveCliente = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const form = e.currentTarget
-    const formData = new FormData(form)
-    const nome = (formData.get('nome') as string)?.trim()
-    const contato = (formData.get('contato') as string)?.trim()
-    const tipo_pessoa = (formData.get('tipo_pessoa') as 'PF' | 'PJ') || 'PJ'
-    const segmento = (formData.get('segmento') as string)?.trim() || ''
-    const info_negocio = (formData.get('info_negocio') as string)?.trim() || ''
-    const gargalos = (formData.get('gargalos') as string)?.trim() || ''
-    const inventario_situacao = (formData.get('inventario_situacao') as string)?.trim() || ''
-    const observacoes = (formData.get('observacoes') as string)?.trim()
-    const email_suporte = (formData.get('email_suporte') as string)?.trim().toLowerCase() || ''
-    const whatsapp_suporte = (formData.get('whatsapp_suporte') as string)?.trim() || ''
-    const nome_atendimento = (formData.get('nome_atendimento') as string)?.trim() || ''
+    const rawData = new FormData(form)
+    const nome = (rawData.get('nome') as string)?.trim()
+    const nome_exibicao = (rawData.get('nome_exibicao') as string)?.trim() || ''
+    const cor_primaria = (rawData.get('cor_primaria') as string)?.trim() || ''
+    const cor_secundaria = (rawData.get('cor_secundaria') as string)?.trim() || ''
+    const contato = (rawData.get('contato') as string)?.trim()
+    const tipo_pessoa = (rawData.get('tipo_pessoa') as 'PF' | 'PJ') || 'PJ'
+    const segmento = (rawData.get('segmento') as string)?.trim() || ''
+    const info_negocio = (rawData.get('info_negocio') as string)?.trim() || ''
+    const gargalos = (rawData.get('gargalos') as string)?.trim() || ''
+    const inventario_situacao = (rawData.get('inventario_situacao') as string)?.trim() || ''
+    const observacoes = (rawData.get('observacoes') as string)?.trim()
+    const email_suporte = (rawData.get('email_suporte') as string)?.trim().toLowerCase() || ''
+    const whatsapp_suporte = (rawData.get('whatsapp_suporte') as string)?.trim() || ''
+    const nome_atendimento = (rawData.get('nome_atendimento') as string)?.trim() || ''
 
     if (!nome) return
 
+    // Monta payload em FormData para suportar upload de logo em arquivo
+    const payload = new FormData()
+    payload.append('nome', nome)
+    payload.append('nome_exibicao', nome_exibicao)
+    payload.append('cor_primaria', cor_primaria)
+    payload.append('cor_secundaria', cor_secundaria)
+    payload.append('contato', contato || '')
+    payload.append('tipo_pessoa', tipo_pessoa)
+    payload.append('segmento', segmento)
+    payload.append('info_negocio', info_negocio)
+    payload.append('gargalos', gargalos)
+    payload.append('inventario_situacao', inventario_situacao)
+    payload.append('observacoes', observacoes || '')
+    payload.append('email_suporte', email_suporte)
+    payload.append('whatsapp_suporte', whatsapp_suporte)
+    payload.append('nome_atendimento', nome_atendimento)
+
+    if (clienteLogoFile) {
+      payload.append('logo', clienteLogoFile)
+    }
+
     try {
       if (clienteModal.data) {
-        await clientesService.update(clienteModal.data.id, {
-          nome,
-          contato,
-          tipo_pessoa,
-          segmento,
-          info_negocio,
-          gargalos,
-          inventario_situacao,
-          observacoes,
-          email_suporte,
-          whatsapp_suporte,
-          nome_atendimento,
-        })
+        await clientesService.update(clienteModal.data.id, payload)
         showFeedback('Cliente atualizado com sucesso!')
       } else {
-        await clientesService.create({
-          nome,
-          contato,
-          tipo_pessoa,
-          segmento,
-          info_negocio,
-          gargalos,
-          inventario_situacao,
-          observacoes,
-          email_suporte,
-          whatsapp_suporte,
-          nome_atendimento,
-        })
+        await clientesService.create(payload)
         showFeedback('Cliente cadastrado com sucesso!')
       }
+      setClienteLogoFile(null)
       setClienteModal({ open: false, data: null })
       loadAll()
     } catch (err: any) {
@@ -1576,7 +1580,10 @@ export default function Admin() {
                 </div>
 
                 <button
-                  onClick={() => setClienteModal({ open: true, data: null })}
+                  onClick={() => {
+                    setClienteLogoFile(null)
+                    setClienteModal({ open: true, data: null })
+                  }}
                   className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs transition-colors self-start sm:self-auto"
                 >
                   <Plus className="w-4 h-4" />
@@ -1597,10 +1604,10 @@ export default function Admin() {
                   <table className="w-full text-left text-xs sm:text-sm">
                     <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB] text-[#4B5563] text-xs font-semibold uppercase tracking-wider">
                       <tr>
-                        <th className="p-3.5">Cliente</th>
+                        <th className="p-3.5">Cliente / Marca</th>
                         <th className="p-3.5">Enquadramento</th>
+                        <th className="p-3.5">Cores / Identidade</th>
                         <th className="p-3.5">Contato</th>
-                        <th className="p-3.5">Observações</th>
                         <th className="p-3.5 text-right">Ações</th>
                       </tr>
                     </thead>
@@ -1608,8 +1615,34 @@ export default function Admin() {
                       {filteredClientes.map((cliente) => (
                         <tr key={cliente.id} className="hover:bg-gray-50/80 transition-colors">
                           <td className="p-3.5 font-semibold text-[#1F2937]">
-                            <div className="flex items-center gap-2">
-                              <span>{cliente.nome}</span>
+                            <div className="flex items-center gap-2.5">
+                              {cliente.logo ? (
+                                <img
+                                  src={pb.files.getUrl(cliente, cliente.logo)}
+                                  alt={cliente.nome_exibicao || cliente.nome}
+                                  className="w-8 h-8 rounded-lg object-contain border border-[#E5E7EB] bg-white p-0.5 shrink-0"
+                                />
+                              ) : (
+                                <div
+                                  className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs shrink-0"
+                                  style={{
+                                    backgroundColor: cliente.cor_primaria || '#0F766E',
+                                  }}
+                                >
+                                  {(cliente.nome_exibicao || cliente.nome)
+                                    .slice(0, 2)
+                                    .toUpperCase()}
+                                </div>
+                              )}
+                              <div className="flex flex-col">
+                                <span>{cliente.nome_exibicao || cliente.nome}</span>
+                                {cliente.nome_exibicao &&
+                                  cliente.nome_exibicao !== cliente.nome && (
+                                    <span className="text-[11px] font-normal text-[#6B7280]">
+                                      Razão: {cliente.nome}
+                                    </span>
+                                  )}
+                              </div>
                             </div>
                           </td>
                           <td className="p-3.5">
@@ -1630,6 +1663,33 @@ export default function Admin() {
                               )}
                             </div>
                           </td>
+                          <td className="p-3.5">
+                            <div className="flex items-center gap-2">
+                              {cliente.cor_primaria ? (
+                                <div className="flex items-center gap-1.5">
+                                  <span
+                                    className="w-4 h-4 rounded-full border border-gray-300 shrink-0"
+                                    style={{ backgroundColor: cliente.cor_primaria }}
+                                    title={`Primária: ${cliente.cor_primaria}`}
+                                  />
+                                  <span className="font-mono text-[11px] text-[#4B5563]">
+                                    {cliente.cor_primaria}
+                                  </span>
+                                  {cliente.cor_secundaria && (
+                                    <span
+                                      className="w-3.5 h-3.5 rounded-full border border-gray-300 shrink-0 ml-1"
+                                      style={{ backgroundColor: cliente.cor_secundaria }}
+                                      title={`Secundária: ${cliente.cor_secundaria}`}
+                                    />
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-xs text-[#9CA3AF] italic">
+                                  Padrão VivaVarejo
+                                </span>
+                              )}
+                            </div>
+                          </td>
                           <td className="p-3.5 text-[#4B5563]">
                             {cliente.contato ? (
                               <span className="flex items-center gap-1.5">
@@ -1640,15 +1700,15 @@ export default function Admin() {
                               <span className="text-[#9CA3AF]">-</span>
                             )}
                           </td>
-                          <td className="p-3.5 text-[#6B7280] max-w-xs truncate">
-                            {cliente.observacoes || '-'}
-                          </td>
                           <td className="p-3.5 text-right">
                             <div className="inline-flex items-center gap-1">
                               <button
-                                onClick={() => setClienteModal({ open: true, data: cliente })}
+                                onClick={() => {
+                                  setClienteLogoFile(null)
+                                  setClienteModal({ open: true, data: cliente })
+                                }}
                                 className="p-1.5 text-[#4B5563] hover:text-[#0F766E] rounded hover:bg-gray-100"
-                                title="Editar cliente"
+                                title="Editar cliente e marca white-label"
                               >
                                 <Edit2 className="w-4 h-4" />
                               </button>
@@ -2576,18 +2636,142 @@ export default function Admin() {
               </button>
             </div>
 
-            <form onSubmit={handleSaveCliente} className="space-y-3.5 text-xs sm:text-sm">
+            <form
+              onSubmit={handleSaveCliente}
+              className="space-y-3.5 text-xs sm:text-sm max-h-[80vh] overflow-y-auto pr-1"
+            >
               <div>
                 <label className="block text-xs font-semibold text-[#374151] mb-1">
-                  Nome do Cliente / Rede <span className="text-red-500">*</span>
+                  Razão Social / Nome de Registro da Rede <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="nome"
                   defaultValue={clienteModal.data?.nome || ''}
                   required
-                  placeholder="Ex: Supermercados Estrela"
+                  placeholder="Ex: Supermercados Estrela Ltda"
                   className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#0F766E]"
                 />
+              </div>
+
+              {/* Seção White-Label & Personalização de Marca da Rede */}
+              <div className="p-3 bg-teal-50/40 border border-teal-200/70 rounded-lg space-y-3">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-teal-900">
+                  <Sparkles className="w-4 h-4 text-[#0F766E]" />
+                  <span>White-Label & Identidade da Rede (Personalização Visual)</span>
+                </div>
+                <p className="text-[11px] text-[#4B5563] leading-relaxed">
+                  Defina o nome fantasia, logotipo e cores para que os usuários e diretores desta
+                  rede enxerguem a aplicação com a própria marca.
+                </p>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-[#374151] mb-1">
+                    Nome de Exibição / Nome Fantasia da Marca
+                  </label>
+                  <input
+                    name="nome_exibicao"
+                    defaultValue={clienteModal.data?.nome_exibicao || ''}
+                    placeholder="Ex: Supermaxi ou Estrela Supermercados"
+                    className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded text-xs outline-none focus:border-[#0F766E]"
+                  />
+                  <p className="text-[10px] text-[#6B7280] mt-0.5">
+                    Nome exibido no topo, no banner demonstrativo e no rodapé para os usuários da
+                    rede.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-semibold text-[#374151]">
+                    Logotipo da Rede (Upload)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    {clienteModal.data?.logo && (
+                      <div className="w-12 h-12 rounded-lg border border-[#E5E7EB] bg-white p-1 flex items-center justify-center shrink-0">
+                        <img
+                          src={pb.files.getUrl(clienteModal.data, clienteModal.data.logo)}
+                          alt="Logo atual"
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) setClienteLogoFile(file)
+                      }}
+                      className="text-xs bg-white w-full file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:bg-teal-50 file:text-[#0F766E] file:font-semibold file:cursor-pointer"
+                    />
+                  </div>
+                  {clienteModal.data?.logo && (
+                    <p className="text-[10px] text-[#6B7280]">
+                      Logo já cadastrado. Selecione um novo arquivo apenas se desejar substituir.
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[#374151] mb-1">
+                      Cor Primária da Marca
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        id="cor_primaria_picker"
+                        defaultValue={clienteModal.data?.cor_primaria || '#0F766E'}
+                        onChange={(e) => {
+                          const input = document.getElementById(
+                            'cor_primaria_text',
+                          ) as HTMLInputElement
+                          if (input) input.value = e.target.value
+                        }}
+                        className="w-8 h-8 rounded border border-gray-300 p-0.5 cursor-pointer bg-white"
+                      />
+                      <input
+                        id="cor_primaria_text"
+                        name="cor_primaria"
+                        defaultValue={clienteModal.data?.cor_primaria || ''}
+                        placeholder="#0F766E"
+                        className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded font-mono text-xs outline-none focus:border-[#0F766E]"
+                      />
+                    </div>
+                    <p className="text-[10px] text-[#6B7280] mt-0.5">
+                      Botões de ação, itens ativos e destaques.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[#374151] mb-1">
+                      Cor Secundária (Opcional)
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        id="cor_secundaria_picker"
+                        defaultValue={clienteModal.data?.cor_secundaria || '#115E59'}
+                        onChange={(e) => {
+                          const input = document.getElementById(
+                            'cor_secundaria_text',
+                          ) as HTMLInputElement
+                          if (input) input.value = e.target.value
+                        }}
+                        className="w-8 h-8 rounded border border-gray-300 p-0.5 cursor-pointer bg-white"
+                      />
+                      <input
+                        id="cor_secundaria_text"
+                        name="cor_secundaria"
+                        defaultValue={clienteModal.data?.cor_secundaria || ''}
+                        placeholder="#115E59"
+                        className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded font-mono text-xs outline-none focus:border-[#0F766E]"
+                      />
+                    </div>
+                    <p className="text-[10px] text-[#6B7280] mt-0.5">
+                      Gradientes ou detalhes secundários.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

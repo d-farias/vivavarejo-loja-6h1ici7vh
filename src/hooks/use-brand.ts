@@ -23,7 +23,9 @@ export interface BrandConfig {
 export function useBrand(): BrandConfig {
   const { user } = useAuth()
 
-  // 1. Gestor geral nunca recebe white-label
+  // 1. Gestor geral nunca recebe white-label; usuários demo@ / teste@ genéricos também não mudam de aparência
+  const userEmail = user?.email?.toLowerCase().trim() || ''
+
   if (!user || isGestorGeralUser(user)) {
     return {
       isWhiteLabelActive: false,
@@ -40,6 +42,28 @@ export function useBrand(): BrandConfig {
     }
   }
 
+  // Usuários demo@/teste@ genéricos existentes sem marca configurada não mudam de aparência.
+  // Mas se for uma conta de demonstração vinculada expressamente a uma rede com marca definida (ex: demo.supermaxi@...), white-label ativa.
+  const hasCustomBrand = Boolean(
+    clienteExpand &&
+    (clienteExpand.nome_exibicao ||
+      clienteExpand.logo ||
+      (clienteExpand.cor_primaria && clienteExpand.cor_primaria !== '#0F766E') ||
+      (clienteExpand.nome && !clienteExpand.nome.toLowerCase().includes('vivavarejo'))),
+  )
+
+  const isGenericDemoWithoutBrand =
+    (userEmail === 'demo@vivavarejo.com.br' ||
+      userEmail.startsWith('teste@') ||
+      userEmail.startsWith('demo@')) &&
+    !hasCustomBrand
+
+  if (isGenericDemoWithoutBrand) {
+    return {
+      isWhiteLabelActive: false,
+    }
+  }
+
   const clienteNome = clienteExpand?.nome_exibicao || clienteExpand?.nome
   const corPrimaria = clienteExpand?.cor_primaria?.trim()
   const corSecundaria = clienteExpand?.cor_secundaria?.trim()
@@ -49,17 +73,7 @@ export function useBrand(): BrandConfig {
     logoUrl = pb.files.getUrl(clienteExpand, clienteExpand.logo)
   }
 
-  // White label ativo se tiver cliente vinculado com nome, logo ou cor personalizada
-  // Evita ativar se for conta genérica sem dados de rede
-  const isWhiteLabelActive = Boolean(
-    clienteExpand &&
-    (clienteExpand.nome_exibicao ||
-      clienteExpand.logo ||
-      clienteExpand.cor_primaria ||
-      (user.profile_type === 'rede' &&
-        clienteExpand.nome &&
-        !clienteExpand.nome.toLowerCase().includes('vivavarejo'))),
-  )
+  const isWhiteLabelActive = Boolean(clienteExpand && hasCustomBrand)
 
   return {
     isWhiteLabelActive,
@@ -87,14 +101,21 @@ export function useBrandTheme() {
       root.style.setProperty('--brand-primary', brand.corPrimaria)
       root.style.setProperty('--primary', brand.corPrimaria)
       root.style.setProperty('--ring', brand.corPrimaria)
+      if (brand.corSecundaria) {
+        root.style.setProperty('--brand-secondary', brand.corSecundaria)
+      } else {
+        root.style.removeProperty('--brand-secondary')
+      }
     } else {
       root.style.removeProperty('--brand-primary')
+      root.style.removeProperty('--brand-secondary')
       root.style.removeProperty('--primary')
       root.style.removeProperty('--ring')
     }
 
     return () => {
       root.style.removeProperty('--brand-primary')
+      root.style.removeProperty('--brand-secondary')
       root.style.removeProperty('--primary')
       root.style.removeProperty('--ring')
     }
