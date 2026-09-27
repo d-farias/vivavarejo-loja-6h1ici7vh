@@ -9,7 +9,7 @@
  * domínios de desenvolvimento ou localhost.
  */
 
-export const PRODUCTION_CANONICAL_ORIGIN = 'https://vivavarejo.goskip.app'
+export const PRODUCTION_CANONICAL_ORIGIN = 'https://www.vivavarejo.com'
 export const BRAND_NAME = 'VivaVarejo'
 export const BRAND_TAGLINE = 'Da informação à execução no chão de loja.'
 

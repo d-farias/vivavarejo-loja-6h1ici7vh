@@ -43,8 +43,8 @@ import {
 import { ProtecaoDadosSecao } from '@/components/ProtecaoDadosSecao'
 import { FalarEspecialistaModal } from '@/components/FalarEspecialistaModal'
 
-const INSTAGRAM_URL = 'https://www.instagram.com/vivavarejo/'
-const LINKEDIN_PERSONAL_URL = 'https://br.linkedin.com/in/dalvanifarias'
+const INSTAGRAM_URL = 'https://www.vivavarejo.com?utm_source=instagram'
+const LINKEDIN_PERSONAL_URL = 'https://www.vivavarejo.com?utm_source=linkedin'
 
 interface SegmentOption {
   id: string
@@ -960,7 +960,7 @@ export default function BemVindo() {
                 href={LINKEDIN_PERSONAL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="LinkedIn"
+                aria-label="LinkedIn da VivaVarejo"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E7EB] bg-white text-[#374151] hover:text-[#0F766E] hover:border-[#0F766E] transition-colors"
               >
                 <Linkedin className="w-3.5 h-3.5" />
@@ -993,10 +993,10 @@ export default function BemVindo() {
               <Mail className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
               <span className="text-[#6B7280]">Tire suas dúvidas:</span>
               <a
-                href={`mailto:${contatos.email || 'dfarias53@gmail.com'}`}
+                href={`mailto:${contatos.email || 'contato@vivavarejo.com'}`}
                 className="font-medium text-[#1F2937] hover:text-[#0F766E] underline underline-offset-2 transition-colors"
               >
-                {contatos.email || 'dfarias53@gmail.com'}
+                {contatos.email || 'contato@vivavarejo.com'}
               </a>
             </div>
           </div>

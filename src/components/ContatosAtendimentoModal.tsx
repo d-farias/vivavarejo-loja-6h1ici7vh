@@ -87,7 +87,7 @@ export const ContatosAtendimentoModal: React.FC<ContatosAtendimentoModalProps> =
   // Preenche os campos conforme o target selecionado
   useEffect(() => {
     if (selectedTarget === 'global') {
-      setEmailSuporte(globalConfig?.email_suporte || 'dfarias53@gmail.com')
+      setEmailSuporte(globalConfig?.email_suporte || 'contato@vivavarejo.com')
       setWhatsappSuporte(formatPhoneBR(globalConfig?.whatsapp_suporte || '(48) 99181-7542'))
       setNomeAtendimento(globalConfig?.nome_atendimento || 'Dalvani Farias')
     } else {
