@@ -16,8 +16,10 @@ import {
   Trash2,
   Store,
   Truck,
+  AlertCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { isGestorGeralUser } from '@/lib/perfil-utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RegistrarOcorrenciaMatchModal } from '@/components/RegistrarOcorrenciaMatchModal'
 import { TratarDemandaMatchModal } from '@/components/TratarDemandaMatchModal'
@@ -52,6 +54,9 @@ export function AbastecimentoMatchSecao({
   isRedeOuAdmin,
   redeId,
 }: AbastecimentoMatchSecaoProps) {
+  // Verificação estrita de segurança: módulo reservado ao gestor geral Dfarias para estudos
+  const isDfarias = isGestorGeralUser(user)
+
   // Aba interna do Integração: Demandas x Oportunidades
   const [subAba, setSubAba] = useState<'demandas' | 'oportunidades'>('demandas')
 

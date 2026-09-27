@@ -68,18 +68,28 @@ export default function ComercialPage() {
   const { user } = useAuth()
   const { lojaSelecionadaId, lojas } = useStore()
 
-  // Seletor principal do Comercial: Gestão Comercial x Integração & Abastecimento
-  // Mantém menu enxuto e sem poluição, perfeito para mobile
-  const [visaoComercial, setVisaoComercial] = useState<'match' | 'gestao'>('match')
-
-  // Lista de fornecedores para o Integração
-  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([])
-
   // Identificação de perfis
   const isGerente = isPerfilGerente(user)
   const isRede = isPerfilRede(user)
   const isDfarias = isGestorGeralUser(user)
   const isRedeOuAdmin = isRede || isDfarias || Boolean(user?.is_admin)
+
+  // Seletor principal do Comercial: Gestão Comercial x Integração & Abastecimento
+  // O módulo "Integração & Abastecimento" fica restrito EXCLUSIVAMENTE ao administrador Dfarias (gestor geral).
+  // Usuários de rede, gerentes, demos e outros visualizam diretamente a 'gestao'.
+  const [visaoComercial, setVisaoComercial] = useState<'match' | 'gestao'>(() =>
+    isDfarias ? 'match' : 'gestao',
+  )
+
+  // Garante que, se o perfil/usuário mudar, o não-admin nunca permaneça em 'match'
+  useEffect(() => {
+    if (!isDfarias && visaoComercial === 'match') {
+      setVisaoComercial('gestao')
+    }
+  }, [isDfarias, visaoComercial])
+
+  // Lista de fornecedores para o Integração
+  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([])
 
   // Estado dos acordeões (flags) da gestão comercial
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -487,7 +497,7 @@ export default function ComercialPage() {
             <span>Comercial & Negociações</span>
           </h1>
           <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">
-            {visaoComercial === 'match'
+            {isDfarias && visaoComercial === 'match'
               ? 'VivaVarejo Integração: conexão Loja, CD, Abastecimento e Fornecedor com diagnóstico prévio e decisão em cascata.'
               : 'Sortimento, vendas, curvas A/B/C+, margens, layout, rebaixas e sincronização ERP.'}
           </p>
@@ -497,7 +507,7 @@ export default function ComercialPage() {
         <div className="flex items-center gap-2 flex-wrap">
           <StoreSelector />
 
-          {visaoComercial === 'gestao' && (
+          {(!isDfarias || visaoComercial === 'gestao') && (
             <>
               <button
                 onClick={handleExportarCsv}
@@ -522,43 +532,45 @@ export default function ComercialPage() {
       </div>
 
       {/* SELETOR ENXUTO DE VISÃO: INTEGRAÇÃO & ABASTECIMENTO x GESTÃO COMERCIAL */}
-      {/* Design sóbrio, 1 toque, limpo no celular (sem menu poluído) */}
-      <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
-        <div className="inline-flex p-1 rounded-xl bg-gray-100 border border-[#E5E7EB] text-xs font-semibold">
-          <button
-            type="button"
-            onClick={() => setVisaoComercial('match')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-              visaoComercial === 'match'
-                ? 'bg-white text-[#0F766E] shadow-2xs font-bold border border-teal-200'
-                : 'text-[#4B5563] hover:text-[#1F2937]'
-            }`}
-          >
-            <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
-            <span>Integração & Abastecimento</span>
-          </button>
+      {/* Exibido EXCLUSIVAMENTE para o administrador Dfarias (gestor geral) */}
+      {isDfarias && (
+        <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
+          <div className="inline-flex p-1 rounded-xl bg-gray-100 border border-[#E5E7EB] text-xs font-semibold">
+            <button
+              type="button"
+              onClick={() => setVisaoComercial('match')}
+              className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+                visaoComercial === 'match'
+                  ? 'bg-white text-[#0F766E] shadow-2xs font-bold border border-teal-200'
+                  : 'text-[#4B5563] hover:text-[#1F2937]'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
+              <span>Integração & Abastecimento</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setVisaoComercial('gestao')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-              visaoComercial === 'gestao'
-                ? 'bg-white text-[#0F766E] shadow-2xs font-bold border border-teal-200'
-                : 'text-[#4B5563] hover:text-[#1F2937]'
-            }`}
-          >
-            <span>Gestão & Sortimento</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setVisaoComercial('gestao')}
+              className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+                visaoComercial === 'gestao'
+                  ? 'bg-white text-[#0F766E] shadow-2xs font-bold border border-teal-200'
+                  : 'text-[#4B5563] hover:text-[#1F2937]'
+              }`}
+            >
+              <span>Gestão & Sortimento</span>
+            </button>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#6B7280]">
+            <span className="font-semibold text-[#1F2937]">VivaVarejo Integração</span>
+            <span>• Fluxo em cascata e diagnóstico anti-ruptura (modo estudo Dfarias)</span>
+          </div>
         </div>
+      )}
 
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#6B7280]">
-          <span className="font-semibold text-[#1F2937]">VivaVarejo Integração</span>
-          <span>• Fluxo em cascata e diagnóstico anti-ruptura</span>
-        </div>
-      </div>
-
-      {/* VISÃO 1: ABASTECIMENTO & MATCH (CONCEITO CENTRAL DO INTEGRAÇÃO) */}
-      {visaoComercial === 'match' && (
+      {/* VISÃO 1: ABASTECIMENTO & MATCH (CONCEITO CENTRAL DO INTEGRAÇÃO) - EXCLUSIVO DFARIAS */}
+      {isDfarias && visaoComercial === 'match' && (
         <AbastecimentoMatchSecao
           lojas={lojas}
           lojaSelecionadaId={lojaId}
@@ -571,7 +583,7 @@ export default function ComercialPage() {
       )}
 
       {/* VISÃO 2: GESTÃO & SORTIMENTO (ESTRUTURA ORIGINAL PRESERVADA 100%) */}
-      {visaoComercial === 'gestao' && (
+      {(!isDfarias || visaoComercial === 'gestao') && (
         <div className="space-y-6">
           {/* Sincronização ERP Banner Discreto (Requisito 3) */}
           <div className="p-3 bg-white border border-[#E5E7EB] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-[#4B5563] shadow-2xs">
