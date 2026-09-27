@@ -405,7 +405,9 @@ export function AgendaMinhaEquipeSecao({
           </div>
           <div>
             <div className="text-sm font-bold text-[#1F2937]">
-              {groupedData.length} Áreas operacionais mapeadas
+              {groupedData.length === 0
+                ? 'Áreas operacionais mapeadas conforme seu segmento'
+                : `${groupedData.length} áreas operacionais mapeadas conforme seu segmento`}
             </div>
             <div className="text-xs text-[#6B7280]">
               Total de {rotinas.length}{' '}

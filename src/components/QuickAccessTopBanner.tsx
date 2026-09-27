@@ -134,7 +134,11 @@ export function QuickAccessTopBanner({ className = '' }: QuickAccessTopBannerPro
       : []),
   ]
 
-  const shortcuts = isGerente ? shortcutsGerente : shortcutsRede
+  const isDemo = user?.email?.toLowerCase().trim() === 'demo@vivavarejo.com.br'
+  const filteredShortcutsRede = isDemo
+    ? shortcutsRede.filter((s) => s.to !== '/rotinas')
+    : shortcutsRede
+  const shortcuts = isGerente ? shortcutsGerente : filteredShortcutsRede
 
   return (
     <div
@@ -151,8 +155,8 @@ export function QuickAccessTopBanner({ className = '' }: QuickAccessTopBannerPro
               Acesso Rápido aos Módulos
             </h2>
             <p className="text-[11px] text-[#6B7280]">
-              Direcione direto sem perder tempo (
-              {isGerente ? 'Modelo Gerente' : 'Modelo ADM de Rede'})
+              Direcione direto sem perder tempo
+              {!isDemo && ` (${isGerente ? 'Modelo Gerente' : 'Modelo ADM de Rede'})`}
             </p>
           </div>
         </div>

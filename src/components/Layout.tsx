@@ -116,10 +116,14 @@ export default function Layout() {
   const isLiderOrAdmin = perfil === 'admin' || perfil === 'adm_rede' || perfil === 'lider'
 
   // Modelos de navegação definidos pelo usuário (Requisito 2):
+  const isDemo = user?.email?.toLowerCase().trim() === 'demo@vivavarejo.com.br'
+
+  // Modelos de navegação definidos pelo usuário (Requisito 2):
   // 1) CPF -> modelo GERENTE (enxuto, foco operação diária): Meu Dia, Agenda/tarefas da loja,
   //    validações, Comercial essencial (sem módulos corporativos de gestão multi-rede / admin multi-lojas).
   // 2) CNPJ -> modelo ADM DE REDE (amplo, parecido com a DEMO existente): multi-rede, lojas,
   //    Comercial completo, negociações, layout/cronograma, gestão de usuários/Workflow.
+  // Obs.: para demo@vivavarejo.com.br, o atalho "Rotinas & Modelos" é removido da navegação conforme decisão do dono.
   const navLinksGerente = [
     { to: '/meu-dia', label: 'Meu Dia', icon: Calendar },
     { to: '/agenda', label: 'Agenda da Loja', icon: CalendarCheck },
@@ -131,7 +135,7 @@ export default function Layout() {
 
   const navLinksRede = [
     { to: '/agenda', label: 'Agenda da Rede', icon: Calendar },
-    { to: '/rotinas', label: 'Rotinas & Modelos', icon: ListChecks },
+    ...(!isDemo ? [{ to: '/rotinas', label: 'Rotinas & Modelos', icon: ListChecks }] : []),
     { to: '/validades', label: 'Validade × Calendário', icon: CalendarCheck },
     { to: '/comercial', label: 'Comercial & Negociações', icon: TrendingUp },
     { to: '/adm-rh', label: 'Adm/RH', icon: Users },

@@ -52,6 +52,14 @@ export function detectarOrigem(
 
   if (utm_source) {
     const s = utm_source.toLowerCase()
+    if (
+      s === 'site_oficial' ||
+      s === 'siteoficial' ||
+      s.includes('vivavarejo.com') ||
+      s === 'site'
+    ) {
+      return { origem: 'site_oficial', utm_source, utm_medium, utm_campaign }
+    }
     if (s.includes('linkedin')) return { origem: 'linkedin', utm_source, utm_medium, utm_campaign }
     if (s.includes('instagram') || s.includes('insta'))
       return { origem: 'instagram', utm_source, utm_medium, utm_campaign }
@@ -72,6 +80,10 @@ export function detectarOrigem(
         : ''
   if (ref) {
     const r = ref.toLowerCase()
+    // Acessos vindos da página principal oficial www.vivavarejo.com ou vivavarejo.com
+    if (r.includes('vivavarejo.com')) {
+      return { origem: 'site_oficial', utm_medium: 'referral' }
+    }
     if (r.includes('linkedin.com') || r.includes('lnkd.in')) {
       return { origem: 'linkedin', utm_medium: 'referral' }
     }
@@ -107,6 +119,8 @@ export function detectarOrigem(
 export interface RegistrarVisitaOptions {
   pagina?: string
   userEmail?: string
+  userName?: string
+  userPerfil?: string
   isAdmin?: boolean
   cadastrou?: boolean
   search?: string
@@ -133,12 +147,25 @@ export const analyticsService = {
 
       // Identificação do usuário logado (se houver)
       let userEmail = options?.userEmail
+      let userNome = options?.userName
+      let userPerfil = options?.userPerfil
       let isAdmin = options?.isAdmin
 
-      if (!userEmail && pb.authStore.isValid && pb.authStore.record) {
-        userEmail = (pb.authStore.record as { email?: string }).email
-        const perfil = (pb.authStore.record as { perfil?: string }).perfil
-        if (perfil === 'admin' || userEmail === 'dfarias53@gmail.com') {
+      if (pb.authStore.isValid && pb.authStore.record) {
+        const rec = pb.authStore.record as {
+          email?: string
+          name?: string
+          perfil?: string
+          cargo?: string
+        }
+        if (!userEmail) userEmail = rec.email
+        if (!userNome) userNome = rec.name
+        if (!userPerfil) userPerfil = rec.perfil || rec.cargo
+        if (
+          rec.perfil === 'admin' ||
+          rec.email === 'dfarias53@gmail.com' ||
+          userEmail === 'dfarias53@gmail.com'
+        ) {
           isAdmin = true
         }
       }
@@ -176,6 +203,8 @@ export const analyticsService = {
         dispositivo,
         sessao_id: sessaoId,
         user_email: userEmail || '',
+        user_nome: userNome || '',
+        user_perfil: userPerfil || '',
         cadastrou: options?.cadastrou || false,
         is_admin: false,
         referrer: document.referrer ? document.referrer.substring(0, 250) : '',
@@ -275,6 +304,7 @@ export const analyticsService = {
     }
 
     const nomesOrigensMap: Record<string, string> = {
+      site_oficial: 'Site Oficial (vivavarejo.com)',
       linkedin: 'LinkedIn',
       instagram: 'Instagram',
       facebook: 'Facebook',
@@ -328,13 +358,29 @@ export const analyticsService = {
       }))
       .sort((a, b) => b.quantidade - a.quantidade)
 
-    // Dispositivos
+    // Dispositivos e distinção de Usuário Identificado vs Anônimo
     let mobileCount = 0
     let desktopCount = 0
+    let totalIdentificados = 0
+    let totalAnonimos = 0
+
     for (const v of visitas) {
       if (v.dispositivo === 'mobile') mobileCount++
       else desktopCount++
+
+      const isIdentificado = Boolean(
+        (v.user_email && v.user_email.trim()) || (v.user_nome && v.user_nome.trim()),
+      )
+
+      if (isIdentificado) {
+        totalIdentificados++
+      } else {
+        totalAnonimos++
+      }
     }
+
+    // Obter as 150 visitas mais recentes para listagem no painel
+    const visitasRecentes = visitas.slice(0, 150)
 
     // Gráfico de acessos por dia
     // Monta todos os dias do período (para não ficar com buraco)
@@ -379,6 +425,8 @@ export const analyticsService = {
       visitantesUnicos,
       totalCadastros,
       taxaConversao: Math.round(taxaConversao * 10) / 10,
+      totalIdentificados,
+      totalAnonimos,
       origensRanking,
       paginasRanking,
       acessosPorDia,
@@ -386,6 +434,7 @@ export const analyticsService = {
         mobile: mobileCount,
         desktop: desktopCount,
       },
+      visitasRecentes,
     }
   },
 }

@@ -3,6 +3,23 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './main.css'
 
+// Redirecionamento de fallback em produção para domínio canônico oficial:
+// Redireciona EXATAMENTE os hostnames 'vivavarejo.goskip.app' e 'guia-para-lideres-do-varejo-921a5.goskip.app'
+// para https://www.vivavarejo.com preservando pathname, search (incluindo utm_*) e hash.
+// Defensivo: nunca redireciona 'www.vivavarejo.com' nem outros subdomínios goskip (não quebra previews de desenvolvimento).
+if (typeof window !== 'undefined' && window.location) {
+  const currentHostname = window.location.hostname.toLowerCase()
+  const TARGET_REDIRECT_HOSTS = [
+    'vivavarejo.goskip.app',
+    'guia-para-lideres-do-varejo-921a5.goskip.app',
+  ]
+
+  if (TARGET_REDIRECT_HOSTS.includes(currentHostname)) {
+    const destination = `https://www.vivavarejo.com${window.location.pathname}${window.location.search}${window.location.hash}`
+    window.location.replace(destination)
+  }
+}
+
 // @skip-protected: Do not remove. Required for React rendering.
 createRoot(document.getElementById('root')!).render(<App />)
 

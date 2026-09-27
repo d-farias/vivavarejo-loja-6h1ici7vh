@@ -13,6 +13,12 @@ import {
   Compass,
   ArrowUpRight,
   ShieldCheck,
+  UserCheck,
+  UserX,
+  Clock,
+  ListFilter,
+  Search,
+  ExternalLink,
 } from 'lucide-react'
 import { analyticsService } from '@/services/analyticsService'
 import type { ResumoAnalytics } from '@/types'
@@ -22,6 +28,10 @@ export const PainelAcessosAnalytics: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [resumo, setResumo] = useState<ResumoAnalytics | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [filtroIdentificacao, setFiltroIdentificacao] = useState<
+    'todos' | 'identificados' | 'anonimos'
+  >('todos')
+  const [buscaTabela, setBuscaTabela] = useState('')
 
   const carregarDados = async (p: 'hoje' | '7dias' | '30dias') => {
     setLoading(true)
@@ -200,6 +210,45 @@ export const PainelAcessosAnalytics: React.FC = () => {
             <p className="text-[11px] text-[#6B7280] mt-0.5">
               Taxa de conversão: visitante → cadastro
             </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Sub-resumo: Usuário Identificado vs Anônimo */}
+      <div className="bg-gradient-to-r from-teal-50/60 via-white to-gray-50 border border-teal-100 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-white border border-teal-200 shadow-2xs flex items-center justify-center text-[#0F766E] shrink-0">
+            <UserCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <h4 className="text-xs sm:text-sm font-bold text-[#1F2937]">
+              Perfil dos Acessos: Identificados vs Anônimos
+            </h4>
+            <p className="text-[11px] text-[#6B7280]">
+              Diferenciação clara entre clientes/gestores com login e visitantes sem identificação
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-emerald-200 shadow-2xs">
+            <UserCheck className="w-4 h-4 text-emerald-600" />
+            <div>
+              <div className="text-[10px] uppercase font-bold text-emerald-700">Identificados</div>
+              <div className="text-base font-extrabold text-[#1F2937] leading-none">
+                {loading ? '...' : resumo?.totalIdentificados || 0}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200 shadow-2xs">
+            <UserX className="w-4 h-4 text-[#6B7280]" />
+            <div>
+              <div className="text-[10px] uppercase font-bold text-[#6B7280]">Anônimos</div>
+              <div className="text-base font-extrabold text-[#1F2937] leading-none">
+                {loading ? '...' : resumo?.totalAnonimos || 0}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -445,6 +494,238 @@ export const PainelAcessosAnalytics: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Tabela de Listagem de Visitas: Quem acessou (Data/Hora, Tela, Origem, Identificação) */}
+      <div className="bg-white border border-[#E5E7EB] rounded-xl shadow-2xs overflow-hidden">
+        <div className="p-4 sm:p-5 border-b border-[#E5E7EB] flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[#0F766E]" />
+              Registro de Acessos Recentes
+            </h3>
+            <p className="text-xs text-[#6B7280]">
+              Últimos acessos ao sistema discriminando usuários identificados vs anônimos
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Filtro por tipo de identificação */}
+            <div className="inline-flex rounded-lg border border-[#E5E7EB] bg-[#F7F7F5] p-0.5 text-xs">
+              <button
+                type="button"
+                onClick={() => setFiltroIdentificacao('todos')}
+                className={`px-2.5 py-1 rounded font-medium transition-colors ${
+                  filtroIdentificacao === 'todos'
+                    ? 'bg-white text-[#0F766E] shadow-2xs font-semibold'
+                    : 'text-[#6B7280] hover:text-[#1F2937]'
+                }`}
+              >
+                Todos
+              </button>
+              <button
+                type="button"
+                onClick={() => setFiltroIdentificacao('identificados')}
+                className={`px-2.5 py-1 rounded font-medium transition-colors ${
+                  filtroIdentificacao === 'identificados'
+                    ? 'bg-white text-emerald-700 shadow-2xs font-semibold'
+                    : 'text-[#6B7280] hover:text-[#1F2937]'
+                }`}
+              >
+                Identificados
+              </button>
+              <button
+                type="button"
+                onClick={() => setFiltroIdentificacao('anonimos')}
+                className={`px-2.5 py-1 rounded font-medium transition-colors ${
+                  filtroIdentificacao === 'anonimos'
+                    ? 'bg-white text-gray-800 shadow-2xs font-semibold'
+                    : 'text-[#6B7280] hover:text-[#1F2937]'
+                }`}
+              >
+                Anônimos
+              </button>
+            </div>
+
+            {/* Busca textual simples */}
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-[#9CA3AF] absolute left-2.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={buscaTabela}
+                onChange={(e) => setBuscaTabela(e.target.value)}
+                placeholder="Buscar tela, origem, e-mail..."
+                className="pl-8 pr-3 py-1 text-xs border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0F766E] w-44 sm:w-56"
+              />
+            </div>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="py-12 text-center text-xs text-[#6B7280]">
+            <RefreshCw className="w-4 h-4 animate-spin text-[#0F766E] mx-auto mb-2" />
+            Carregando acessos...
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="bg-[#F9FAFB] border-b border-[#E5E7EB] text-[#4B5563]">
+                  <th className="py-2.5 px-4 font-semibold whitespace-nowrap">Data / Hora</th>
+                  <th className="py-2.5 px-4 font-semibold whitespace-nowrap">Tela / Página</th>
+                  <th className="py-2.5 px-4 font-semibold whitespace-nowrap">Origem do Tráfego</th>
+                  <th className="py-2.5 px-4 font-semibold whitespace-nowrap">
+                    Identificação do Visitante
+                  </th>
+                  <th className="py-2.5 px-4 font-semibold text-center whitespace-nowrap">
+                    Dispositivo
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E5E7EB]">
+                {(() => {
+                  const lista = (resumo?.visitasRecentes || []).filter((v) => {
+                    const isIdent = Boolean(
+                      (v.user_email && v.user_email.trim()) || (v.user_nome && v.user_nome.trim()),
+                    )
+                    if (filtroIdentificacao === 'identificados' && !isIdent) return false
+                    if (filtroIdentificacao === 'anonimos' && isIdent) return false
+
+                    if (buscaTabela.trim()) {
+                      const termo = buscaTabela.toLowerCase().trim()
+                      const matchPagina = (v.pagina || '').toLowerCase().includes(termo)
+                      const matchOrigem = (v.origem || '').toLowerCase().includes(termo)
+                      const matchEmail = (v.user_email || '').toLowerCase().includes(termo)
+                      const matchNome = (v.user_nome || '').toLowerCase().includes(termo)
+                      return matchPagina || matchOrigem || matchEmail || matchNome
+                    }
+                    return true
+                  })
+
+                  if (lista.length === 0) {
+                    return (
+                      <tr>
+                        <td colSpan={5} className="py-8 text-center text-xs text-[#6B7280]">
+                          Nenhum registro de acesso encontrado com os filtros selecionados.
+                        </td>
+                      </tr>
+                    )
+                  }
+
+                  const formatOrigemLabel = (origemRaw?: string) => {
+                    const o = (origemRaw || 'direto').toLowerCase().trim()
+                    if (o === 'site_oficial') return 'Site Oficial (vivavarejo.com)'
+                    if (o === 'linkedin') return 'LinkedIn'
+                    if (o === 'instagram') return 'Instagram'
+                    if (o === 'whatsapp') return 'WhatsApp'
+                    if (o === 'google') return 'Google'
+                    if (o === 'facebook') return 'Facebook'
+                    if (o === 'direto') return 'Acesso Direto'
+                    return o
+                  }
+
+                  return lista.map((v) => {
+                    const isIdent = Boolean(
+                      (v.user_email && v.user_email.trim()) || (v.user_nome && v.user_nome.trim()),
+                    )
+                    const dataFormatada = v.created
+                      ? new Date(v.created.replace(' ', 'T')).toLocaleString('pt-BR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })
+                      : '-'
+
+                    const origemFormatada = formatOrigemLabel(v.origem)
+
+                    return (
+                      <tr key={v.id} className="hover:bg-[#F9FAFB] transition-colors">
+                        {/* Data / Hora */}
+                        <td className="py-2.5 px-4 font-mono text-[11px] text-[#6B7280] whitespace-nowrap">
+                          {dataFormatada}
+                        </td>
+
+                        {/* Tela */}
+                        <td className="py-2.5 px-4 text-[#1F2937] font-medium whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded text-[#374151]">
+                            {v.pagina || '/'}
+                          </span>
+                        </td>
+
+                        {/* Origem */}
+                        <td className="py-2.5 px-4 whitespace-nowrap">
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold ${
+                              v.origem === 'site_oficial'
+                                ? 'bg-teal-50 text-[#0F766E] border border-teal-200'
+                                : v.origem === 'linkedin'
+                                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                  : v.origem === 'instagram'
+                                    ? 'bg-pink-50 text-pink-700 border border-pink-200'
+                                    : v.origem === 'whatsapp'
+                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                      : 'bg-gray-100 text-[#4B5563]'
+                            }`}
+                          >
+                            {origemFormatada}
+                          </span>
+                        </td>
+
+                        {/* Identificação */}
+                        <td className="py-2.5 px-4 whitespace-nowrap">
+                          {isIdent ? (
+                            <div className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                              <div className="flex flex-col">
+                                <span className="font-semibold text-[#1F2937] leading-tight">
+                                  {v.user_nome || v.user_email}
+                                </span>
+                                <span className="text-[10px] text-[#6B7280] leading-tight">
+                                  {v.user_email && v.user_nome ? v.user_email : ''}
+                                  {v.user_perfil ? ` • perfil: ${v.user_perfil}` : ''}
+                                </span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5 text-[#6B7280]">
+                              <span className="w-2 h-2 rounded-full bg-gray-300 shrink-0" />
+                              <span className="font-medium italic text-[11px]">Anônimo</span>
+                              <span className="text-[10px] font-mono text-[#9CA3AF]">
+                                ({v.sessao_id.substring(0, 10)})
+                              </span>
+                            </div>
+                          )}
+                        </td>
+
+                        {/* Dispositivo */}
+                        <td className="py-2.5 px-4 text-center whitespace-nowrap">
+                          {v.dispositivo === 'mobile' ? (
+                            <span
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] bg-gray-100 text-[#4B5563]"
+                              title="Celular / Tablet"
+                            >
+                              <Smartphone className="w-3 h-3 text-[#0F766E]" />
+                              Mobile
+                            </span>
+                          ) : (
+                            <span
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] bg-gray-100 text-[#4B5563]"
+                              title="Computador"
+                            >
+                              <Monitor className="w-3 h-3 text-[#4B5563]" />
+                              Desktop
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })
+                })()}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   )

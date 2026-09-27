@@ -17,6 +17,7 @@ export function ModeloDemonstrativoBanner({ className = '' }: ModeloDemonstrativ
 
   const profileType = getUserProfileType(user)
   const isRede = profileType === 'rede'
+  const isDemo = user?.email?.toLowerCase().trim() === 'demo@vivavarejo.com.br'
 
   useEffect(() => {
     if (!user) {
@@ -45,11 +46,6 @@ export function ModeloDemonstrativoBanner({ className = '' }: ModeloDemonstrativ
     setVisible(false)
   }
 
-  const handleConfigureVoceMesmo = () => {
-    // Redireciona para o fluxo de rotinas/configuração existente
-    navigate('/rotinas')
-  }
-
   return (
     <>
       <div
@@ -65,40 +61,32 @@ export function ModeloDemonstrativoBanner({ className = '' }: ModeloDemonstrativ
             </div>
             <div className="space-y-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-teal-50 text-[#0F766E] border border-teal-200">
-                  {isRede ? 'Modelo ADM de Rede' : 'Modelo Gerente de Loja'}
-                </span>
+                {/* No usuário DEMO (demo@vivavarejo.com.br), ocultar etiqueta 'Modelo ADM de Rede' */}
+                {!isDemo && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-teal-50 text-[#0F766E] border border-teal-200">
+                    {isRede ? 'Modelo ADM de Rede' : 'Modelo Gerente de Loja'}
+                  </span>
+                )}
                 <span className="text-xs font-semibold text-[#6B7280]">
                   Ambiente de demonstração
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-[#374151] leading-relaxed">
-                Este é apenas um modelo de demonstração. Sendo REDE ou profissional, você configura
-                demandas, rotinas e indicadores conforme sua realidade — e atualiza quando quiser,
-                na hora que quiser.
+                Este é apenas um modelo demonstrativo. Cada rede ou profissional tem sua realidade:
+                demandas, rotinas e indicadores configurados por nós, conforme o seu negócio — e
+                atualizados sempre que precisar.
               </p>
             </div>
           </div>
 
-          {/* Duas Ações Claras Solicitadas */}
+          {/* Ação Única: 'Nos envie que configuramos e entregamos pronto.' (decisão do dono) */}
           <div className="flex flex-wrap items-center gap-2 shrink-0 md:pl-2">
-            {/* Ação 1: Configure você mesmo */}
-            <button
-              type="button"
-              onClick={handleConfigureVoceMesmo}
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] hover:text-[#0F766E] text-[#1F2937] transition-colors inline-flex items-center gap-1.5 shadow-2xs"
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-[#0F766E]" />
-              <span>Configure as suas rotinas e demandas de processos</span>
-            </button>
-
-            {/* Ação 2: Nos envie que configuramos */}
             <button
               type="button"
               onClick={() => setFalarModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white transition-colors inline-flex items-center gap-1.5 shadow-xs"
+              className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white transition-colors inline-flex items-center gap-2 shadow-xs"
             >
-              <SendHorizontal className="w-3.5 h-3.5" />
+              <SendHorizontal className="w-4 h-4" />
               <span>Nos envie que configuramos e entregamos pronto.</span>
             </button>
 

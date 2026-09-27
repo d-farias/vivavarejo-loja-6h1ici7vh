@@ -177,6 +177,8 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
     },
   ]
 
+  const isDemo = user?.email?.toLowerCase().trim() === 'demo@vivavarejo.com.br'
+
   // Atalhos para Perfil ADM de Rede (amplo, visão multi-lojas e comercial completo)
   const shortcutsRede: HubShortcut[] = [
     {
@@ -202,13 +204,17 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
       description: 'Triagem e tratamento de demandas de RH, DP, ADM, Financeiro e Fiscal',
       icon: Users,
     },
-    {
-      to: '/rotinas',
-      label: 'Rotinas',
-      badge: 'Padrões',
-      description: 'Cadastro, horários limites e modelos',
-      icon: ListChecks,
-    },
+    ...(!isDemo
+      ? [
+          {
+            to: '/rotinas',
+            label: 'Rotinas',
+            badge: 'Padrões',
+            description: 'Cadastro, horários limites e modelos',
+            icon: ListChecks,
+          },
+        ]
+      : []),
     {
       to: '/validades',
       label: 'Validades',
@@ -268,9 +274,11 @@ export function QuickAccessHubModal({ forceOpen, onClose }: QuickAccessHubModalP
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#0F766E]">
                   Acesso Rápido
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
-                  {isGerente ? 'Modelo Gerente (CPF)' : 'Modelo ADM de Rede (CNPJ)'}
-                </span>
+                {!isDemo && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
+                    {isGerente ? 'Modelo Gerente (CPF)' : 'Modelo ADM de Rede (CNPJ)'}
+                  </span>
+                )}
               </div>
               <h2
                 id="hub-acesso-rapido-title"

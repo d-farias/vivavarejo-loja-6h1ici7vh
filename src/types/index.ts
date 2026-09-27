@@ -742,6 +742,8 @@ export interface VisitaAnalytics {
   dispositivo: 'mobile' | 'desktop'
   sessao_id: string
   user_email?: string
+  user_nome?: string
+  user_perfil?: string
   cadastrou?: boolean
   is_admin?: boolean
   referrer?: string
@@ -755,6 +757,8 @@ export interface ResumoAnalytics {
   visitantesUnicos: number
   totalCadastros: number
   taxaConversao: number // percentual ex: 4.5
+  totalIdentificados: number
+  totalAnonimos: number
   origensRanking: {
     origem: string
     nomeAmigavel: string
@@ -777,4 +781,5 @@ export interface ResumoAnalytics {
     mobile: number
     desktop: number
   }
+  visitasRecentes?: VisitaAnalytics[]
 }
