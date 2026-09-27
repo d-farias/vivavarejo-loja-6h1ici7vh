@@ -94,7 +94,7 @@ export const ContatosAtendimentoModal: React.FC<ContatosAtendimentoModalProps> =
           : 'contato@vivavarejo.com',
       )
       setWhatsappSuporte(formatPhoneBR(globalConfig?.whatsapp_suporte || '(48) 99181-7542'))
-      setNomeAtendimento(globalConfig?.nome_atendimento || 'Dalvani Farias')
+      setNomeAtendimento(globalConfig?.nome_atendimento || '')
     } else {
       const cli = clientes.find((c) => c.id === selectedTarget)
       if (cli) {
@@ -302,7 +302,7 @@ export const ContatosAtendimentoModal: React.FC<ContatosAtendimentoModalProps> =
               onChange={(e) => setNomeAtendimento(e.target.value)}
               placeholder={
                 selectedTarget === 'global'
-                  ? 'Ex: Dalvani Farias'
+                  ? 'Ex: Suporte Operacional'
                   : `Ex: Suporte Operacional ${selectedClienteObj?.nome || ''}`
               }
               className="w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md outline-none focus:border-[#2563EB]"

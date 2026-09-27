@@ -3,7 +3,7 @@ import type { ConfiguracaoSistema } from '@/types'
 
 export const DEFAULT_CONTATO_EMAIL = 'contato@vivavarejo.com'
 export const DEFAULT_CONTATO_WHATSAPP = '(48) 99181-7542'
-export const DEFAULT_CONTATO_NOME = 'Dalvani Farias'
+export const DEFAULT_CONTATO_NOME = ''
 
 export const configuracoesService = {
   /**

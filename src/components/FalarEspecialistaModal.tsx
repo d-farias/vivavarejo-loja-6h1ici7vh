@@ -29,7 +29,6 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
 
   if (!open) return null
 
-  const specialistName = contatos.nomeAtendente || 'Especialista'
   const specialistEmail =
     contatos.email && contatos.email.toLowerCase() !== 'dfarias53@gmail.com'
       ? contatos.email
@@ -42,8 +41,8 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
 
   const whatsappMessage = encodeURIComponent(
     assuntoContexto
-      ? `Olá, ${specialistName}! Gostaria de falar sobre o VivaVarejo: ${assuntoContexto}`
-      : `Olá, ${specialistName}! Estou navegando no VivaVarejo e gostaria de tirar dúvidas sobre o atendimento/operação.`,
+      ? `Olá! Gostaria de falar sobre o VivaVarejo: ${assuntoContexto}`
+      : 'Olá! Estou navegando no VivaVarejo e gostaria de tirar dúvidas sobre o atendimento/operação.',
   )
 
   const mailtoLink = `mailto:${specialistEmail}?subject=${encodeURIComponent(
@@ -51,7 +50,7 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
       ? `[VivaVarejo] ${assuntoContexto}`
       : '[VivaVarejo] Contato com Suporte e Especialista',
   )}&body=${encodeURIComponent(
-    `Olá, ${specialistName},\n\nGostaria de entender melhor como liberar o acesso e implementar as rotinas operacionais para a minha rede/lojas no VivaVarejo.\n\nAguardo retorno!`,
+    `Olá,\n\nGostaria de entender melhor como liberar o acesso e implementar as rotinas operacionais para a minha rede/lojas no VivaVarejo.\n\nAguardo retorno!`,
   )}`
 
   const handleCopyEmail = () => {
@@ -117,8 +116,8 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
         <div className="text-xs text-[#4B5563] space-y-2 leading-relaxed">
           <p>
             O <strong>VivaVarejo</strong> disponibiliza atendimento direto com{' '}
-            <strong className="text-[#1F2937]">{specialistName}</strong> para sanar dúvidas,
-            implantar processos, auditar rotinas e alinhar demandas operacionais.
+            <strong className="text-[#1F2937]">especialista</strong> para sanar dúvidas, implantar
+            processos, auditar rotinas e alinhar demandas operacionais.
           </p>
         </div>
 

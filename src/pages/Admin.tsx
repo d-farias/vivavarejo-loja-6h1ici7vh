@@ -2684,7 +2684,7 @@ export default function Admin() {
                   <input
                     name="nome_atendimento"
                     defaultValue={clienteModal.data?.nome_atendimento || ''}
-                    placeholder="Ex: Suporte Operacional / Dalvani Farias"
+                    placeholder="Ex: Suporte Operacional"
                     className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded text-xs outline-none focus:border-[#0F766E]"
                   />
                 </div>

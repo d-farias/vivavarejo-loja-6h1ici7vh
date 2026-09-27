@@ -40,7 +40,11 @@ export function useContatosAtendimento(clienteIdParam?: string): {
           ? rawGlobalEmail
           : DEFAULT_CONTATO_EMAIL
       const globalWhatsapp = globalConfig?.whatsapp_suporte?.trim() || DEFAULT_CONTATO_WHATSAPP
-      const globalNome = globalConfig?.nome_atendimento?.trim() || DEFAULT_CONTATO_NOME
+      const globalNome =
+        globalConfig?.nome_atendimento &&
+        !/dfarias|dalvani|farias/i.test(globalConfig.nome_atendimento)
+          ? globalConfig.nome_atendimento.trim()
+          : ''
 
       if (targetClienteId) {
         try {
@@ -52,12 +56,16 @@ export function useContatosAtendimento(clienteIdParam?: string): {
               ? rawEmailRede
               : undefined
           const whatsappRede = cliente.whatsapp_suporte?.trim()
-          const nomeRedeAtendente = cliente.nome_atendimento?.trim()
+          const rawNomeRedeAtendente = cliente.nome_atendimento?.trim()
+          const nomeRedeAtendente =
+            rawNomeRedeAtendente && !/dfarias|dalvani|farias/i.test(rawNomeRedeAtendente)
+              ? rawNomeRedeAtendente
+              : ''
 
           if (emailRede || whatsappRede || nomeRedeAtendente) {
             const finalEmail = emailRede || globalEmail
             const finalWhatsapp = whatsappRede || globalWhatsapp
-            const finalNome = nomeRedeAtendente || cliente.nome || globalNome
+            const finalNome = nomeRedeAtendente || ''
 
             setContatos({
               email:
