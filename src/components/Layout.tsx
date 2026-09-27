@@ -40,11 +40,14 @@ import { getUserProfileType, isGestorGeralUser } from '@/lib/perfil-utils'
 import { usePwaInstall } from '@/hooks/use-pwa-install'
 import { segmentosService } from '@/services/segmentos'
 import { SeletorSegmentoModal } from '@/components/SeletorSegmentoModal'
+import { LanguageSelector } from '@/components/LanguageSelector'
 import { useAutoLogout } from '@/hooks/use-auto-logout'
 import { useBrandTheme } from '@/hooks/use-brand'
+import { useI18n } from '@/lib/i18n/context'
 
 export default function Layout() {
   const { user, logout } = useAuth()
+  const { t } = useI18n()
   const brand = useBrandTheme()
   const location = useLocation()
   const navigate = useNavigate()
@@ -127,27 +130,27 @@ export default function Layout() {
   //    Comercial completo, negociações, layout/cronograma, gestão de usuários/Workflow.
   // Obs.: para demo@vivavarejo.com.br, o atalho "Rotinas & Modelos" é removido da navegação conforme decisão do dono.
   const navLinksGerente = [
-    { to: '/meu-dia', label: 'Meu Dia', icon: Calendar },
-    { to: '/agenda', label: 'Agenda da Loja', icon: CalendarCheck },
-    { to: '/validades', label: 'Validades', icon: ShieldAlert },
-    { to: '/comercial', label: 'Comercial Loja', icon: TrendingUp },
-    { to: '/adm-rh', label: 'Adm/RH', icon: Users },
-    { to: '/rotinas', label: 'Rotinas & Padrões', icon: ListChecks },
+    { to: '/meu-dia', label: t.nav.meuDia, icon: Calendar },
+    { to: '/agenda', label: t.nav.agendaLoja, icon: CalendarCheck },
+    { to: '/validades', label: t.nav.validades, icon: ShieldAlert },
+    { to: '/comercial', label: t.nav.comercialLoja, icon: TrendingUp },
+    { to: '/adm-rh', label: t.nav.admRh, icon: Users },
+    { to: '/rotinas', label: t.nav.rotinasPadroes, icon: ListChecks },
   ]
 
   const navLinksRede = [
-    { to: '/agenda', label: 'Agenda da Rede', icon: Calendar },
-    ...(!isDemo ? [{ to: '/rotinas', label: 'Rotinas & Modelos', icon: ListChecks }] : []),
-    { to: '/validades', label: 'Validade × Calendário', icon: CalendarCheck },
-    { to: '/comercial', label: 'Comercial & Negociações', icon: TrendingUp },
-    { to: '/adm-rh', label: 'Adm/RH', icon: Users },
-    { to: '/perdas', label: 'Perdas & Inventário', icon: ShieldAlert },
-    ...(isLiderOrAdmin ? [{ to: '/promotores', label: 'Promotores', icon: Handshake }] : []),
+    { to: '/agenda', label: t.nav.agendaRede, icon: Calendar },
+    ...(!isDemo ? [{ to: '/rotinas', label: t.nav.rotinasModelos, icon: ListChecks }] : []),
+    { to: '/validades', label: t.nav.validadeCalendario, icon: CalendarCheck },
+    { to: '/comercial', label: t.nav.comercialNegociacoes, icon: TrendingUp },
+    { to: '/adm-rh', label: t.nav.admRh, icon: Users },
+    { to: '/perdas', label: t.nav.perdasInventario, icon: ShieldAlert },
+    ...(isLiderOrAdmin ? [{ to: '/promotores', label: t.nav.promotores, icon: Handshake }] : []),
     ...(hasAdminAccess
       ? [
           {
             to: '/admin',
-            label: isAdmRede ? 'Gestão da Rede' : 'Workflow Geral',
+            label: isAdmRede ? t.nav.gestaoRede : t.nav.workflowGeral,
             icon: GitBranch,
           },
         ]
@@ -205,7 +208,7 @@ export default function Layout() {
                 </span>
                 {brand.isWhiteLabelActive && (
                   <span className="text-[9px] font-semibold text-[#6B7280] leading-none">
-                    Rede Parceira
+                    {t.common.partnerNetwork}
                   </span>
                 )}
               </div>
@@ -264,8 +267,8 @@ export default function Layout() {
                   className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-[#E5E7EB] hover:border-[#0F766E] hover:text-[#0F766E] text-[#374151] shadow-2xs transition-colors"
                   title={
                     segmentoAtivo
-                      ? `Ramo: ${segmentoAtivo}. Clique para trocar.`
-                      : 'Escolha o ramo da sua loja'
+                      ? `${t.common.segmentPrefix}: ${segmentoAtivo}`
+                      : t.common.setSegment
                   }
                 >
                   <SlidersHorizontal
@@ -277,7 +280,11 @@ export default function Layout() {
                           : '#0F766E',
                     }}
                   />
-                  <span>{segmentoAtivo ? `Ramo: ${segmentoAtivo}` : 'Definir Ramo'}</span>
+                  <span>
+                    {segmentoAtivo
+                      ? `${t.common.segmentPrefix}: ${segmentoAtivo}`
+                      : t.common.setSegment}
+                  </span>
                 </button>
 
                 <button
@@ -297,7 +304,7 @@ export default function Layout() {
                       ? 'border hover:opacity-90'
                       : 'bg-white border border-[#E5E7EB] hover:border-[#0F766E] hover:text-[#0F766E] text-[#374151]'
                   }`}
-                  title="Fale diretamente com o consultor especialista"
+                  title={t.common.talkToSpecialist}
                 >
                   <MessageSquare
                     className="w-3.5 h-3.5"
@@ -307,8 +314,13 @@ export default function Layout() {
                         : { color: '#0F766E' }
                     }
                   />
-                  <span>Falar com especialista</span>
+                  <span>{t.common.talkToSpecialist}</span>
                 </button>
+
+                {/* Seletor de Idioma no Header Desktop (Logado) */}
+                <div className="hidden sm:block">
+                  <LanguageSelector />
+                </div>
               </>
             )}
 
@@ -349,7 +361,7 @@ export default function Layout() {
                           className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2 text-[#0F766E] hover:bg-teal-50"
                         >
                           <GitBranch className="w-4 h-4" />
-                          <span>{isAdmRede ? 'Workflow Rede' : 'Workflow Geral'}</span>
+                          <span>{isAdmRede ? t.nav.workflowRede : t.nav.workflowGeral}</span>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator className="bg-[#E5E7EB]" />
                       </>
@@ -359,7 +371,7 @@ export default function Layout() {
                       className="cursor-pointer p-2.5 font-medium text-xs flex items-center gap-2 text-[#374151] hover:text-[#1F2937] hover:bg-gray-50"
                     >
                       <KeyRound className="w-4 h-4 text-[#6B7280]" />
-                      <span>Alterar senha</span>
+                      <span>{t.common.changePassword}</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-[#E5E7EB]" />
                     <DropdownMenuItem
@@ -367,7 +379,7 @@ export default function Layout() {
                       className="text-rose-600 focus:text-rose-700 focus:bg-rose-50 cursor-pointer p-2.5 font-semibold text-xs flex items-center gap-2"
                     >
                       <LogOut className="w-4 h-4" />
-                      <span>Sair da conta</span>
+                      <span>{t.common.logout}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -382,7 +394,12 @@ export default function Layout() {
                 </button>
               </div>
             ) : isAuthPage ? (
-              <span className="text-xs text-[#6B7280] hidden sm:inline">Acesso de Liderança</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-[#6B7280] hidden sm:inline">
+                  {t.common.leadershipAccess}
+                </span>
+                <LanguageSelector />
+              </div>
             ) : null}
           </div>
         </div>
@@ -451,6 +468,12 @@ export default function Layout() {
               </div>
             </div>
 
+            {/* Seletor de Idioma dentro do Menu Gaveta Mobile */}
+            <div className="p-3 border-b border-[#E5E7EB] bg-white flex items-center justify-between">
+              <span className="text-xs font-semibold text-[#4B5563]">Idioma / Language:</span>
+              <LanguageSelector />
+            </div>
+
             <nav className="p-3 space-y-1.5 flex-1 overflow-y-auto">
               {navLinks.map((link) => {
                 const Icon = link.icon
@@ -492,7 +515,7 @@ export default function Layout() {
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#374151] bg-white border border-[#E5E7EB] hover:bg-gray-100 transition-colors"
                   >
                     <Smartphone className="w-4 h-4 text-[#0F766E]" />
-                    <span>Instalar app no celular</span>
+                    <span>{t.common.installApp}</span>
                   </button>
                 )}
 
@@ -510,7 +533,7 @@ export default function Layout() {
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0F766E] hover:bg-[#115E59] shadow-sm transition-colors"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>Falar com especialista</span>
+                  <span>{t.common.talkToSpecialist}</span>
                 </button>
               </div>
             </nav>
@@ -524,7 +547,7 @@ export default function Layout() {
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#374151] hover:bg-white hover:text-[#1F2937] transition-colors"
               >
                 <KeyRound className="w-4 h-4 text-[#6B7280]" />
-                <span>Alterar senha</span>
+                <span>{t.common.changePassword}</span>
               </button>
               <button
                 onClick={() => {
@@ -534,7 +557,7 @@ export default function Layout() {
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
-                <span>Sair da conta</span>
+                <span>{t.common.logout}</span>
               </button>
             </div>
           </div>
@@ -618,7 +641,7 @@ export default function Layout() {
               {brand.isWhiteLabelActive && brand.nomeExibicao
                 ? `${brand.nomeExibicao} • VivaVarejo`
                 : 'VivaVarejo'}
-              . Todos os direitos reservados.
+              . {t.common.allRightsReserved}
             </span>
           </div>
         </div>

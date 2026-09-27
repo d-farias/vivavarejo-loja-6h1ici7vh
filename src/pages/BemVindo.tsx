@@ -42,6 +42,8 @@ import {
 } from '@/components/ui/dialog'
 import { ProtecaoDadosSecao } from '@/components/ProtecaoDadosSecao'
 import { FalarEspecialistaModal } from '@/components/FalarEspecialistaModal'
+import { LanguageSelector } from '@/components/LanguageSelector'
+import { useI18n } from '@/lib/i18n/context'
 
 const INSTAGRAM_URL = 'https://www.vivavarejo.com?utm_source=instagram'
 const LINKEDIN_PERSONAL_URL = 'https://www.vivavarejo.com?utm_source=linkedin'
@@ -215,6 +217,7 @@ const SEGMENT_OPTIONS: SegmentOption[] = [
 export default function BemVindo() {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { t } = useI18n()
   const { contatos } = useContatosAtendimento()
 
   // Detecta se o visitante é o Gestor Geral (Dfarias — perfil 'admin' ou email dfarias53@gmail.com)
@@ -271,7 +274,7 @@ export default function BemVindo() {
 
   return (
     <div className="min-h-screen bg-[#F7F7F5] text-[#1F2937] flex flex-col font-sans">
-      {/* Header sóbrio: apenas marca à esquerda e botão Entrar à direita */}
+      {/* Header sóbrio: apenas marca à esquerda e botão Entrar à direita com seletor de idioma */}
       <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-[#E5E7EB]">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 group">
@@ -279,18 +282,19 @@ export default function BemVindo() {
               <div className="w-4 h-4 border-2 border-white rotate-45 transform" />
             </div>
             <span className="text-sm font-bold tracking-wider uppercase text-[#1F2937] leading-tight">
-              VivaVarejo
+              {t.common.appName}
             </span>
           </Link>
 
-          {/* Botão Entrar para visitantes anônimos (ocultado para Gestor Geral logado para manter a capa limpa) */}
-          <nav className="flex items-center gap-2 sm:gap-4 text-xs font-medium">
+          {/* Área de Ações: Seletor de Idioma lado a lado com Entrar */}
+          <nav className="flex items-center gap-2 sm:gap-3 text-xs font-medium">
+            <LanguageSelector />
             {!isGestorGeral && (
               <Link
                 to="/login"
                 className="px-3.5 py-1.5 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] hover:text-[#0F766E] rounded-lg transition-colors font-semibold shadow-2xs"
               >
-                Entrar
+                {t.common.login}
               </Link>
             )}
           </nav>
@@ -305,21 +309,19 @@ export default function BemVindo() {
             {/* Chip discreto */}
             <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-semibold text-[#0F766E] shadow-2xs">
               <ShieldCheck className="w-4 h-4 shrink-0 text-[#0F766E]" />
-              <span>Execução para o Varejo Físico</span>
+              <span>{t.landing.badgeHero}</span>
             </div>
 
             {/* Posicionamento Principal */}
             <div className="space-y-4">
               <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[#1F2937] tracking-tight leading-tight">
-                Prioridades do dia definidas, acompanhadas e comprovadas na execução.
+                {t.landing.heroTitle}
               </h1>
               <p className="text-base sm:text-lg font-medium text-[#0F766E] max-w-2xl mx-auto leading-relaxed">
-                “Seu ERP mostra o que aconteceu. O sistema garante que seja feito.”
+                {t.landing.heroQuote}
               </p>
               <p className="text-sm sm:text-base text-[#4B5563] max-w-2xl mx-auto leading-relaxed">
-                Direcionamento de prioridades diárias, comprovação de rotinas com fotos, gestão de
-                validades, visitas de promotores e sincronização de dados comerciais em uma só
-                plataforma.
+                {t.landing.heroDescription}
               </p>
 
               {/* Destaque de personalização sob medida: nós configuramos */}
@@ -327,12 +329,9 @@ export default function BemVindo() {
                 <div className="inline-flex items-start sm:items-center gap-2.5 text-left sm:text-center text-xs sm:text-sm text-[#1F2937] bg-white/70 border border-[#E5E7EB] border-l-4 border-l-[#0F766E] rounded-r-lg rounded-l-xs px-3.5 py-2.5 max-w-2xl shadow-2xs">
                   <p className="leading-snug">
                     <span className="font-semibold text-[#1F2937]">
-                      Cada rede tem sua realidade:
+                      {t.landing.customizationTitle}
                     </span>{' '}
-                    <span className="text-[#4B5563]">
-                      demandas, rotinas e indicadores configurados por nós, conforme o seu negócio —
-                      e atualizados sempre que precisar.
-                    </span>
+                    <span className="text-[#4B5563]">{t.landing.customizationDesc}</span>
                   </p>
                 </div>
               </div>
@@ -347,7 +346,7 @@ export default function BemVindo() {
                     onClick={() => navigate('/signup')}
                     className="w-full sm:w-auto px-6 py-3 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-sm rounded-xl shadow-xs transition-all hover:scale-[1.02] inline-flex items-center justify-center gap-2"
                   >
-                    <span>Criar conta</span>
+                    <span>{t.landing.btnCreateAccount}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
 
@@ -357,22 +356,22 @@ export default function BemVindo() {
                     className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] hover:text-[#0F766E] font-semibold text-sm rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-2xs"
                   >
                     <MessageSquare className="w-4 h-4 text-[#0F766E]" />
-                    <span>Falar com especialista</span>
+                    <span>{t.landing.btnTalkSpecialist}</span>
                   </button>
                 </div>
                 {/* Benefícios rápidos */}
                 <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-[#4B5563]">
                   <span className="inline-flex items-center gap-1.5 font-medium">
                     <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-                    Sem necessidade de cartão
+                    {t.landing.benefitNoCard}
                   </span>
                   <span className="inline-flex items-center gap-1.5 font-medium">
                     <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-                    Modo offline com fila segura
+                    {t.landing.benefitOffline}
                   </span>
                   <span className="inline-flex items-center gap-1.5 font-medium">
                     <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-                    Celular e desktop
+                    {t.landing.benefitDevices}
                   </span>
                 </div>
               </>
@@ -385,15 +384,12 @@ export default function BemVindo() {
           <div className="max-w-6xl mx-auto space-y-8">
             <div className="text-center space-y-2 max-w-2xl mx-auto">
               <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-xs font-semibold text-[#0F766E]">
-                Módulos Integrados
+                {t.landing.modulesTag}
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
-                Tudo o que acontece no chão de loja, sob controle
+                {t.landing.modulesTitle}
               </h2>
-              <p className="text-xs sm:text-sm text-[#4B5563]">
-                Cada setor com processos claros, execução acompanhada e evidências registradas no
-                momento da ação.
-              </p>
+              <p className="text-xs sm:text-sm text-[#4B5563]">{t.landing.modulesDesc}</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -402,12 +398,8 @@ export default function BemVindo() {
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <CalendarCheck className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">Agenda & Meu Dia</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">
-                  Priorização clara do turno dividida em <strong>Faça agora</strong>,{' '}
-                  <strong>Depois</strong> e <strong>Em seguida</strong>, garantindo foco no que traz
-                  impacto imediato.
-                </p>
+                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.mod1Title}</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.mod1Desc}</p>
               </div>
 
               {/* Módulo 2: Execução com Foto */}
@@ -415,11 +407,8 @@ export default function BemVindo() {
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <Camera className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">Execução com Foto & Validação</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">
-                  Comprovação visual de cada rotina finalizada, com fluxo de validação pela
-                  liderança e imagens protegidas por tokens de acesso.
-                </p>
+                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.mod2Title}</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.mod2Desc}</p>
               </div>
 
               {/* Módulo 3: Validades */}
@@ -427,11 +416,8 @@ export default function BemVindo() {
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <BadgeAlert className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">Controle de Validades</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">
-                  Varredura preventiva por setor com alertas automáticos (30, 60 e 90 dias) para
-                  evitar perdas de mercadoria e recolhimento tardio.
-                </p>
+                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.mod3Title}</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.mod3Desc}</p>
               </div>
 
               {/* Módulo 4: Perdas & Inventário */}
@@ -439,11 +425,8 @@ export default function BemVindo() {
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <TrendingUp className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">Perdas & Inventário Rotativo</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">
-                  Apontamento ágil de quebras por motivo e contagens rotativas periódicas,
-                  identificando divergências antes do fechamento mensal.
-                </p>
+                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.mod4Title}</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.mod4Desc}</p>
               </div>
 
               {/* Módulo 5: Promotores & Visitas */}
@@ -451,11 +434,8 @@ export default function BemVindo() {
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <Users2 className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">Promotores & Visitas</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">
-                  Registro de check-in e check-out de promotores de fornecedores, com fotos de
-                  gôndola e checklist de conformidade por visita.
-                </p>
+                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.mod5Title}</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.mod5Desc}</p>
               </div>
 
               {/* Módulo 6: Workflow 5W2H */}
@@ -463,11 +443,8 @@ export default function BemVindo() {
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <GitBranch className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">Planos de Ação 5W2H</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">
-                  Transforme inconformidades em planos estruturados com responsável, prazo,
-                  causa-raiz e acompanhamento de status em tempo real.
-                </p>
+                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.mod6Title}</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.mod6Desc}</p>
               </div>
             </div>
 
@@ -475,21 +452,15 @@ export default function BemVindo() {
             <div className="mt-4 p-5 rounded-2xl bg-gradient-to-r from-teal-50 via-white to-gray-50 border border-teal-200 shadow-2xs space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-[#0F766E] text-white">
-                  Diferencial Exclusivo
+                  {t.landing.diffBadge}
                 </span>
-                <span className="text-xs font-bold text-[#0F766E]">
-                  VivaVarejo Integração • Loja, CD, Abastecimento e Fornecedor
-                </span>
+                <span className="text-xs font-bold text-[#0F766E]">{t.landing.diffHeader}</span>
               </div>
               <h3 className="text-sm sm:text-base font-bold text-[#1F2937]">
-                Cruza físico × sistema × venda, indica onde está a verdade e só gera demanda quando
-                há ação real
+                {t.landing.diffTitle}
               </h3>
               <p className="text-xs text-[#4B5563] leading-relaxed max-w-3xl">
-                Antes de gerar demandas automáticas de ruptura, o sistema diagnostica se é
-                divergência de estoque físico (inventário), produto sem giro comercial ou ruptura
-                real. Quando comprovada, verifica a solução dentro de casa (CD e pedidos em
-                trânsito) e só aciona fornecedor se não houver cobertura interna.
+                {t.landing.diffDesc}
               </p>
             </div>
           </div>
@@ -500,60 +471,45 @@ export default function BemVindo() {
           <div className="max-w-5xl mx-auto space-y-6">
             <div className="space-y-2 text-center max-w-2xl mx-auto">
               <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white border border-[#E5E7EB] text-xs font-semibold text-[#0F766E]">
-                Módulo Comercial Completo
+                {t.landing.comTag}
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
-                Da planilha ao chão de loja
+                {t.landing.comTitle}
               </h2>
-              <p className="text-xs sm:text-sm text-[#4B5563]">
-                Importe planilhas (XLSX/CSV) ou conecte ao seu ERP para sincronizar os dados que
-                direcionam as ações na loja.
-              </p>
+              <p className="text-xs sm:text-sm text-[#4B5563]">{t.landing.comDesc}</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
               <div className="bg-white p-4 rounded-xl border border-[#E5E7EB] space-y-1.5">
                 <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
-                  Rupturas & Estoque Virtual
+                  {t.landing.comCard1Title}
                 </div>
-                <p className="text-[#6B7280] leading-relaxed">
-                  Identifique itens com saldo em sistema que não estão na gôndola e atue antes de
-                  perder vendas.
-                </p>
+                <p className="text-[#6B7280] leading-relaxed">{t.landing.comCard1Desc}</p>
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-[#E5E7EB] space-y-1.5">
                 <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
-                  Negativos & Sem Venda 30/60/90+
+                  {t.landing.comCard2Title}
                 </div>
-                <p className="text-[#6B7280] leading-relaxed">
-                  Diagnóstico rápido de estoque travado e divergências para correções imediatas de
-                  saldo.
-                </p>
+                <p className="text-[#6B7280] leading-relaxed">{t.landing.comCard2Desc}</p>
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-[#E5E7EB] space-y-1.5">
                 <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
-                  Curvas A/B/C+ & Margens
+                  {t.landing.comCard3Title}
                 </div>
-                <p className="text-[#6B7280] leading-relaxed">
-                  Acompanhamento de sortimento crítico, precificação e rebaixas com foco na margem
-                  real.
-                </p>
+                <p className="text-[#6B7280] leading-relaxed">{t.landing.comCard3Desc}</p>
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-[#E5E7EB] space-y-1.5">
                 <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
-                  Layout & Sazonalidade
+                  {t.landing.comCard4Title}
                 </div>
-                <p className="text-[#6B7280] leading-relaxed">
-                  Cronogramas de implantação de ponta de gôndola e campanhas sazonais comprovados
-                  com fotos.
-                </p>
+                <p className="text-[#6B7280] leading-relaxed">{t.landing.comCard4Desc}</p>
               </div>
             </div>
           </div>
@@ -564,15 +520,12 @@ export default function BemVindo() {
           <div className="max-w-5xl mx-auto space-y-8">
             <div className="text-center space-y-2 max-w-xl mx-auto">
               <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-xs font-semibold text-[#0F766E]">
-                Engenharia para o Varejo Real
+                {t.landing.engTag}
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
-                Feito para a realidade do ponto de venda
+                {t.landing.engTitle}
               </h2>
-              <p className="text-xs sm:text-sm text-[#4B5563]">
-                Confiabilidade para operações com sinal instável e gestão corporativa para redes em
-                expansão.
-              </p>
+              <p className="text-xs sm:text-sm text-[#4B5563]">{t.landing.engDesc}</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -581,11 +534,8 @@ export default function BemVindo() {
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <WifiOff className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">Modo Offline Seguro</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">
-                  Depósitos e subsolos sem internet não travam a equipe: os registros entram em uma
-                  fila local e são sincronizados automaticamente na reconexão, sem perda de dados.
-                </p>
+                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.engCard1Title}</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.engCard1Desc}</p>
               </div>
 
               {/* Cartão 2: Multi-rede */}
@@ -593,11 +543,8 @@ export default function BemVindo() {
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <Network className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">Gestão Multi-Rede</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">
-                  Cada rede possui seu Administrador com gestão autônoma de lojas, equipes e
-                  permissões, com isolamento rigoroso entre clientes no backend.
-                </p>
+                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.engCard2Title}</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.engCard2Desc}</p>
               </div>
 
               {/* Cartão 3: Importação Ágil */}
@@ -605,11 +552,8 @@ export default function BemVindo() {
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <FileSpreadsheet className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">Planilhas e ERP</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">
-                  Importação direta de arquivos XLSX/CSV de produtos, validades e rotinas,
-                  permitindo operar sem burocracia desde o primeiro dia.
-                </p>
+                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.engCard3Title}</h3>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.engCard3Desc}</p>
               </div>
             </div>
           </div>
@@ -623,16 +567,17 @@ export default function BemVindo() {
                 {/* Cabeçalho do Funil */}
                 <div className="border-b border-[#E5E7EB] pb-4 space-y-1">
                   <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#0F766E]">
-                    <span>Perfil de Atuação</span>
+                    <span>{t.landing.funnelTag}</span>
                     <span>•</span>
-                    <span>Passo {isStep1Complete ? '2 de 2' : '1 de 2'}</span>
+                    <span>
+                      {isStep1Complete ? t.landing.funnelStep2Label : t.landing.funnelStep1Label}
+                    </span>
                   </div>
                   <h2 className="text-xl sm:text-2xl font-extrabold text-[#1F2937] tracking-tight">
-                    Comece pelo seu segmento
+                    {t.landing.funnelTitle}
                   </h2>
                   <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                    Adaptamos os modelos de rotinas e prioridades de acordo com o formato da sua
-                    operação.
+                    {t.landing.funnelDesc}
                   </p>
                 </div>
 
@@ -647,12 +592,12 @@ export default function BemVindo() {
                       >
                         1
                       </span>
-                      <span>Tipo de empresa:</span>
+                      <span>{t.landing.funnelStep1Title}</span>
                     </label>
                     {tipoPessoa && (
                       <span className="text-xs font-medium text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 inline-flex items-center gap-1">
                         <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        {tipoPessoa === 'PJ' ? 'Pessoa Jurídica' : 'Pessoa Física'}
+                        {tipoPessoa === 'PJ' ? t.landing.funnelPjTitle : t.landing.funnelPfTitle}
                       </span>
                     )}
                   </div>
@@ -676,9 +621,11 @@ export default function BemVindo() {
                           CNPJ
                         </span>
                       </div>
-                      <div className="text-sm font-bold text-[#1F2937]">Pessoa Jurídica / Rede</div>
+                      <div className="text-sm font-bold text-[#1F2937]">
+                        {t.landing.funnelPjTitle}
+                      </div>
                       <p className="text-xs text-[#4B5563] mt-1 leading-relaxed">
-                        Lojas físicas, redes de supermercados, franquias ou operações com filiais.
+                        {t.landing.funnelPjDesc}
                       </p>
                     </button>
 
@@ -701,10 +648,10 @@ export default function BemVindo() {
                         </span>
                       </div>
                       <div className="text-sm font-bold text-[#1F2937]">
-                        Pessoa Física / Lojista
+                        {t.landing.funnelPfTitle}
                       </div>
                       <p className="text-xs text-[#4B5563] mt-1 leading-relaxed">
-                        Lojista independente, MEI ou consultor de varejo autônomo.
+                        {t.landing.funnelPfDesc}
                       </p>
                     </button>
                   </div>
@@ -724,7 +671,7 @@ export default function BemVindo() {
                         >
                           2
                         </span>
-                        <span>Selecione o segmento:</span>
+                        <span>{t.landing.funnelStep2Title}</span>
                       </label>
                       {segmento && (
                         <span className="text-xs font-medium text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 inline-flex items-center gap-1">
@@ -783,13 +730,13 @@ export default function BemVindo() {
                     {segmento === 'Outro' && (
                       <div className="pt-2">
                         <label className="block text-xs font-semibold uppercase tracking-wider text-[#1F2937] mb-1">
-                          Especifique o segmento:
+                          {t.landing.funnelSpecifySegment}
                         </label>
                         <input
                           type="text"
                           value={outroSegmento}
                           onChange={(e) => setOutroSegmento(e.target.value)}
-                          placeholder="Ex.: Ótica, Joalheria, Papelaria..."
+                          placeholder={t.landing.funnelSpecifyPlaceholder}
                           className="w-full px-3.5 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-xl outline-none focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937]"
                         />
                       </div>
@@ -800,11 +747,11 @@ export default function BemVindo() {
                       <div className="mt-3.5 p-4 rounded-xl bg-[#F7F7F5] border border-[#E5E7EB]">
                         <div className="flex items-center justify-between mb-2.5">
                           <span className="text-xs font-bold text-[#1F2937]">
-                            Exemplos de rotinas para{' '}
+                            {t.landing.funnelRoutineExamples}{' '}
                             {SEGMENT_OPTIONS.find((s) => s.id === segmento)?.label || segmento}:
                           </span>
                           <span className="text-[10px] font-semibold text-[#0F766E] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
-                            Modelo Pronto
+                            {t.landing.funnelReadyModel}
                           </span>
                         </div>
 
@@ -834,13 +781,13 @@ export default function BemVindo() {
                 <div className="pt-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3">
                   <div className="text-xs text-[#4B5563]">
                     {!isStep1Complete ? (
-                      <span>Selecione PJ ou PF para continuar.</span>
+                      <span>{t.landing.funnelPromptStep1}</span>
                     ) : !isStep2Complete ? (
-                      <span>Escolha o segmento da sua loja para avançar.</span>
+                      <span>{t.landing.funnelPromptStep2}</span>
                     ) : (
                       <span className="text-emerald-700 font-semibold inline-flex items-center gap-1.5">
                         <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                        Perfil selecionado. Clique em Continuar.
+                        {t.landing.funnelPromptReady}
                       </span>
                     )}
                   </div>
@@ -852,7 +799,7 @@ export default function BemVindo() {
                       className="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-xl transition-colors inline-flex items-center justify-center gap-1.5"
                     >
                       <MessageSquare className="w-3.5 h-3.5 text-[#0F766E]" />
-                      <span>Falar com especialista</span>
+                      <span>{t.landing.btnTalkSpecialist}</span>
                     </button>
 
                     <button
@@ -861,7 +808,7 @@ export default function BemVindo() {
                       disabled={!canContinue}
                       className="w-full sm:w-auto px-6 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-xs sm:text-sm rounded-xl shadow-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                     >
-                      <span>Continuar</span>
+                      <span>{t.common.continue}</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -879,18 +826,16 @@ export default function BemVindo() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-[#1F2937] tracking-wider uppercase">
-                VivaVarejo
+                {t.common.appName}
               </span>
-              <span className="text-xs text-[#6B7280]">
-                • Prioridades do dia definidas, acompanhadas e comprovadas na execução.
-              </span>
+              <span className="text-xs text-[#6B7280]">{t.landing.footerTagline}</span>
             </div>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[#6B7280]">
               {!isGestorGeral && (
                 <>
                   <Link to="/login" className="hover:text-[#1F2937] font-medium transition-colors">
-                    Já tenho conta
+                    {t.landing.footerAlreadyHaveAccount}
                   </Link>
                   <span className="text-gray-300">•</span>
                   <button
@@ -898,7 +843,7 @@ export default function BemVindo() {
                     onClick={() => setModalEspecialistaOpen(true)}
                     className="hover:text-[#1F2937] font-medium transition-colors"
                   >
-                    Falar com especialista
+                    {t.landing.footerTalkSpecialist}
                   </button>
                   <span className="text-gray-300">•</span>
                   <button
@@ -906,7 +851,7 @@ export default function BemVindo() {
                     onClick={handleScrollToInterest}
                     className="hover:text-[#1F2937] font-medium transition-colors"
                   >
-                    Cadastrar
+                    {t.landing.footerSignup}
                   </button>
                 </>
               )}
@@ -922,12 +867,12 @@ export default function BemVindo() {
             >
               <ShieldCheck className="w-4 h-4 text-[#0F766E] group-hover:scale-105 transition-transform shrink-0" />
               <span className="underline decoration-dotted underline-offset-4 group-hover:decoration-solid">
-                Sobre proteção
+                {t.landing.footerAboutProtection}
               </span>
             </button>
             <span className="text-[11px] text-[#9CA3AF] flex items-center gap-1">
               <Lock className="w-3 h-3 text-[#9CA3AF]" />
-              Sigilo corporativo e isolamento estrito por rede
+              {t.landing.footerSecurityNote}
             </span>
           </div>
 
@@ -937,11 +882,10 @@ export default function BemVindo() {
               <DialogHeader className="space-y-1">
                 <DialogTitle className="text-xl font-bold text-[#1F2937] flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-[#0F766E]" />
-                  Sobre a Proteção e Sigilo de Dados no VivaVarejo
+                  {t.landing.protectionModalTitle}
                 </DialogTitle>
                 <DialogDescription className="text-xs text-[#6B7280]">
-                  Garantias de conformidade com LGPD, isolamento estrito entre redes e segurança
-                  técnica
+                  {t.landing.protectionModalDesc}
                 </DialogDescription>
               </DialogHeader>
 
@@ -962,7 +906,7 @@ export default function BemVindo() {
           <div className="pt-4 border-t border-[#E5E7EB] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-[#6B7280]">
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[#6B7280] mr-1">
-                Conecte-se:
+                {t.landing.footerConnect}
               </span>
 
               {/* Instagram */}
@@ -1013,7 +957,7 @@ export default function BemVindo() {
             {/* E-mail de dúvidas */}
             <div className="flex items-center gap-1.5">
               <Mail className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
-              <span className="text-[#6B7280]">Tire suas dúvidas:</span>
+              <span className="text-[#6B7280]">{t.landing.footerQuestions}</span>
               {(() => {
                 const emailExibido =
                   contatos.email && contatos.email.toLowerCase() !== 'dfarias53@gmail.com'
@@ -1034,12 +978,14 @@ export default function BemVindo() {
           {/* Linha de copyright e versão */}
           <div className="pt-3 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-[#6B7280]">
             <div className="flex items-center gap-2">
-              <span>© {new Date().getFullYear()} VivaVarejo. Todos os direitos reservados.</span>
+              <span>
+                © {new Date().getFullYear()} VivaVarejo. {t.common.allRightsReserved}
+              </span>
               <span className="font-mono font-bold bg-teal-50 text-[#0F766E] px-1.5 py-0.5 rounded border border-teal-200 text-[10px]">
                 {APP_VERSION_LABEL}
               </span>
             </div>
-            <span>Prioridades do dia definidas, acompanhadas e comprovadas na execução.</span>
+            <span>{t.common.tagline}</span>
           </div>
         </div>
       </footer>

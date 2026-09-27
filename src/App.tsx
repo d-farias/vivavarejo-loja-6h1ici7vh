@@ -6,6 +6,7 @@ import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { StoreProvider } from './context/StoreContext'
+import { I18nProvider } from './lib/i18n/context'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { getUserProfileType } from '@/lib/perfil-utils'
 import Layout from './components/Layout'
@@ -77,116 +78,118 @@ function RootRouteRedirect() {
 const App = () => (
   <BrowserRouter>
     <AuthProvider>
-      <DocumentTitleSync />
-      <StoreProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Routes>
-            <Route element={<Layout />}>
-              {/* Protected Routes */}
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <RootRouteRedirect />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/meu-dia"
-                element={
-                  <ProtectedRoute>
-                    <MeuDiaPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/agenda"
-                element={
-                  <ProtectedRoute>
-                    <Agenda />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/rotinas"
-                element={
-                  <ProtectedRoute>
-                    <Rotinas />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/validades"
-                element={
-                  <ProtectedRoute>
-                    <Validades />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/perdas"
-                element={
-                  <ProtectedRoute>
-                    <Perdas />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/comercial"
-                element={
-                  <ProtectedRoute>
-                    <Comercial />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/adm-rh"
-                element={
-                  <ProtectedRoute>
-                    <AdmRh />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/equipe"
-                element={
-                  <ProtectedRoute>
-                    <Equipe />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/promotores"
-                element={
-                  <ProtectedRoute>
-                    <Promotores />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute>
-                    <Admin />
-                  </ProtectedRoute>
-                }
-              />
+      <I18nProvider>
+        <DocumentTitleSync />
+        <StoreProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <Routes>
+              <Route element={<Layout />}>
+                {/* Protected Routes */}
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <RootRouteRedirect />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/meu-dia"
+                  element={
+                    <ProtectedRoute>
+                      <MeuDiaPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/agenda"
+                  element={
+                    <ProtectedRoute>
+                      <Agenda />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/rotinas"
+                  element={
+                    <ProtectedRoute>
+                      <Rotinas />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/validades"
+                  element={
+                    <ProtectedRoute>
+                      <Validades />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/perdas"
+                  element={
+                    <ProtectedRoute>
+                      <Perdas />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/comercial"
+                  element={
+                    <ProtectedRoute>
+                      <Comercial />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/adm-rh"
+                  element={
+                    <ProtectedRoute>
+                      <AdmRh />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/equipe"
+                  element={
+                    <ProtectedRoute>
+                      <Equipe />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/promotores"
+                  element={
+                    <ProtectedRoute>
+                      <Promotores />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute>
+                      <Admin />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* Public Auth Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/cadastro" element={<Signup />} />
-            </Route>
+                {/* Public Auth Routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/cadastro" element={<Signup />} />
+              </Route>
 
-            {/* Public External Landing Page */}
-            <Route path="/bem-vindo" element={<BemVindo />} />
+              {/* Public External Landing Page */}
+              <Route path="/bem-vindo" element={<BemVindo />} />
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </TooltipProvider>
-      </StoreProvider>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </TooltipProvider>
+        </StoreProvider>
+      </I18nProvider>
     </AuthProvider>
   </BrowserRouter>
 )

@@ -4,6 +4,7 @@ import { CalendarDays, Store, CheckSquare, Menu, Home, TrendingUp } from 'lucide
 import { useAuth } from '@/context/AuthContext'
 import { segmentosService } from '@/services/segmentos'
 import { useBrand } from '@/hooks/use-brand'
+import { useI18n } from '@/lib/i18n/context'
 
 interface BottomNavMobileProps {
   isCampo: boolean
@@ -18,21 +19,25 @@ interface BottomNavMobileProps {
  * Preservar a rolagem vertical padrão e rolagem lateral de tabelas."
  */
 export function BottomNavMobile({ isCampo, onOpenMais }: BottomNavMobileProps) {
+  const { user } = useAuth()
+  const { t } = useI18n()
+  const brand = useBrand()
+
   // Itens para Perfil Campo
   const campoItems = [
     {
       to: '/meu-dia',
-      label: 'Hoje',
+      label: t.common.today,
       icon: Home,
     },
     {
       to: '/promotores',
-      label: 'Visitas',
+      label: t.common.visits,
       icon: Store,
     },
     {
       to: '/agenda',
-      label: 'Tarefas',
+      label: t.common.tasks,
       icon: CheckSquare,
     },
   ]
@@ -41,23 +46,20 @@ export function BottomNavMobile({ isCampo, onOpenMais }: BottomNavMobileProps) {
   const gestaoItems = [
     {
       to: '/agenda',
-      label: 'Agenda',
+      label: t.common.agenda,
       icon: CalendarDays,
     },
     {
       to: '/comercial',
-      label: 'Comercial',
+      label: t.common.commercial,
       icon: TrendingUp,
     },
     {
       to: '/promotores',
-      label: 'Visitas',
+      label: t.common.visits,
       icon: Store,
     },
   ]
-
-  const { user } = useAuth()
-  const brand = useBrand()
   const segmentoAtivo = segmentosService.getSegmentoAtivo(user)
   const temSegmentoDefinido = Boolean(segmentoAtivo)
 
@@ -134,7 +136,7 @@ export function BottomNavMobile({ isCampo, onOpenMais }: BottomNavMobileProps) {
           className="flex flex-col items-center justify-center h-full py-1 rounded-xl text-[#6B7280] hover:text-[#1F2937] hover:bg-gray-100/70 font-medium transition-colors"
         >
           <Menu className="w-5 h-5" />
-          <span className="text-[11px] mt-0.5 leading-none tracking-tight">Mais</span>
+          <span className="text-[11px] mt-0.5 leading-none tracking-tight">{t.common.more}</span>
         </button>
       </div>
     </nav>

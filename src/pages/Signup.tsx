@@ -27,6 +27,7 @@ import {
   MSG_SENHA_REQUISITOS,
 } from '@/components/PasswordStrengthMeter'
 import { formatPhoneBR } from '@/lib/phone-utils'
+import { useI18n } from '@/lib/i18n/context'
 
 /**
  * Utilitário de máscara de CNPJ brasileira (XX.XXX.XXX/XXXX-XX)
@@ -43,6 +44,7 @@ function formatCNPJ(value: string | undefined | null): string {
 }
 
 export default function Signup() {
+  const { t } = useI18n()
   const { signup } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -282,7 +284,7 @@ export default function Signup() {
               className="inline-flex items-center gap-1.5 text-xs text-[#4B5563] hover:text-[#0F766E] font-medium transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Voltar para escolha de perfil</span>
+              <span>{t.signup.backToStep1}</span>
             </button>
           ) : (
             <Link
@@ -290,12 +292,12 @@ export default function Signup() {
               className="inline-flex items-center gap-1.5 text-xs text-[#4B5563] hover:text-[#1F2937] transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Voltar à apresentação</span>
+              <span>{t.common.backToPresentation}</span>
             </Link>
           )}
 
           <Link to="/login" className="text-xs font-bold text-[#0F766E] hover:underline">
-            Já tenho conta
+            {t.common.alreadyHaveAccount}
           </Link>
         </div>
 
@@ -308,7 +310,7 @@ export default function Signup() {
                 : 'bg-teal-50 text-[#0F766E] border border-teal-200'
             }`}
           >
-            1. Escolha de Perfil
+            {t.signup.step1Badge}
           </span>
           <span className="text-[#D1D5DB]">→</span>
           <span
@@ -316,7 +318,7 @@ export default function Signup() {
               step === 2 ? 'bg-[#0F766E] text-white' : 'bg-gray-100 text-[#9CA3AF]'
             }`}
           >
-            2. Dados de Cadastro
+            {t.signup.step2Badge}
           </span>
         </div>
 
@@ -327,17 +329,17 @@ export default function Signup() {
           </div>
           <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937]">
             {step === 1
-              ? 'Como você irá usar o VivaVarejo?'
+              ? t.signup.step1Title
               : selectedPerfil === 'cpf'
-                ? 'Cadastro de Profissional (CPF)'
-                : 'Cadastro de Rede / Empresa (CNPJ)'}
+                ? t.signup.step2CpfTitle
+                : t.signup.step2CnpjTitle}
           </h1>
           <p className="text-xs sm:text-sm text-[#4B5563] mt-1 max-w-sm">
             {step === 1
-              ? 'Escolha uma das opções abaixo para abrir o cadastro adequado à sua realidade'
+              ? t.signup.step1Desc
               : selectedPerfil === 'cpf'
-                ? 'Preencha seus dados para acessar o Modelo GERENTE (enxuto, Meu Dia e chão de loja)'
-                : 'Preencha os dados da sua operação para acessar o Modelo ADM de Rede'}
+                ? t.signup.step2CpfDesc
+                : t.signup.step2CnpjDesc}
           </p>
         </div>
 
@@ -345,9 +347,7 @@ export default function Signup() {
         <div className="mb-5 p-3 rounded-xl bg-amber-50/70 border border-amber-200 text-xs text-amber-950 flex items-start gap-2">
           <Info className="w-4 h-4 shrink-0 text-amber-700 mt-0.5" />
           <p className="leading-relaxed text-[11px]">
-            <strong>Este é apenas um modelo de demonstração inicial:</strong> Sendo REDE ou
-            profissional, você configura demandas, rotinas e indicadores conforme suas opções e
-            prioridades — ou nos envia que entregamos tudo pronto.
+            <strong>{t.signup.demoAlertTitle}</strong> {t.signup.demoAlertDesc}
           </p>
         </div>
 
@@ -382,12 +382,11 @@ export default function Signup() {
                 </div>
                 <div>
                   <div className="text-sm font-bold text-[#1F2937] group-hover:text-[#0F766E] transition-colors flex items-center justify-between">
-                    <span>Sou REDE / empresa (CNPJ)</span>
+                    <span>{t.signup.optionCnpjTitle}</span>
                     <ChevronRight className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#0F766E] group-hover:translate-x-0.5 transition-all" />
                   </div>
                   <p className="text-xs text-[#4B5563] mt-1.5 leading-relaxed">
-                    Modelo ADM de Rede: multi-lojas, visão corporativa, Comercial completo,
-                    diagnóstico de perdas e gestão de usuários.
+                    {t.signup.optionCnpjDesc}
                   </p>
                 </div>
               </button>
@@ -408,19 +407,18 @@ export default function Signup() {
                 </div>
                 <div>
                   <div className="text-sm font-bold text-[#1F2937] group-hover:text-[#0F766E] transition-colors flex items-center justify-between">
-                    <span>Sou profissional (CPF)</span>
+                    <span>{t.signup.optionCpfTitle}</span>
                     <ChevronRight className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#0F766E] group-hover:translate-x-0.5 transition-all" />
                   </div>
                   <p className="text-xs text-[#4B5563] mt-1.5 leading-relaxed">
-                    Modelo GERENTE: enxuto, foco na operação diária da loja, agenda Meu Dia e
-                    validações de rotinas.
+                    {t.signup.optionCpfDesc}
                   </p>
                 </div>
               </button>
             </div>
 
             <p className="text-center text-[11px] text-[#6B7280] pt-2">
-              Toque em uma das opções para abrir o formulário correspondente.
+              {t.signup.promptTapOption}
             </p>
           </div>
         )}
@@ -437,8 +435,8 @@ export default function Signup() {
                 <CheckCircle2 className="w-4 h-4 text-[#0F766E] shrink-0" />
                 <span className="text-[#1F2937] font-semibold text-[11px]">
                   {selectedPerfil === 'cpf'
-                    ? 'Perfil: Profissional (CPF) • Modelo Gerente'
-                    : 'Perfil: REDE / Empresa (CNPJ) • Modelo ADM de Rede'}
+                    ? t.signup.activeProfileCpf
+                    : t.signup.activeProfileCnpj}
                 </span>
               </div>
               <button
@@ -446,7 +444,7 @@ export default function Signup() {
                 onClick={handleBackToStep1}
                 className="text-[11px] font-bold text-[#0F766E] hover:underline cursor-pointer"
               >
-                Alterar
+                {t.signup.change}
               </button>
             </div>
 
@@ -460,7 +458,7 @@ export default function Signup() {
                 {/* Nome completo */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-                    Nome completo <span className="text-rose-500">*</span>
+                    {t.signup.fullName} <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <User className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -485,7 +483,7 @@ export default function Signup() {
                 {/* Telefone */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-                    Telefone / WhatsApp <span className="text-rose-500">*</span>
+                    {t.signup.phone} <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <Phone className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -512,7 +510,7 @@ export default function Signup() {
                 {/* Cargo */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-                    Cargo <span className="text-rose-500">*</span>
+                    {t.signup.role} <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <Briefcase className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -539,7 +537,10 @@ export default function Signup() {
                 {/* Empresa (OPCIONAL) */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-                    Empresa <span className="text-[#6B7280] font-normal lowercase">(opcional)</span>
+                    {t.signup.company}{' '}
+                    <span className="text-[#6B7280] font-normal lowercase">
+                      {t.signup.companyOptional}
+                    </span>
                   </label>
                   <div className="relative">
                     <Building2 className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -552,9 +553,7 @@ export default function Signup() {
                       disabled={loading}
                     />
                   </div>
-                  <p className="text-[11px] text-[#6B7280] mt-1">
-                    Se não preencher, identificaremos sua operação pelo seu nome.
-                  </p>
+                  <p className="text-[11px] text-[#6B7280] mt-1">{t.signup.companyHint}</p>
                 </div>
               </>
             )}
@@ -570,7 +569,7 @@ export default function Signup() {
                 {/* Nome do responsável */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-                    Nome do responsável <span className="text-rose-500">*</span>
+                    {t.signup.respName} <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <User className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -595,7 +594,7 @@ export default function Signup() {
                 {/* Razão Social / Nome da Empresa / Rede */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-                    Nome da Empresa / Rede <span className="text-rose-500">*</span>
+                    {t.signup.companyName} <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <Building2 className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -623,7 +622,10 @@ export default function Signup() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-                      CNPJ <span className="text-[#6B7280] font-normal lowercase">(opcional)</span>
+                      {t.signup.cnpj}{' '}
+                      <span className="text-[#6B7280] font-normal lowercase">
+                        {t.signup.companyOptional}
+                      </span>
                     </label>
                     <div className="relative">
                       <FileText className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -640,7 +642,7 @@ export default function Signup() {
 
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-                      Telefone / WhatsApp <span className="text-rose-500">*</span>
+                      {t.signup.phone} <span className="text-rose-500">*</span>
                     </label>
                     <div className="relative">
                       <Phone className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -669,7 +671,7 @@ export default function Signup() {
                 <div className="space-y-2 p-3 bg-[#F7F7F5] rounded-xl border border-[#E5E7EB]">
                   <div>
                     <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#374151] mb-1">
-                      Segmento de Atuação
+                      {t.signup.segment}
                     </label>
                     <select
                       value={
@@ -695,7 +697,7 @@ export default function Signup() {
                   {segmento === 'Outro' && (
                     <div className="pt-1">
                       <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#374151] mb-1">
-                        Especifique o segmento
+                        {t.signup.specifySegment}
                       </label>
                       <input
                         type="text"
@@ -712,21 +714,23 @@ export default function Signup() {
                 <div className="pt-2 border-t border-[#E5E7EB] space-y-3.5">
                   <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0F766E]">
                     <HelpCircle className="w-3.5 h-3.5" />
-                    <span>Diagnóstico Inicial da Operação</span>
+                    <span>{t.signup.diagnosisTitle}</span>
                   </div>
 
                   {/* Maiores gargalos ou problemas */}
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
                       <AlertTriangle className="w-3 h-3 text-amber-500" />
-                      <span>Quais são seus maiores problemas ou gargalos?</span>
-                      <span className="text-[#6B7280] font-normal lowercase">(opcional)</span>
+                      <span>{t.signup.bottlenecksLabel}</span>
+                      <span className="text-[#6B7280] font-normal lowercase">
+                        {t.signup.companyOptional}
+                      </span>
                     </label>
                     <textarea
                       value={gargalos}
                       onChange={(e) => setGargalos(e.target.value)}
                       rows={2}
-                      placeholder="Ex: perdas recorrentes, equipe desorganizada, falta de padrão na abertura/fechamento, falta de tempo do gerente..."
+                      placeholder={t.signup.bottlenecksPlaceholder}
                       className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-xl outline-none focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937] placeholder:text-[#9CA3AF] resize-none"
                       disabled={loading}
                     />
@@ -735,27 +739,27 @@ export default function Signup() {
                   {/* Informações do negócio */}
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1">
-                      Informações do negócio{' '}
-                      <span className="text-[#6B7280] font-normal lowercase">(opcional)</span>
+                      {t.signup.businessInfoLabel}{' '}
+                      <span className="text-[#6B7280] font-normal lowercase">
+                        {t.signup.companyOptional}
+                      </span>
                     </label>
                     <input
                       type="text"
                       value={infoNegocio}
                       onChange={(e) => setInfoNegocio(e.target.value)}
-                      placeholder="Ex: 3 lojas, 28 colaboradores, Londrina - PR"
+                      placeholder={t.signup.businessInfoPlaceholder}
                       className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-xl outline-none focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937] placeholder:text-[#9CA3AF]"
                       disabled={loading}
                     />
-                    <p className="text-[11px] text-[#6B7280] mt-1">
-                      Informe número de lojas, quantidade de colaboradores ou cidade de atuação.
-                    </p>
+                    <p className="text-[11px] text-[#6B7280] mt-1">{t.signup.businessInfoHint}</p>
                   </div>
 
                   {/* Inventário */}
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1 flex items-center gap-1">
                       <Boxes className="w-3 h-3 text-[#0F766E]" />
-                      <span>Como está o controle de inventário da sua empresa?</span>
+                      <span>{t.signup.inventoryLabel}</span>
                     </label>
                     <select
                       value={inventarioSituacao}
@@ -767,10 +771,10 @@ export default function Signup() {
                       className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] focus:border-[#0F766E] rounded-xl outline-none focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937]"
                       disabled={loading}
                     >
-                      <option value="">Selecione uma opção (opcional)</option>
-                      <option value="rotativo">Fazemos inventário rotativo frequente</option>
-                      <option value="anual">Só inventário anual / esporádico</option>
-                      <option value="sem_controle">Não temos controle formal de inventário</option>
+                      <option value="">{t.signup.inventorySelectPrompt}</option>
+                      <option value="rotativo">{t.signup.inventoryOption1}</option>
+                      <option value="anual">{t.signup.inventoryOption2}</option>
+                      <option value="sem_controle">{t.signup.inventoryOption3}</option>
                     </select>
                   </div>
                 </div>
@@ -785,7 +789,7 @@ export default function Signup() {
               {/* E-mail */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-                  E-mail <span className="text-rose-500">*</span>
+                  {t.common.email} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -810,9 +814,9 @@ export default function Signup() {
               {/* Senha */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-                  Senha <span className="text-rose-500">*</span>{' '}
+                  {t.common.password} <span className="text-rose-500">*</span>{' '}
                   <span className="text-[11px] text-[#6B7280] font-normal lowercase">
-                    (mínimo 8 caracteres, maiúscula, minúscula e número)
+                    {t.signup.passwordRequirements}
                   </span>
                 </label>
                 <div className="relative">
@@ -841,7 +845,7 @@ export default function Signup() {
               {/* Confirmar senha */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-                  Confirmar senha <span className="text-rose-500">*</span>
+                  {t.common.confirmPassword} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -872,9 +876,9 @@ export default function Signup() {
                 type="button"
                 onClick={handleBackToStep1}
                 disabled={loading}
-                className="w-full sm:w-1/3 py-2.5 px-4 bg-white hover:bg-gray-50 border border-[#E5E7EB] text-[#374151] font-semibold text-sm rounded-xl transition-all cursor-pointer"
+                className="w-full sm:w-1/3 py-2.5 px-4 bg-white hover:bg-gray-50 border border-[#E5E7EB] text-[#374151] font-semibold text-sm rounded-xl transition-all cursor-pointer flex items-center justify-center"
               >
-                Voltar
+                {t.common.back}
               </button>
 
               <button
@@ -883,10 +887,10 @@ export default function Signup() {
                 className="w-full sm:w-2/3 py-2.5 px-4 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-sm rounded-xl shadow-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer"
               >
                 {loading
-                  ? 'Cadastrando...'
+                  ? t.common.registering
                   : selectedPerfil === 'cpf'
-                    ? 'Finalizar Cadastro PF'
-                    : 'Finalizar Cadastro CNPJ'}
+                    ? t.signup.btnSubmitCpf
+                    : t.signup.btnSubmitCnpj}
               </button>
             </div>
           </form>
@@ -894,9 +898,9 @@ export default function Signup() {
 
         {/* Login Link */}
         <div className="mt-6 text-center text-xs text-[#4B5563]">
-          Já tem conta?{' '}
+          {t.common.alreadyHaveAccount}?{' '}
           <Link to="/login" className="text-[#0F766E] font-bold hover:underline">
-            Acesse sua conta
+            {t.common.accessYourAccount}
           </Link>
         </div>
       </div>

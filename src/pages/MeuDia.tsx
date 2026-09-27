@@ -33,6 +33,7 @@ import { OfflineStatusIndicator } from '@/components/OfflineStatusIndicator'
 import { useAuth } from '@/context/AuthContext'
 import { useStore } from '@/context/StoreContext'
 import { rotinasService, execucoesService, getTodayDateString } from '@/services/rotinas'
+import { useI18n } from '@/lib/i18n/context'
 import { visitasPromotorService } from '@/services/visitasPromotor'
 import { parseHorarioLimiteToMinutes, isPastDue } from '@/lib/time-utils'
 import {
@@ -48,6 +49,7 @@ import type { Rotina, ExecucaoRotina, VisitaPromotor } from '@/types'
 
 export function MeuDiaPage() {
   const { user } = useAuth()
+  const { t } = useI18n()
   const { lojaSelecionada, lojaSelecionadaId } = useStore()
   const navigate = useNavigate()
   const [seletorSegmentoOpen, setSeletorSegmentoOpen] = useState(false)
@@ -461,7 +463,7 @@ export function MeuDiaPage() {
             <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider">
               <Calendar className="w-3.5 h-3.5 text-[#0F766E]" />
               <span>
-                Meu Dia •{' '}
+                {t.meuDia.title} •{' '}
                 {new Date().toLocaleDateString('pt-BR', {
                   weekday: 'short',
                   day: '2-digit',
@@ -510,7 +512,9 @@ export function MeuDiaPage() {
             <div className="bg-gradient-to-r from-[#0F766E] to-[#115E59] px-4 py-2.5 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-white" />
-                <span className="text-xs font-bold uppercase tracking-wider">Próxima Visita</span>
+                <span className="text-xs font-bold uppercase tracking-wider">
+                  {t.meuDia.proximaVisita}
+                </span>
               </div>
               {proximaVisita.check_in && !proximaVisita.check_out && (
                 <span className="text-[11px] font-bold bg-emerald-500/90 text-white px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
@@ -608,14 +612,14 @@ export function MeuDiaPage() {
                 <Flame className="w-4 h-4" />
               </div>
               <div>
-                <h2 className="text-sm font-bold text-[#1F2937]">Faça Agora — Ordem Recomendada</h2>
-                <p className="text-[11px] text-[#6B7280]">
-                  O produto orienta o que fazer primeiro sem você precisar procurar
-                </p>
+                <h2 className="text-sm font-bold text-[#1F2937]">
+                  {t.meuDia.facaAgora} — {t.meuDia.subtitle}
+                </h2>
+                <p className="text-[11px] text-[#6B7280]">{t.common.tagline}</p>
               </div>
             </div>
             <span className="text-xs font-semibold text-[#0F766E]">
-              {pctConcluido}% concluído
+              {pctConcluido}% ({t.meuDia.progressoDia})
             </span>{' '}
           </div>
 
@@ -631,7 +635,7 @@ export function MeuDiaPage() {
                 <div className="p-4 rounded-2xl border-2 border-rose-500 bg-rose-500/10 shadow-lg relative">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[11px] font-bold uppercase tracking-wider bg-rose-600 text-white px-2.5 py-0.5 rounded-full shadow-xs">
-                      Faça agora — Prioridade Máxima
+                      {t.meuDia.facaAgora}
                     </span>
                     <span className="text-xs font-mono font-bold text-rose-300">
                       {tarefasClassificadas.facaAgora.horario_limite || 'Imediato'}

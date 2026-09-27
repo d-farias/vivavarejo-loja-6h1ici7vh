@@ -7,8 +7,10 @@ import { triggerQuickAccessHub } from '@/components/QuickAccessHubModal'
 import { analyticsService } from '@/services/analyticsService'
 import { AlertCircle, Lock, Mail, CheckCircle2, KeyRound, ArrowLeft, Info } from 'lucide-react'
 import type { User } from '@/types'
+import { useI18n } from '@/lib/i18n/context'
 
 export default function Login() {
+  const { t } = useI18n()
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -41,12 +43,12 @@ export default function Login() {
   const validate = () => {
     const errors: { email?: string; password?: string } = {}
     if (!email.trim()) {
-      errors.email = 'O e-mail é obrigatório'
+      errors.email = t.login.errEmailRequired
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      errors.email = 'Informe um e-mail válido'
+      errors.email = t.login.errEmailInvalid
     }
     if (!password) {
-      errors.password = 'A senha é obrigatória'
+      errors.password = t.login.errPasswordRequired
     }
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
@@ -108,7 +110,7 @@ export default function Login() {
       }
 
       if (!errors.email && !errors.password) {
-        errors.general = 'E-mail ou senha incorretos. Verifique suas credenciais.'
+        errors.general = t.login.errInvalidCredentials
       }
 
       setFieldErrors(errors)
@@ -127,7 +129,7 @@ export default function Login() {
             className="inline-flex items-center gap-1.5 text-xs text-[#4B5563] hover:text-[#1F2937] transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Voltar à apresentação</span>
+            <span>{t.common.backToPresentation}</span>
           </Link>
         </div>
 
@@ -136,10 +138,8 @@ export default function Login() {
           <div className="w-12 h-12 rounded-2xl bg-[#0F766E] flex items-center justify-center text-white mb-3 shadow-sm">
             <div className="w-5 h-5 border-2 border-white rotate-45 transform" />
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937]">VivaVarejo</h1>
-          <p className="text-xs sm:text-sm text-[#4B5563] mt-1">
-            Acompanhamento operacional e gestão de rotinas
-          </p>
+          <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937]">{t.common.appName}</h1>
+          <p className="text-xs sm:text-sm text-[#4B5563] mt-1">{t.login.subtitle}</p>
         </div>
 
         {/* Banner de Expiração de Sessão por Inatividade */}
@@ -162,7 +162,7 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-              E-mail
+              {t.common.email}
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -170,7 +170,7 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
+                placeholder={t.login.emailPlaceholder}
                 className={`w-full pl-9 pr-3 py-2 text-sm bg-white border ${
                   fieldErrors.email
                     ? 'border-rose-500 focus:ring-rose-500/30'
@@ -186,7 +186,7 @@ export default function Login() {
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#374151] mb-1.5">
-              Senha
+              {t.common.password}
             </label>
             <div className="relative">
               <Lock className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -194,7 +194,7 @@ export default function Login() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder={t.login.passwordPlaceholder}
                 className={`w-full pl-9 pr-3 py-2 text-sm bg-white border ${
                   fieldErrors.password
                     ? 'border-rose-500 focus:ring-rose-500/30'
@@ -213,7 +213,7 @@ export default function Login() {
             disabled={loading}
             className="w-full mt-2 py-2.5 px-4 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-sm rounded-xl shadow-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
           >
-            {loading ? 'Acessando...' : 'Acesse sua conta'}
+            {loading ? t.login.btnSubmitting : t.login.btnSubmit}
           </button>
         </form>
 
@@ -228,15 +228,15 @@ export default function Login() {
             }}
             className="text-xs font-semibold text-[#0F766E] hover:underline transition-colors"
           >
-            Esqueci minha senha
+            {t.common.forgotPassword}
           </button>
         </div>
 
         {/* Signup Link */}
         <div className="mt-5 pt-4 border-t border-[#E5E7EB] text-center text-xs text-[#4B5563]">
-          Não tem conta?{' '}
+          {t.common.dontHaveAccount}{' '}
           <Link to="/signup" className="text-[#0F766E] font-bold hover:underline">
-            Cadastre-se
+            {t.common.signup}
           </Link>
         </div>
       </div>
@@ -256,10 +256,8 @@ export default function Login() {
                 <KeyRound className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-[#1F2937]">Recuperar Senha</h3>
-                <p className="text-xs text-[#4B5563]">
-                  Instruções para redefinir o acesso à sua conta
-                </p>
+                <h3 className="text-base font-bold text-[#1F2937]">{t.login.forgotTitle}</h3>
+                <p className="text-xs text-[#4B5563]">{t.login.forgotDesc}</p>
               </div>
             </div>
 
@@ -300,7 +298,7 @@ export default function Login() {
                 if (!trimmed || !/\S+@\S+\.\S+/.test(trimmed)) {
                   setForgotFeedback({
                     type: 'error',
-                    text: 'Informe um endereço de e-mail válido.',
+                    text: t.login.errEmailInvalid,
                   })
                   return
                 }
@@ -312,9 +310,8 @@ export default function Login() {
                   await pb.collection('users').requestPasswordReset(trimmed)
                   setForgotFeedback({
                     type: 'success',
-                    text: 'Enviamos um link de redefinição para seu e-mail.',
-                    details:
-                      'Verifique a caixa de entrada e a pasta de spam. Siga as instruções contidas na mensagem.',
+                    text: t.login.forgotSuccess,
+                    details: t.login.forgotSuccessDetails,
                   })
                 } catch (err: unknown) {
                   const errorObj = err as {
@@ -355,7 +352,7 @@ export default function Login() {
             >
               <div>
                 <label className="block text-xs font-semibold text-[#374151] mb-1">
-                  E-mail cadastrado
+                  {t.login.forgotEmailLabel}
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -365,19 +362,15 @@ export default function Login() {
                     onChange={(e) => setForgotEmail(e.target.value)}
                     required
                     disabled={forgotLoading}
-                    placeholder="seu@email.com"
+                    placeholder={t.login.emailPlaceholder}
                     className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white border border-[#E5E7EB] rounded-xl outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 text-[#1F2937]"
                   />
                 </div>
               </div>
 
               <div className="p-3 rounded-xl bg-[#F7F7F5] border border-[#E5E7EB] text-[11px] text-[#4B5563] space-y-1">
-                <p className="font-semibold text-[#1F2937]">Dica para Líderes e Colaboradores:</p>
-                <p>
-                  Caso não receba a mensagem em alguns minutos, qualquer usuário com perfil{' '}
-                  <strong className="text-[#0F766E]">Admin</strong> pode gerar uma nova senha
-                  temporária instantaneamente na aba <em>Usuários & Perfis</em>.
-                </p>
+                <p className="font-semibold text-[#1F2937]">{t.login.forgotHintTitle}</p>
+                <p>{t.login.forgotHintDesc}</p>
               </div>
 
               <div className="flex items-center justify-between gap-2 pt-3 border-t border-[#E5E7EB]">
@@ -388,14 +381,14 @@ export default function Login() {
                   className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#4B5563] hover:text-[#1F2937]"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Voltar ao login</span>
+                  <span>{t.common.backToLogin}</span>
                 </button>
                 <button
                   type="submit"
                   disabled={forgotLoading}
                   className="px-4 py-2 text-xs font-semibold bg-[#0F766E] hover:bg-[#115E59] text-white rounded-xl shadow-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {forgotLoading ? 'Enviando...' : 'Enviar link de redefinição'}
+                  {forgotLoading ? t.login.forgotBtnSubmitting : t.login.forgotBtnSubmit}
                 </button>
               </div>
             </form>

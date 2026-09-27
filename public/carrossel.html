@@ -1557,6 +1557,54 @@
         </div>
       </div>
       <div class="top-actions">
+        <!-- Seletor de Idioma no Carrossel -->
+        <div
+          id="carrosselLangToggle"
+          style="
+            display: inline-flex;
+            align-items: center;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 2px;
+            margin-right: 4px;
+          "
+        >
+          <button
+            id="btnCarrosselPt"
+            type="button"
+            style="
+              background: #f0fdfa;
+              border: 1px solid #99f6e4;
+              color: #0f766e;
+              font-size: 11px;
+              font-weight: 700;
+              padding: 4px 8px;
+              border-radius: 6px;
+              cursor: pointer;
+            "
+            title="Português"
+          >
+            🇧🇷 PT
+          </button>
+          <button
+            id="btnCarrosselEn"
+            type="button"
+            style="
+              background: transparent;
+              border: 1px solid transparent;
+              color: #6b7280;
+              font-size: 11px;
+              font-weight: 700;
+              padding: 4px 8px;
+              border-radius: 6px;
+              cursor: pointer;
+            "
+            title="English"
+          >
+            🇺🇸 EN
+          </button>
+        </div>
         <button
           type="button"
           class="btn btn-secondary"
@@ -4058,6 +4106,67 @@
               user_agent: navigator.userAgent ? navigator.userAgent.substring(0, 250) : '',
             }),
           }).catch(function () {})
+        } catch (e) {}
+
+        // Sincronização de idioma da página carrossel com localStorage
+        try {
+          var STORAGE_KEY = 'vivavarejo_locale_preference'
+          var btnPt = document.getElementById('btnCarrosselPt')
+          var btnEn = document.getElementById('btnCarrosselEn')
+          var btnDownloadAllLabel = document.getElementById('btnDownloadAllLabel')
+          var btnToggleHelp = document.getElementById('btnToggleHelp')
+
+          function updateCarrosselUI(lang) {
+            if (lang === 'en') {
+              if (btnPt) {
+                btnPt.style.background = 'transparent'
+                btnPt.style.borderColor = 'transparent'
+                btnPt.style.color = '#6b7280'
+              }
+              if (btnEn) {
+                btnEn.style.background = '#f0fdfa'
+                btnEn.style.borderColor = '#99f6e4'
+                btnEn.style.color = '#0f766e'
+              }
+              if (btnDownloadAllLabel) btnDownloadAllLabel.textContent = 'Download all (8 PNGs)'
+              if (btnToggleHelp) {
+                var span = btnToggleHelp.querySelector('span')
+                if (span) span.textContent = 'How to Use'
+              }
+            } else {
+              if (btnEn) {
+                btnEn.style.background = 'transparent'
+                btnEn.style.borderColor = 'transparent'
+                btnEn.style.color = '#6b7280'
+              }
+              if (btnPt) {
+                btnPt.style.background = '#f0fdfa'
+                btnPt.style.borderColor = '#99f6e4'
+                btnPt.style.color = '#0f766e'
+              }
+              if (btnDownloadAllLabel) btnDownloadAllLabel.textContent = 'Baixar todos (8 PNGs)'
+              if (btnToggleHelp) {
+                var span = btnToggleHelp.querySelector('span')
+                if (span) span.textContent = 'Como Usar'
+              }
+            }
+          }
+
+          var initialLang = localStorage.getItem(STORAGE_KEY) || 'pt'
+          updateCarrosselUI(initialLang)
+
+          if (btnPt) {
+            btnPt.addEventListener('click', function () {
+              localStorage.setItem(STORAGE_KEY, 'pt')
+              updateCarrosselUI('pt')
+            })
+          }
+          if (btnEn) {
+            btnEn.addEventListener('click', function () {
+              localStorage.setItem(STORAGE_KEY, 'en')
+              updateCarrosselUI('en')
+            })
+          }
         } catch (e) {}
       })()
     </script>
