@@ -7,7 +7,7 @@
 // 3. NUNCA interceptar nem cachear chamadas de API do PocketBase (/api/) ou serviços externos (essas usam a camada IndexedDB do app).
 // 4. Ativação imediata: self.skipWaiting() e clients.claim(), enviando mensagem de update aos clientes abertos e expurgando caches antigos.
 
-const APP_VERSION = '0.0.145'
+const APP_VERSION = '0.0.160'
 const CACHE_NAME = `vivavarejo-shell-v${APP_VERSION}`
 
 const PRECACHE_ASSETS = [
