@@ -24,6 +24,7 @@ import {
   TrendingUp,
   Boxes,
   ZoomIn,
+  Zap,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { getCanonicalShareUrl, shareVivaVarejo } from '@/lib/share-utils'

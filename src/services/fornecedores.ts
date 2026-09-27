@@ -9,6 +9,10 @@ export const fornecedoresService = {
     })
   },
 
+  async listar(): Promise<Fornecedor[]> {
+    return this.getAll()
+  },
+
   async getById(id: string): Promise<Fornecedor> {
     return await pb.collection('fornecedores').getOne<Fornecedor>(id, {
       expand: 'cliente',

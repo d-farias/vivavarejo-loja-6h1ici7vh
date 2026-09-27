@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   TrendingUp,
   AlertTriangle,
@@ -86,11 +86,16 @@ export function AbastecimentoMatchSecao({
   const carregarDados = async () => {
     setLoading(true)
     try {
-      // Se for perfil Gerente, restringe estritamente para a loja dele
-      const lojaFiltroEfetiva = isGerente
-        ? lojaSelecionadaId && lojaSelecionadaId !== 'todas'
+      // Se for perfil Gerente, restringe estritamente para a sua loja (lojaSelecionadaId ou primeira loja da lista)
+      const lojaDoGerente =
+        lojaSelecionadaId && lojaSelecionadaId !== 'todas'
           ? lojaSelecionadaId
-          : undefined
+          : lojas.length > 0
+            ? lojas[0].id
+            : undefined
+
+      const lojaFiltroEfetiva = isGerente
+        ? lojaDoGerente
         : filtroLoja && filtroLoja !== 'todas'
           ? filtroLoja
           : lojaSelecionadaId && lojaSelecionadaId !== 'todas'
@@ -122,9 +127,18 @@ export function AbastecimentoMatchSecao({
   }
 
   // Recarregar quando filtros mudarem
-  useState(() => {
+  useEffect(() => {
     carregarDados()
-  })
+  }, [
+    filtroSituacao,
+    filtroCurva,
+    filtroStatus,
+    filtroFornecedor,
+    filtroLoja,
+    busca,
+    lojaSelecionadaId,
+    redeId,
+  ])
 
   // Formatador BRL
   const formatCurrency = (val: number) => {

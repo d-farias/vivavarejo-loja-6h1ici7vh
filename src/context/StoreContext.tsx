@@ -65,8 +65,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           const todasLojas = await lojasService.getAll()
           const permitidas = todasLojas.filter((l) => lojaIdsVinculadas.has(l.id))
           setLojas(permitidas)
+        } else if (user.cliente) {
+          // Líder com cliente/rede definida: vê apenas lojas do seu cliente/rede
+          const todasLojas = await lojasService.getAll()
+          const lojasDoCliente = todasLojas.filter((l) => l.cliente === user.cliente)
+          setLojas(lojasDoCliente)
         } else {
-          // Fallback para líder sem vínculo restrito explícito
+          // Fallback para líder sem vínculo restrito explícito nem cliente
           const todasLojas = await lojasService.getAll()
           setLojas(todasLojas)
         }
