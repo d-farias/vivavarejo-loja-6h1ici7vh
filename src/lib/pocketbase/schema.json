@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-27T15:09:07.371Z",
+  "generatedAt": "2026-09-27T15:25:55.655Z",
   "collections": [
     {
       "name": "users",
@@ -477,6 +477,30 @@
         },
         {
           "name": "cargo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "nome_exibicao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "logo",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cor_primaria",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cor_secundaria",
           "type": "text",
           "required": false,
           "system": false
@@ -3242,6 +3266,24 @@
         },
         {
           "name": "user_perfil",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cidade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "regiao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "pais",
           "type": "text",
           "required": false,
           "system": false

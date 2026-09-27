@@ -41,9 +41,11 @@ import { usePwaInstall } from '@/hooks/use-pwa-install'
 import { segmentosService } from '@/services/segmentos'
 import { SeletorSegmentoModal } from '@/components/SeletorSegmentoModal'
 import { useAutoLogout } from '@/hooks/use-auto-logout'
+import { useBrandTheme } from '@/hooks/use-brand'
 
 export default function Layout() {
   const { user, logout } = useAuth()
+  const brand = useBrandTheme()
   const location = useLocation()
   const navigate = useNavigate()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -176,14 +178,36 @@ export default function Layout() {
               to={isGerente ? '/meu-dia' : '/agenda'}
               className="flex items-center gap-2.5 group shrink-0"
             >
-              <div className="w-9 h-9 rounded-xl bg-[#0F766E] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
-                {/* Compact square diamond logo */}
-                <div className="w-4 h-4 border-2 border-white rotate-45 transform" />
-              </div>
+              {brand.isWhiteLabelActive && brand.logoUrl ? (
+                <div className="h-9 max-w-[130px] flex items-center justify-center transition-transform group-hover:scale-105">
+                  <img
+                    src={brand.logoUrl}
+                    alt={brand.nomeExibicao || 'Logo da Rede'}
+                    className="max-h-9 max-w-[130px] object-contain"
+                  />
+                </div>
+              ) : (
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105"
+                  style={{
+                    backgroundColor:
+                      brand.isWhiteLabelActive && brand.corPrimaria ? brand.corPrimaria : '#0F766E',
+                  }}
+                >
+                  <div className="w-4 h-4 border-2 border-white rotate-45 transform" />
+                </div>
+              )}
               <div className="flex flex-col">
                 <span className="text-sm font-bold tracking-wider uppercase text-[#1F2937] leading-tight">
-                  VivaVarejo
+                  {brand.isWhiteLabelActive && brand.nomeExibicao
+                    ? brand.nomeExibicao
+                    : 'VivaVarejo'}
                 </span>
+                {brand.isWhiteLabelActive && (
+                  <span className="text-[9px] font-semibold text-[#6B7280] leading-none">
+                    Rede Parceira
+                  </span>
+                )}
               </div>
             </NavLink>
 
@@ -336,11 +360,29 @@ export default function Layout() {
           <div className="relative w-4/5 max-w-xs bg-white h-full shadow-2xl flex flex-col z-10 border-r border-[#E5E7EB] transform transition-transform duration-200 ease-in-out text-[#1F2937]">
             <div className="p-4 border-b border-[#E5E7EB] flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#0F766E] flex items-center justify-center text-white">
-                  <div className="w-3.5 h-3.5 border-2 border-white rotate-45 transform" />
-                </div>
+                {brand.isWhiteLabelActive && brand.logoUrl ? (
+                  <img
+                    src={brand.logoUrl}
+                    alt={brand.nomeExibicao || 'Logo da Rede'}
+                    className="h-8 max-w-[100px] object-contain"
+                  />
+                ) : (
+                  <div
+                    className="w-8 h-8 rounded-xl flex items-center justify-center text-white"
+                    style={{
+                      backgroundColor:
+                        brand.isWhiteLabelActive && brand.corPrimaria
+                          ? brand.corPrimaria
+                          : '#0F766E',
+                    }}
+                  >
+                    <div className="w-3.5 h-3.5 border-2 border-white rotate-45 transform" />
+                  </div>
+                )}
                 <span className="text-xs font-bold uppercase tracking-wider text-[#1F2937]">
-                  VivaVarejo
+                  {brand.isWhiteLabelActive && brand.nomeExibicao
+                    ? brand.nomeExibicao
+                    : 'VivaVarejo'}
                 </span>
               </div>
               <button
@@ -511,13 +553,21 @@ export default function Layout() {
       <footer className="w-full border-t border-[#E5E7EB] bg-white py-4 mt-auto pb-20 md:pb-4">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#6B7280]">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-[#1F2937]">VivaVarejo</span>
+            <span className="font-bold text-[#1F2937]">
+              {brand.isWhiteLabelActive && brand.nomeExibicao ? brand.nomeExibicao : 'VivaVarejo'}
+            </span>
             <span className="text-xs font-mono font-bold bg-teal-50 text-[#0F766E] px-1.5 py-0.5 rounded border border-teal-200">
               {APP_VERSION_LABEL}
             </span>
           </div>{' '}
           <div>
-            <span>© {new Date().getFullYear()} VivaVarejo. Todos os direitos reservados.</span>
+            <span>
+              © {new Date().getFullYear()}{' '}
+              {brand.isWhiteLabelActive && brand.nomeExibicao
+                ? `${brand.nomeExibicao} • VivaVarejo`
+                : 'VivaVarejo'}
+              . Todos os direitos reservados.
+            </span>
           </div>
         </div>
       </footer>

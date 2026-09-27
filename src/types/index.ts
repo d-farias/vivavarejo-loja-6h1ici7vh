@@ -53,6 +53,10 @@ export interface Cliente extends RecordModel {
   email_suporte?: string
   whatsapp_suporte?: string
   nome_atendimento?: string
+  nome_exibicao?: string
+  logo?: string
+  cor_primaria?: string
+  cor_secundaria?: string
   created: string
   updated: string
 }
@@ -744,12 +748,23 @@ export interface VisitaAnalytics {
   user_email?: string
   user_nome?: string
   user_perfil?: string
+  cidade?: string
+  regiao?: string
+  pais?: string
   cadastrou?: boolean
   is_admin?: boolean
   referrer?: string
   user_agent?: string
   created: string
   updated: string
+}
+
+export interface LocalAnalyticsRanking {
+  local: string // ex: "São Paulo - SP" ou "Porto Alegre - RS"
+  cidade?: string
+  regiao?: string
+  quantidade: number
+  percentual: number
 }
 
 export interface ResumoAnalytics {
@@ -765,6 +780,7 @@ export interface ResumoAnalytics {
     quantidade: number
     percentual: number
   }[]
+  locaisRanking?: LocalAnalyticsRanking[]
   paginasRanking: {
     pagina: string
     nomeAmigavel: string

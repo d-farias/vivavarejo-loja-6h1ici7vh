@@ -172,9 +172,126 @@ export interface RegistrarVisitaOptions {
   userEmail?: string
   userName?: string
   userPerfil?: string
+  cidade?: string
+  regiao?: string
+  pais?: string
   isAdmin?: boolean
   cadastrou?: boolean
   search?: string
+}
+
+// Cache de geolocalização da sessão (1 consulta por sessão, fallback silencioso)
+const GEO_CACHE_KEY = 'vv_geo_location_cache'
+let memGeoLocation: { cidade?: string; regiao?: string; pais?: string } | null = null
+let geoLookupPromise: Promise<{ cidade?: string; regiao?: string; pais?: string } | null> | null =
+  null
+
+/**
+ * Consulta de geolocalização por IP gratuita e sem chave (feita 1 vez por sessão com timeout rápido de 2.5s)
+ * Usa ipwho.is com fallback para ipapi.co
+ * NÃO usa geolocalização do navegador (sem permissão/prompt). Falha silenciosamente retornando null.
+ */
+export async function obterGeolocalizacaoSessao(): Promise<{
+  cidade?: string
+  regiao?: string
+  pais?: string
+} | null> {
+  if (typeof window === 'undefined') return null
+
+  // 1. Memória
+  if (memGeoLocation) return memGeoLocation
+
+  // 2. SessionStorage
+  try {
+    const raw = sessionStorage.getItem(GEO_CACHE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      memGeoLocation = parsed
+      return parsed
+    }
+  } catch {
+    // sessionStorage inacessível
+  }
+
+  // 3. Se já tem consulta em andamento, aguardar
+  if (geoLookupPromise) {
+    return geoLookupPromise
+  }
+
+  geoLookupPromise = (async () => {
+    const fetchWithTimeout = async (url: string, ms = 2500) => {
+      const controller = new AbortController()
+      const timer = setTimeout(() => controller.abort(), ms)
+      try {
+        const res = await fetch(url, { signal: controller.signal })
+        clearTimeout(timer)
+        if (!res.ok) return null
+        return await res.json()
+      } catch {
+        clearTimeout(timer)
+        return null
+      }
+    }
+
+    try {
+      // Tentativa 1: ipwho.is (CORS amigável, sem chave, veloz)
+      const dataWho = await fetchWithTimeout(
+        'https://ipwho.is/?fields=city,region,region_code,country,success',
+      )
+      if (dataWho && dataWho.success !== false && (dataWho.city || dataWho.region)) {
+        const geo = {
+          cidade: dataWho.city ? String(dataWho.city).trim() : undefined,
+          regiao: dataWho.region_code
+            ? String(dataWho.region_code).trim()
+            : dataWho.region
+              ? String(dataWho.region).trim()
+              : undefined,
+          pais: dataWho.country ? String(dataWho.country).trim() : 'Brasil',
+        }
+        memGeoLocation = geo
+        try {
+          sessionStorage.setItem(GEO_CACHE_KEY, JSON.stringify(geo))
+        } catch {
+          /* intentionally ignored */
+        }
+        return geo
+      }
+
+      // Tentativa 2: fallback ipapi.co/json
+      const dataApi = await fetchWithTimeout('https://ipapi.co/json/', 2500)
+      if (dataApi && (dataApi.city || dataApi.region_code)) {
+        const geo = {
+          cidade: dataApi.city ? String(dataApi.city).trim() : undefined,
+          regiao: dataApi.region_code
+            ? String(dataApi.region_code).trim()
+            : dataApi.region
+              ? String(dataApi.region).trim()
+              : undefined,
+          pais: dataApi.country_name ? String(dataApi.country_name).trim() : 'Brasil',
+        }
+        memGeoLocation = geo
+        try {
+          sessionStorage.setItem(GEO_CACHE_KEY, JSON.stringify(geo))
+        } catch {
+          /* intentionally ignored */
+        }
+        return geo
+      }
+    } catch {
+      // Fallback silencioso
+    }
+
+    const emptyGeo = {}
+    memGeoLocation = emptyGeo
+    try {
+      sessionStorage.setItem(GEO_CACHE_KEY, JSON.stringify(emptyGeo))
+    } catch {
+      /* intentionally ignored */
+    }
+    return null
+  })()
+
+  return geoLookupPromise
 }
 
 export const analyticsService = {
@@ -260,6 +377,22 @@ export const analyticsService = {
       }
       sessionStorage.setItem(DEBOUNCE_VISITA_KEY, JSON.stringify({ key: debounceKey, time: now }))
 
+      // Tenta obter dados geográficos silenciosamente (com cache)
+      let geoData: { cidade?: string; regiao?: string; pais?: string } | null = null
+      if (options?.cidade !== undefined) {
+        geoData = {
+          cidade: options.cidade,
+          regiao: options.regiao,
+          pais: options.pais,
+        }
+      } else {
+        try {
+          geoData = await obterGeolocalizacaoSessao()
+        } catch {
+          // ignore
+        }
+      }
+
       const payload = {
         pagina: pathname || '/',
         origem: origem || 'direto',
@@ -271,6 +404,9 @@ export const analyticsService = {
         user_email: userEmail || '',
         user_nome: userNome || '',
         user_perfil: userPerfil || '',
+        cidade: geoData?.cidade || '',
+        regiao: geoData?.regiao || '',
+        pais: geoData?.pais || '',
         cadastrou: options?.cadastrou || false,
         is_admin: false,
         referrer: document.referrer ? document.referrer.substring(0, 250) : '',
@@ -399,6 +535,28 @@ export const analyticsService = {
       }))
       .sort((a, b) => b.quantidade - a.quantidade)
 
+    // Ranking de locais (cidade / UF)
+    const locaisCount: Record<string, { cidade?: string; regiao?: string; count: number }> = {}
+    for (const v of visitas) {
+      const cid = (v.cidade || '').trim()
+      const reg = (v.regiao || '').trim()
+      let label = ''
+      if (cid && reg) {
+        label = `${cid} - ${reg}`
+      } else if (cid) {
+        label = cid
+      } else if (reg) {
+        label = reg
+      }
+
+      if (label) {
+        if (!locaisCount[label]) {
+          locaisCount[label] = { cidade: cid, regiao: reg, count: 0 }
+        }
+        locaisCount[label].count++
+      }
+    }
+
     // Páginas mais visitadas
     const paginasCount: Record<string, number> = {}
     for (const v of visitas) {
@@ -496,21 +654,33 @@ export const analyticsService = {
       }
     })
 
+    const locaisRanking = Object.entries(locaisCount)
+      .map(([local, data]) => ({
+        local,
+        cidade: data.cidade,
+        regiao: data.regiao,
+        quantidade: data.count,
+        percentual: totalAcessos > 0 ? Math.round((data.count / totalAcessos) * 1000) / 10 : 0,
+      }))
+      .sort((a, b) => b.quantidade - a.quantidade)
+      .slice(0, 12)
+
     return {
       totalAcessos,
       visitantesUnicos,
       totalCadastros,
-      taxaConversao: Math.round(taxaConversao * 10) / 10,
+      taxaConversao,
       totalIdentificados,
       totalAnonimos,
       origensRanking,
+      locaisRanking,
       paginasRanking,
       acessosPorDia,
       dispositivos: {
         mobile: mobileCount,
         desktop: desktopCount,
       },
-      visitasRecentes,
+      visitasRecentes: visitasValidas.slice(0, 100),
     }
   },
 }

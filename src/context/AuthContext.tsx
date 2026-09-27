@@ -66,15 +66,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         perfil: rec.perfil || (rec.email === 'dfarias53@gmail.com' ? 'admin' : 'lider'),
       }
       setUser(updatedUser)
-      // If perfil isn't set yet on model, refresh auth store
-      if (!rec.perfil) {
-        pb.collection('users')
-          .getOne<User>(rec.id)
-          .then((fresh) => {
-            setUser(fresh)
-          })
-          .catch(() => {})
-      }
+      // Carrega usuário completo com expand cliente para ter dados da rede / white-label
+      pb.collection('users')
+        .getOne<User>(rec.id, { expand: 'cliente' })
+        .then((fresh) => {
+          setUser(fresh)
+        })
+        .catch(() => {
+          // ignore
+        })
     } else {
       setUser(null)
     }
@@ -91,6 +91,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           ...rec,
           perfil: rec.perfil || (rec.email === 'dfarias53@gmail.com' ? 'admin' : 'lider'),
         })
+        // Busca expand cliente
+        pb.collection('users')
+          .getOne<User>(rec.id, { expand: 'cliente' })
+          .then((fresh) => {
+            setUser(fresh)
+          })
+          .catch(() => {})
       } else {
         setUser(null)
       }
@@ -102,7 +109,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [])
 
   const login = async (email: string, pass: string) => {
-    const authData = await pb.collection('users').authWithPassword<User>(email.trim(), pass)
+    const authData = await pb.collection('users').authWithPassword<User>(email.trim(), pass, {
+      expand: 'cliente',
+    })
     if (authData.record.ativo === false) {
       pb.authStore.clear()
       setUser(null)

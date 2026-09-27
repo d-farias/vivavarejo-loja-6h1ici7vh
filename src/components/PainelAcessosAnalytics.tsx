@@ -9,21 +9,17 @@ import {
   RefreshCw,
   Calendar,
   Share2,
-  FileText,
-  Compass,
-  ArrowUpRight,
+  MapPin,
   ShieldCheck,
   UserCheck,
   UserX,
   Clock,
-  ListFilter,
   Search,
-  ExternalLink,
+  Sparkles,
 } from 'lucide-react'
 import { analyticsService, isDemoEmail } from '@/services/analyticsService'
 import type { ResumoAnalytics } from '@/types'
 import { Badge } from '@/components/ui/badge'
-import { Sparkles } from 'lucide-react'
 
 export const PainelAcessosAnalytics: React.FC = () => {
   const [periodo, setPeriodo] = useState<'hoje' | '7dias' | '30dias'>('7dias')
@@ -412,8 +408,39 @@ export const PainelAcessosAnalytics: React.FC = () => {
             </div>
           )}
 
+          {/* Chips de Perfil Geográfico: Cidades / Regiões com mais acessos */}
+          <div className="mt-5 pt-4 border-t border-[#E5E7EB]">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold text-[#1F2937] flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-[#0F766E]" />
+                Perfil Geográfico (Cidades/Estados)
+              </span>
+              <span className="text-[10px] font-semibold text-[#0F766E] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                IP anônimo
+              </span>
+            </div>
+            {resumo?.locaisRanking && resumo.locaisRanking.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {resumo.locaisRanking.map((loc) => (
+                  <span
+                    key={loc.local}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] bg-slate-50 border border-slate-200 text-slate-800 font-medium hover:bg-slate-100 transition-colors"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-teal-600 shrink-0" />
+                    <span>{loc.local}</span>
+                    <strong className="text-[#0F766E] font-bold">{loc.quantidade}</strong>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-[#6B7280] italic">
+                Localização geográfica será preenchida conforme novos acessos forem registrados.
+              </p>
+            )}
+          </div>
+
           {/* Dica leiga de como usar utm no LinkedIn */}
-          <div className="mt-5 p-3 rounded-lg bg-[#F7F7F5] border border-[#E5E7EB] text-[11px] text-[#4B5563] space-y-1">
+          <div className="mt-4 p-3 rounded-lg bg-[#F7F7F5] border border-[#E5E7EB] text-[11px] text-[#4B5563] space-y-1">
             <strong className="text-[#1F2937] block">
               💡 Dica para suas postagens no LinkedIn:
             </strong>
@@ -576,12 +603,13 @@ export const PainelAcessosAnalytics: React.FC = () => {
                   <th className="py-2.5 px-4 font-semibold whitespace-nowrap">Data / Hora</th>
                   <th className="py-2.5 px-4 font-semibold whitespace-nowrap">Tela / Página</th>
                   <th className="py-2.5 px-4 font-semibold whitespace-nowrap">Origem do Tráfego</th>
+                  <th className="py-2.5 px-4 font-semibold whitespace-nowrap">Local (Cidade/UF)</th>
                   <th className="py-2.5 px-4 font-semibold whitespace-nowrap">
                     Identificação do Visitante
                   </th>
                   <th className="py-2.5 px-4 font-semibold text-center whitespace-nowrap">
                     Dispositivo
-                  </th>
+                  </th>{' '}
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E5E7EB]">
@@ -607,13 +635,12 @@ export const PainelAcessosAnalytics: React.FC = () => {
                   if (lista.length === 0) {
                     return (
                       <tr>
-                        <td colSpan={5} className="py-8 text-center text-xs text-[#6B7280]">
+                        <td colSpan={6} className="py-8 text-center text-xs text-[#6B7280]">
                           Nenhum registro de acesso encontrado com os filtros selecionados.
                         </td>
                       </tr>
                     )
                   }
-
                   const formatOrigemLabel = (origemRaw?: string) => {
                     const o = (origemRaw || 'direto').toLowerCase().trim()
                     if (o === 'site_oficial') return 'Site Oficial (vivavarejo.com)'
@@ -647,14 +674,12 @@ export const PainelAcessosAnalytics: React.FC = () => {
                         <td className="py-2.5 px-4 font-mono text-[11px] text-[#6B7280] whitespace-nowrap">
                           {dataFormatada}
                         </td>
-
                         {/* Tela */}
                         <td className="py-2.5 px-4 text-[#1F2937] font-medium whitespace-nowrap">
                           <span className="inline-flex items-center gap-1.5 font-mono text-[11px] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded text-[#374151]">
                             {v.pagina || '/'}
                           </span>
                         </td>
-
                         {/* Origem */}
                         <td className="py-2.5 px-4 whitespace-nowrap">
                           <span
@@ -673,8 +698,20 @@ export const PainelAcessosAnalytics: React.FC = () => {
                             {origemFormatada}
                           </span>
                         </td>
-
-                        {/* Identificação */}
+                        {/* Local (Cidade/UF) */}
+                        <td className="py-2.5 px-4 whitespace-nowrap">
+                          {v.cidade || v.regiao ? (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                              <MapPin className="w-3 h-3 text-[#0F766E] shrink-0" />
+                              {v.cidade && v.regiao
+                                ? `${v.cidade} - ${v.regiao}`
+                                : v.cidade || v.regiao}
+                            </span>
+                          ) : (
+                            <span className="text-[#9CA3AF] text-[11px]">—</span>
+                          )}
+                        </td>
+                        {/* Identificação */}{' '}
                         <td className="py-2.5 px-4 whitespace-nowrap">
                           {isIdent ? (
                             (() => {
@@ -721,7 +758,6 @@ export const PainelAcessosAnalytics: React.FC = () => {
                             </div>
                           )}
                         </td>
-
                         {/* Dispositivo */}
                         <td className="py-2.5 px-4 text-center whitespace-nowrap">
                           {v.dispositivo === 'mobile' ? (
