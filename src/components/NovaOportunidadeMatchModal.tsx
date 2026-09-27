@@ -115,7 +115,7 @@ export function NovaOportunidadeMatchModal({
       onOpenChange(false)
       onSucesso()
     } catch (err) {
-      console.error('Erro ao salvar oportunidade match:', err)
+      console.error('Erro ao salvar oportunidade no Integração:', err)
       alert('Não foi possível salvar a oportunidade comercial. Tente novamente.')
     } finally {
       setSalvando(false)
@@ -128,7 +128,7 @@ export function NovaOportunidadeMatchModal({
         <DialogHeader className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
-              Oportunidade Comercial • VivaVarejo Match
+              Oportunidade Comercial • VivaVarejo Integração
             </span>
           </div>
           <DialogTitle className="text-base font-bold text-[#1F2937] flex items-center gap-2">

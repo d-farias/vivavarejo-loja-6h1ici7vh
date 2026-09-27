@@ -118,7 +118,7 @@ export function TratarDemandaMatchModal({
       onOpenChange(false)
       onSucesso()
     } catch (err) {
-      console.error('Erro ao atualizar status da demanda match:', err)
+      console.error('Erro ao atualizar status da demanda no Integração:', err)
       alert('Não foi possível atualizar a demanda. Tente novamente.')
     } finally {
       setSalvando(false)
@@ -131,12 +131,12 @@ export function TratarDemandaMatchModal({
         <DialogHeader className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
-              Tratamento & Resposta • VivaVarejo Match
+              Tratamento & Resposta • VivaVarejo Integração
             </span>
           </div>
           <DialogTitle className="text-base font-bold text-[#1F2937] flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-[#0F766E]" />
-            <span>Tratar Demanda de Abastecimento</span>
+            <span>Tratar Demanda no Integração</span>
           </DialogTitle>
           <DialogDescription className="text-xs text-[#4B5563]">
             Atualize o ciclo de atendimento, selecione a resposta estruturada e registre o avanço
@@ -162,19 +162,33 @@ export function TratarDemandaMatchModal({
             <span
               className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0 ${
                 demanda.situacao === 'ruptura'
-                  ? 'bg-red-50 text-red-700 border border-red-200'
-                  : 'bg-amber-50 text-amber-800 border border-amber-200'
+                  ? 'bg-red-100 text-red-700 border border-red-200'
+                  : demanda.situacao === 'divergencia_sistema_fisico'
+                    ? 'bg-purple-100 text-purple-700 border border-purple-200'
+                    : demanda.situacao === 'sem_giro'
+                      ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                      : 'bg-amber-50 text-amber-800 border border-amber-200'
               }`}
             >
-              {demanda.situacao.replace('_', ' ')}
+              {demanda.situacao === 'divergencia_sistema_fisico'
+                ? 'Divergência sistêmica'
+                : demanda.situacao === 'sem_giro'
+                  ? 'Sem giro'
+                  : demanda.situacao.replace('_', ' ')}
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#E5E7EB] text-[11px]">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-[#E5E7EB] text-[11px]">
             <div>
-              <span className="text-[#6B7280] block">Estoque Loja:</span>
+              <span className="text-[#6B7280] block">Físico Loja:</span>
               <strong className={demanda.estoque_loja === 0 ? 'text-red-600' : 'text-[#1F2937]'}>
                 {demanda.estoque_loja ?? 0} un.
+              </strong>
+            </div>
+            <div>
+              <span className="text-[#6B7280] block">No Sistema (ERP):</span>
+              <strong className="text-[#1F2937]">
+                {demanda.estoque_sistema !== undefined ? `${demanda.estoque_sistema} un.` : '—'}
               </strong>
             </div>
             <div>
@@ -182,7 +196,7 @@ export function TratarDemandaMatchModal({
               <strong className="text-[#0F766E]">{demanda.estoque_cd ?? 0} un.</strong>
             </div>
             <div>
-              <span className="text-[#6B7280] block">Potencial em Risco:</span>
+              <span className="text-[#6B7280] block">Impacto Financeiro:</span>
               <strong className="text-amber-700">
                 {formatCurrency(demanda.potencial_venda_perdida || 0)}
               </strong>

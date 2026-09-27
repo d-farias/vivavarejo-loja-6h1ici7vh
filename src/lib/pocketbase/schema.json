@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-27T22:06:53.796Z",
+  "generatedAt": "2026-09-27T22:29:03.165Z",
   "collections": [
     {
       "name": "users",
@@ -3477,7 +3477,9 @@
             "risco_ruptura",
             "pedido_aberto",
             "excesso_estoque",
-            "oportunidade"
+            "oportunidade",
+            "divergencia_sistema_fisico",
+            "sem_giro"
           ]
         },
         {
@@ -3599,6 +3601,12 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "estoque_sistema",
+          "type": "number",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

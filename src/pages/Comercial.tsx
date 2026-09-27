@@ -68,11 +68,11 @@ export default function ComercialPage() {
   const { user } = useAuth()
   const { lojaSelecionadaId, lojas } = useStore()
 
-  // Seletor principal do Comercial: Gestão Comercial x Abastecimento & Match
+  // Seletor principal do Comercial: Gestão Comercial x Integração & Abastecimento
   // Mantém menu enxuto e sem poluição, perfeito para mobile
   const [visaoComercial, setVisaoComercial] = useState<'match' | 'gestao'>('match')
 
-  // Lista de fornecedores para o Match
+  // Lista de fornecedores para o Integração
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([])
 
   // Identificação de perfis
@@ -488,7 +488,7 @@ export default function ComercialPage() {
           </h1>
           <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">
             {visaoComercial === 'match'
-              ? 'VivaVarejo Match: conexão Loja, CD, Abastecimento e Fornecedor com decisão em cascata.'
+              ? 'VivaVarejo Integração: conexão Loja, CD, Abastecimento e Fornecedor com diagnóstico prévio e decisão em cascata.'
               : 'Sortimento, vendas, curvas A/B/C+, margens, layout, rebaixas e sincronização ERP.'}
           </p>
         </div>
@@ -521,7 +521,7 @@ export default function ComercialPage() {
         </div>
       </div>
 
-      {/* SELETOR ENXUTO DE VISÃO: ABASTECIMENTO & MATCH x GESTÃO COMERCIAL */}
+      {/* SELETOR ENXUTO DE VISÃO: INTEGRAÇÃO & ABASTECIMENTO x GESTÃO COMERCIAL */}
       {/* Design sóbrio, 1 toque, limpo no celular (sem menu poluído) */}
       <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
         <div className="inline-flex p-1 rounded-xl bg-gray-100 border border-[#E5E7EB] text-xs font-semibold">
@@ -535,7 +535,7 @@ export default function ComercialPage() {
             }`}
           >
             <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
-            <span>Abastecimento & Match</span>
+            <span>Integração & Abastecimento</span>
           </button>
 
           <button
@@ -552,12 +552,12 @@ export default function ComercialPage() {
         </div>
 
         <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#6B7280]">
-          <span className="font-semibold text-[#1F2937]">VivaVarejo Match</span>
-          <span>• Fluxo em cascata anti-ruptura</span>
+          <span className="font-semibold text-[#1F2937]">VivaVarejo Integração</span>
+          <span>• Fluxo em cascata e diagnóstico anti-ruptura</span>
         </div>
       </div>
 
-      {/* VISÃO 1: ABASTECIMENTO & MATCH (CONCEITO CENTRAL DO MATCH) */}
+      {/* VISÃO 1: ABASTECIMENTO & MATCH (CONCEITO CENTRAL DO INTEGRAÇÃO) */}
       {visaoComercial === 'match' && (
         <AbastecimentoMatchSecao
           lojas={lojas}

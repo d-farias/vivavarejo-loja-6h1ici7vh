@@ -39,6 +39,7 @@ export function RegistrarOcorrenciaMatchModal({
   const [produtoDescricao, setProdutoDescricao] = useState('')
   const [curva, setCurva] = useState<CurvaAbc>('A')
   const [estoqueLoja, setEstoqueLoja] = useState<number>(0)
+  const [estoqueSistema, setEstoqueSistema] = useState<number>(0)
   const [estoqueCd, setEstoqueCd] = useState<number>(0)
   const [estoqueTransito, setEstoqueTransito] = useState<boolean>(false)
   const [previsaoTransito, setPrevisaoTransito] = useState('')
@@ -64,6 +65,7 @@ export function RegistrarOcorrenciaMatchModal({
   // Motor de decisão em cascata recalculado em tempo real
   const cascata = calcularCascataMatch({
     estoqueLoja: Number(estoqueLoja) || 0,
+    estoqueSistema: Number(estoqueSistema) || 0,
     estoqueCd: Number(estoqueCd) || 0,
     estoqueTransito: Boolean(estoqueTransito),
     previsaoTransito,
@@ -109,6 +111,7 @@ export function RegistrarOcorrenciaMatchModal({
         produtoDescricao: produtoDescricao.trim(),
         curva,
         estoqueLoja: Number(estoqueLoja) || 0,
+        estoqueSistema: Number(estoqueSistema) || 0,
         estoqueCd: Number(estoqueCd) || 0,
         estoqueTransito: Boolean(estoqueTransito),
         previsaoEntregaTransito: previsaoTransito.trim() || undefined,
@@ -128,6 +131,7 @@ export function RegistrarOcorrenciaMatchModal({
       setProdutoCodigo('')
       setProdutoDescricao('')
       setEstoqueLoja(0)
+      setEstoqueSistema(0)
       setEstoqueCd(0)
       setEstoqueTransito(false)
       setPrevisaoTransito('')
@@ -135,7 +139,7 @@ export function RegistrarOcorrenciaMatchModal({
       onOpenChange(false)
       onSucesso()
     } catch (err) {
-      console.error('Erro ao registrar ocorrência match:', err)
+      console.error('Erro ao registrar ocorrência no Integração:', err)
       alert('Não foi possível registrar a ocorrência. Tente novamente.')
     } finally {
       setSalvando(false)
@@ -148,16 +152,17 @@ export function RegistrarOcorrenciaMatchModal({
         <DialogHeader className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
-              VivaVarejo Match • Cascata Inteligente
+              VivaVarejo Integração • Diagnóstico Inteligente
             </span>
           </div>
           <DialogTitle className="text-base font-bold text-[#1F2937] flex items-center gap-2">
             <Plus className="w-4 h-4 text-[#0F766E]" />
-            <span>Registrar Ocorrência de Abastecimento</span>
+            <span>Registrar Ocorrência de Abastecimento / Estoque</span>
           </DialogTitle>
           <DialogDescription className="text-xs text-[#4B5563]">
-            Preencha os dados do SKU. O sistema cruza loja, CD e pedidos e sugere a ação imediata —
-            antes de acionar fornecedor, verifica a solução interna.
+            Antes de gerar demanda, o sistema cruza físico × sistema × venda e indica onde está a
+            verdade: demanda só quando há ação real; o resto vira conferência ou oportunidade
+            comercial.
           </DialogDescription>
         </DialogHeader>
 
@@ -225,32 +230,49 @@ export function RegistrarOcorrenciaMatchModal({
             </div>
           </div>
 
-          {/* Saldos: Loja, CD, Trânsito */}
+          {/* Saldos: Físico da Loja × Sistema × CD × Trânsito */}
           <div className="bg-[#F7F7F5] border border-[#E5E7EB] rounded-xl p-3.5 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-[#1F2937] uppercase tracking-wider flex items-center gap-1.5">
                 <Store className="w-3.5 h-3.5 text-[#0F766E]" />
-                <span>Saldos de Estoque (Ponta a Ponta)</span>
+                <span>Auditoria & Saldos de Estoque</span>
               </span>
-              <span className="text-[11px] text-[#6B7280]">Insira 0 para indicar ruptura</span>
+              <span className="text-[11px] text-[#6B7280]">Cruze o piso de loja com o ERP</span>
             </div>
 
-            <div className="grid grid-cols-3 gap-2.5 text-xs">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
               <div>
                 <label className="block text-[11px] font-semibold text-[#4B5563] mb-1">
-                  Estoque Loja (un)
+                  Estoque Físico Loja *
                 </label>
                 <input
                   type="number"
                   min={0}
                   value={estoqueLoja}
                   onChange={(e) => setEstoqueLoja(Number(e.target.value))}
+                  placeholder="0 un"
                   className={`w-full text-xs bg-white border rounded-lg px-2.5 py-1.5 font-bold outline-none ${
                     estoqueLoja <= 0
                       ? 'border-red-300 text-red-600 focus:border-red-500'
                       : 'border-[#D1D5DB] text-[#1F2937] focus:border-[#0F766E]'
                   }`}
                 />
+                <span className="text-[10px] text-[#6B7280] block mt-0.5">Real na gôndola</span>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-[#4B5563] mb-1">
+                  Estoque no Sistema *
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={estoqueSistema}
+                  onChange={(e) => setEstoqueSistema(Number(e.target.value))}
+                  placeholder="Saldo no ERP"
+                  className="w-full text-xs bg-white border border-[#D1D5DB] rounded-lg px-2.5 py-1.5 font-bold text-[#1F2937] outline-none focus:border-[#0F766E]"
+                />
+                <span className="text-[10px] text-[#6B7280] block mt-0.5">Saldo virtual ERP</span>
               </div>
 
               <div>
@@ -264,6 +286,7 @@ export function RegistrarOcorrenciaMatchModal({
                   onChange={(e) => setEstoqueCd(Number(e.target.value))}
                   className="w-full text-xs bg-white border border-[#D1D5DB] rounded-lg px-2.5 py-1.5 font-bold text-[#0F766E] outline-none focus:border-[#0F766E]"
                 />
+                <span className="text-[10px] text-[#6B7280] block mt-0.5">Disponível no CD</span>
               </div>
 
               <div>
@@ -276,8 +299,9 @@ export function RegistrarOcorrenciaMatchModal({
                   className="w-full text-xs bg-white border border-[#D1D5DB] rounded-lg px-2 py-1.5 font-semibold text-[#1F2937] outline-none focus:border-[#0F766E]"
                 >
                   <option value="nao">Não</option>
-                  <option value="sim">Sim (Pedido em rota)</option>
+                  <option value="sim">Sim (Carga em rota)</option>
                 </select>
+                <span className="text-[10px] text-[#6B7280] block mt-0.5">Pedido faturado</span>
               </div>
             </div>
 
@@ -370,40 +394,57 @@ export function RegistrarOcorrenciaMatchModal({
             </div>
           </div>
 
-          {/* MOTOR DE DECISÃO EM CASCATA — DESTAQUE VISUAL (SUGESTÃO DO SISTEMA) */}
+          {/* MOTOR DE DECISÃO EM CASCATA — DESTAQUE VISUAL (DIAGNÓSTICO E SUGESTÃO DO SISTEMA) */}
           <div className="bg-teal-50/70 border border-teal-200 rounded-xl p-3.5 space-y-2 text-xs">
             <div className="flex items-center justify-between">
               <span className="font-bold text-[#0F766E] flex items-center gap-1.5">
                 <Calculator className="w-4 h-4 text-[#0F766E]" />
-                <span>Sugestão em Cascata do VivaVarejo Match</span>
+                <span>Diagnóstico VivaVarejo Integração</span>
               </span>
               <span
                 className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
                   cascata.situacao === 'ruptura'
                     ? 'bg-red-100 text-red-700 border border-red-200'
-                    : cascata.situacao === 'risco_ruptura'
-                      ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                      : 'bg-blue-100 text-blue-700 border border-blue-200'
+                    : cascata.situacao === 'divergencia_sistema_fisico'
+                      ? 'bg-purple-100 text-purple-700 border border-purple-200'
+                      : cascata.situacao === 'sem_giro'
+                        ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                        : cascata.situacao === 'risco_ruptura'
+                          ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                          : 'bg-blue-100 text-blue-700 border border-blue-200'
                 }`}
               >
-                {cascata.situacao.replace('_', ' ')} • Prioridade {cascata.prioridade}
+                {cascata.situacao === 'divergencia_sistema_fisico'
+                  ? 'Divergência sistema × físico'
+                  : cascata.situacao === 'sem_giro'
+                    ? 'Sem giro comercial'
+                    : cascata.situacao.replace('_', ' ')}{' '}
+                • Prioridade {cascata.prioridade}
               </span>
             </div>
 
             <div className="p-2.5 rounded-lg bg-white border border-teal-200 space-y-1">
               <div className="text-xs font-bold text-[#1F2937] flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#0F766E]" />
-                <span>Ação sugerida: {cascata.acaoSugerida}</span>
+                <span>Ação indicada: {cascata.acaoSugerida}</span>
               </div>
               <p className="text-[11px] text-[#4B5563] leading-relaxed">{cascata.justificativa}</p>
+              {cascata.diagnosticoVerdade && (
+                <div className="text-[10px] font-medium text-[#0F766E] pt-0.5">
+                  Diagnóstico: {cascata.diagnosticoVerdade}
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] pt-1 text-[#374151]">
               <span>
-                Regra: <strong>Solução dentro de casa primeiro</strong> (CD / trânsito).
+                {cascata.geraDemandaAbastecimento
+                  ? 'Gera demanda de abastecimento (cobertura interna / pedido).'
+                  : 'NÃO gera demanda automática ao fornecedor (foco em conferência / giro).'}
               </span>
               <span className="font-bold text-[#0F766E]">
-                Venda em risco estimada: {formatCurrency(cascata.potencialEstimado)}
+                {cascata.situacao === 'sem_giro' ? 'Estoque parado: ' : 'Impacto financeiro: '}
+                {formatCurrency(cascata.potencialEstimado)}
               </span>
             </div>
           </div>
@@ -448,7 +489,7 @@ export function RegistrarOcorrenciaMatchModal({
               ) : (
                 <>
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Registrar Demanda Match</span>
+                  <span>Registrar Demanda no Integração</span>
                 </>
               )}
             </Button>

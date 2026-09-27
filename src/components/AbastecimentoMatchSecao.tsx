@@ -52,7 +52,7 @@ export function AbastecimentoMatchSecao({
   isRedeOuAdmin,
   redeId,
 }: AbastecimentoMatchSecaoProps) {
-  // Aba interna do Match: Demandas x Oportunidades
+  // Aba interna do Integração: Demandas x Oportunidades
   const [subAba, setSubAba] = useState<'demandas' | 'oportunidades'>('demandas')
 
   // Filtros
@@ -153,6 +153,8 @@ export function AbastecimentoMatchSecao({
   const kpis = useMemo(() => {
     const total = demandas.length
     const emRuptura = demandas.filter((d) => d.situacao === 'ruptura')
+    const emDivergencia = demandas.filter((d) => d.situacao === 'divergencia_sistema_fisico')
+    const semGiro = demandas.filter((d) => d.situacao === 'sem_giro')
     const emRisco = demandas.filter((d) => d.situacao === 'risco_ruptura')
 
     // R$ em risco por ruptura
@@ -196,6 +198,8 @@ export function AbastecimentoMatchSecao({
     return {
       total,
       emRupturaCount: emRuptura.length,
+      emDivergenciaCount: emDivergencia.length,
+      semGiroCount: semGiro.length,
       emRiscoCount: emRisco.length,
       valorEmRisco,
       valorRecuperado,
@@ -259,6 +263,53 @@ export function AbastecimentoMatchSecao({
     }
   }
 
+  const renderSituacaoBadge = (situacao: string) => {
+    switch (situacao) {
+      case 'ruptura':
+        return (
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200">
+            Ruptura real
+          </span>
+        )
+      case 'divergencia_sistema_fisico':
+        return (
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 border border-purple-200">
+            Divergência sistema × físico
+          </span>
+        )
+      case 'sem_giro':
+        return (
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+            Sem giro
+          </span>
+        )
+      case 'risco_ruptura':
+        return (
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+            Risco
+          </span>
+        )
+      case 'pedido_aberto':
+        return (
+          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+            Pedido aberto
+          </span>
+        )
+      case 'excesso_estoque':
+        return (
+          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+            Excesso
+          </span>
+        )
+      default:
+        return (
+          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+            {situacao.replace('_', ' ')}
+          </span>
+        )
+    }
+  }
+
   const renderStatusDemandaBadge = (st: StatusMatchDemanda) => {
     const map: Record<StatusMatchDemanda, { label: string; cls: string }> = {
       aberta: { label: 'Aberta', cls: 'bg-gray-100 text-gray-800 border-gray-200' },
@@ -300,15 +351,20 @@ export function AbastecimentoMatchSecao({
           <div className="space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-[#0F766E] text-white">
-                VivaVarejo Match
+                VivaVarejo Integração
               </span>
               <span className="text-xs font-semibold text-[#0F766E] bg-teal-100/60 px-2 py-0.5 rounded-md border border-teal-200">
                 Loja • CD • Abastecimento • Fornecedor
               </span>
             </div>
             <h3 className="text-base sm:text-lg font-extrabold text-[#1F2937] tracking-tight">
-              Motor de Decisão em Cascata: Solução Interna Antes do Fornecedor
+              Integração Operacional: Diagnóstico de Estoque Antes de Gerar Demanda
             </h3>
+            <p className="text-xs text-[#4B5563] leading-relaxed max-w-2xl">
+              Antes de gerar demanda, o sistema cruza físico × sistema × venda e indica onde está a
+              verdade: demanda só quando há ação real; o resto vira conferência física ou
+              oportunidade comercial.
+            </p>
           </div>
 
           <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
@@ -380,9 +436,10 @@ export function AbastecimentoMatchSecao({
             <div className="flex items-center gap-1.5 font-medium text-[#0F766E]">
               <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
               <span>
-                <strong>Regra fundamental:</strong> Antes de procurar fora, o VivaVarejo verifica se
-                a solução está dentro de casa (CD, trânsito). O fornecedor NUNCA é o primeiro
-                destino.
+                <strong>Princípio de Integração:</strong> Cruzamos físico × sistema × venda para não
+                gerar demanda à toa. Se o sistema marca estoque mas a loja zerou, é divergência
+                física (inventário). Se há físico e não vende, é exposição comercial. Ruptura real
+                aciona CD primeiro e fornecedor só sem saldo interno.
               </span>
             </div>
             {isGerente && (
@@ -539,7 +596,9 @@ export function AbastecimentoMatchSecao({
                 className="bg-white border border-[#D1D5DB] rounded-lg px-2.5 py-1.5 text-[#1F2937] outline-none focus:border-[#0F766E]"
               >
                 <option value="todas">Todas as Situações</option>
-                <option value="ruptura">Ruptura (Estoque 0)</option>
+                <option value="ruptura">Ruptura real (Físico 0 e Sistema 0)</option>
+                <option value="divergencia_sistema_fisico">Divergência sistema × físico</option>
+                <option value="sem_giro">Sem giro (Físico &gt; 0 e sem venda)</option>
                 <option value="risco_ruptura">Risco de Ruptura</option>
                 <option value="pedido_aberto">Pedido Aberto / Em Trânsito</option>
                 <option value="excesso_estoque">Estoque Excessivo</option>
@@ -628,9 +687,10 @@ export function AbastecimentoMatchSecao({
                       <th className="p-3">Loja</th>
                       <th className="p-3">SKU / Produto</th>
                       <th className="p-3 text-center">Curva</th>
-                      <th className="p-3 text-right">Estoque Loja</th>
+                      <th className="p-3 text-right">Físico Loja</th>
+                      <th className="p-3 text-right">No Sistema</th>
                       <th className="p-3 text-right">Estoque CD</th>
-                      <th className="p-3">Situação</th>
+                      <th className="p-3">Situação Classificada</th>
                       <th className="p-3">Ação Sugerida</th>
                       <th className="p-3">Status</th>
                       <th className="p-3 text-right">Venda em Risco</th>
@@ -679,6 +739,9 @@ export function AbastecimentoMatchSecao({
                             {dem.estoque_loja ?? 0}
                           </span>
                         </td>
+                        <td className="p-3 text-right font-medium text-[#1F2937]">
+                          {dem.estoque_sistema !== undefined ? dem.estoque_sistema : '—'}
+                        </td>
                         <td className="p-3 text-right font-medium">
                           <span
                             className={
@@ -690,19 +753,7 @@ export function AbastecimentoMatchSecao({
                             {dem.estoque_cd ?? 0}
                           </span>
                         </td>
-                        <td className="p-3">
-                          <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
-                              dem.situacao === 'ruptura'
-                                ? 'bg-red-50 text-red-700 border border-red-200'
-                                : dem.situacao === 'risco_ruptura'
-                                  ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                                  : 'bg-blue-50 text-blue-700 border border-blue-200'
-                            }`}
-                          >
-                            {dem.situacao.replace('_', ' ')}
-                          </span>
-                        </td>
+                        <td className="p-3">{renderSituacaoBadge(dem.situacao)}</td>
                         <td className="p-3 max-w-xs">
                           <div className="text-[11px] font-semibold text-[#1F2937] truncate">
                             {dem.acao_sugerida}
@@ -785,9 +836,12 @@ export function AbastecimentoMatchSecao({
                       <div className="text-[11px] font-bold text-[#1F2937]">
                         Ação: {dem.acao_sugerida}
                       </div>
-                      <div className="grid grid-cols-2 gap-2 text-[11px] text-[#4B5563] pt-1">
+                      <div className="flex items-center gap-1.5 pt-0.5">
+                        {renderSituacaoBadge(dem.situacao)}
+                      </div>
+                      <div className="grid grid-cols-3 gap-1.5 text-[11px] text-[#4B5563] pt-1">
                         <div>
-                          Estoque Loja:{' '}
+                          Físico:{' '}
                           <strong
                             className={dem.estoque_loja === 0 ? 'text-red-600' : 'text-[#1F2937]'}
                           >
@@ -795,8 +849,13 @@ export function AbastecimentoMatchSecao({
                           </strong>
                         </div>
                         <div>
-                          Estoque CD:{' '}
-                          <strong className="text-[#0F766E]">{dem.estoque_cd ?? 0}</strong>
+                          Sistema:{' '}
+                          <strong className="text-[#1F2937]">
+                            {dem.estoque_sistema !== undefined ? dem.estoque_sistema : '—'}
+                          </strong>
+                        </div>
+                        <div>
+                          CD: <strong className="text-[#0F766E]">{dem.estoque_cd ?? 0}</strong>
                         </div>
                       </div>
                     </div>

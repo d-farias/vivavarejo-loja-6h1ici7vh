@@ -736,13 +736,15 @@ export interface AdmRhDemanda extends RecordModel {
   }
 }
 
-// ==================== VIVAVAREJO MATCH ====================
+// ==================== VIVAVAREJO INTEGRAÇÃO ====================
 export type SituacaoMatch =
   | 'ruptura'
   | 'risco_ruptura'
   | 'pedido_aberto'
   | 'excesso_estoque'
   | 'oportunidade'
+  | 'divergencia_sistema_fisico'
+  | 'sem_giro'
 
 export type StatusMatchDemanda =
   | 'aberta'
@@ -788,6 +790,7 @@ export interface MatchDemanda extends RecordModel {
   produto_descricao: string
   curva: CurvaAbc
   estoque_loja?: number
+  estoque_sistema?: number
   estoque_cd?: number
   estoque_transito?: boolean
   previsao_entrega_transito?: string

@@ -18,15 +18,35 @@ export interface SugestaoCascataMatch {
   prioridade: PrioridadeMatch
   potencialEstimado: number
   justificativa: string
+  geraDemandaAbastecimento: boolean
+  diagnosticoVerdade: string
 }
 
 /**
- * MOTOR DE DECISÃO EM CASCATA — VivaVarejo Match
- * Regra fundamental: "Antes de procurar fora, o VivaVarejo verifica se a solução está dentro de casa."
- * O fornecedor NUNCA é o primeiro destino.
+ * MOTOR DE DECISÃO EM CASCATA — VivaVarejo Integração
+ * Princípio chave: "Antes de gerar demanda, o sistema cruza físico × sistema × venda e
+ * indica onde está a verdade — demanda só quando há ação real; o resto vira conferência ou oportunidade."
+ *
+ * Classificação prévia em 3 situações ANTES da cascata de decisão:
+ * a) VENDA ATÉ ZERAR O FÍSICO, MAS SISTEMA AINDA MOSTRA ESTOQUE:
+ *    (venda média > 0, estoque físico da loja <= 0, estoque no SISTEMA > 0)
+ *    -> Divergência sistema × físico (merma, furto, baixa não lançada).
+ *    -> AÇÃO SUGERIDA: Conferência física / inventário cíclico na loja (NÃO gera demanda de abastecimento).
+ *
+ * b) TEM FÍSICO E NÃO VENDE:
+ *    (estoque físico > 0, venda média <= 0.05 ou sem giro)
+ *    -> NÃO é abastecimento. Classificar como "Sem giro — exposição/preço/posicionamento".
+ *    -> AÇÃO SUGERIDA: Direcionar ao Comercial como sinal/oportunidade de análise.
+ *
+ * c) SEM FÍSICO E SEM ESTOQUE NO SISTEMA (físico <= 0 e sistema <= 0) com venda média > 0:
+ *    -> Ruptura real, e segue a cascata de abastecimento:
+ *       1. CD tem estoque -> abastecer via CD
+ *       2. Pedido em trânsito -> acompanhar SLA
+ *       3. Sem cobertura interna -> demanda ao fornecedor
  */
 export function calcularCascataMatch(params: {
   estoqueLoja: number
+  estoqueSistema?: number
   estoqueCd: number
   estoqueTransito: boolean
   previsaoTransito?: string
@@ -38,6 +58,7 @@ export function calcularCascataMatch(params: {
 }): SugestaoCascataMatch {
   const {
     estoqueLoja = 0,
+    estoqueSistema,
     estoqueCd = 0,
     estoqueTransito = false,
     vendaMediaDiaria = 0,
@@ -50,20 +71,62 @@ export function calcularCascataMatch(params: {
   const leadTime = Math.max(1, leadTimeDias || 3)
   const potencialEstimado = Math.round(vendaMediaDiaria * leadTime * precoVenda * 100) / 100
 
-  // 1. Ruptura: estoque de loja zerado ou negativo
+  // Se estoqueSistema não for informado explicitamente, assume o mesmo valor do físico para compatibilidade retroativa
+  const sistemaVal = estoqueSistema !== undefined ? estoqueSistema : estoqueLoja
+
+  // =========================================================================
+  // SITUAÇÃO A: Venda até zerar o físico, mas sistema ainda mostra estoque
+  // (venda > 0, físico <= 0, sistema > 0) -> Divergência sistema × físico
+  // =========================================================================
+  if (estoqueLoja <= 0 && sistemaVal > 0 && vendaMediaDiaria > 0) {
+    const valorDivergencia = Math.round(sistemaVal * precoVenda * 100) / 100
+    return {
+      situacao: 'divergencia_sistema_fisico',
+      acaoSugerida: 'Conferência física / inventário cíclico na loja',
+      prioridade: curva === 'A' ? 'alta' : 'media',
+      potencialEstimado: valorDivergencia > 0 ? valorDivergencia : potencialEstimado,
+      justificativa: `Físico zerado com saldo virtual no sistema (${sistemaVal} un.). Provável perda, furto, mercadoria extraviada ou baixa não registrada. Correção na loja antes de abastecer.`,
+      geraDemandaAbastecimento: false,
+      diagnosticoVerdade: 'Divergência sistêmica: o sistema pensa que tem, o cliente não encontra.',
+    }
+  }
+
+  // =========================================================================
+  // SITUAÇÃO B: Tem físico e não vende (físico > 0 e venda média ≈ 0)
+  // -> Sem giro / exposição / preço / posicionamento
+  // =========================================================================
+  if (estoqueLoja > 0 && vendaMediaDiaria <= 0.05) {
+    const valorImobilizado = Math.round(estoqueLoja * precoVenda * 100) / 100
+    return {
+      situacao: 'sem_giro',
+      acaoSugerida: 'Análise comercial: rever exposição, gôndola, preço ou campanha de ativação',
+      prioridade: 'media',
+      potencialEstimado: valorImobilizado,
+      justificativa: `Estoque físico em loja (${estoqueLoja} un.) sem registro de vendas representativo. Não requer abastecimento; requer ação de sell-out ou reposicionamento no piso.`,
+      geraDemandaAbastecimento: false,
+      diagnosticoVerdade: 'Produto disponível fisicamente, mas sem tração de vendas.',
+    }
+  }
+
+  // =========================================================================
+  // SITUAÇÃO C: Sem físico e sem estoque no sistema (ou físico <= 0 e sistema <= 0)
+  // com venda média > 0 -> Ruptura real, entra na cascata de abastecimento
+  // =========================================================================
   if (estoqueLoja <= 0) {
-    // Ruptura + CD possui estoque -> ação interna "Abastecer via CD"
+    // 1. Ruptura real + CD possui estoque -> abastecer via CD
     if (estoqueCd > 0) {
       return {
         situacao: 'ruptura',
         acaoSugerida: `Abastecer via CD (${estoqueCd} un. disponíveis internamente)`,
         prioridade: curva === 'A' ? 'alta' : 'media',
         potencialEstimado,
-        justificativa: 'CD possui estoque disponível para suprir a loja imediatamente.',
+        justificativa: `Ruptura real confirmada (físico 0 e sistema ${sistemaVal}). CD possui estoque para suprir a loja imediatamente sem compra externa.`,
+        geraDemandaAbastecimento: true,
+        diagnosticoVerdade: 'Ruptura real com cobertura interna pronta no CD.',
       }
     }
 
-    // Ruptura + CD sem estoque + pedido em trânsito -> Acompanhar SLA
+    // 2. Ruptura real + pedido em trânsito -> Acompanhar SLA
     if (estoqueTransito) {
       return {
         situacao: 'pedido_aberto',
@@ -71,22 +134,28 @@ export function calcularCascataMatch(params: {
         prioridade: curva === 'A' ? 'alta' : 'media',
         potencialEstimado,
         justificativa:
-          'Carga em trânsito identificada. Evitar duplicidade de pedido ao fornecedor.',
+          'Ruptura real confirmada, porém já há pedido faturado/em trânsito. Acompanhar SLA para evitar pedido duplicado.',
+        geraDemandaAbastecimento: false,
+        diagnosticoVerdade: 'Ruptura em atendimento — carga já despachada pelo fornecedor/CD.',
       }
     }
 
-    // Ruptura + CD sem estoque + sem pedido -> Fornecedor só agora
+    // 3. Ruptura real + sem CD + sem trânsito -> Demanda ao fornecedor
     return {
       situacao: 'ruptura',
       acaoSugerida: 'Não existe cobertura interna. Gerar demanda para fornecedor',
       prioridade: curva === 'A' ? 'alta' : curva === 'B' ? 'alta' : 'media',
       potencialEstimado,
       justificativa:
-        'Solução não encontrada dentro de casa (CD zerado e sem trânsito). Acionamento de compra necessário.',
+        'Ruptura real confirmada sem cobertura interna (CD zerado e sem trânsito). Necessário acionar fornecedor.',
+      geraDemandaAbastecimento: true,
+      diagnosticoVerdade: 'Ruptura real desprovida de qualquer cobertura interna.',
     }
   }
 
-  // 2. Risco de ruptura: estoque da loja abaixo do crítico ou cobertura < lead time
+  // =========================================================================
+  // DEMAIS CENÁRIOS: Risco de ruptura, excesso ou regular
+  // =========================================================================
   const coberturaDias = vendaMediaDiaria > 0 ? estoqueLoja / vendaMediaDiaria : 999
   const abaixoDoCritico = estoqueLoja <= estoqueCriticoParam || coberturaDias <= leadTime
 
@@ -98,6 +167,8 @@ export function calcularCascataMatch(params: {
         prioridade: curva === 'A' ? 'alta' : 'media',
         potencialEstimado: Math.round(potencialEstimado * 0.5 * 100) / 100,
         justificativa: 'Estoque da loja em faixa de alerta e o CD possui saldo de cobertura.',
+        geraDemandaAbastecimento: true,
+        diagnosticoVerdade: 'Risco iminente de ruptura com cobertura disponível no CD.',
       }
     }
 
@@ -108,6 +179,8 @@ export function calcularCascataMatch(params: {
         prioridade: 'media',
         potencialEstimado: Math.round(potencialEstimado * 0.3 * 100) / 100,
         justificativa: 'Atendimento já faturado ou despachado cobrirá o consumo projetado.',
+        geraDemandaAbastecimento: false,
+        diagnosticoVerdade: 'Risco coberto por pedido já em trânsito.',
       }
     }
 
@@ -117,10 +190,12 @@ export function calcularCascataMatch(params: {
       prioridade: curva === 'A' ? 'media' : 'baixa',
       potencialEstimado: Math.round(potencialEstimado * 0.5 * 100) / 100,
       justificativa: 'Loja corre risco de romper e o CD não dispõe de estoque reserva.',
+      geraDemandaAbastecimento: true,
+      diagnosticoVerdade: 'Risco de ruptura sem saldo no CD — acionar fornecedor antecipadamente.',
     }
   }
 
-  // 3. Estoque excessivo (mais de 45 dias de cobertura)
+  // Estoque excessivo (mais de 45 dias de cobertura)
   if (coberturaDias >= 45 && estoqueLoja > 30) {
     return {
       situacao: 'excesso_estoque',
@@ -128,16 +203,20 @@ export function calcularCascataMatch(params: {
       prioridade: 'baixa',
       potencialEstimado: 0,
       justificativa: `Cobertura estimada em ${Math.round(coberturaDias)} dias. Risco de capital parado.`,
+      geraDemandaAbastecimento: false,
+      diagnosticoVerdade: 'Sobrecarga de estoque em loja.',
     }
   }
 
-  // 4. Regular
+  // Regular
   return {
     situacao: 'oportunidade',
     acaoSugerida: 'Manter abastecimento regular conforme demanda do PDV',
     prioridade: 'baixa',
     potencialEstimado: 0,
     justificativa: 'Estoque atual suficiente para cobrir o lead time com folga operacional.',
+    geraDemandaAbastecimento: false,
+    diagnosticoVerdade: 'Estoque e giro equilibrados.',
   }
 }
 
@@ -200,6 +279,7 @@ export const matchService = {
     produtoDescricao: string
     curva: CurvaAbc
     estoqueLoja?: number
+    estoqueSistema?: number
     estoqueCd?: number
     estoqueTransito?: boolean
     previsaoEntregaTransito?: string
@@ -236,6 +316,8 @@ export const matchService = {
       produto_descricao: data.produtoDescricao.trim(),
       curva: data.curva,
       estoque_loja: data.estoqueLoja ?? 0,
+      estoque_sistema:
+        data.estoqueSistema !== undefined ? data.estoqueSistema : (data.estoqueLoja ?? 0),
       estoque_cd: data.estoqueCd ?? 0,
       estoque_transito: Boolean(data.estoqueTransito),
       previsao_entrega_transito: data.previsaoEntregaTransito || '',

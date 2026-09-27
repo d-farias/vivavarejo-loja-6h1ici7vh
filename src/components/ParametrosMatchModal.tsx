@@ -65,7 +65,7 @@ export function ParametrosMatchModal({
       onOpenChange(false)
       onSucesso()
     } catch (err) {
-      console.error('Erro ao salvar parâmetros match:', err)
+      console.error('Erro ao salvar parâmetros no Integração:', err)
       alert('Não foi possível salvar os parâmetros. Tente novamente.')
     } finally {
       setSalvando(false)
@@ -78,16 +78,16 @@ export function ParametrosMatchModal({
         <DialogHeader className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
-              Parametrização por Rede • VivaVarejo Match
+              Parametrização por Rede • VivaVarejo Integração
             </span>
           </div>
           <DialogTitle className="text-base font-bold text-[#1F2937] flex items-center gap-2">
             <Settings className="w-4 h-4 text-[#0F766E]" />
-            <span>Configurações & Parâmetros de SLA</span>
+            <span>Configurações & Parâmetros do Integração</span>
           </DialogTitle>
           <DialogDescription className="text-xs text-[#4B5563]">
-            Ajuste as regras de cálculo do motor em cascata, nível crítico de estoque e meta de SLA
-            em dias.
+            Ajuste as regras de cálculo do motor de integração, nível crítico de estoque e meta de
+            SLA em dias.
           </DialogDescription>
         </DialogHeader>
 
