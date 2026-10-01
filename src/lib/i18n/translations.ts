@@ -104,9 +104,6 @@ export const translations = {
       solve6Desc:
         'Padrão visual de gôndola, abertura e fechamento com fotos protegidas por tokens seguros.',
       modulesTag: 'Módulos Integrados',
-      modulesTitle: 'Tudo o que acontece no chão de loja, sob controle',
-      modulesDesc:
-        'Processos claros, execução acompanhada e evidências registradas no momento exato da ação.',
       mod1Title: 'Agenda & Meu Dia',
       mod1Desc:
         'Turno dividido em Faça agora, Depois e Em seguida, garantindo foco no que traz impacto financeiro imediato.',
@@ -534,9 +531,6 @@ export const translations = {
       solve6Desc:
         'Visual standards for displays, store opening, and closing secured by tokenized URLs.',
       modulesTag: 'Integrated Modules',
-      modulesTitle: 'Everything on the retail floor, fully controlled',
-      modulesDesc:
-        'Clear processes, tracked execution, and photo evidence recorded at the exact moment of action.',
       mod1Title: 'Schedule & My Day',
       mod1Desc:
         'Shift prioritized into Do Now, Later, and Next, ensuring focus on what creates immediate bottom-line impact.',

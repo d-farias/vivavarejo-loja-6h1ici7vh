@@ -457,14 +457,10 @@ export default function BemVindo() {
         {/* Módulos do Produto Real: Apresentação Prática em Grade */}
         <section className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5] border-b border-[#E5E7EB]">
           <div className="max-w-6xl mx-auto space-y-8">
-            <div className="text-center space-y-2 max-w-2xl mx-auto">
+            <div className="text-center max-w-2xl mx-auto">
               <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-xs font-semibold text-[#0F766E]">
                 {t.landing.modulesTag}
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
-                {t.landing.modulesTitle}
-              </h2>
-              <p className="text-xs sm:text-sm text-[#4B5563]">{t.landing.modulesDesc}</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
