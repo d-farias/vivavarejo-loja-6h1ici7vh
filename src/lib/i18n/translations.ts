@@ -38,7 +38,7 @@ export const translations = {
       offlineActive: 'Modo Offline Ativo',
       offlineDesc: 'Usando rotinas e visitas salvas no aparelho.',
       leadershipAccess: 'Acesso de Liderança',
-      tagline: 'Gestão que transforma prioridade em execução.',
+      tagline: 'Gestão que transforma prioridades em execução.',
       userMenu: 'Menu do usuário',
       openMenu: 'Abrir menu',
       closeMenu: 'Fechar menu',
@@ -68,7 +68,7 @@ export const translations = {
     },
     landing: {
       badgeHero: 'Execução para o Varejo Físico',
-      heroTitle: 'Gestão que transforma prioridade em execução.',
+      heroTitle: 'Gestão que transforma prioridades em execução.',
       heroQuote: '“Seu ERP mostra o que aconteceu. O VivaVarejo garante que seja feito.”',
       heroDescription:
         'Direcionamento diário da equipe, rotinas comprovadas com foto, prevenção de validade e controle de perdas sem burocracia de planilhas.',
@@ -174,7 +174,7 @@ export const translations = {
       funnelPromptStep1: 'Selecione PJ ou PF para continuar.',
       funnelPromptStep2: 'Escolha o segmento da sua loja para avançar.',
       funnelPromptReady: 'Perfil selecionado. Clique em Continuar.',
-      footerTagline: '• Gestão que transforma prioridade em execução.',
+      footerTagline: '• Gestão que transforma prioridades em execução.',
       footerAlreadyHaveAccount: 'Já tenho conta',
       footerTalkSpecialist: 'Falar com especialista',
       footerSignup: 'Cadastrar',
