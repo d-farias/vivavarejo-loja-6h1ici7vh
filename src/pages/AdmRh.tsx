@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button'
 import { StoreSelector } from '@/components/StoreSelector'
 import { useStore } from '@/context/StoreContext'
 import { useAuth } from '@/context/AuthContext'
+import { useI18n } from '@/lib/i18n/context'
 import { getUserProfileType } from '@/lib/perfil-utils'
 import { admRhService } from '@/services/admRh'
 import { NovaDemandaAdmRhModal } from '@/components/NovaDemandaAdmRhModal'
@@ -128,6 +129,7 @@ const PRIORIDADE_LABELS: Record<PrioridadeAdmRh, { label: string; badgeCls: stri
 export default function AdmRhPage() {
   const { user } = useAuth()
   const { lojaSelecionadaId, lojas } = useStore()
+  const { t } = useI18n()
 
   // Perfil: Rede vs Gerente
   const profileType = getUserProfileType(user)
@@ -284,7 +286,7 @@ export default function AdmRhPage() {
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F2937]">
-              Adm / RH
+              {t.admRh.title}
             </h1>
             <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
               {isModeloGerente ? 'Modelo Gerente (Loja)' : 'Modelo ADM de Rede (Multi-lojas)'}
@@ -292,9 +294,7 @@ export default function AdmRhPage() {
             <SegmentoAtivoBadge onTrocarSegmento={() => setSeletorSegmentoOpen(true)} />
           </div>
           <p className="text-xs sm:text-sm text-[#4B5563] mt-0.5">
-            {isModeloGerente
-              ? 'Envio de demandas com foto da loja para as áreas centrais (RH, DP, ADM, Financeiro e Fiscal) e acompanhamento do tratamento.'
-              : 'Gestão integrada de demandas corporativas de todas as lojas da rede com triagem, atribuição e resposta centralizada.'}
+            {isModeloGerente ? t.admRh.managerSubtitle : t.admRh.chainSubtitle}
           </p>
         </div>
 
@@ -308,7 +308,7 @@ export default function AdmRhPage() {
             className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold gap-1.5 shadow-2xs"
           >
             <Plus className="w-4 h-4" />
-            <span>Nova Demanda</span>
+            <span>{t.admRh.btnNewDemand}</span>
           </Button>
         </div>
       </div>

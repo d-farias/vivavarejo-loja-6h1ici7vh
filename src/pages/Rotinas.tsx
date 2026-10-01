@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useStore } from '@/context/StoreContext'
+import { useI18n } from '@/lib/i18n/context'
 import { rotinasService, execucoesService, getTodayDateString } from '@/services/rotinas'
 import type { Rotina, ExecucaoRotina } from '@/types'
 import { getHorarioStatus } from '@/lib/time-utils'
@@ -49,6 +50,7 @@ import {
 export default function Rotinas() {
   const { user } = useAuth()
   const { lojaSelecionadaId, lojaSelecionada, lojas } = useStore()
+  const { t } = useI18n()
   const perfil = user?.perfil || (user?.email === 'dfarias53@gmail.com' ? 'admin' : 'lider')
   const podeGerenciar = perfil === 'admin' || perfil === 'adm_rede' || perfil === 'lider'
 
@@ -634,15 +636,11 @@ export default function Rotinas() {
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-2xl sm:text-3xl font-bold text-[#1F2937] tracking-tight">
-              Rotinas Operacionais
+              {t.rotinas.title}
             </h1>
             <SegmentoAtivoBadge onTrocarSegmento={() => setSeletorSegmentoOpen(true)} />
           </div>
-          <p className="text-sm text-[#6B7280] mt-1">
-            {lojaSelecionada
-              ? `Acompanhamento e catálogo de rotinas ativas para ${lojaSelecionada.nome}.`
-              : 'Gestão operacional de rotinas da loja. Cadastre, edite, exclua ou importe planilhas.'}
-          </p>
+          <p className="text-sm text-[#6B7280] mt-1">{t.rotinas.subtitle}</p>
         </div>
 
         {/* Action Buttons: Seletor de Loja + Importar Planilha + Nova Rotina */}
@@ -656,7 +654,7 @@ export default function Rotinas() {
                 className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-md shadow-xs transition-colors"
               >
                 <FileSpreadsheet className="w-4 h-4 text-[#0F766E]" />
-                <span>Importar Planilha</span>
+                <span>{t.rotinas.btnImportSpreadsheet}</span>
               </button>
 
               <button
@@ -667,7 +665,7 @@ export default function Rotinas() {
                 className="inline-flex items-center gap-2 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                <span>Nova Rotina</span>
+                <span>{t.rotinas.btnNewRoutine}</span>
               </button>
             </>
           )}

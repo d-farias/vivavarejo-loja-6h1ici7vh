@@ -324,15 +324,13 @@ export default function BemVindo() {
                 {t.landing.heroDescription}
               </p>
 
-              {/* Destaque de personalização sob medida: nós configuramos */}
-              <div className="pt-1.5 flex justify-center">
-                <div className="inline-flex items-start sm:items-center gap-2.5 text-left sm:text-center text-xs sm:text-sm text-[#1F2937] bg-white/70 border border-[#E5E7EB] border-l-4 border-l-[#0F766E] rounded-r-lg rounded-l-xs px-3.5 py-2.5 max-w-2xl shadow-2xs">
-                  <p className="leading-snug">
-                    <span className="font-semibold text-[#1F2937]">
-                      {t.landing.customizationTitle}
-                    </span>{' '}
-                    <span className="text-[#4B5563]">{t.landing.customizationDesc}</span>
-                  </p>
+              {/* Destaque de implantação rápida */}
+              <div className="pt-1 flex justify-center">
+                <div className="inline-flex items-center gap-2 text-xs sm:text-sm text-[#1F2937] bg-white/80 border border-[#E5E7EB] rounded-lg px-3.5 py-2 max-w-xl shadow-2xs">
+                  <span className="font-semibold text-[#0F766E]">
+                    {t.landing.customizationTitle}:
+                  </span>
+                  <span className="text-[#4B5563]">{t.landing.customizationDesc}</span>
                 </div>
               </div>
             </div>
@@ -379,8 +377,85 @@ export default function BemVindo() {
           </div>
         </section>
 
-        {/* Módulos do Produto Real: Apresentação Prática em Grade */}
+        {/* Nova Seção Objetiva: O QUE RESOLVE? */}
         <section className="py-12 sm:py-16 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]">
+          <div className="max-w-5xl mx-auto space-y-8">
+            <div className="text-center space-y-2 max-w-2xl mx-auto">
+              <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-xs font-semibold text-[#0F766E]">
+                {t.landing.whatItSolvesTag}
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
+                {t.landing.whatItSolvesTitle}
+              </h2>
+              <p className="text-xs sm:text-sm text-[#4B5563]">{t.landing.whatItSolvesDesc}</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-teal-100/60 text-[#0F766E] flex items-center justify-center">
+                    <CheckCircle2 className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-xs font-bold text-[#1F2937]">{t.landing.solve1Title}</h3>
+                </div>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.solve1Desc}</p>
+              </div>
+
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-teal-100/60 text-[#0F766E] flex items-center justify-center">
+                    <BadgeAlert className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-xs font-bold text-[#1F2937]">{t.landing.solve2Title}</h3>
+                </div>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.solve2Desc}</p>
+              </div>
+
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-teal-100/60 text-[#0F766E] flex items-center justify-center">
+                    <TrendingUp className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-xs font-bold text-[#1F2937]">{t.landing.solve3Title}</h3>
+                </div>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.solve3Desc}</p>
+              </div>
+
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-teal-100/60 text-[#0F766E] flex items-center justify-center">
+                    <GitBranch className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-xs font-bold text-[#1F2937]">{t.landing.solve4Title}</h3>
+                </div>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.solve4Desc}</p>
+              </div>
+
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-teal-100/60 text-[#0F766E] flex items-center justify-center">
+                    <Building2 className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-xs font-bold text-[#1F2937]">{t.landing.solve5Title}</h3>
+                </div>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.solve5Desc}</p>
+              </div>
+
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-teal-100/60 text-[#0F766E] flex items-center justify-center">
+                    <Camera className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-xs font-bold text-[#1F2937]">{t.landing.solve6Title}</h3>
+                </div>
+                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.solve6Desc}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Módulos do Produto Real: Apresentação Prática em Grade */}
+        <section className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5] border-b border-[#E5E7EB]">
           <div className="max-w-6xl mx-auto space-y-8">
             <div className="text-center space-y-2 max-w-2xl mx-auto">
               <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-xs font-semibold text-[#0F766E]">
@@ -467,7 +542,7 @@ export default function BemVindo() {
         </section>
 
         {/* Destaque Comercial: Inteligência de Gôndola e ERP */}
-        <section className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5] border-b border-[#E5E7EB]">
+        <section className="py-12 sm:py-16 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]">
           <div className="max-w-5xl mx-auto space-y-6">
             <div className="space-y-2 text-center max-w-2xl mx-auto">
               <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white border border-[#E5E7EB] text-xs font-semibold text-[#0F766E]">

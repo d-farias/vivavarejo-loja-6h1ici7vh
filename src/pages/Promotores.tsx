@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useStore } from '@/context/StoreContext'
+import { useI18n } from '@/lib/i18n/context'
 import { StoreSelector } from '@/components/StoreSelector'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PromotoresFornecedoresManager } from '@/components/PromotoresFornecedoresManager'
@@ -17,6 +18,7 @@ import { Handshake, AlertTriangle, CheckCircle2, X } from 'lucide-react'
 export default function PromotoresPage() {
   const { user } = useAuth()
   const { lojas, lojaSelecionadaId } = useStore()
+  const { t } = useI18n()
 
   const [visitas, setVisitas] = useState<VisitaPromotor[]>([])
   const [promotores, setPromotores] = useState<Promotor[]>([])
@@ -115,16 +117,13 @@ export default function PromotoresPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F2937]">
-              Promotores & Fornecedores
+              {t.promotores.title}
             </h1>
             <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-teal-50 text-[#0F766E] border border-teal-200">
-              Operação de Loja
+              {t.promotores.badgeStoreOp}
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">
-            Gestão de visitas, representantes de marcas e rotinas de abastecimento e auditoria em
-            loja
-          </p>
+          <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">{t.promotores.subtitle}</p>
         </div>
 
         <div className="flex items-center gap-3">

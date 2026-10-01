@@ -41,6 +41,7 @@ import { AbastecimentoMatchSecao } from '@/components/AbastecimentoMatchSecao'
 import { fornecedoresService } from '@/services/fornecedores'
 import { isPerfilGerente, isPerfilRede, isGestorGeralUser } from '@/lib/perfil-utils'
 import { useAuth } from '@/context/AuthContext'
+import { useI18n } from '@/lib/i18n/context'
 import type {
   ComercialProduto,
   ComercialCategoria,
@@ -67,6 +68,7 @@ export type SecaoComercialId = AbaComercial
 export default function ComercialPage() {
   const { user } = useAuth()
   const { lojaSelecionadaId, lojas } = useStore()
+  const { t } = useI18n()
 
   // Identificação de perfis
   const isGerente = isPerfilGerente(user)
@@ -494,12 +496,12 @@ export default function ComercialPage() {
           </div>
           <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937] tracking-tight mt-1 flex items-center gap-2.5">
             <TrendingUp className="w-6 h-6 text-[#0F766E]" />
-            <span>Comercial & Negociações</span>
+            <span>{t.comercial.title}</span>
           </h1>
           <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">
             {isDfarias && visaoComercial === 'match'
               ? 'VivaVarejo Integração: conexão Loja, CD, Abastecimento e Fornecedor com diagnóstico prévio e decisão em cascata.'
-              : 'Sortimento, vendas, curvas A/B/C+, margens, layout, rebaixas e sincronização ERP.'}
+              : t.comercial.subtitle}
           </p>
         </div>
 
@@ -524,7 +526,7 @@ export default function ComercialPage() {
                 className="bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-xl gap-1.5 shadow-xs"
               >
                 <UploadCloud className="w-4 h-4" />
-                <span>Importar Planilha</span>
+                <span>{t.comercial.btnImportData}</span>
               </Button>
             </>
           )}

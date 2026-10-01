@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useStore } from '@/context/StoreContext'
+import { useI18n } from '@/lib/i18n/context'
 import { rotinasService, execucoesService, getTodayDateString } from '@/services/rotinas'
 import { visitasPromotorService, rotinasPromotorService } from '@/services/visitasPromotor'
 import { planosAcaoService } from '@/services/planosAcao'
@@ -41,6 +42,7 @@ export function AgendaPage() {
 export default function AgendaDefault() {
   const { user } = useAuth()
   const { lojaSelecionadaId } = useStore()
+  const { t } = useI18n()
 
   // Data atual da visualização da Agenda (padrão hoje)
   const [currentDateStr, setCurrentDateStr] = useState<string>(() => getTodayDateString())
@@ -370,14 +372,11 @@ export default function AgendaDefault() {
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F2937]">
-              Agenda Operacional do Dia
+              {t.agenda.title}
             </h1>
             <SegmentoAtivoBadge onTrocarSegmento={() => setSeletorSegmentoOpen(true)} />
           </div>
-          <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">
-            Ordem cronológica das rotinas, horários limite, visitas de promotores e planos de ação
-            da loja.
-          </p>
+          <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">{t.agenda.subtitle}</p>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
@@ -392,11 +391,10 @@ export default function AgendaDefault() {
           <button
             onClick={() => handleMudarDia(-1)}
             className="p-2 rounded-xl border border-[#E5E7EB] hover:bg-gray-100 text-[#1F2937] transition-colors"
-            title="Dia anterior"
+            title={t.agenda.prevDay}
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-
           <div className="flex items-center gap-2.5 px-3 py-1.5 bg-[#F7F7F5] rounded-xl border border-[#E5E7EB]">
             <CalendarIcon className="w-4 h-4 text-[#0F766E]" />
             <div>
@@ -411,23 +409,21 @@ export default function AgendaDefault() {
               <div className="text-[11px] text-[#4B5563]">{dataInfo.formatted}</div>
             </div>
           </div>
-
           <button
             onClick={() => handleMudarDia(1)}
             className="p-2 rounded-xl border border-[#E5E7EB] hover:bg-gray-100 text-[#1F2937] transition-colors"
-            title="Dia seguinte"
+            title={t.agenda.nextDay}
           >
             <ChevronRight className="w-4 h-4" />
           </button>
-
           {!isToday && (
             <button
               onClick={handleIrParaHoje}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#0F766E] border border-teal-200 hover:bg-teal-50 transition-colors"
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#0F766E] border border-teal-200 hover:bg-teal-50 transition-colors ml-1"
             >
-              Voltar para Hoje
+              {t.agenda.backToToday}
             </button>
-          )}
+          )}{' '}
         </div>
 
         {/* Input direto de data */}

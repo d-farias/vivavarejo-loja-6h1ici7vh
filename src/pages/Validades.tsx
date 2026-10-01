@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { useStore } from '@/context/StoreContext'
 import { useAuth } from '@/context/AuthContext'
+import { useI18n } from '@/lib/i18n/context'
 import { normalizarNomeCanonico, getChaveCanonico } from '@/lib/cargos'
 import { StoreSelector } from '@/components/StoreSelector'
 import { ImportarValidadeModal } from '@/components/ImportarValidadeModal'
@@ -36,6 +37,7 @@ import type { TarefaValidade, StatusTarefaValidade } from '@/types'
 export default function ValidadesPage() {
   const { lojas, lojaSelecionada, lojaSelecionadaId } = useStore()
   const { user } = useAuth()
+  const { t } = useI18n()
 
   // Data atual de visualização (padrão: hoje no fuso local)
   const [dataVisualizacao, setDataVisualizacao] = useState<string>(() => {
@@ -272,16 +274,13 @@ export default function ValidadesPage() {
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F2937]">
-              Validade × Calendário
+              {t.validades.title}
             </h1>
             <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-50 text-[#0F766E] border border-teal-200">
-              Cronograma Operacional
+              {t.validades.badgeCronograma}
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">
-            Cronograma diário de auditoria de validades por setor/categoria com alerta de 1h antes e
-            validação pelo Líder Prevenção.
-          </p>
+          <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">{t.validades.subtitle}</p>
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
@@ -295,7 +294,7 @@ export default function ValidadesPage() {
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-md shadow-2xs transition-colors"
               >
                 <FileSpreadsheet className="w-4 h-4 text-[#0F766E]" />
-                <span>Importar Cronograma</span>
+                <span>{t.validades.btnImportSchedule}</span>
               </button>
 
               <button
@@ -307,7 +306,7 @@ export default function ValidadesPage() {
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-md shadow-2xs transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                <span>Nova Tarefa</span>
+                <span>{t.validades.btnNewTask}</span>
               </button>
             </>
           )}
@@ -359,14 +358,14 @@ export default function ValidadesPage() {
               onClick={handleIrParaHoje}
               className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[#0F766E] border border-teal-200 hover:bg-teal-50 transition-colors"
             >
-              Voltar para Hoje
+              {t.validades.backToToday}
             </button>
           )}
         </div>
 
         {/* Input direto de data */}
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <span className="text-xs text-[#6B7280]">Ir para data:</span>
+          <span className="text-xs text-[#6B7280]">{t.validades.goToDate}</span>
           <input
             type="date"
             value={dataVisualizacao}

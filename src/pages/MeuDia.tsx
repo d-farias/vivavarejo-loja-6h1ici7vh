@@ -673,7 +673,8 @@ export function MeuDiaPage() {
                 <div className="p-3.5 rounded-2xl border border-amber-500/30 bg-amber-500/10">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300">
-                      Depois — Limite {tarefasClassificadas.depois.horario_limite || '10:30'}
+                      {t.meuDia.depois} — Limite{' '}
+                      {tarefasClassificadas.depois.horario_limite || '10:30'}
                     </span>
                     <button
                       type="button"
@@ -694,7 +695,8 @@ export function MeuDiaPage() {
                 <div className="p-3.5 rounded-2xl border border-[#E5E7EB] bg-white">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B7280]">
-                      Em seguida — Limite {tarefasClassificadas.emSeguida.horario_limite || '11:00'}
+                      {t.meuDia.emSeguida} — Limite{' '}
+                      {tarefasClassificadas.emSeguida.horario_limite || '11:00'}
                     </span>
                     <button
                       type="button"
@@ -742,7 +744,7 @@ export function MeuDiaPage() {
                     : 'text-[#4B5563]'
                 }`}
               >
-                Pendentes ({pendentesCount})
+                {t.meuDia.filtroPendentes} ({pendentesCount})
               </button>
               <button
                 type="button"
@@ -753,7 +755,7 @@ export function MeuDiaPage() {
                     : 'text-[#4B5563]'
                 }`}
               >
-                Concluídas ({concluidasCount})
+                {t.meuDia.filtroConcluidas} ({concluidasCount})
               </button>
               <button
                 type="button"
@@ -764,7 +766,7 @@ export function MeuDiaPage() {
                     : 'text-[#4B5563]'
                 }`}
               >
-                Todas
+                {t.meuDia.filtroTodos}
               </button>
             </div>
           </div>

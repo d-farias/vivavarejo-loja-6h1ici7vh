@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useStore } from '@/context/StoreContext'
+import { useI18n } from '@/lib/i18n/context'
 import { normalizarNomeCanonico, getChaveCanonico } from '@/lib/cargos'
 import { perdasService } from '@/services/perdas'
 import { inventariosService } from '@/services/inventarios'
@@ -36,6 +37,7 @@ import {
 export default function PerdasPage() {
   const { user } = useAuth()
   const { lojaSelecionadaId, lojaSelecionada } = useStore()
+  const { t } = useI18n()
 
   const perfil = user?.perfil || (user?.email === 'dfarias53@gmail.com' ? 'admin' : 'lider')
   const isAdminGeral = perfil === 'admin'
@@ -440,13 +442,10 @@ export default function PerdasPage() {
           </div>
           <h1 className="text-xl sm:text-2xl font-bold text-[#1F2937] tracking-tight mt-1 flex items-center gap-2.5">
             <ShieldAlert className="w-6 h-6 text-[#0F766E]" />
-            <span>Painel de Perdas & Inventário</span>
+            <span>{t.perdas.title}</span>
           </h1>
-          <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">
-            Cruzamento inteligente de quebras com rotinas de validade não realizadas no prazo
-          </p>
+          <p className="text-xs sm:text-sm text-[#6B7280] mt-0.5">{t.perdas.subtitle}</p>
         </div>
-
         {/* Botões de Ação Rápida */}
         <div className="flex items-center gap-2 flex-wrap">
           <button
@@ -456,7 +455,7 @@ export default function PerdasPage() {
             title="Exportar planilha de perdas e quebras em formato CSV"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Exportar CSV</span>
+            <span>{t.perdas.btnExportCsv}</span>
           </button>
 
           <button
@@ -464,10 +463,10 @@ export default function PerdasPage() {
               setSetorPreSelecionado('')
               setRegistroInventarioOpen(true)
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#0F766E] text-[#0F766E] hover:bg-teal-50 text-xs font-semibold rounded-lg shadow-2xs transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#0F766E] text-[#0F766E] hover:bg-teal-50 text-xs font-semibold rounded-lg shadow-2xs transition-colors"
           >
             <ClipboardCheck className="w-3.5 h-3.5" />
-            <span>Contagem de Inventário</span>
+            <span>{t.perdas.btnRegisterInventory}</span>
           </button>
 
           <button
@@ -475,12 +474,12 @@ export default function PerdasPage() {
               setSetorPreSelecionado('')
               setRegistroPerdaOpen(true)
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors"
           >
             <Plus className="w-4 h-4" />
-            <span>Registrar Perda (2 toques)</span>
+            <span>{t.perdas.btnRegisterLoss}</span>
           </button>
-        </div>
+        </div>{' '}
       </div>
 
       {/* Barra de Filtros */}
@@ -496,7 +495,7 @@ export default function PerdasPage() {
                   : 'text-[#6B7280] hover:text-[#1F2937]'
               }`}
             >
-              Últimos 7 dias
+              {t.perdas.period7Days}
             </button>
             <button
               onClick={() => setFiltroPeriodo('30')}
@@ -506,7 +505,7 @@ export default function PerdasPage() {
                   : 'text-[#6B7280] hover:text-[#1F2937]'
               }`}
             >
-              Últimos 30 dias
+              {t.perdas.period30Days}
             </button>
             <button
               onClick={() => setFiltroPeriodo('90')}
@@ -516,7 +515,7 @@ export default function PerdasPage() {
                   : 'text-[#6B7280] hover:text-[#1F2937]'
               }`}
             >
-              Últimos 90 dias
+              {t.perdas.period90Days}
             </button>
             <button
               onClick={() => setFiltroPeriodo('tudo')}
@@ -526,7 +525,7 @@ export default function PerdasPage() {
                   : 'text-[#6B7280] hover:text-[#1F2937]'
               }`}
             >
-              Tudo
+              {t.perdas.periodAll}
             </button>
           </div>
 
