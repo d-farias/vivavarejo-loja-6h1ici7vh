@@ -124,10 +124,6 @@ export const translations = {
       mod6Desc:
         'Transformação imediata de inconformidades em ações com prazo, responsável e causa-raiz definida.',
       crossIndustryNote: 'A mesma lógica funciona em escritórios, serviços e operações técnicas.',
-      ctaFinalTitle:
-        'Sua empresa sabe o que precisa fazer. A VivaVarejo ajuda a acompanhar até acontecer.',
-      ctaFinalParagraph: 'Cada prioridade com responsável, prazo e comprovante de execução.',
-      btnCtaFinal: 'QUERO CONHECER A VIVAVAREJO',
       funnelTag: 'Perfil de Atuação',
       funnelStep1Label: 'Passo 1 de 2',
       funnelStep2Label: 'Passo 2 de 2',
@@ -529,10 +525,6 @@ export const translations = {
       mod6Desc:
         'Turn issues into concrete corrective plans with owners, deadlines, and root causes.',
       crossIndustryNote: 'The same logic works for offices, services and technical operations.',
-      ctaFinalTitle:
-        'Your company knows what needs to be done. VivaVarejo helps you follow through.',
-      ctaFinalParagraph: 'Every priority with an owner, a deadline and proof of execution.',
-      btnCtaFinal: 'I WANT TO KNOW VIVAVAREJO',
       funnelTag: 'Business Profile',
       funnelStep1Label: 'Step 1 of 2',
       funnelStep2Label: 'Step 2 of 2',

@@ -609,30 +609,6 @@ export default function BemVindo() {
           </div>
         </section>
 
-        {/* 6. CHAMADA FINAL ENXUTA (sem promessas falsas de colaboração em tempo real) */}
-        {!isGestorGeral && (
-          <section className="py-12 sm:py-16 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]">
-            <div className="max-w-3xl mx-auto text-center space-y-5">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight leading-tight">
-                {t.landing.ctaFinalTitle}
-              </h2>
-              <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed">
-                {t.landing.ctaFinalParagraph}
-              </p>
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={handleScrollToInterest}
-                  className="px-6 py-3.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold text-xs sm:text-sm tracking-wide uppercase rounded-xl shadow-xs transition-all hover:scale-[1.02] inline-flex items-center justify-center gap-2"
-                >
-                  <span>{t.landing.btnCtaFinal}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* 7. Funil de interesse em 2 passos: PF/PJ e Segmento (ocultado para o Gestor Geral) */}
         {!isGestorGeral && (
           <section id="opcao-interesse" className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5]">
