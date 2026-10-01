@@ -125,11 +125,6 @@ export const translations = {
       mod6Title: 'Planos de Ação 5W2H',
       mod6Desc:
         'Transformação imediata de inconformidades em ações com prazo, responsável e causa-raiz definida.',
-      diffBadge: 'Diferencial Exclusivo',
-      diffHeader: 'VivaVarejo Integração • Loja, CD, Abastecimento e Fornecedor',
-      diffTitle: 'Cruza físico × sistema × venda, aponta a causa real e aciona quem pode resolver',
-      diffDesc:
-        'Distingue divergência física, item sem giro ou ruptura real. Verifica saldo no CD e pedidos em trânsito antes de gerar demanda para fornecedores.',
       comTag: 'Inteligência Comercial',
       comTitle: 'Da planilha ao chão de loja',
       comDesc:
@@ -556,12 +551,6 @@ export const translations = {
       mod6Title: '5W2H Action Plans',
       mod6Desc:
         'Turn issues into concrete corrective plans with owners, deadlines, and root causes.',
-      diffBadge: 'Exclusive Advantage',
-      diffHeader: 'VivaVarejo Integration • Store, DC, Replenishment, and Vendor',
-      diffTitle:
-        'Cross-checks physical × system × sales, pinpoints the root cause, and alerts who can act',
-      diffDesc:
-        'Distinguishes physical shrink, slow-movers, or genuine out-of-stock. Checks DC stock and purchase orders in transit before alerting vendors.',
       comTag: 'Commercial Intelligence',
       comTitle: 'From spreadsheet to store floor',
       comDesc:

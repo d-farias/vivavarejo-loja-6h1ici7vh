@@ -522,22 +522,6 @@ export default function BemVindo() {
                 <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.mod6Desc}</p>
               </div>
             </div>
-
-            {/* Destaque VivaVarejo Integração na Seção de Módulos */}
-            <div className="mt-4 p-5 rounded-2xl bg-gradient-to-r from-teal-50 via-white to-gray-50 border border-teal-200 shadow-2xs space-y-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-[#0F766E] text-white">
-                  {t.landing.diffBadge}
-                </span>
-                <span className="text-xs font-bold text-[#0F766E]">{t.landing.diffHeader}</span>
-              </div>
-              <h3 className="text-sm sm:text-base font-bold text-[#1F2937]">
-                {t.landing.diffTitle}
-              </h3>
-              <p className="text-xs text-[#4B5563] leading-relaxed max-w-3xl">
-                {t.landing.diffDesc}
-              </p>
-            </div>
           </div>
         </section>
 
@@ -1060,7 +1044,6 @@ export default function BemVindo() {
                 {APP_VERSION_LABEL}
               </span>
             </div>
-            <span>{t.common.tagline}</span>
           </div>
         </div>
       </footer>
