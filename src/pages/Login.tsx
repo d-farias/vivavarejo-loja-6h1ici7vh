@@ -73,9 +73,8 @@ export default function Login() {
       } else {
         sessionStorage.removeItem('vivavarejo_gestor_logado')
         triggerQuickAccessHub()
-        // Notifica analytics do usuário autenticado (demo, cliente externo ou líder)
-        analyticsService.registrarVisita({
-          pagina: '/login',
+        // Notifica analytics do login concluído (destaque de evento de login com perfil e origem)
+        analyticsService.registrarLoginSucesso({
           userEmail: loggedUser.email,
           userName: loggedUser.name,
           userPerfil: loggedUser.perfil,

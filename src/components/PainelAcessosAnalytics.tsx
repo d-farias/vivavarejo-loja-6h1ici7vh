@@ -17,6 +17,9 @@ import {
   Search,
   Sparkles,
   FileText,
+  LogIn,
+  Building2,
+  Compass,
 } from 'lucide-react'
 import { analyticsService, isDemoEmail } from '@/services/analyticsService'
 import type { ResumoAnalytics } from '@/types'
@@ -352,6 +355,204 @@ export const PainelAcessosAnalytics: React.FC = () => {
         ) : (
           <div className="h-40 flex items-center justify-center text-xs text-[#6B7280]">
             Nenhum acesso registrado neste período ainda.
+          </div>
+        )}
+      </div>
+
+      {/* NOVO BLOCO: Logins Recentes no Período (Destaque claro de QUEM fez login, perfil e origem) */}
+      <div className="bg-white border border-[#E5E7EB] rounded-xl shadow-2xs overflow-hidden">
+        <div className="p-4 sm:p-5 border-b border-[#E5E7EB] flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-gradient-to-r from-teal-50/40 via-white to-transparent">
+          <div>
+            <h3 className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
+              <span className="w-6 h-6 rounded-md bg-[#0F766E] text-white flex items-center justify-center">
+                <LogIn className="w-3.5 h-3.5" />
+              </span>
+              <span>Logins Recentes no Sistema</span>
+              {resumo?.loginsRecentes && (
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-teal-100 text-[#0F766E]">
+                  {resumo.loginsRecentes.length}{' '}
+                  {resumo.loginsRecentes.length === 1 ? 'login' : 'logins'}
+                </span>
+              )}
+            </h3>
+            <p className="text-xs text-[#6B7280] mt-0.5">
+              Identificação de usuários autenticados: nome, e-mail, perfil de acesso (CNPJ / CPF /
+              Demo), data/hora e origem prévia (utm_source)
+            </p>
+          </div>
+          <div className="text-[11px] text-[#6B7280] flex items-center gap-3">
+            <span className="inline-flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-blue-600 inline-block" />
+              CNPJ (Rede)
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block" />
+              CPF (Gerente)
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+              Demo
+            </span>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="py-10 text-center text-xs text-[#6B7280]">
+            <RefreshCw className="w-4 h-4 animate-spin text-[#0F766E] mx-auto mb-2" />
+            Carregando eventos de login...
+          </div>
+        ) : !resumo?.loginsRecentes || resumo.loginsRecentes.length === 0 ? (
+          <div className="py-10 text-center text-xs text-[#6B7280] space-y-1">
+            <UserCheck className="w-8 h-8 text-gray-300 mx-auto" />
+            <p className="font-medium text-[#374151]">
+              Nenhum login registrado no período selecionado.
+            </p>
+            <p className="text-[11px] text-[#9CA3AF]">
+              Logins de contas de teste/demo e de parceiros externos aparecem aqui automaticamente.
+              Acessos do gestor geral Dfarias são excluídos.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="bg-[#F9FAFB] border-b border-[#E5E7EB] text-[#4B5563]">
+                  <th className="py-2.5 px-4 font-semibold whitespace-nowrap">Data / Hora</th>
+                  <th className="py-2.5 px-4 font-semibold whitespace-nowrap">
+                    Usuário (Nome & E-mail)
+                  </th>
+                  <th className="py-2.5 px-4 font-semibold whitespace-nowrap">Perfil de Acesso</th>
+                  <th className="py-2.5 px-4 font-semibold whitespace-nowrap">
+                    Origem Anterior (UTM)
+                  </th>
+                  <th className="py-2.5 px-4 font-semibold whitespace-nowrap">Local (Cidade/UF)</th>
+                  <th className="py-2.5 px-4 font-semibold text-center whitespace-nowrap">
+                    Aparelho
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E5E7EB]">
+                {resumo.loginsRecentes.map((item) => {
+                  const dataFormatada = item.created
+                    ? new Date(item.created.replace(' ', 'T')).toLocaleString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
+                    : '-'
+
+                  const badgePerfil = (() => {
+                    if (item.isDemo) {
+                      return (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-300">
+                          <Sparkles className="w-2.5 h-2.5 text-amber-600" />
+                          Demo
+                        </span>
+                      )
+                    }
+                    if (item.tipoPerfil === 'cnpj') {
+                      return (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-900 border border-blue-200">
+                          <Building2 className="w-2.5 h-2.5 text-blue-600" />
+                          Rede / CNPJ
+                        </span>
+                      )
+                    }
+                    if (item.tipoPerfil === 'cpf') {
+                      return (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-900 border border-emerald-200">
+                          <UserCheck className="w-2.5 h-2.5 text-emerald-600" />
+                          Gerente / CPF
+                        </span>
+                      )
+                    }
+                    return (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-[#374151] border border-gray-200">
+                        {item.userPerfil || 'Identificado'}
+                      </span>
+                    )
+                  })()
+
+                  return (
+                    <tr key={item.id} className="hover:bg-[#F9FAFB] transition-colors">
+                      {/* Data / Hora */}
+                      <td className="py-2.5 px-4 font-mono text-[11px] text-[#6B7280] whitespace-nowrap">
+                        {dataFormatada}
+                      </td>
+
+                      {/* Usuário */}
+                      <td className="py-2.5 px-4 whitespace-nowrap">
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-[#1F2937] leading-tight">
+                            {item.userNome || item.userEmail}
+                          </span>
+                          <span className="text-[10px] font-mono text-[#6B7280]">
+                            {item.userEmail}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Perfil */}
+                      <td className="py-2.5 px-4 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5">
+                          {badgePerfil}
+                          {item.userPerfil && (
+                            <span className="text-[10px] text-[#6B7280]">({item.userPerfil})</span>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Origem / UTM */}
+                      <td className="py-2.5 px-4 whitespace-nowrap">
+                        {item.utm_source ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-teal-50 text-[#0F766E] border border-teal-200">
+                            <Compass className="w-3 h-3 text-[#0F766E]" />
+                            utm: {item.utm_source}
+                          </span>
+                        ) : item.origem && item.origem !== 'direto' ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-gray-100 text-[#374151]">
+                            {item.origem}
+                          </span>
+                        ) : (
+                          <span className="text-[#9CA3AF] text-[11px] italic">Acesso direto</span>
+                        )}
+                      </td>
+
+                      {/* Local */}
+                      <td className="py-2.5 px-4 whitespace-nowrap">
+                        {item.cidade || item.regiao ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                            <MapPin className="w-3 h-3 text-[#0F766E] shrink-0" />
+                            {item.cidade && item.regiao
+                              ? `${item.cidade} - ${item.regiao}`
+                              : item.cidade || item.regiao}
+                          </span>
+                        ) : (
+                          <span className="text-[#9CA3AF] text-[11px]">—</span>
+                        )}
+                      </td>
+
+                      {/* Aparelho */}
+                      <td className="py-2.5 px-4 text-center whitespace-nowrap">
+                        {item.dispositivo === 'mobile' ? (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-gray-100 text-[#4B5563]">
+                            <Smartphone className="w-3 h-3 text-[#0F766E]" />
+                            Mobile
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-gray-100 text-[#4B5563]">
+                            <Monitor className="w-3 h-3 text-[#4B5563]" />
+                            Desktop
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

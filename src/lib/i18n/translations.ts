@@ -38,7 +38,7 @@ export const translations = {
       offlineActive: 'Modo Offline Ativo',
       offlineDesc: 'Usando rotinas e visitas salvas no aparelho.',
       leadershipAccess: 'Acesso de Liderança',
-      tagline: 'Prioridades do dia definidas, acompanhadas e comprovadas na execução.',
+      tagline: 'Gestão que transforma prioridade em execução.',
       userMenu: 'Menu do usuário',
       openMenu: 'Abrir menu',
       closeMenu: 'Fechar menu',
@@ -68,7 +68,7 @@ export const translations = {
     },
     landing: {
       badgeHero: 'Execução para o Varejo Físico',
-      heroTitle: 'Prioridades do dia definidas, acompanhadas e comprovadas na execução.',
+      heroTitle: 'Gestão que transforma prioridade em execução.',
       heroQuote: '“Seu ERP mostra o que aconteceu. O sistema garante que seja feito.”',
       heroDescription:
         'Direcionamento de prioridades diárias, comprovação de rotinas com fotos, gestão de validades, visitas de promotores e sincronização de dados comerciais em uma só plataforma.',
@@ -156,7 +156,7 @@ export const translations = {
       funnelPromptStep1: 'Selecione PJ ou PF para continuar.',
       funnelPromptStep2: 'Escolha o segmento da sua loja para avançar.',
       funnelPromptReady: 'Perfil selecionado. Clique em Continuar.',
-      footerTagline: '• Prioridades do dia definidas, acompanhadas e comprovadas na execução.',
+      footerTagline: '• Gestão que transforma prioridade em execução.',
       footerAlreadyHaveAccount: 'Já tenho conta',
       footerTalkSpecialist: 'Falar com especialista',
       footerSignup: 'Cadastrar',
@@ -296,7 +296,7 @@ export const translations = {
       offlineActive: 'Offline Mode Active',
       offlineDesc: 'Using routines and visits cached on device.',
       leadershipAccess: 'Leadership Access',
-      tagline: 'Daily priorities defined, tracked, and proven in execution.',
+      tagline: 'Management that turns priority into execution.',
       userMenu: 'User menu',
       openMenu: 'Open menu',
       closeMenu: 'Close menu',
@@ -326,7 +326,7 @@ export const translations = {
     },
     landing: {
       badgeHero: 'Execution for Physical Retail',
-      heroTitle: 'Daily priorities defined, tracked, and proven in execution.',
+      heroTitle: 'Management that turns priority into execution.',
       heroQuote: '“Your ERP shows what happened. The system ensures it gets done.”',
       heroDescription:
         'Daily priority alignment, routine proof with photos, expiration management, merchandiser visits, and commercial data sync in a single platform.',
@@ -413,7 +413,7 @@ export const translations = {
       funnelPromptStep1: 'Select Corporate or Professional to continue.',
       funnelPromptStep2: 'Select your store industry to proceed.',
       funnelPromptReady: 'Profile selected. Click Continue.',
-      footerTagline: '• Daily priorities defined, tracked, and proven in execution.',
+      footerTagline: '• Management that turns priority into execution.',
       footerAlreadyHaveAccount: 'Already have an account',
       footerTalkSpecialist: 'Talk to a specialist',
       footerSignup: 'Sign Up',

@@ -864,6 +864,21 @@ export interface MatchConfiguracao extends RecordModel {
   updated: string
 }
 
+export interface LoginEventoAnalytics {
+  id: string
+  created: string
+  userEmail: string
+  userNome?: string
+  userPerfil?: string
+  tipoPerfil: 'cnpj' | 'cpf' | 'demo' | 'geral'
+  origem?: string
+  utm_source?: string
+  cidade?: string
+  regiao?: string
+  dispositivo?: 'mobile' | 'desktop'
+  isDemo: boolean
+}
+
 export interface VisitaAnalytics {
   id: string
   pagina: string
@@ -926,4 +941,5 @@ export interface ResumoAnalytics {
     desktop: number
   }
   visitasRecentes?: VisitaAnalytics[]
+  loginsRecentes?: LoginEventoAnalytics[]
 }

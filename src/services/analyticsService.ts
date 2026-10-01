@@ -1,5 +1,5 @@
 import pb from '@/lib/pocketbase/client'
-import type { VisitaAnalytics, ResumoAnalytics } from '@/types'
+import type { VisitaAnalytics, ResumoAnalytics, LoginEventoAnalytics } from '@/types'
 
 const SESSAO_STORAGE_KEY = 'vivavarejo_sessao_id'
 const DEBOUNCE_VISITA_KEY = 'vivavarejo_last_visita'
@@ -178,6 +178,9 @@ export interface RegistrarVisitaOptions {
   isAdmin?: boolean
   cadastrou?: boolean
   search?: string
+  isLogin?: boolean
+  origemOverride?: string
+  utmSourceOverride?: string
 }
 
 // Cache de geolocalização da sessão (1 consulta por sessão, fallback silencioso)
@@ -308,10 +311,27 @@ export const analyticsService = {
 
       const sessaoId = getOrCreateSessionId()
       const dispositivo = detectarDispositivo()
-      const { origem, utm_source, utm_medium, utm_campaign } = detectarOrigem(
-        searchParams,
-        document.referrer,
-      )
+      const detectado = detectarOrigem(searchParams, document.referrer)
+      const origem = options?.origemOverride || detectado.origem
+      const utm_source = options?.utmSourceOverride || detectado.utm_source
+      const utm_medium = detectado.utm_medium
+      const utm_campaign = detectado.utm_campaign
+
+      // Se for evento de login explícito, salva a origem de entrada no sessionStorage para a sessão
+      if (utm_source) {
+        try {
+          sessionStorage.setItem('vv_first_utm_source', utm_source)
+        } catch {
+          // ignore
+        }
+      }
+      if (origem) {
+        try {
+          sessionStorage.setItem('vv_first_origem', origem)
+        } catch {
+          // ignore
+        }
+      }
 
       // Identificação do usuário logado (se houver)
       let userEmail = options?.userEmail
@@ -360,11 +380,11 @@ export const analyticsService = {
         return
       }
 
-      // Debounce simples: não registrar a mesma página na mesma sessão em menos de 10 segundos
-      const debounceKey = `${sessaoId}:${pathname}`
+      // Debounce simples: não registrar a mesma página na mesma sessão em menos de 10 segundos (salvo eventos de login)
+      const debounceKey = `${sessaoId}:${pathname}:${options?.isLogin ? 'login' : 'page'}`
       const lastVisitTimeStr = sessionStorage.getItem(DEBOUNCE_VISITA_KEY)
       const now = Date.now()
-      if (lastVisitTimeStr) {
+      if (lastVisitTimeStr && !options?.isLogin) {
         try {
           const parsed = JSON.parse(lastVisitTimeStr) as { key: string; time: number }
           if (parsed.key === debounceKey && now - parsed.time < 10000) {
@@ -397,7 +417,7 @@ export const analyticsService = {
         pagina: pathname || '/',
         origem: origem || 'direto',
         utm_source: utm_source || '',
-        utm_medium: utm_medium || '',
+        utm_medium: utm_medium || (options?.isLogin ? 'login_event' : ''),
         utm_campaign: utm_campaign || '',
         dispositivo,
         sessao_id: sessaoId,
@@ -426,7 +446,6 @@ export const analyticsService = {
    */
   async marcarCadastroConcluido(email?: string): Promise<void> {
     try {
-      const sessaoId = getOrCreateSessionId()
       // Registra uma visita na rota de sucesso/onboarding já com cadastrou = true
       await this.registrarVisita({
         pagina: window.location.pathname || '/cadastro-sucesso',
@@ -435,6 +454,46 @@ export const analyticsService = {
       })
     } catch {
       // silent
+    }
+  },
+
+  /**
+   * Registra expressamente um evento de login bem-sucedido na collection de visitas
+   * associando o usuário autenticado, seu perfil e a origem/utm_source capturada.
+   */
+  async registrarLoginSucesso(params: {
+    userEmail: string
+    userName?: string
+    userPerfil?: string
+    origem?: string
+    utm_source?: string
+  }): Promise<void> {
+    try {
+      let origemPrevia = params.origem
+      let utmPrevia = params.utm_source
+
+      try {
+        if (!utmPrevia) {
+          utmPrevia = sessionStorage.getItem('vv_first_utm_source') || undefined
+        }
+        if (!origemPrevia) {
+          origemPrevia = sessionStorage.getItem('vv_first_origem') || undefined
+        }
+      } catch {
+        // ignore
+      }
+
+      await this.registrarVisita({
+        pagina: '/login',
+        userEmail: params.userEmail,
+        userName: params.userName,
+        userPerfil: params.userPerfil,
+        isLogin: true,
+        origemOverride: origemPrevia,
+        utmSourceOverride: utmPrevia,
+      })
+    } catch (e) {
+      console.warn('analyticsService.registrarLoginSucesso aviso:', e)
     }
   },
 
@@ -616,6 +675,138 @@ export const analyticsService = {
     // Obter as 150 visitas mais recentes para listagem no painel
     const visitasRecentes = visitas.slice(0, 150)
 
+    // Extrai eventos de logins recentes
+    // 1. A partir de auditoria_acoes com acao='login' (para histórico robusto e confiável de logins)
+    // 2. Mescla com dados de visitas da mesma sessão / usuário para obter utm_source, cidade e dispositivo
+    const loginsRecentes: LoginEventoAnalytics[] = []
+
+    try {
+      const auditoriaLogins = await pb.collection('auditoria_acoes').getFullList({
+        filter: `acao = 'login' && created >= '${isoCorte}' && usuario_perfil != 'admin' && usuario_nome !~ 'dfarias'`,
+        sort: '-created',
+        requestKey: null,
+      })
+
+      // Mapeia sessoes/visitas por email do usuário para enriquecer utm_source e cidade
+      const infoPorEmail = new Map<
+        string,
+        {
+          utm_source?: string
+          origem?: string
+          cidade?: string
+          regiao?: string
+          dispositivo?: 'mobile' | 'desktop'
+        }
+      >()
+      for (const v of visitas) {
+        const em = (v.user_email || '').toLowerCase().trim()
+        if (em && !infoPorEmail.has(em)) {
+          infoPorEmail.set(em, {
+            utm_source: v.utm_source,
+            origem: v.origem,
+            cidade: v.cidade,
+            regiao: v.regiao,
+            dispositivo: v.dispositivo,
+          })
+        }
+      }
+
+      for (const al of auditoriaLogins) {
+        // Extrai email dos detalhes "Login realizado por ..." ou nome
+        const emailMatch = al.detalhes?.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)
+        const email = (emailMatch ? emailMatch[0] : '').toLowerCase().trim()
+
+        if (
+          isGestorOuAdminGeral({
+            email,
+            perfil: al.usuario_perfil,
+            name: al.usuario_nome,
+          })
+        ) {
+          continue
+        }
+
+        const isDemo = isDemoEmail(email)
+        const perfilNormalizado = (al.usuario_perfil || '').toLowerCase()
+        let tipoPerfil: 'cnpj' | 'cpf' | 'demo' | 'geral' = 'geral'
+        if (isDemo) {
+          tipoPerfil = 'demo'
+        } else if (perfilNormalizado === 'adm_rede' || perfilNormalizado === 'rede') {
+          tipoPerfil = 'cnpj'
+        } else if (perfilNormalizado === 'lider' || perfilNormalizado === 'gerente') {
+          tipoPerfil = 'cpf'
+        }
+
+        const extra = email ? infoPorEmail.get(email) : undefined
+
+        loginsRecentes.push({
+          id: al.id,
+          created: al.created,
+          userEmail: email || al.usuario_nome || 'Usuário',
+          userNome: al.usuario_nome || email,
+          userPerfil: al.usuario_perfil,
+          tipoPerfil,
+          origem: extra?.origem || 'direto',
+          utm_source: extra?.utm_source,
+          cidade: extra?.cidade,
+          regiao: extra?.regiao,
+          dispositivo: extra?.dispositivo,
+          isDemo,
+        })
+      }
+    } catch (e) {
+      console.warn('analyticsService: erro ao carregar auditoria de logins:', e)
+    }
+
+    // Se houver visitas marcadas expressamente como login na collection visitas que ainda não constem:
+    for (const v of visitas) {
+      const isLoginVisit =
+        v.utm_medium === 'login_event' ||
+        (v.pagina.includes('/login') && v.user_email && v.user_email.trim().length > 0)
+      if (isLoginVisit && v.user_email) {
+        const em = v.user_email.toLowerCase().trim()
+        if (isGestorOuAdminGeral({ email: em, perfil: v.user_perfil, name: v.user_nome })) {
+          continue
+        }
+        // Verifica se já não foi capturado na auditoria há menos de 1 minuto
+        const jaExiste = loginsRecentes.some(
+          (l) =>
+            l.userEmail.toLowerCase() === em &&
+            Math.abs(new Date(l.created).getTime() - new Date(v.created).getTime()) < 60000,
+        )
+        if (!jaExiste) {
+          const isDemo = isDemoEmail(em)
+          const p = (v.user_perfil || '').toLowerCase()
+          let tipoPerfil: 'cnpj' | 'cpf' | 'demo' | 'geral' = 'geral'
+          if (isDemo) {
+            tipoPerfil = 'demo'
+          } else if (p === 'adm_rede' || p === 'rede') {
+            tipoPerfil = 'cnpj'
+          } else if (p === 'lider' || p === 'gerente') {
+            tipoPerfil = 'cpf'
+          }
+
+          loginsRecentes.push({
+            id: v.id,
+            created: v.created,
+            userEmail: v.user_email,
+            userNome: v.user_nome || v.user_email,
+            userPerfil: v.user_perfil,
+            tipoPerfil,
+            origem: v.origem,
+            utm_source: v.utm_source,
+            cidade: v.cidade,
+            regiao: v.regiao,
+            dispositivo: v.dispositivo,
+            isDemo,
+          })
+        }
+      }
+    }
+
+    // Ordenar logins decrescente por created
+    loginsRecentes.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
+
     // Gráfico de acessos por dia
     // Monta todos os dias do período (para não ficar com buraco)
     const diasRange: string[] = []
@@ -681,6 +872,7 @@ export const analyticsService = {
         desktop: desktopCount,
       },
       visitasRecentes: visitasRecentes.slice(0, 100),
+      loginsRecentes: loginsRecentes.slice(0, 50),
     }
   },
 }
