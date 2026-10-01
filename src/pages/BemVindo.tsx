@@ -13,7 +13,6 @@ import {
   CheckCircle2,
   ArrowRight,
   ShieldCheck,
-  Check,
   Instagram,
   Linkedin,
   CalendarCheck,
@@ -22,11 +21,14 @@ import {
   Users2,
   GitBranch,
   TrendingUp,
-  FileSpreadsheet,
-  WifiOff,
-  Network,
   Lock,
   MessageSquare,
+  Clock,
+  PlayCircle,
+  AlertCircle,
+  FileText,
+  MapPin,
+  ListTodo,
 } from 'lucide-react'
 import pb from '@/lib/pocketbase/client'
 import { useAuth } from '@/context/AuthContext'
@@ -221,7 +223,6 @@ export default function BemVindo() {
   const { contatos } = useContatosAtendimento()
 
   // Detecta se o visitante é o Gestor Geral (Dfarias — perfil 'admin' ou email dfarias53@gmail.com)
-  // Usa o mesmo critério leve do analyticsService: checa useAuth e PocketBase authStore
   const authRecord =
     pb.authStore.isValid && pb.authStore.record
       ? (pb.authStore.record as { email?: string; perfil?: string })
@@ -303,169 +304,251 @@ export default function BemVindo() {
 
       {/* Main Content */}
       <main className="flex-1 w-full">
-        {/* Seção Hero: Posicionamento Principal e Tese Central */}
-        <section className="pt-12 pb-16 sm:pt-20 sm:pb-20 px-4 sm:px-6 border-b border-[#E5E7EB] bg-[#F7F7F5]">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            {/* Chip discreto */}
-            <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-semibold text-[#0F766E] shadow-2xs">
-              <ShieldCheck className="w-4 h-4 shrink-0 text-[#0F766E]" />
-              <span>{t.landing.badgeHero}</span>
-            </div>
+        {/* HERO: Da prioridade à execução (com mockup real da tela Meu Dia à direita) */}
+        <section className="pt-10 pb-14 sm:pt-16 sm:pb-16 px-4 sm:px-6 border-b border-[#E5E7EB] bg-[#F7F7F5]">
+          <div className="max-w-[1280px] mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              {/* Coluna Esquerda: Texto do Hero enxuto + CTAs */}
+              <div className="lg:col-span-6 space-y-5 text-left">
+                {/* Chip discreto */}
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[#E5E7EB] text-xs font-semibold text-[#0F766E] shadow-2xs">
+                  <ShieldCheck className="w-3.5 h-3.5 shrink-0 text-[#0F766E]" />
+                  <span>{t.landing.badgeHero}</span>
+                </div>
 
-            {/* Posicionamento Principal */}
-            <div className="space-y-4">
-              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[#1F2937] tracking-tight leading-tight">
-                {t.landing.heroTitle}
-              </h1>
-              <p className="text-base sm:text-lg font-medium text-[#0F766E] max-w-2xl mx-auto leading-relaxed">
-                {t.landing.heroQuote}
-              </p>
-              <p className="text-sm sm:text-base text-[#4B5563] max-w-2xl mx-auto leading-relaxed">
-                {t.landing.heroDescription}
-              </p>
+                <div className="space-y-3">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1F2937] tracking-tight leading-[1.15]">
+                    {t.landing.heroTitle}
+                  </h1>
+                  <p className="text-base sm:text-lg font-semibold text-[#0F766E] leading-snug">
+                    {t.landing.heroSubtitle}
+                  </p>
+                  <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed">
+                    {t.landing.heroParagraph}
+                  </p>
+                </div>
 
-              {/* Destaque de implantação rápida */}
-              <div className="pt-1 flex justify-center">
-                <div className="inline-flex items-center gap-2 text-xs sm:text-sm text-[#1F2937] bg-white/80 border border-[#E5E7EB] rounded-lg px-3.5 py-2 max-w-xl shadow-2xs">
-                  <span className="font-semibold text-[#0F766E]">
-                    {t.landing.customizationTitle}:
-                  </span>
-                  <span className="text-[#4B5563]">{t.landing.customizationDesc}</span>
+                {/* CTAs comerciais (ocultados para o Gestor Geral) */}
+                {!isGestorGeral && (
+                  <div className="space-y-3 pt-2">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                      <button
+                        type="button"
+                        onClick={handleScrollToInterest}
+                        className="px-5 py-3 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold text-xs sm:text-sm tracking-wide uppercase rounded-xl shadow-xs transition-all hover:scale-[1.01] inline-flex items-center justify-center gap-2"
+                      >
+                        <span>{t.landing.btnSeePlatform}</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setModalEspecialistaOpen(true)}
+                        className="px-5 py-3 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] hover:text-[#0F766E] font-bold text-xs sm:text-sm tracking-wide uppercase rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-2xs"
+                      >
+                        <MessageSquare className="w-4 h-4 text-[#0F766E]" />
+                        <span>{t.landing.btnRequestDemo}</span>
+                      </button>
+                    </div>
+
+                    {/* Frase de apoio sob os botões */}
+                    <p className="text-xs text-[#6B7280]">{t.landing.heroTargetAudience}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Coluna Direita: Representação REAL do sistema ("Meu Dia") em HTML/CSS nativo */}
+              <div className="lg:col-span-6 w-full">
+                <div className="rounded-2xl border border-[#E5E7EB] bg-white shadow-md overflow-hidden">
+                  {/* Barra da janela / identificação */}
+                  <div className="bg-[#1F2937] text-white px-4 py-2.5 flex items-center justify-between border-b border-[#374151]">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
+                      <span className="ml-2 text-xs font-semibold tracking-wide text-gray-200">
+                        {t.common.appName} • {t.landing.previewScreenName}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono uppercase tracking-wider bg-white/10 text-emerald-300 px-2 py-0.5 rounded">
+                      {t.landing.previewLiveBadge}
+                    </span>
+                  </div>
+
+                  {/* Sub-header da tela Meu Dia */}
+                  <div className="p-3.5 sm:p-4 bg-[#F7F7F5] border-b border-[#E5E7EB] flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-[#0F766E] text-white flex items-center justify-center font-bold text-xs">
+                        VV
+                      </div>
+                      <div>
+                        <div className="font-bold text-[#1F2937] leading-tight">
+                          {t.landing.previewStoreName}
+                        </div>
+                        <div className="text-[10px] text-[#6B7280] leading-tight">
+                          {t.landing.previewSupplierText}
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-[11px] font-bold text-[#0F766E] bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-md">
+                      {t.landing.previewProgressText}
+                    </span>
+                  </div>
+
+                  {/* Conteúdo fiel ao MeuDia.tsx */}
+                  <div className="p-4 space-y-3 bg-[#F7F7F5]">
+                    {/* Card 1: Próxima Visita com borda teal */}
+                    <div className="bg-white rounded-xl border border-teal-600/40 shadow-2xs overflow-hidden">
+                      <div className="bg-gradient-to-r from-[#0F766E] to-[#115E59] px-3.5 py-1.5 text-white flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider">
+                          <MapPin className="w-3.5 h-3.5 text-white" />
+                          <span>{t.landing.previewNextVisitTitle}</span>
+                        </div>
+                        <span className="text-[10px] font-bold bg-white/20 text-white px-2 py-0.5 rounded-full">
+                          {t.landing.previewCheckinBadge}
+                        </span>
+                      </div>
+                      <div className="p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-[#1F2937]">
+                            {t.landing.previewStoreName}
+                          </span>
+                          <span className="text-[11px] font-bold font-mono text-[#0F766E] bg-teal-50 border border-teal-200 px-2 py-0.5 rounded flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {t.landing.previewTimeText}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[10px]">
+                          <span className="bg-gray-100 text-[#374151] px-2 py-0.5 rounded font-medium">
+                            {t.landing.previewTaskCount}
+                          </span>
+                          <span className="bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded font-bold">
+                            {t.landing.previewPriorityCount}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card 2: Motor Faça Agora (borda rose) */}
+                    <div className="p-3.5 rounded-xl border-2 border-rose-500 bg-rose-500/10 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-rose-600 text-white px-2 py-0.5 rounded-full">
+                          {t.landing.previewDoNowTitle}
+                        </span>
+                        <span className="text-[11px] font-mono font-bold text-rose-700">08:30</span>
+                      </div>
+                      <div className="text-xs font-bold text-[#1F2937] leading-snug">
+                        {t.landing.previewDoNowTask}
+                      </div>
+                      <p className="text-[11px] text-[#4B5563] leading-tight">
+                        {t.landing.previewDoNowDesc}
+                      </p>
+                      <div className="pt-1.5 flex items-center justify-between border-t border-rose-200/60 text-[10px]">
+                        <span className="text-[#6B7280]">{t.landing.previewDoNowOwner}</span>
+                        <span className="bg-rose-600 text-white font-semibold px-2.5 py-1 rounded-lg inline-flex items-center gap-1 shadow-2xs">
+                          <PlayCircle className="w-3 h-3" />
+                          {t.landing.previewDoNowAction}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Card 3: Depois (borda amber discreta) */}
+                    <div className="p-3 rounded-xl border border-amber-300 bg-amber-50/40 flex items-center justify-between text-xs">
+                      <div className="space-y-0.5 min-w-0 pr-2">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-amber-800">
+                          {t.landing.previewLaterTitle}
+                        </div>
+                        <div className="text-xs font-semibold text-[#1F2937] truncate">
+                          {t.landing.previewLaterTask}
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-bold text-[#0F766E] shrink-0">→</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-
-            {/* CTAs comerciais (ocultados para o Gestor Geral) */}
-            {!isGestorGeral && (
-              <>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => navigate('/signup')}
-                    className="w-full sm:w-auto px-6 py-3 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-sm rounded-xl shadow-xs transition-all hover:scale-[1.02] inline-flex items-center justify-center gap-2"
-                  >
-                    <span>{t.landing.btnCreateAccount}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setModalEspecialistaOpen(true)}
-                    className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] hover:text-[#0F766E] font-semibold text-sm rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-2xs"
-                  >
-                    <MessageSquare className="w-4 h-4 text-[#0F766E]" />
-                    <span>{t.landing.btnTalkSpecialist}</span>
-                  </button>
-                </div>
-                {/* Benefícios rápidos */}
-                <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-[#4B5563]">
-                  <span className="inline-flex items-center gap-1.5 font-medium">
-                    <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-                    {t.landing.benefitNoCard}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 font-medium">
-                    <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-                    {t.landing.benefitOffline}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 font-medium">
-                    <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-                    {t.landing.benefitDevices}
-                  </span>
-                </div>
-              </>
-            )}
           </div>
         </section>
 
-        {/* Nova Seção Objetiva: O QUE RESOLVE? */}
+        {/* 2. NOVA SEÇÃO DA DOR: O desafio não é apenas identificar... */}
         <section className="py-12 sm:py-16 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]">
-          <div className="max-w-5xl mx-auto space-y-8">
-            <div className="text-center space-y-2 max-w-2xl mx-auto">
-              <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-xs font-semibold text-[#0F766E]">
-                {t.landing.whatItSolvesTag}
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
-                {t.landing.whatItSolvesTitle}
+          <div className="max-w-4xl mx-auto space-y-8">
+            <div className="text-center space-y-3 max-w-3xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight leading-tight">
+                {t.landing.painSectionTitle}
               </h2>
-              <p className="text-xs sm:text-sm text-[#4B5563]">{t.landing.whatItSolvesDesc}</p>
+              <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed">
+                {t.landing.painSectionParagraph}
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-teal-100/60 text-[#0F766E] flex items-center justify-center">
-                    <CheckCircle2 className="w-4 h-4" />
-                  </div>
-                  <h3 className="text-xs font-bold text-[#1F2937]">{t.landing.solve1Title}</h3>
+            {/* 4 situações em cards pequenos e sóbrios (ícone + frase curta) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-red-50 border border-red-200 text-red-600 flex items-center justify-center shrink-0">
+                  <AlertCircle className="w-4 h-4" />
                 </div>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.solve1Desc}</p>
+                <p className="text-xs font-semibold text-[#1F2937] leading-snug">
+                  {t.landing.pain1Title}
+                </p>
               </div>
 
-              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-teal-100/60 text-[#0F766E] flex items-center justify-center">
-                    <BadgeAlert className="w-4 h-4" />
-                  </div>
-                  <h3 className="text-xs font-bold text-[#1F2937]">{t.landing.solve2Title}</h3>
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center shrink-0">
+                  <ListTodo className="w-4 h-4" />
                 </div>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.solve2Desc}</p>
+                <p className="text-xs font-semibold text-[#1F2937] leading-snug">
+                  {t.landing.pain2Title}
+                </p>
               </div>
 
-              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-teal-100/60 text-[#0F766E] flex items-center justify-center">
-                    <TrendingUp className="w-4 h-4" />
-                  </div>
-                  <h3 className="text-xs font-bold text-[#1F2937]">{t.landing.solve3Title}</h3>
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
+                  <Users2 className="w-4 h-4" />
                 </div>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.solve3Desc}</p>
+                <p className="text-xs font-semibold text-[#1F2937] leading-snug">
+                  {t.landing.pain3Title}
+                </p>
               </div>
 
-              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-teal-100/60 text-[#0F766E] flex items-center justify-center">
-                    <GitBranch className="w-4 h-4" />
-                  </div>
-                  <h3 className="text-xs font-bold text-[#1F2937]">{t.landing.solve4Title}</h3>
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-gray-100 border border-gray-200 text-[#4B5563] flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4" />
                 </div>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.solve4Desc}</p>
-              </div>
-
-              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-teal-100/60 text-[#0F766E] flex items-center justify-center">
-                    <Building2 className="w-4 h-4" />
-                  </div>
-                  <h3 className="text-xs font-bold text-[#1F2937]">{t.landing.solve5Title}</h3>
-                </div>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.solve5Desc}</p>
-              </div>
-
-              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-teal-100/60 text-[#0F766E] flex items-center justify-center">
-                    <Camera className="w-4 h-4" />
-                  </div>
-                  <h3 className="text-xs font-bold text-[#1F2937]">{t.landing.solve6Title}</h3>
-                </div>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.solve6Desc}</p>
+                <p className="text-xs font-semibold text-[#1F2937] leading-snug">
+                  {t.landing.pain4Title}
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Módulos do Produto Real: Apresentação Prática em Grade */}
+        {/* 3. SEÇÃO MÓDULOS INTEGRADOS: 6 cards existentes + linha fina de fluxo conectando */}
         <section className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5] border-b border-[#E5E7EB]">
-          <div className="max-w-6xl mx-auto space-y-8">
+          <div className="max-w-6xl mx-auto space-y-6">
             <div className="text-center max-w-2xl mx-auto">
               <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-xs font-semibold text-[#0F766E]">
                 {t.landing.modulesTag}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Linha fina de fluxo discreta conectando os 4 passos como correnteza */}
+            <div className="flex items-center justify-center">
+              <div className="inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 px-4 py-2 bg-white rounded-full border border-[#E5E7EB] text-xs font-semibold text-[#374151] shadow-2xs">
+                <span className="text-[#0F766E]">{t.landing.flowStep1}</span>
+                <span className="text-gray-300 font-normal">→</span>
+                <span className="text-[#0F766E]">{t.landing.flowStep2}</span>
+                <span className="text-gray-300 font-normal">→</span>
+                <span className="text-[#0F766E]">{t.landing.flowStep3}</span>
+                <span className="text-gray-300 font-normal">→</span>
+                <span className="text-[#0F766E]">{t.landing.flowStep4}</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
               {/* Módulo 1: Agenda & Meu Dia */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] hover:border-[#0F766E]/50 transition-colors space-y-2.5">
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors space-y-2.5">
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <CalendarCheck className="w-5 h-5" />
                 </div>
@@ -474,7 +557,7 @@ export default function BemVindo() {
               </div>
 
               {/* Módulo 2: Execução com Foto */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] hover:border-[#0F766E]/50 transition-colors space-y-2.5">
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors space-y-2.5">
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <Camera className="w-5 h-5" />
                 </div>
@@ -483,7 +566,7 @@ export default function BemVindo() {
               </div>
 
               {/* Módulo 3: Validades */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] hover:border-[#0F766E]/50 transition-colors space-y-2.5">
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors space-y-2.5">
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <BadgeAlert className="w-5 h-5" />
                 </div>
@@ -492,7 +575,7 @@ export default function BemVindo() {
               </div>
 
               {/* Módulo 4: Perdas & Inventário */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] hover:border-[#0F766E]/50 transition-colors space-y-2.5">
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors space-y-2.5">
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <TrendingUp className="w-5 h-5" />
                 </div>
@@ -501,7 +584,7 @@ export default function BemVindo() {
               </div>
 
               {/* Módulo 5: Promotores & Visitas */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] hover:border-[#0F766E]/50 transition-colors space-y-2.5">
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors space-y-2.5">
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <Users2 className="w-5 h-5" />
                 </div>
@@ -510,7 +593,7 @@ export default function BemVindo() {
               </div>
 
               {/* Módulo 6: Workflow 5W2H */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] hover:border-[#0F766E]/50 transition-colors space-y-2.5">
+              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors space-y-2.5">
                 <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                   <GitBranch className="w-5 h-5" />
                 </div>
@@ -518,103 +601,39 @@ export default function BemVindo() {
                 <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.mod6Desc}</p>
               </div>
             </div>
+
+            {/* 4. Linha discreta de cross-industry (sem cards artificiais de segmentos) */}
+            <div className="pt-3 text-center">
+              <p className="text-xs text-[#6B7280] italic">{t.landing.crossIndustryNote}</p>
+            </div>
           </div>
         </section>
 
-        {/* Destaque Comercial: Inteligência de Gôndola e ERP */}
-        <section className="py-12 sm:py-16 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]">
-          <div className="max-w-5xl mx-auto space-y-6">
-            <div className="space-y-2 text-center max-w-2xl mx-auto">
-              <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white border border-[#E5E7EB] text-xs font-semibold text-[#0F766E]">
-                {t.landing.comTag}
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
-                {t.landing.comTitle}
+        {/* 6. CHAMADA FINAL ENXUTA (sem promessas falsas de colaboração em tempo real) */}
+        {!isGestorGeral && (
+          <section className="py-12 sm:py-16 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]">
+            <div className="max-w-3xl mx-auto text-center space-y-5">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight leading-tight">
+                {t.landing.ctaFinalTitle}
               </h2>
-              <p className="text-xs sm:text-sm text-[#4B5563]">{t.landing.comDesc}</p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-              <div className="bg-white p-4 rounded-xl border border-[#E5E7EB] space-y-1.5">
-                <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
-                  {t.landing.comCard1Title}
-                </div>
-                <p className="text-[#6B7280] leading-relaxed">{t.landing.comCard1Desc}</p>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-[#E5E7EB] space-y-1.5">
-                <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
-                  {t.landing.comCard2Title}
-                </div>
-                <p className="text-[#6B7280] leading-relaxed">{t.landing.comCard2Desc}</p>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-[#E5E7EB] space-y-1.5">
-                <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
-                  {t.landing.comCard3Title}
-                </div>
-                <p className="text-[#6B7280] leading-relaxed">{t.landing.comCard3Desc}</p>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border border-[#E5E7EB] space-y-1.5">
-                <div className="font-bold text-[#1F2937] flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
-                  {t.landing.comCard4Title}
-                </div>
-                <p className="text-[#6B7280] leading-relaxed">{t.landing.comCard4Desc}</p>
+              <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed">
+                {t.landing.ctaFinalParagraph}
+              </p>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={handleScrollToInterest}
+                  className="px-6 py-3.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold text-xs sm:text-sm tracking-wide uppercase rounded-xl shadow-xs transition-all hover:scale-[1.02] inline-flex items-center justify-center gap-2"
+                >
+                  <span>{t.landing.btnCtaFinal}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
-        {/* Recursos de Confiança: Modo Offline, Multi-rede e Segurança */}
-        <section className="py-12 sm:py-16 px-4 sm:px-6 bg-white border-b border-[#E5E7EB]">
-          <div className="max-w-5xl mx-auto space-y-8">
-            <div className="text-center space-y-2 max-w-xl mx-auto">
-              <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-xs font-semibold text-[#0F766E]">
-                {t.landing.engTag}
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] tracking-tight">
-                {t.landing.engTitle}
-              </h2>
-              <p className="text-xs sm:text-sm text-[#4B5563]">{t.landing.engDesc}</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Cartão 1: Modo Offline */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
-                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
-                  <WifiOff className="w-5 h-5" />
-                </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.engCard1Title}</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.engCard1Desc}</p>
-              </div>
-
-              {/* Cartão 2: Multi-rede */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
-                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
-                  <Network className="w-5 h-5" />
-                </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.engCard2Title}</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.engCard2Desc}</p>
-              </div>
-
-              {/* Cartão 3: Importação Ágil */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] space-y-2">
-                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
-                  <FileSpreadsheet className="w-5 h-5" />
-                </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.engCard3Title}</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.engCard3Desc}</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Funil de interesse em 2 passos: PF/PJ e Segmento (ocultado para o Gestor Geral) */}
+        {/* 7. Funil de interesse em 2 passos: PF/PJ e Segmento (ocultado para o Gestor Geral) */}
         {!isGestorGeral && (
           <section id="opcao-interesse" className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F7F7F5]">
             <div className="max-w-4xl mx-auto">
@@ -854,7 +873,7 @@ export default function BemVindo() {
                       className="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-xl transition-colors inline-flex items-center justify-center gap-1.5"
                     >
                       <MessageSquare className="w-3.5 h-3.5 text-[#0F766E]" />
-                      <span>{t.landing.btnTalkSpecialist}</span>
+                      <span>{t.common.talkToSpecialist}</span>
                     </button>
 
                     <button
@@ -913,7 +932,7 @@ export default function BemVindo() {
             </div>
           </div>
 
-          {/* Acionador discreto: Sobre proteção (mantido conforme padrão existente) */}
+          {/* Acionador discreto: Sobre proteção */}
           <div className="flex items-center justify-between py-1 text-xs">
             <button
               type="button"
