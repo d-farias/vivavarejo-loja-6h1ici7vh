@@ -25,6 +25,8 @@ import Validades from './pages/Validades'
 import Perdas from './pages/Perdas'
 import Comercial from './pages/Comercial'
 import AdmRh from './pages/AdmRh'
+import Privacidade from './pages/Privacidade'
+import Termos from './pages/Termos'
 
 const DocumentTitleSync = () => {
   const location = useLocation()
@@ -182,8 +184,10 @@ const App = () => (
                 <Route path="/cadastro" element={<Signup />} />
               </Route>
 
-              {/* Public External Landing Page */}
+              {/* Public External Landing Page & Legal */}
               <Route path="/bem-vindo" element={<BemVindo />} />
+              <Route path="/privacidade" element={<Privacidade />} />
+              <Route path="/termos" element={<Termos />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>

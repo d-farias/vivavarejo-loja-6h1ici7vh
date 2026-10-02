@@ -884,32 +884,43 @@ export default function BemVindo() {
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[#6B7280]">
               {!isGestorGeral && (
                 <>
-                  <Link to="/login" className="hover:text-[#1F2937] font-medium transition-colors">
+                  <Link to="/login" className="hover:text-[#0F766E] font-medium transition-colors">
                     {t.landing.footerAlreadyHaveAccount}
                   </Link>
-                  <span className="text-gray-300">•</span>
+                  <span className="text-gray-300 leading-none">•</span>
                   <button
                     type="button"
                     onClick={() => setModalEspecialistaOpen(true)}
-                    className="hover:text-[#1F2937] font-medium transition-colors"
+                    className="hover:text-[#0F766E] font-medium transition-colors cursor-pointer"
                   >
                     {t.landing.footerTalkSpecialist}
                   </button>
-                  <span className="text-gray-300">•</span>
+                  <span className="text-gray-300 leading-none">•</span>
                   <button
                     type="button"
                     onClick={handleScrollToInterest}
-                    className="hover:text-[#1F2937] font-medium transition-colors"
+                    className="hover:text-[#0F766E] font-medium transition-colors cursor-pointer"
                   >
                     {t.landing.footerSignup}
                   </button>
+                  <span className="text-gray-300 leading-none">•</span>
                 </>
               )}
+              <Link
+                to="/privacidade"
+                className="hover:text-[#0F766E] font-medium transition-colors"
+              >
+                {t.landing.footerPrivacyPolicy}
+              </Link>
+              <span className="text-gray-300 leading-none">•</span>
+              <Link to="/termos" className="hover:text-[#0F766E] font-medium transition-colors">
+                {t.landing.footerTermsOfUse}
+              </Link>
             </div>
           </div>
 
           {/* Acionador discreto: Sobre proteção */}
-          <div className="flex items-center justify-between py-1 text-xs">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 py-1 text-xs text-[#6B7280]">
             <button
               type="button"
               onClick={() => setModalProtecaoOpen(true)}
@@ -920,9 +931,9 @@ export default function BemVindo() {
                 {t.landing.footerAboutProtection}
               </span>
             </button>
-            <span className="text-[11px] text-[#9CA3AF] flex items-center gap-1">
-              <Lock className="w-3 h-3 text-[#9CA3AF]" />
-              {t.landing.footerSecurityNote}
+            <span className="text-[11px] text-[#9CA3AF] inline-flex items-center gap-1">
+              <Lock className="w-3 h-3 text-[#9CA3AF] shrink-0" />
+              <span>{t.landing.footerSecurityNote}</span>
             </span>
           </div>
 
@@ -952,10 +963,10 @@ export default function BemVindo() {
             assuntoContexto="Demonstração VivaVarejo"
           />
 
-          {/* Linha de contato e redes sociais */}
-          <div className="pt-4 border-t border-[#E5E7EB] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-[#6B7280]">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#6B7280] mr-1">
+          {/* Linha de contato e redes sociais com alinhamento rigoroso */}
+          <div className="pt-4 border-t border-[#E5E7EB] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 text-xs text-[#6B7280]">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#6B7280] shrink-0 mr-0.5">
                 {t.landing.footerConnect}
               </span>
 
@@ -965,10 +976,10 @@ export default function BemVindo() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram da VivaVarejo"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E7EB] bg-white text-[#374151] hover:text-[#0F766E] hover:border-[#0F766E] transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-lg border border-[#E5E7EB] bg-white text-[#374151] hover:text-[#0F766E] hover:border-[#0F766E] transition-colors leading-none"
               >
-                <Instagram className="w-3.5 h-3.5" />
-                <span className="font-medium">Instagram</span>
+                <Instagram className="w-3.5 h-3.5 shrink-0" />
+                <span className="font-medium text-xs leading-none">Instagram</span>
               </a>
 
               {/* LinkedIn */}
@@ -977,10 +988,10 @@ export default function BemVindo() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn da VivaVarejo"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E7EB] bg-white text-[#374151] hover:text-[#0F766E] hover:border-[#0F766E] transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-lg border border-[#E5E7EB] bg-white text-[#374151] hover:text-[#0F766E] hover:border-[#0F766E] transition-colors leading-none"
               >
-                <Linkedin className="w-3.5 h-3.5" />
-                <span className="font-medium">LinkedIn</span>
+                <Linkedin className="w-3.5 h-3.5 shrink-0" />
+                <span className="font-medium text-xs leading-none">LinkedIn</span>
               </a>
 
               {/* WhatsApp */}
@@ -995,28 +1006,34 @@ export default function BemVindo() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="WhatsApp VivaVarejo"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E7EB] bg-white text-[#374151] hover:text-[#0F766E] hover:border-[#0F766E] transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-lg border border-[#E5E7EB] bg-white text-[#374151] hover:text-[#0F766E] hover:border-[#0F766E] transition-colors leading-none"
               >
-                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                <svg
+                  className="w-3.5 h-3.5 fill-current shrink-0"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
                   <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.63C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.04 7.42C8.87 7.42 8.61 7.48 8.38 7.73C8.16 7.97 7.54 8.55 7.54 9.72C7.54 10.89 8.39 12.02 8.51 12.18C8.63 12.34 10.15 14.75 12.53 15.72C14.51 16.53 14.91 16.37 15.34 16.33C15.77 16.29 16.73 15.76 16.93 15.2C17.13 14.64 17.13 14.16 17.07 14.06C17.01 13.96 16.85 13.9 16.6 13.78C16.35 13.66 15.12 13.05 14.89 12.97C14.66 12.89 14.5 12.85 14.33 13.09C14.16 13.33 13.69 13.9 13.55 14.06C13.41 14.22 13.26 14.24 13.02 14.12C12.77 14 11.98 13.74 11.04 12.9C10.31 12.25 9.82 11.45 9.68 11.2C9.54 10.96 9.66 10.83 9.78 10.71C9.9 10.6 10.04 10.42 10.17 10.27C10.3 10.12 10.34 10.02 10.42 9.85C10.5 9.69 10.46 9.55 10.4 9.42C10.34 9.3 9.87 8.14 9.67 7.66C9.48 7.19 9.28 7.25 9.13 7.24C9 7.24 8.87 7.42 9.04 7.42Z" />
                 </svg>
-                <span className="font-medium">WhatsApp</span>
+                <span className="font-medium text-xs leading-none">WhatsApp</span>
               </a>
             </div>
 
             {/* E-mail de dúvidas */}
-            <div className="flex items-center gap-1.5">
+            <div className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#E5E7EB] bg-white leading-none shrink-0 self-start md:self-auto">
               <Mail className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
-              <span className="text-[#6B7280]">{t.landing.footerQuestions}</span>
+              <span className="text-[#6B7280] text-xs leading-none">
+                {t.landing.footerQuestions}
+              </span>
               {(() => {
                 const emailExibido =
                   contatos.email && contatos.email.toLowerCase() !== 'dfarias53@gmail.com'
                     ? contatos.email
-                    : 'contato@vivavarejo.com'
+                    : 'contato@vivavarejo.com.br'
                 return (
                   <a
                     href={`mailto:${emailExibido}`}
-                    className="font-medium text-[#1F2937] hover:text-[#0F766E] underline underline-offset-2 transition-colors"
+                    className="font-medium text-xs text-[#1F2937] hover:text-[#0F766E] underline underline-offset-2 transition-colors leading-none"
                   >
                     {emailExibido}
                   </a>

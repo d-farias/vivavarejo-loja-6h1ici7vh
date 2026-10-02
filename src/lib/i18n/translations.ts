@@ -148,11 +148,88 @@ export const translations = {
       footerSignup: 'Cadastrar',
       footerAboutProtection: 'Sobre proteção',
       footerSecurityNote: 'Sigilo corporativo e isolamento estrito por rede',
+      footerPrivacyPolicy: 'Política de privacidade',
+      footerTermsOfUse: 'Termos de uso',
       footerConnect: 'Conecte-se:',
       footerQuestions: 'Tire suas dúvidas:',
       protectionModalTitle: 'Sobre a Proteção e Sigilo de Dados no VivaVarejo',
       protectionModalDesc:
         'Garantias de conformidade com LGPD, isolamento estrito entre redes e segurança técnica',
+    },
+    privacy: {
+      badge: 'Conformidade LGPD & Governança',
+      title: 'Política de Privacidade',
+      subtitle:
+        'Transparência sobre os dados tratados na plataforma VivaVarejo, finalidades de uso, segurança e seus direitos como titular.',
+      lastUpdated: 'Última atualização: Março de 2025',
+      introTitle: '1. Nosso Compromisso com a sua Privacidade',
+      introText:
+        'O VivaVarejo é uma plataforma corporativa voltada à excelência operacional, rotinas, validades, perdas e auditorias no varejo. Temos o compromisso ético e legal de proteger a privacidade e os dados pessoais de todos os nossos usuários, clientes e visitantes, em conformidade estrita com a Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018 - LGPD).',
+      collectedTitle: '2. Dados que Coletamos',
+      collectedText:
+        'Coletamos exclusivamente as informações necessárias para a operacionalização da plataforma e prestação dos serviços contratados:',
+      collectedLeadItem:
+        'Dados de cadastro e funil de interesse: nome completo, endereço de e-mail, número de telefone/WhatsApp, cargo, cidade/UF, tipo de pessoa (PF/PJ), segmento de varejo e parâmetros de campanha de origem (como utm_source).',
+      collectedOperationalItem:
+        'Dados operacionais inseridos pelo usuário no exercício de sua função: rotinas de trabalho, horários de execução, demandas corporativas (Adm/RH), apontamentos de auditoria de validade, contagens de inventário rotativo, registros de quebra/perda de mercadorias, visitas de promotores e fotos de comprovação de execução e de gôndola.',
+      collectedNoCookiesItem:
+        'Uso restrito do navegador: utilizamos exclusivamente armazenamento local (LocalStorage/SessionStorage) para controle de sessão autenticada e memorização do idioma preferido. Não utilizamos cookies invasivos de terceiros, trackers comportamentais ou redes de anúncios.',
+      howWeUseTitle: '3. Finalidade e Como Usamos seus Dados',
+      howWeUseText:
+        'Todas as informações tratadas no VivaVarejo têm propósitos comerciais e operacionais legítimos, específicos e proporcionais:',
+      howWeUse1:
+        'Prestação do serviço contratado: permissão de acesso à plataforma, acompanhamento da rotina das lojas, cronogramas de validade, cálculo de conformidade operacional e alertas de atraso.',
+      howWeUse2:
+        'Comunicação direta e contato comercial: atendimento a dúvidas, envio de proposta comercial personalizada, agendamento de demonstrações e suporte técnico via WhatsApp ou e-mail.',
+      howWeUse3:
+        'Relatórios internos e governança: consolidação de estatísticas internas de acesso, acompanhamento de uso e auditoria de ações realizadas no ambiente logado.',
+      noSaleTitle: '4. Não Venda de Dados e Compartilhamento Restrito',
+      noSaleText:
+        'O VivaVarejo JAMAIS vende, aluga, troca ou comercializa dados de usuários ou de clientes com quaisquer terceiros. O acesso às informações operacionais é rigorosamente isolado por rede supermercadista (multi-inquilino / multi-tenant), garantindo que dados de uma rede nunca sejam visualizados por concorrentes.',
+      rightsTitle: '5. Seus Direitos como Titular (Art. 18 da LGPD)',
+      rightsText:
+        'Como titular dos dados, você possui direitos assegurados pela legislação brasileira, incluindo:',
+      right1:
+        'Confirmação da existência de tratamento e acesso aos seus dados pessoais cadastrados.',
+      right2: 'Correção de dados incompletos, inexatos ou desatualizados.',
+      right3:
+        'Anonimização, bloqueio ou eliminação de dados desnecessários ou tratados em desconformidade.',
+      right4: 'Revogação de consentimento e solicitação de exclusão definitiva de sua conta.',
+      rightsContactText:
+        'Para exercer qualquer um destes direitos, basta enviar uma mensagem formal para o canal do encarregado de dados:',
+      securityTitle: '6. Segurança das Informações e Armazenamento',
+      securityText:
+        'Adotamos padrões elevados de proteção cibernética: tráfego 100% criptografado com TLS/HTTPS, senhas com hashing criptográfico seguro, fotos e evidências armazenadas com tokens temporários de visualização e expiração automática de sessão após inatividade.',
+      contactTitle: '7. Canal de Contato do Responsável',
+      contactText:
+        'Em caso de dúvidas, solicitações ou esclarecimentos sobre esta Política de Privacidade ou sobre o tratamento de dados no VivaVarejo, entre em contato:',
+      emailLabel: 'E-mail oficial:',
+      backToHome: 'Voltar à página inicial',
+      goToTerms: 'Conhecer os Termos de Uso',
+    },
+    terms: {
+      badge: 'Contrato de Adesão & Regras de Uso',
+      title: 'Termos de Uso',
+      subtitle:
+        'Condições de utilização da plataforma VivaVarejo para lojistas, redes parceiras e líderes operacionais.',
+      lastUpdated: 'Última atualização: Março de 2025',
+      section1Title: '1. O que é a Plataforma VivaVarejo',
+      section1Text:
+        'O VivaVarejo é uma solução tecnológica voltada à gestão operacional do varejo físico. A plataforma oferece módulos integrados para agenda diária ("Meu Dia"), execução orientada com foto, cronograma de auditoria de validades, controle de quebras e inventários rotativos, acompanhamento de promotores/fornecedores e fluxo de planos de ação 5W2H.',
+      section2Title: '2. Responsabilidade do Usuário pelos Dados Inseridos',
+      section2Text:
+        'O usuário é o único responsável pela veracidade, exatidão e licitude dos dados, fotos, relatórios e parâmetros operacionais inseridos no sistema. É vedado o uso da plataforma para inserção de conteúdo ilícito, difamatório ou que viole direitos de propriedade intelectual ou privacidade de terceiros.',
+      section3Title: '3. Propriedade Intelectual',
+      section3Text:
+        'A marca VivaVarejo, logotipos, códigos-fonte, estruturas de banco de dados, interfaces, fluxos metodológicos e documentações são de propriedade exclusiva do VivaVarejo. A concessão de acesso não transfere direitos autorais ou de propriedade sobre a ferramenta, operando sob licença de uso.',
+      section4Title: '4. Disponibilidade do Serviço e Manutenções',
+      section4Text:
+        'Empenhamos os melhores esforços para assegurar máxima disponibilidade contínua da plataforma. Janelas de manutenção preventiva ou atualizações programadas poderão ocorrer com aviso prévio nos canais oficiais. A plataforma conta também com suporte a modo offline no dispositivo móvel para consultas e execuções essenciais.',
+      section5Title: '5. Contato & Suporte Oficial',
+      section5Text:
+        'Para esclarecer dúvidas operacionais, suporte técnico ou informações contratuais:',
+      backToHome: 'Voltar à página inicial',
+      goToPrivacy: 'Ler a Política de Privacidade',
     },
     login: {
       title: 'VivaVarejo',
@@ -549,11 +626,84 @@ export const translations = {
       footerSignup: 'Sign Up',
       footerAboutProtection: 'Data Protection',
       footerSecurityNote: 'Corporate privacy and strict tenant isolation',
+      footerPrivacyPolicy: 'Privacy Policy',
+      footerTermsOfUse: 'Terms of Use',
       footerConnect: 'Connect with us:',
       footerQuestions: 'Have questions?',
       protectionModalTitle: 'Data Protection & Privacy at VivaVarejo',
       protectionModalDesc:
         'Compliance with LGPD, strict multi-tenant isolation, and technical security',
+    },
+    privacy: {
+      badge: 'LGPD Compliance & Governance',
+      title: 'Privacy Policy',
+      subtitle:
+        'Transparency regarding data processed on the VivaVarejo platform, purpose of use, security, and data subject rights.',
+      lastUpdated: 'Last updated: March 2025',
+      introTitle: '1. Our Commitment to Your Privacy',
+      introText:
+        'VivaVarejo is an enterprise retail operations platform designed to coordinate shift priorities, standard routines, expiration sweeps, shrink prevention, and store audits. We are committed to safeguarding personal and operational data in strict compliance with the Brazilian General Data Protection Law (LGPD, Law No. 13.709/2018).',
+      collectedTitle: '2. Data We Collect',
+      collectedText:
+        'We only collect information strictly required to operate the platform and deliver contracted services:',
+      collectedLeadItem:
+        'Lead and registration data: full name, business email, phone/WhatsApp number, job title, city/state, entity type (Individual / Corporate), retail industry, and campaign attribution parameters (such as utm_source).',
+      collectedOperationalItem:
+        'Operational data entered by users in their day-to-day duties: shift routines, cutoff times, admin/HR internal tickets, expiration audit records, cycle inventory counts, loss/shrink logs, merchandiser visits, and photo proofs of execution and shelf displays.',
+      collectedNoCookiesItem:
+        'Minimal browser storage: we exclusively use local storage (LocalStorage / SessionStorage) to preserve authenticated sessions and language preference. We do not use third-party tracking cookies or advertising pixels.',
+      howWeUseTitle: '3. How We Use Your Information',
+      howWeUseText:
+        'All data processed by VivaVarejo serves legitimate, transparent, and proportionate operational purposes:',
+      howWeUse1:
+        'Service delivery: granting access, orchestrating store routines, scheduling expiration checks, computing operational compliance, and sending cutoff alerts.',
+      howWeUse2:
+        'Direct business communication: answering inquiries, delivering customized proposals, scheduling guided walkthroughs, and technical support via WhatsApp or email.',
+      howWeUse3:
+        'Internal reporting & governance: aggregating platform usage statistics and immutable audit logging for corporate compliance.',
+      noSaleTitle: '4. No Data Sale & Strict Multi-Tenant Isolation',
+      noSaleText:
+        'VivaVarejo NEVER sells, rents, trades, or commercializes personal or operational data with any third party. Operational records are strictly isolated at database engine level per supermarket chain (multi-tenant), guaranteeing zero cross-chain visibility.',
+      rightsTitle: '5. Data Subject Rights (LGPD Article 18)',
+      rightsText: 'As a data subject, you hold rights guaranteed by Brazilian law, including:',
+      right1: 'Confirmation of data processing and access to your registered personal data.',
+      right2: 'Correction of incomplete, inaccurate, or outdated data.',
+      right3: 'Anonymization, blocking, or deletion of unnecessary or non-compliant information.',
+      right4: 'Consent revocation and request for permanent account deletion.',
+      rightsContactText:
+        'To exercise any of these rights, simply email our data protection contact at:',
+      securityTitle: '6. Information Security & Storage',
+      securityText:
+        'We enforce industry-standard cyber defense: end-to-end TLS/HTTPS encryption, secure cryptographic password hashing, photo tokens with short lifespans, and automatic session logout upon prolonged inactivity.',
+      contactTitle: '7. Data Protection Officer Contact',
+      contactText:
+        'If you have questions, feedback, or formal requests regarding this Privacy Policy or your data, please contact:',
+      emailLabel: 'Official email:',
+      backToHome: 'Back to home page',
+      goToTerms: 'Read Terms of Use',
+    },
+    terms: {
+      badge: 'User Agreement & Terms of Service',
+      title: 'Terms of Use',
+      subtitle:
+        'Terms and conditions governing the use of the VivaVarejo retail platform for store owners, partner chains, and operations leaders.',
+      lastUpdated: 'Last updated: March 2025',
+      section1Title: '1. What is the VivaVarejo Platform',
+      section1Text:
+        'VivaVarejo is a digital solution built for brick-and-mortar retail execution. The software integrates shift schedules ("My Day"), photo-verified procedures, expiration calendar sweeps, shrink logging, cycle counts, vendor merchandiser coordination, and 5W2H action plans.',
+      section2Title: '2. User Responsibility for Entered Data',
+      section2Text:
+        'Users are solely responsible for the authenticity, accuracy, and legality of information, photos, reports, and operational records submitted to the platform. Misuse, unlawful content, or infringement of third-party intellectual property is strictly prohibited.',
+      section3Title: '3. Intellectual Property',
+      section3Text:
+        'The VivaVarejo brand, logos, source code, database architectures, interfaces, methodology flows, and documentation are the exclusive intellectual property of VivaVarejo. Platform access constitutes a non-exclusive license for operational use, not a transfer of ownership.',
+      section4Title: '4. Service Availability & Maintenance',
+      section4Text:
+        'We strive to maintain continuous service availability. Scheduled maintenance and upgrades are notified in advance through official channels. The web app also provides offline support for essential store floor tasks on mobile devices.',
+      section5Title: '5. Official Contact & Support',
+      section5Text: 'For operational questions, technical assistance, or contractual inquiries:',
+      backToHome: 'Back to home page',
+      goToPrivacy: 'Read Privacy Policy',
     },
     login: {
       title: 'VivaVarejo',

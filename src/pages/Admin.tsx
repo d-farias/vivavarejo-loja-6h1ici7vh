@@ -942,9 +942,9 @@ export default function Admin() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 print:hidden">
         <div>
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-[#0F766E]" />
@@ -1266,7 +1266,7 @@ export default function Admin() {
         <>
           {/* ======================= ABA PAINEL GERENCIAL ======================= */}
           {activeTab === 'painel' && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               <PainelGerencial
                 clientes={clientes}
                 lojas={lojas}
@@ -1310,7 +1310,7 @@ export default function Admin() {
 
           {/* ======================= ABA RELATÓRIOS LOJA A LOJA ======================= */}
           {activeTab === 'relatorios' && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               <RelatorioLojaLoja
                 clientes={clientes}
                 lojas={lojas}
