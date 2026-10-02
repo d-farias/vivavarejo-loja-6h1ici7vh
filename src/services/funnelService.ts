@@ -72,7 +72,8 @@ export const funnelService = {
     try {
       const sessaoId = getOrCreateSessionId()
       const search = typeof window !== 'undefined' ? window.location.search : ''
-      const origem = detectarOrigem(search)
+      const searchParams = new URLSearchParams(search)
+      const detectado = detectarOrigem(searchParams)
 
       const payload = {
         evento: params.evento,
@@ -82,7 +83,7 @@ export const funnelService = {
         user_id: params.userId || undefined,
         perfil: params.perfil || undefined,
         segmento: params.segmento || undefined,
-        origem: origem.nome,
+        origem: detectado.origem,
         detalhes: params.detalhes || {},
       }
 
