@@ -17,11 +17,56 @@ export interface User extends RecordModel {
   ativo?: boolean
   primeiro_acesso_notificado?: boolean
   segmento?: string // Segmento do varejo selecionado pelo usuário
+  is_trial?: boolean
+  trial_expires_at?: string // ISO date string
+  trial_started_at?: string // ISO date string
   created: string
   updated: string
   expand?: {
     cliente?: Cliente
   }
+}
+
+export interface ConsentRecord extends RecordModel {
+  user?: string
+  email: string
+  nome?: string
+  empresa?: string
+  termos_aceitos: boolean
+  termos_versao: string
+  privacidade_aceita: boolean
+  privacidade_versao: string
+  receber_novidades?: boolean
+  ip_origem?: string
+  user_agent?: string
+  created: string
+  updated: string
+}
+
+export type FunnelEventType =
+  | 'visitou_previa'
+  | 'iniciou_cadastro'
+  | 'criou_conta'
+  | 'primeiro_acesso'
+  | 'criou_primeira_demanda'
+  | 'direcionou_primeira_acao'
+  | 'convidou_usuarios'
+  | 'acoes_concluidas'
+  | 'ultimo_acesso'
+  | 'solicitou_demonstracao'
+
+export interface FunnelEvent extends RecordModel {
+  evento: FunnelEventType | string
+  sessao_id?: string
+  user_email?: string
+  user_nome?: string
+  user_id?: string
+  perfil?: string
+  segmento?: string
+  origem?: string
+  detalhes?: Record<string, unknown>
+  created: string
+  updated: string
 }
 
 export type FrequenciaRotina =

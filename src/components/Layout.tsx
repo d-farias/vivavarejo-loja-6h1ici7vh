@@ -36,6 +36,7 @@ import { InactivityWarningModal } from '@/components/InactivityWarningModal'
 import { BottomNavMobile } from '@/components/BottomNavMobile'
 import { QuickAccessHubModal } from '@/components/QuickAccessHubModal'
 import { ModeloDemonstrativoBanner } from '@/components/ModeloDemonstrativoBanner'
+import { TrialTopBanner } from '@/components/TrialTopBanner'
 import { getUserProfileType, isGestorGeralUser } from '@/lib/perfil-utils'
 import { usePwaInstall } from '@/hooks/use-pwa-install'
 import { segmentosService } from '@/services/segmentos'
@@ -564,9 +565,12 @@ export default function Layout() {
         </div>
       )}
 
+      {/* Banner de Controle do Teste Gratuito de 14 Dias (Contador, Avisos In-App e Bloqueio) */}
+      {!isAuthPage && user && <TrialTopBanner />}
+
       {/* Main Content Area */}
       <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-6 py-6 md:py-8">
-        {/* Banner do Modelo Demonstrativo com as 2 ações de configuração (Requisitos 3 e 4) */}
+        {/* Banner do Modelo Demonstrativo com as 2 ações de configuração */}
         {!isAuthPage && user && <ModeloDemonstrativoBanner />}
         <Outlet />
       </main>

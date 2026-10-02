@@ -331,20 +331,27 @@ export default function BemVindo() {
                 {/* CTAs comerciais (ocultados para o Gestor Geral) */}
                 {!isGestorGeral && (
                   <div className="space-y-3 pt-2">
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-                      <button
-                        type="button"
-                        onClick={handleScrollToInterest}
-                        className="px-5 py-3 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold text-xs sm:text-sm tracking-wide uppercase rounded-xl shadow-xs transition-all hover:scale-[1.01] inline-flex items-center justify-center gap-2"
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-wrap">
+                      <Link
+                        to="/previa"
+                        className="px-5 py-3 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold text-xs sm:text-sm tracking-wide uppercase rounded-xl shadow-xs transition-all hover:scale-[1.01] inline-flex items-center justify-center gap-2 text-center"
                       >
                         <span>{t.landing.btnSeePlatform}</span>
                         <ArrowRight className="w-4 h-4" />
-                      </button>
+                      </Link>
+
+                      <Link
+                        to="/teste"
+                        className="px-5 py-3 bg-white hover:bg-teal-50 border-2 border-[#0F766E] text-[#0F766E] font-bold text-xs sm:text-sm tracking-wide uppercase rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-2xs text-center"
+                      >
+                        <Sparkles className="w-4 h-4 text-[#0F766E]" />
+                        <span>{t.landing.btnTestFree}</span>
+                      </Link>
 
                       <button
                         type="button"
                         onClick={() => setModalEspecialistaOpen(true)}
-                        className="px-5 py-3 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] hover:text-[#0F766E] font-bold text-xs sm:text-sm tracking-wide uppercase rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-2xs"
+                        className="px-4 py-3 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#4B5563] hover:text-[#0F766E] font-semibold text-xs sm:text-sm tracking-wide uppercase rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-2xs"
                       >
                         <MessageSquare className="w-4 h-4 text-[#0F766E]" />
                         <span>{t.landing.btnRequestDemo}</span>
@@ -842,14 +849,21 @@ export default function BemVindo() {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                    <Link
+                      to="/previa"
+                      className="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-xl transition-colors inline-flex items-center justify-center gap-1.5"
+                    >
+                      <span>{t.landing.btnSeePlatform}</span>
+                    </Link>
+
                     <button
                       type="button"
                       onClick={() => setModalEspecialistaOpen(true)}
                       className="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-gray-50 border border-[#E5E7EB] hover:border-[#0F766E] text-[#1F2937] text-xs font-semibold rounded-xl transition-colors inline-flex items-center justify-center gap-1.5"
                     >
                       <MessageSquare className="w-3.5 h-3.5 text-[#0F766E]" />
-                      <span>{t.common.talkToSpecialist}</span>
+                      <span>{t.landing.btnRequestDemo}</span>
                     </button>
 
                     <button
@@ -858,7 +872,7 @@ export default function BemVindo() {
                       disabled={!canContinue}
                       className="w-full sm:w-auto px-6 py-2.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-xs sm:text-sm rounded-xl shadow-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                     >
-                      <span>{t.common.continue}</span>
+                      <span>{t.landing.btnTestFree}</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -896,13 +910,19 @@ export default function BemVindo() {
                     {t.landing.footerTalkSpecialist}
                   </button>
                   <span className="text-gray-300 leading-none">•</span>
-                  <button
-                    type="button"
-                    onClick={handleScrollToInterest}
+                  <Link
+                    to="/previa"
                     className="hover:text-[#0F766E] font-medium transition-colors cursor-pointer"
                   >
-                    {t.landing.footerSignup}
-                  </button>
+                    {t.landing.btnSeePlatform}
+                  </Link>
+                  <span className="text-gray-300 leading-none">•</span>
+                  <Link
+                    to="/teste"
+                    className="hover:text-[#0F766E] font-medium transition-colors cursor-pointer"
+                  >
+                    {t.landing.btnTestFree}
+                  </Link>
                   <span className="text-gray-300 leading-none">•</span>
                 </>
               )}

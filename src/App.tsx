@@ -19,6 +19,8 @@ import Admin from './pages/Admin'
 import Promotores from './pages/Promotores'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import SignupTrialPage from './pages/SignupTrial'
+import PreviewPlataforma from './pages/PreviewPlataforma'
 import BemVindo from './pages/BemVindo'
 import NotFound from './pages/NotFound'
 import Validades from './pages/Validades'
@@ -182,9 +184,13 @@ const App = () => (
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/cadastro" element={<Signup />} />
+                <Route path="/teste" element={<SignupTrialPage />} />
+                <Route path="/signup-trial" element={<SignupTrialPage />} />
               </Route>
 
-              {/* Public External Landing Page & Legal */}
+              {/* Public External Landing Page, Preview & Legal */}
+              <Route path="/previa" element={<PreviewPlataforma />} />
+              <Route path="/preview" element={<PreviewPlataforma />} />
               <Route path="/bem-vindo" element={<BemVindo />} />
               <Route path="/privacidade" element={<Privacidade />} />
               <Route path="/termos" element={<Termos />} />

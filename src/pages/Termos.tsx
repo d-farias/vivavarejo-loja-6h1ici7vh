@@ -88,7 +88,8 @@ export default function Termos() {
             <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">{term.section2Text}</p>
           </div>
 
-          {/* 3. Propriedade Intelectual */}
+          {/* 3. Propriedade Intelectual e Uso Permitido */}
+          {/* NOTA INTERNA: Cláusula de proteção de propriedade intelectual adaptada da base jurídica do cliente para revisão jurídica periódica */}
           <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-xs space-y-3">
             <div className="flex items-center gap-2 text-[#0F766E]">
               <Shield className="w-5 h-5 shrink-0" />
@@ -97,12 +98,31 @@ export default function Termos() {
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">{term.section3Text}</p>
+            {term.section3Vedações && (
+              <div className="p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-[#374151] leading-relaxed">
+                <strong>Vedações expressas:</strong> {term.section3Vedações}
+              </div>
+            )}
           </div>
 
-          {/* 4. Disponibilidade do Serviço */}
+          {/* 4. Proteção do Conteúdo do Cliente */}
+          {/* NOTA INTERNA: Conteúdo do cliente ≠ Propriedade intelectual da VivaVarejo */}
           <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-xs space-y-3">
             <div className="flex items-center gap-2 text-[#0F766E]">
               <CheckCircle2 className="w-5 h-5 shrink-0" />
+              <h2 className="text-base sm:text-lg font-bold text-[#1F2937]">
+                {term.sectionProtectionTitle}
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+              {term.sectionProtectionText}
+            </p>
+          </div>
+
+          {/* 5. Disponibilidade do Serviço e Período de Teste */}
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-xs space-y-3">
+            <div className="flex items-center gap-2 text-[#0F766E]">
+              <Building className="w-5 h-5 shrink-0" />
               <h2 className="text-base sm:text-lg font-bold text-[#1F2937]">
                 {term.section4Title}
               </h2>

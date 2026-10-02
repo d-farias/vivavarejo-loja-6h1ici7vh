@@ -22,6 +22,7 @@ import {
   Compass,
 } from 'lucide-react'
 import { analyticsService, isDemoEmail } from '@/services/analyticsService'
+import { funnelService } from '@/services/funnelService'
 import type { ResumoAnalytics } from '@/types'
 import { Badge } from '@/components/ui/badge'
 
@@ -29,6 +30,13 @@ export const PainelAcessosAnalytics: React.FC = () => {
   const [periodo, setPeriodo] = useState<'hoje' | '7dias' | '30dias'>('7dias')
   const [loading, setLoading] = useState(true)
   const [resumo, setResumo] = useState<ResumoAnalytics | null>(null)
+  const [metricasFunil, setMetricasFunil] = useState<{
+    totalEventos: number
+    contagem: Record<string, number>
+  }>({
+    totalEventos: 0,
+    contagem: {},
+  })
   const [error, setError] = useState<string | null>(null)
   const [filtroIdentificacao, setFiltroIdentificacao] = useState<
     'todos' | 'identificados' | 'anonimos'
@@ -39,8 +47,16 @@ export const PainelAcessosAnalytics: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
-      const data = await analyticsService.getResumoAnalytics(p)
+      const dias = p === 'hoje' ? 1 : p === '7dias' ? 7 : 30
+      const [data, funil] = await Promise.all([
+        analyticsService.getResumoAnalytics(p),
+        funnelService.getMetricasFunil(dias),
+      ])
       setResumo(data)
+      setMetricasFunil({
+        totalEventos: funil.totalEventos,
+        contagem: funil.contagem,
+      })
     } catch (err) {
       console.error('Erro ao carregar dados de acessos:', err)
       setError('Não foi possível carregar os dados de visitas neste momento.')
@@ -132,6 +148,91 @@ export const PainelAcessosAnalytics: React.FC = () => {
           {error}
         </div>
       )}
+
+      {/* NOVO BLOCO: FUNIL DA JORNADA B2B (Prévia sem cadastro → Teste 14 dias → Demonstração → Contratação) */}
+      <div className="bg-white border border-[#E5E7EB] rounded-xl p-5 shadow-2xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#E5E7EB]">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-6 h-6 rounded-md bg-[#0F766E] text-white flex items-center justify-center font-bold text-xs">
+                <Compass className="w-3.5 h-3.5" />
+              </span>
+              <h3 className="text-sm font-bold text-[#1F2937]">
+                Funil de Conversão da Jornada VivaVarejo
+              </h3>
+            </div>
+            <p className="text-xs text-[#6B7280] mt-0.5">
+              Etapas oficiais: Prévia Demonstrativa → Cadastro do Teste → Primeiro Acesso → Ciclo
+              Completo (4 Pilares) → Solicitação de Demonstração
+            </p>
+          </div>
+          <span className="text-[11px] font-mono text-[#0F766E] bg-teal-50 border border-teal-200 px-2.5 py-1 rounded-md font-bold self-start sm:self-center">
+            Métrica-Chave: Ciclo Completo & Valor Percebido
+          </span>
+        </div>
+
+        {/* Etapas do Funil em Grid Horizontal */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          {/* Etapa 1: Visitou Prévia */}
+          <div className="p-3.5 rounded-xl border border-gray-200 bg-[#F7F7F5] space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B7280]">
+              1. Prévia Sem Cadastro
+            </span>
+            <div className="text-2xl font-extrabold text-[#1F2937]">
+              {loading ? '...' : metricasFunil.contagem['visitou_previa'] || 0}
+            </div>
+            <p className="text-[10px] text-[#6B7280]">
+              Navegaram na prévia demonstrativa (/previa)
+            </p>
+          </div>
+
+          {/* Etapa 2: Iniciou/Criou Conta */}
+          <div className="p-3.5 rounded-xl border border-gray-200 bg-[#F7F7F5] space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B7280]">
+              2. Criou Conta Teste
+            </span>
+            <div className="text-2xl font-extrabold text-[#0F766E]">
+              {loading ? '...' : metricasFunil.contagem['criou_conta'] || 0}
+            </div>
+            <p className="text-[10px] text-[#6B7280]">
+              Cadastros no teste de 14 dias com termos aceitos
+            </p>
+          </div>
+
+          {/* Etapa 3: Criou 1ª Demanda */}
+          <div className="p-3.5 rounded-xl border border-gray-200 bg-[#F7F7F5] space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B7280]">
+              3. Identificou (1ª Demanda)
+            </span>
+            <div className="text-2xl font-extrabold text-teal-700">
+              {loading ? '...' : metricasFunil.contagem['criou_primeira_demanda'] || 0}
+            </div>
+            <p className="text-[10px] text-[#6B7280]">Criou primeira demanda no Meu Dia / Loja</p>
+          </div>
+
+          {/* Etapa 4: Concluiu Ações (Ciclo Completo) */}
+          <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
+              4. Ciclo Completo
+            </span>
+            <div className="text-2xl font-extrabold text-emerald-800">
+              {loading ? '...' : metricasFunil.contagem['acoes_concluidas'] || 0}
+            </div>
+            <p className="text-[10px] text-emerald-700">Executou e concluiu com foto/evidência</p>
+          </div>
+
+          {/* Etapa 5: Demonstração / Contratação */}
+          <div className="p-3.5 rounded-xl border border-teal-200 bg-teal-50/50 space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#0F766E]">
+              5. Demonstração
+            </span>
+            <div className="text-2xl font-extrabold text-[#0F766E]">
+              {loading ? '...' : metricasFunil.contagem['solicitou_demonstracao'] || 0}
+            </div>
+            <p className="text-[10px] text-teal-800">Solicitações de contato / apresentação</p>
+          </div>
+        </div>
+      </div>
 
       {/* 4 Cards Principais com Linguagem Leiga */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

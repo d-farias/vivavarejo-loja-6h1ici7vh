@@ -38,6 +38,19 @@ export interface AuthContextType {
       cnpj?: string
     },
   ) => Promise<void>
+  signupTrial: (
+    email: string,
+    pass: string,
+    name: string,
+    empresa: string,
+    segmento: string,
+    telefone?: string,
+    consentimento?: {
+      termosAceitos: boolean
+      privacidadeAceita: boolean
+      receberNovidades?: boolean
+    },
+  ) => Promise<void>
   logout: () => void
 }
 
@@ -212,6 +225,96 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await login(email, pass)
   }
 
+  const signupTrial = async (
+    email: string,
+    pass: string,
+    name: string,
+    empresa: string,
+    segmento: string,
+    telefone?: string,
+    consentimento?: {
+      termosAceitos: boolean
+      privacidadeAceita: boolean
+      receberNovidades?: boolean
+    },
+  ) => {
+    const agora = new Date()
+    const expiresAt = new Date(agora.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString()
+    const startedAt = agora.toISOString()
+
+    const empresaTrimmed = empresa.trim() || `Operação ${name.trim()}`
+
+    let createdClienteId: string | undefined
+    try {
+      const clienteRecord = await pb.collection('clientes').create({
+        nome: empresaTrimmed,
+        contato: email.trim(),
+        tipo_pessoa: 'PJ',
+        profile_type: 'gerente',
+        segmento: segmento || 'Supermercado/Food',
+        is_trial: true,
+        trial_expires_at: expiresAt,
+        observacoes: `Teste gratuito de 14 dias iniciado em ${agora.toLocaleDateString('pt-BR')} por ${name.trim()}`,
+      })
+      createdClienteId = clienteRecord.id
+    } catch (e) {
+      console.warn('Erro ao criar cliente no signupTrial:', e)
+    }
+
+    const createdUser = await pb.collection('users').create({
+      email: email.trim(),
+      password: pass,
+      passwordConfirm: pass,
+      name: name.trim(),
+      telefone: telefone?.trim() || undefined,
+      perfil: 'lider',
+      profile_type: 'gerente',
+      cliente: createdClienteId || undefined,
+      segmento: segmento || 'Supermercado/Food',
+      is_trial: true,
+      trial_started_at: startedAt,
+      trial_expires_at: expiresAt,
+      ativo: true,
+    })
+
+    // Persistir o consentimento na collection consent_records
+    if (consentimento) {
+      try {
+        const { funnelService } = await import('@/services/funnelService')
+        await funnelService.registrarConsentimento({
+          userId: createdUser.id,
+          email: email.trim(),
+          nome: name.trim(),
+          empresa: empresaTrimmed,
+          termosAceitos: consentimento.termosAceitos,
+          privacidadeAceita: consentimento.privacidadeAceita,
+          receberNovidades: consentimento.receberNovidades,
+        })
+      } catch (err) {
+        console.warn('Erro ao registrar consentimento no signupTrial:', err)
+      }
+    }
+
+    // Registrar evento de conversão e funil
+    try {
+      const { funnelService } = await import('@/services/funnelService')
+      await funnelService.registrarEvento({
+        evento: 'criou_conta',
+        userId: createdUser.id,
+        userEmail: email.trim(),
+        userNome: name.trim(),
+        perfil: 'trial',
+        segmento,
+        detalhes: { trial_dias: 14, empresa: empresaTrimmed },
+      })
+    } catch {
+      /* ignore */
+    }
+
+    // Auto login
+    await login(email, pass)
+  }
+
   const refreshUser = async (): Promise<User | null> => {
     if (!pb.authStore.record?.id) return null
     try {
@@ -237,7 +340,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, refreshUser, login, signup, logout }}>
+    <AuthContext.Provider
+      value={{ user, token, loading, refreshUser, login, signup, signupTrial, logout }}
+    >
       {children}
     </AuthContext.Provider>
   )

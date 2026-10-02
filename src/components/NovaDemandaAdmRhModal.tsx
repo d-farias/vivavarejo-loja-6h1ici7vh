@@ -107,6 +107,19 @@ export function NovaDemandaAdmRhModal({
         fotoFile,
       })
 
+      // Registra evento de funil: criou primeira demanda
+      try {
+        const { funnelService } = await import('@/services/funnelService')
+        await funnelService.registrarEvento({
+          evento: 'criou_primeira_demanda',
+          userId,
+          userNome: solicitanteNome.trim() || userName,
+          detalhes: { titulo: titulo.trim(), subArea, prioridade },
+        })
+      } catch {
+        /* ignore */
+      }
+
       // Reset
       setTitulo('')
       setDescricao('')

@@ -73,7 +73,8 @@ export const translations = {
       heroParagraph:
         'Organize prioridades, transforme demandas em ações, defina responsáveis e acompanhe a execução em uma única plataforma.',
       btnSeePlatform: 'CONHEÇA A PLATAFORMA',
-      btnRequestDemo: 'SOLICITE UMA DEMONSTRAÇÃO',
+      btnTestFree: 'TESTAR GRATUITAMENTE',
+      btnRequestDemo: 'SOLICITAR DEMONSTRAÇÃO',
       heroTargetAudience: 'Para empresas, equipes e operações de diferentes segmentos.',
       previewLiveBadge: 'Visão Real do App',
       previewScreenName: 'Meu Dia',
@@ -212,20 +213,25 @@ export const translations = {
       title: 'Termos de Uso',
       subtitle:
         'Condições de utilização da plataforma VivaVarejo para lojistas, redes parceiras e líderes operacionais.',
-      lastUpdated: 'Última atualização: Março de 2025',
+      lastUpdated: 'Versão v1.0 — 2025 • Março de 2025',
       section1Title: '1. O que é a Plataforma VivaVarejo',
       section1Text:
         'O VivaVarejo é uma solução tecnológica voltada à gestão operacional do varejo físico. A plataforma oferece módulos integrados para agenda diária ("Meu Dia"), execução orientada com foto, cronograma de auditoria de validades, controle de quebras e inventários rotativos, acompanhamento de promotores/fornecedores e fluxo de planos de ação 5W2H.',
       section2Title: '2. Responsabilidade do Usuário pelos Dados Inseridos',
       section2Text:
-        'O usuário é o único responsável pela veracidade, exatidão e licitude dos dados, fotos, relatórios e parâmetros operacionais inseridos no sistema. É vedado o uso da plataforma para inserção de conteúdo ilícito, difamatório ou que viole direitos de propriedade intelectual ou privacidade de terceiros.',
-      section3Title: '3. Propriedade Intelectual',
+        'O usuário é o único responsável pela veracidade, exatidão e licitude dos dados, fotos, relatórios e parâmetros operacionais inseridos no sistema. É vedado o uso da plataforma para inserção de conteúdo ilícito, difamatório ou que viole direitos de terceiros.',
+      section3Title: '3. Propriedade Intelectual e Uso Permitido',
       section3Text:
-        'A marca VivaVarejo, logotipos, códigos-fonte, estruturas de banco de dados, interfaces, fluxos metodológicos e documentações são de propriedade exclusiva do VivaVarejo. A concessão de acesso não transfere direitos autorais ou de propriedade sobre a ferramenta, operando sob licença de uso.',
-      section4Title: '4. Disponibilidade do Serviço e Manutenções',
+        'A plataforma VivaVarejo, sua marca, códigos-fonte, arquitetura, fluxos operacionais, interfaces e materiais são obras protegidas pela legislação de direitos autorais e propriedade intelectual. O acesso — inclusive em ambientes demonstrativos (prévia) e durante períodos de teste gratuito (trial) — concede ao usuário uma autorização de uso pessoal, temporária, revogável, limitada e não exclusiva, restrita à avaliação e à operação autorizada.',
+      section3Vedações:
+        'São expressamente vedados: (a) copiar, modificar, distribuir, licenciar ou comercializar qualquer elemento da plataforma; (b) utilizar telas, metodologias ou fluxos para conceber, aprimorar ou desenvolver solução própria ou de terceiros com fins concorrenciais; (c) realizar engenharia reversa, descompilação ou tentativa de obtenção do código-fonte; (d) contornar mecanismos de autenticação e segurança; (e) acessar ambientes de outros clientes; (f) remover menções de autoria e marca da VivaVarejo.',
+      sectionProtectionTitle: '4. Proteção do Conteúdo do Cliente',
+      sectionProtectionText:
+        'Todo o conteúdo, fotos de auditoria, cadastros de colaboradores, produtos, rotinas e registros operacionais inseridos pelo cliente ou sua equipe permanecem de propriedade exclusiva do cliente. A VivaVarejo utiliza tais dados unicamente na medida necessária para viabilizar o funcionamento da plataforma e prestar o serviço contratado, mantendo estrito isolamento lógico entre contas de diferentes clientes. O cliente declara deter a devida autorização para a inserção de quaisquer dados de terceiros ou colaboradores.',
+      section4Title: '5. Disponibilidade do Serviço e Período de Teste',
       section4Text:
-        'Empenhamos os melhores esforços para assegurar máxima disponibilidade contínua da plataforma. Janelas de manutenção preventiva ou atualizações programadas poderão ocorrer com aviso prévio nos canais oficiais. A plataforma conta também com suporte a modo offline no dispositivo móvel para consultas e execuções essenciais.',
-      section5Title: '5. Contato & Suporte Oficial',
+        'Empenhamos os melhores esforços para assegurar máxima disponibilidade contínua da plataforma. Janelas de manutenção preventiva ocorrerão com aviso prévio. Ao término de períodos de teste gratuito (trial), as funcionalidades de criação e edição poderão ser bloqueadas, permanecendo os dados cadastrados preservados conforme nossa política de retenção para eventual continuidade da contratação.',
+      section5Title: '6. Contato & Suporte Oficial',
       section5Text:
         'Para esclarecer dúvidas operacionais, suporte técnico ou informações contratuais:',
       backToHome: 'Voltar à página inicial',
@@ -555,6 +561,7 @@ export const translations = {
       heroParagraph:
         'Organize priorities, turn demands into actions, define owners, and track execution in a single platform.',
       btnSeePlatform: 'SEE THE PLATFORM',
+      btnTestFree: 'TRY FOR FREE',
       btnRequestDemo: 'REQUEST A DEMO',
       heroTargetAudience: 'For companies, teams and operations across segments.',
       previewLiveBadge: 'Real App View',
@@ -683,27 +690,32 @@ export const translations = {
       goToTerms: 'Read Terms of Use',
     },
     terms: {
-      badge: 'User Agreement & Terms of Service',
+      badge: 'Terms of Service & Rules of Use',
       title: 'Terms of Use',
       subtitle:
-        'Terms and conditions governing the use of the VivaVarejo retail platform for store owners, partner chains, and operations leaders.',
-      lastUpdated: 'Last updated: March 2025',
+        'Conditions for using the VivaVarejo platform for retailers, partner chains, and operational leaders.',
+      lastUpdated: 'Version v1.0 — 2025 • March 2025',
       section1Title: '1. What is the VivaVarejo Platform',
       section1Text:
-        'VivaVarejo is a digital solution built for brick-and-mortar retail execution. The software integrates shift schedules ("My Day"), photo-verified procedures, expiration calendar sweeps, shrink logging, cycle counts, vendor merchandiser coordination, and 5W2H action plans.',
+        'VivaVarejo is a technological solution designed for the operational management of physical retail. The platform provides integrated modules for daily agenda ("My Day"), photo-guided execution, expiration audit schedules, shrink and cycle count control, vendor promoter tracking, and a 5W2H action plan workflow.',
       section2Title: '2. User Responsibility for Entered Data',
       section2Text:
-        'Users are solely responsible for the authenticity, accuracy, and legality of information, photos, reports, and operational records submitted to the platform. Misuse, unlawful content, or infringement of third-party intellectual property is strictly prohibited.',
-      section3Title: '3. Intellectual Property',
+        'The user is solely responsible for the truthfulness, accuracy, and legality of data, photos, reports, and operational parameters entered into the system. Using the platform to enter unlawful, defamatory content, or violate third-party rights is strictly prohibited.',
+      section3Title: '3. Intellectual Property & Permitted Use',
       section3Text:
-        'The VivaVarejo brand, logos, source code, database architectures, interfaces, methodology flows, and documentation are the exclusive intellectual property of VivaVarejo. Platform access constitutes a non-exclusive license for operational use, not a transfer of ownership.',
-      section4Title: '4. Service Availability & Maintenance',
+        'The VivaVarejo platform, its trademark, source code, architecture, operational flows, interfaces, and materials are works protected by copyright and intellectual property laws. Access — including preview demonstration environments and 14-day free trial periods — grants a personal, temporary, revocable, limited, and non-exclusive authorization strictly for authorized evaluation and operation.',
+      section3Vedações:
+        'It is strictly prohibited to: (a) copy, modify, distribute, license, or commercialize any element of the platform; (b) use screens, methodologies, or flows to design, improve, or build competing solutions; (c) reverse engineer, decompile, or attempt to extract source code; (d) bypass authentication and security measures; (e) access environments of other customers; (f) remove copyright or VivaVarejo marks.',
+      sectionProtectionTitle: '4. Customer Content Protection',
+      sectionProtectionText:
+        'All content, audit photos, employee records, products, routines, and operational records entered by the customer remain the exclusive property of the customer. VivaVarejo uses such data solely to operate the platform and deliver the service, maintaining strict logical separation between customer accounts. The customer declares having proper authorization to input third-party or employee data.',
+      section4Title: '5. Service Availability & Free Trial Period',
       section4Text:
-        'We strive to maintain continuous service availability. Scheduled maintenance and upgrades are notified in advance through official channels. The web app also provides offline support for essential store floor tasks on mobile devices.',
-      section5Title: '5. Official Contact & Support',
-      section5Text: 'For operational questions, technical assistance, or contractual inquiries:',
-      backToHome: 'Back to home page',
-      goToPrivacy: 'Read Privacy Policy',
+        'We make best efforts to ensure maximum continuous availability. At the end of free trial periods, create and edit actions may be locked, while stored data is retained according to our retention policy for future service continuation.',
+      section5Title: '6. Official Contact & Support',
+      section5Text: 'To clarify operational doubts, technical support, or contractual information:',
+      backToHome: 'Back to Home',
+      goToPrivacy: 'Read the Privacy Policy',
     },
     login: {
       title: 'VivaVarejo',

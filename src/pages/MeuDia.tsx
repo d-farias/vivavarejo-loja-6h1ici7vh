@@ -369,6 +369,20 @@ export function MeuDiaPage() {
           : `${rotinaAlvo.nome} registrada com fotos/obs.`,
       })
 
+      // Registra evento de métricas do funil: ações concluídas
+      try {
+        const { funnelService } = await import('@/services/funnelService')
+        await funnelService.registrarEvento({
+          evento: 'acoes_concluidas',
+          userId: user.id,
+          userEmail: user.email,
+          userNome: user.name,
+          detalhes: { rotina_id: rotinaId, conforme: res.conforme },
+        })
+      } catch {
+        /* ignore */
+      }
+
       // Atualiza lista do servidor
       await carregarDados()
     } catch (err) {

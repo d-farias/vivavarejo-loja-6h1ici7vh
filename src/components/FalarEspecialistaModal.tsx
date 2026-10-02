@@ -45,6 +45,19 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
       : 'Olá! Estou navegando no VivaVarejo e gostaria de tirar dúvidas sobre o atendimento/operação.',
   )
 
+  const handleRegistrarEventoDemo = () => {
+    try {
+      import('@/services/funnelService').then(({ funnelService }) => {
+        funnelService.registrarEvento({
+          evento: 'solicitou_demonstracao',
+          detalhes: { assunto: assuntoContexto || 'Geral' },
+        })
+      })
+    } catch {
+      /* ignore */
+    }
+  }
+
   const mailtoLink = `mailto:${specialistEmail}?subject=${encodeURIComponent(
     assuntoContexto
       ? `[VivaVarejo] ${assuntoContexto}`
@@ -128,6 +141,7 @@ export const FalarEspecialistaModal: React.FC<FalarEspecialistaModalProps> = ({
             href={`${whatsappUrl}?text=${whatsappMessage}`}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={handleRegistrarEventoDemo}
             className="w-full flex items-center justify-between p-3.5 rounded-lg bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200 text-emerald-900 transition-colors group"
           >
             <div className="flex items-center gap-3">

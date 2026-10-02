@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T00:05:32.272Z",
+  "generatedAt": "2026-10-02T00:41:43.878Z",
   "collections": [
     {
       "name": "users",
@@ -85,6 +85,24 @@
         },
         {
           "name": "segmento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_trial",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "trial_expires_at",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "trial_started_at",
           "type": "text",
           "required": false,
           "system": false
@@ -501,6 +519,18 @@
         },
         {
           "name": "cor_secundaria",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_trial",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "trial_expires_at",
           "type": "text",
           "required": false,
           "system": false
@@ -3747,6 +3777,191 @@
         "CREATE INDEX idx_match_opp_rede ON match_oportunidades (rede)",
         "CREATE INDEX idx_match_opp_status ON match_oportunidades (status)",
         "CREATE INDEX idx_match_opp_created ON match_oportunidades (created)"
+      ]
+    },
+    {
+      "name": "consent_records",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "",
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "user",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "empresa",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "termos_aceitos",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "termos_versao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "privacidade_aceita",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "privacidade_versao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "receber_novidades",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ip_origem",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_agent",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_consent_email ON consent_records (email)",
+        "CREATE INDEX idx_consent_created ON consent_records (created DESC)"
+      ]
+    },
+    {
+      "name": "funnel_events",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "",
+        "update": "@request.auth.id != ''",
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "evento",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "sessao_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_email",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "perfil",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "segmento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "origem",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "detalhes",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_funnel_evento ON funnel_events (evento)",
+        "CREATE INDEX idx_funnel_created ON funnel_events (created DESC)",
+        "CREATE INDEX idx_funnel_sessao ON funnel_events (sessao_id)",
+        "CREATE INDEX idx_funnel_email ON funnel_events (user_email)"
       ]
     }
   ]
