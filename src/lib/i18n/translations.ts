@@ -69,7 +69,7 @@ export const translations = {
     landing: {
       badgeHero: 'Execução para o Varejo Físico',
       heroTitle: 'Da prioridade à execução.',
-      heroSubtitle: 'Sua empresa tem demandas. A VivaVarejo ajuda a fazer acontecer.',
+      heroSubtitle: 'Sua gestão conectada à execução.',
       heroParagraph:
         'Organize prioridades, transforme demandas em ações, defina responsáveis e acompanhe a execução em uma única plataforma.',
       btnSeePlatform: 'CONHEÇA A PLATAFORMA',
@@ -474,7 +474,7 @@ export const translations = {
     landing: {
       badgeHero: 'Execution for Physical Retail',
       heroTitle: 'From priority to execution.',
-      heroSubtitle: 'Your company has demands. VivaVarejo helps make them happen.',
+      heroSubtitle: 'Your management, connected to execution.',
       heroParagraph:
         'Organize priorities, turn demands into actions, define owners, and track execution in a single platform.',
       btnSeePlatform: 'SEE THE PLATFORM',
