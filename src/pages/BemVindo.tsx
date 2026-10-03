@@ -13,8 +13,6 @@ import {
   CheckCircle2,
   ArrowRight,
   ShieldCheck,
-  Instagram,
-  Linkedin,
   CalendarCheck,
   Camera,
   BadgeAlert,
@@ -46,9 +44,6 @@ import { ProtecaoDadosSecao } from '@/components/ProtecaoDadosSecao'
 import { FalarEspecialistaModal } from '@/components/FalarEspecialistaModal'
 import { LanguageSelector } from '@/components/LanguageSelector'
 import { useI18n } from '@/lib/i18n/context'
-
-const INSTAGRAM_URL = 'https://www.vivavarejo.com?utm_source=instagram'
-const LINKEDIN_PERSONAL_URL = 'https://www.vivavarejo.com?utm_source=linkedin'
 
 interface SegmentOption {
   id: string
@@ -553,59 +548,65 @@ export default function BemVindo() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
               {/* Módulo 1: Agenda & Meu Dia */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors space-y-2.5">
-                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
                   <CalendarCheck className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.mod1Title}</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.mod1Desc}</p>
+                <h3 className="text-sm font-bold text-[#1F2937] leading-snug">
+                  {t.landing.mod1Title}
+                </h3>
               </div>
 
               {/* Módulo 2: Execução com Foto */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors space-y-2.5">
-                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
                   <Camera className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.mod2Title}</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.mod2Desc}</p>
+                <h3 className="text-sm font-bold text-[#1F2937] leading-snug">
+                  {t.landing.mod2Title}
+                </h3>
               </div>
 
               {/* Módulo 3: Validades */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors space-y-2.5">
-                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
                   <BadgeAlert className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.mod3Title}</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.mod3Desc}</p>
+                <h3 className="text-sm font-bold text-[#1F2937] leading-snug">
+                  {t.landing.mod3Title}
+                </h3>
               </div>
 
               {/* Módulo 4: Perdas & Inventário */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors space-y-2.5">
-                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
                   <TrendingUp className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.mod4Title}</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.mod4Desc}</p>
+                <h3 className="text-sm font-bold text-[#1F2937] leading-snug">
+                  {t.landing.mod4Title}
+                </h3>
               </div>
 
               {/* Módulo 5: Promotores & Visitas */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors space-y-2.5">
-                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
                   <Users2 className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.mod5Title}</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.mod5Desc}</p>
+                <h3 className="text-sm font-bold text-[#1F2937] leading-snug">
+                  {t.landing.mod5Title}
+                </h3>
               </div>
 
               {/* Módulo 6: Workflow 5W2H */}
-              <div className="p-5 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors space-y-2.5">
-                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+              <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white hover:border-[#0F766E]/50 transition-colors flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
                   <GitBranch className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1F2937]">{t.landing.mod6Title}</h3>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{t.landing.mod6Desc}</p>
+                <h3 className="text-sm font-bold text-[#1F2937] leading-snug">
+                  {t.landing.mod6Title}
+                </h3>
               </div>
             </div>
 
@@ -892,7 +893,6 @@ export default function BemVindo() {
               <span className="text-xs font-bold text-[#1F2937] tracking-wider uppercase">
                 {t.common.appName}
               </span>
-              <span className="text-xs text-[#6B7280]">{t.landing.footerTagline}</span>
             </div>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[#6B7280]">
@@ -900,21 +900,6 @@ export default function BemVindo() {
                 <>
                   <Link to="/login" className="hover:text-[#0F766E] font-medium transition-colors">
                     {t.landing.footerAlreadyHaveAccount}
-                  </Link>
-                  <span className="text-gray-300 leading-none">•</span>
-                  <button
-                    type="button"
-                    onClick={() => setModalEspecialistaOpen(true)}
-                    className="hover:text-[#0F766E] font-medium transition-colors cursor-pointer"
-                  >
-                    {t.landing.footerTalkSpecialist}
-                  </button>
-                  <span className="text-gray-300 leading-none">•</span>
-                  <Link
-                    to="/previa"
-                    className="hover:text-[#0F766E] font-medium transition-colors cursor-pointer"
-                  >
-                    {t.landing.btnSeePlatform}
                   </Link>
                   <span className="text-gray-300 leading-none">•</span>
                   <Link
@@ -989,30 +974,6 @@ export default function BemVindo() {
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[#6B7280] shrink-0 mr-0.5">
                 {t.landing.footerConnect}
               </span>
-
-              {/* Instagram */}
-              <a
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram da VivaVarejo"
-                className="inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-lg border border-[#E5E7EB] bg-white text-[#374151] hover:text-[#0F766E] hover:border-[#0F766E] transition-colors leading-none"
-              >
-                <Instagram className="w-3.5 h-3.5 shrink-0" />
-                <span className="font-medium text-xs leading-none">Instagram</span>
-              </a>
-
-              {/* LinkedIn */}
-              <a
-                href={LINKEDIN_PERSONAL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn da VivaVarejo"
-                className="inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-lg border border-[#E5E7EB] bg-white text-[#374151] hover:text-[#0F766E] hover:border-[#0F766E] transition-colors leading-none"
-              >
-                <Linkedin className="w-3.5 h-3.5 shrink-0" />
-                <span className="font-medium text-xs leading-none">LinkedIn</span>
-              </a>
 
               {/* WhatsApp */}
               <a

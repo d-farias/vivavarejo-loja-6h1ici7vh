@@ -107,23 +107,11 @@ export const translations = {
       flowStep4: 'Acompanhar',
       modulesTag: 'Módulos Integrados',
       mod1Title: 'Agenda & Meu Dia',
-      mod1Desc:
-        'Turno dividido em Faça agora, Depois e Em seguida, garantindo foco no que traz impacto financeiro imediato.',
       mod2Title: 'Execução com Foto & Validação',
-      mod2Desc:
-        'Registro fotográfico de abertura, precificação e fechamento com aprovação rápida da gerência.',
       mod3Title: 'Controle de Validades',
-      mod3Desc:
-        'Varreduras preventivas por setor para antecipar recolhimentos e evitar descarte de mercadorias.',
       mod4Title: 'Perdas & Inventário Rotativo',
-      mod4Desc:
-        'Lançamento rápido de quebras por motivo e contagens periódicas antes do fechamento de mês.',
       mod5Title: 'Promotores & Visitas',
-      mod5Desc:
-        'Check-in, fotos de ponta de gôndola e checklist de abastecimento por promotor de fornecedor.',
       mod6Title: 'Planos de Ação 5W2H',
-      mod6Desc:
-        'Transformação imediata de inconformidades em ações com prazo, responsável e causa-raiz definida.',
       crossIndustryNote: 'A mesma lógica funciona em escritórios, serviços e operações técnicas.',
       funnelTag: 'Perfil de Atuação',
       funnelStep1Label: 'Passo 1 de 2',
@@ -143,9 +131,7 @@ export const translations = {
       funnelPromptStep1: 'Selecione PJ ou PF para continuar.',
       funnelPromptStep2: 'Escolha o segmento da sua loja para avançar.',
       funnelPromptReady: 'Perfil selecionado. Clique em Continuar.',
-      footerTagline: '• Da prioridade à execução.',
       footerAlreadyHaveAccount: 'Já tenho conta',
-      footerTalkSpecialist: 'Falar com especialista',
       footerSignup: 'Cadastrar',
       footerAboutProtection: 'Sobre proteção',
       footerSecurityNote: 'Sigilo corporativo e isolamento estrito por rede',
@@ -595,19 +581,11 @@ export const translations = {
       flowStep4: 'Follow up',
       modulesTag: 'Integrated Modules',
       mod1Title: 'Schedule & My Day',
-      mod1Desc:
-        'Shift prioritized into Do Now, Later, and Next, ensuring focus on what creates immediate bottom-line impact.',
       mod2Title: 'Photo Execution & Verification',
-      mod2Desc: 'Photo proof for opening, pricing, and closing with fast manager approvals.',
       mod3Title: 'Expiration Control',
-      mod3Desc: 'Preventive department audits to anticipate vendor returns and stop write-offs.',
       mod4Title: 'Shrink & Cycle Inventory',
-      mod4Desc: 'Fast loss logging by cause code and regular counts before monthly ledger closing.',
       mod5Title: 'Merchandisers & Visits',
-      mod5Desc: 'Check-in, end-cap photos, and vendor merchandiser checklists per visit.',
       mod6Title: '5W2H Action Plans',
-      mod6Desc:
-        'Turn issues into concrete corrective plans with owners, deadlines, and root causes.',
       crossIndustryNote: 'The same logic works for offices, services and technical operations.',
       funnelTag: 'Business Profile',
       funnelStep1Label: 'Step 1 of 2',
@@ -627,9 +605,7 @@ export const translations = {
       funnelPromptStep1: 'Select Corporate or Professional to continue.',
       funnelPromptStep2: 'Select your store industry to proceed.',
       funnelPromptReady: 'Profile selected. Click Continue.',
-      footerTagline: '• From priority to execution.',
       footerAlreadyHaveAccount: 'Already have an account',
-      footerTalkSpecialist: 'Talk to a specialist',
       footerSignup: 'Sign Up',
       footerAboutProtection: 'Data Protection',
       footerSecurityNote: 'Corporate privacy and strict tenant isolation',
